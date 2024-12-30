@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: "testdb"
+      POSTGRES_USER: "testuser"
+      POSTGRES_PASSWORD: "testpassword"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - test_network
+
+volumes:
+  postgres_data:
+
+networks:
+  test_network:
+    driver: bridge

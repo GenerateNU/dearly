@@ -1,0 +1,243 @@
+openapi: 3.1.0
+
+info:
+  title: Dearly API
+  summary: Dearly makes connecting with loved ones easy.
+  description: "Dearly is a private family-sharing app that bridges generational gaps and makes staying connected easier and more meaningful. The platform allows families to share photos, voice memos, and other media in a secure, invite-only space. With two thoughtfully designed modes, Dearly caters to every generation: a streamlined, user-friendly interface for those less familiar with technology and a dynamic, feature-rich experience for younger users"
+  version: 1.0.0
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    # Application Error Schemas
+    Error:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+    ValidationError:
+      type: object
+      required:
+        - message
+        - errors
+      properties:
+        message:
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
+            required:
+              - path
+              - message
+            properties:
+              path:
+                type: string
+              message:
+                type: string
+
+    # User Schema
+    User:
+      type: object
+      properties:
+        firstName:
+          type: string
+          description: The first name of the user.
+        lastName:
+          type: string
+          description: The last name of the user.
+        id:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: A unique identifier for the user.
+      required:
+        - firstName
+        - lastName
+        - id
+
+paths:
+  /healthcheck:
+    get:
+      summary: Healthcheck endpoint
+      description: Pings the server to check the health of the current server
+      responses:
+        "200":
+          description: Success!
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    enum:
+                      - OK
+  /api/v1/users:
+    post:
+      summary: Creates a User
+      description: Creates a user from the specified body.
+      security:
+        - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                  minLength: 1
+                  description: The first name of the user.
+                lastName:
+                  type: string
+                  minLength: 1
+                  description: The last name of the user.
+              required:
+                - firstName
+                - lastName
+              additionalProperties: true
+      responses:
+        201:
+          description: Successfully created a User
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/v1/users/{id}:
+    get:
+      summary: Gets a user
+      description: Gets the user by their UUID.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the user to get
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+      responses:
+        200:
+          description: Successfully retrieved a User
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/v1/users/me:
+    put:
+      summary: Updates a user
+      description: Updates the user profile for the currently authenticated user (identified by the token).
+      security:
+        - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                  description: The first name of the user.
+                lastName:
+                  type: string
+                  description: The last name of the user.
+              required:
+                - firstName
+                - lastName
+              additionalProperties: true
+      responses:
+        200:
+          description: Successfully updated the user profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Deletes a user
+      description: Deletes the user account for the currently authenticated user (identified by the token).
+      security:
+        - BearerAuth: []
+      responses:
+        204:
+          description: Successfully deleted the user account
+          content:
+            text/plain:
+              schema:
+                type: string
+                enum:
+                  - "User Successfully Deleted"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"

@@ -1,0 +1,80 @@
+version: "3"
+
+tasks:
+  frontend:install:
+    desc: "Install frontend dependencies"
+    cmds:
+      - cd frontend && bun install
+
+  backend:install:
+    desc: "Install backend dependencies"
+    cmds:
+      - cd backend && bun install
+
+  frontend:lint:
+    desc: "Lint frontend"
+    cmds:
+      - cd frontend && bun lint:fix
+
+  backend:lint:
+    desc: "Lint backend"
+    cmds:
+      - cd backend && bun lint:fix
+
+  frontend:dev:
+    desc: "Run frontend development server"
+    cmds:
+      - cd frontend && bun run start
+
+  backend:dev:
+    desc: "Run backend development server"
+    cmds:
+      - cd backend && bun run dev
+
+  db:up:
+    desc: "Start local database in Docker"
+    cmds:
+      - cd backend && bun run db:up
+
+  db:down:
+    desc: "Stop local database in Docker"
+    cmds:
+      - cd backend && bun run db:down
+
+  db:generate:
+    desc: "Generate SQL for database schema"
+    cmds:
+      - cd backend && bun generate
+
+  db:migrate:
+    desc: "Apply database migrations"
+    cmds:
+      - cd backend && bun migrate
+
+  db:generate:migrate:
+    desc: "Apply SQL generation and migration"
+    deps: [db:generate, db:migrate]
+
+  format:
+    desc: "Format frontend and backend code"
+    cmds:
+      - cd backend && bun format
+      - cd frontend && bun format
+
+  install:
+    desc: "Install frontend and backend dependencies"
+    deps: [frontend:install, backend:install]
+
+  dev:
+    desc: "Start frontend and backend in dev mode"
+    deps: [frontend:dev, backend:dev]
+
+  test:
+    desc: "Run tests in backend"
+    cmds:
+      - cd backend && bun run test
+
+  generate:
+    desc: "Generate Schema from OpenAPI Specification"
+    cmds:
+      - cd backend && bun run gen

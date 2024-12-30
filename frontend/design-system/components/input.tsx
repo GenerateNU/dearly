@@ -1,0 +1,67 @@
+import React from "react";
+import { TextInput } from "react-native";
+
+import { BoxProps, createBox } from "@shopify/restyle";
+
+import { Theme } from "../base/theme";
+import Box from "../base/box";
+import Text from "../base/text";
+
+type TextboxProps = {
+  title?: string;
+  placeholder?: string;
+  error?: string;
+  autoFocus?: boolean;
+  readOnly?: boolean;
+  inputMode?: "text" | "numeric" | "search" | "email";
+  onChangeText?: (() => void) | ((value: any) => void);
+  value?: string;
+  maxLength?: number;
+  secureTextEntry?: boolean;
+  children?: React.ReactNode;
+} & BoxProps<Theme>;
+
+const BaseTextInput = createBox<Theme, TextboxProps>(TextInput);
+
+const Input: React.FC<TextboxProps> = ({
+  title,
+  placeholder,
+  error,
+  autoFocus = false,
+  readOnly = false,
+  inputMode = "text",
+  onChangeText,
+  value,
+  maxLength,
+  secureTextEntry = false,
+}) => {
+  return (
+    <Box>
+      <Text paddingBottom="s">{title}</Text>
+      <BaseTextInput
+        placeholder={placeholder}
+        autoFocus={autoFocus}
+        readOnly={readOnly}
+        inputMode={inputMode}
+        onChangeText={onChangeText}
+        value={value}
+        maxLength={maxLength}
+        secureTextEntry={secureTextEntry}
+        opacity={readOnly ? 0.5 : 1}
+        borderWidth={1}
+        borderRadius="s"
+        padding="s"
+        borderColor={error ? "error" : "cardPrimaryBackground"}
+      />
+      {error && (
+        <Box gap="xxs" flexDirection="row" alignItems="center">
+          <Text color="error" variant="body">
+            {error}
+          </Text>
+        </Box>
+      )}
+    </Box>
+  );
+};
+
+export default Input;

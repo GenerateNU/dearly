@@ -1,0 +1,29 @@
+name: Auto Assign PR
+
+on:
+  pull_request:
+    types: [opened, ready_for_review]
+
+jobs:
+  auto-assign:
+    runs-on: ubuntu-latest
+    if: ${{ github.actor != 'dependabot[bot]' }}
+    steps:
+      - name: Auto-assign PR reviewers and assignee
+        if: ${{ !github.event.pull_request.draft }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Get the PR number from GitHub context
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          REPO="${{ github.repository }}"
+
+          # Add reviewers 
+          gh pr edit $PR_NUMBER \
+            --repo $REPO \
+            --add-reviewer "stoneliuCS,in-mai-space"
+
+          # Add PR creator as assignee
+          gh pr edit $PR_NUMBER \
+            --repo $REPO \
+            --add-assignee "${{ github.event.pull_request.user.login }}"
