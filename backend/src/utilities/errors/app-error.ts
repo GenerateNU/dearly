@@ -1,19 +1,19 @@
 import { ZodError } from "zod";
 import { Context } from "hono";
-import { StatusCode } from "hono/utils/http-status";
+import { ContentfulStatusCode } from "hono/utils/http-status";
 import { Status } from "../../constants/http";
 import logger from "../logger";
 
 interface AppError extends Error {
-  getStatusCode: () => StatusCode | undefined;
+  getStatusCode: () => ContentfulStatusCode;
 }
 
 abstract class AbstractAppError implements AppError {
   readonly name: string;
   readonly message: string;
-  private readonly statusCode: StatusCode | undefined;
+  private readonly statusCode: ContentfulStatusCode;
 
-  protected constructor(name: string, message: string, statusCode: StatusCode | undefined) {
+  protected constructor(name: string, message: string, statusCode: ContentfulStatusCode) {
     this.name = name;
     this.message = message;
     this.statusCode = statusCode;
@@ -21,8 +21,8 @@ abstract class AbstractAppError implements AppError {
     Error.captureStackTrace(this, this.constructor);
   }
 
-  public getStatusCode(): StatusCode | undefined {
-    return this.statusCode as StatusCode;
+  public getStatusCode(): ContentfulStatusCode {
+    return this.statusCode as ContentfulStatusCode;
   }
 }
 
