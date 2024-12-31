@@ -12,13 +12,13 @@ For a visual representation of the architecture, see [Architecture Diagrams](htt
 
 | **Aspect**               | **Description**                                                                                                                                                  |
 |--------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Framework**            | **Hono** (lightweight alternative to Express) and **Bun** (high-performance alternative to Node.js) with excellent TypeScript support.                           |
+| **Framework**            | **[Hono](https://hono.dev/)** (lightweight alternative to Express) and **Bun** (high-performance alternative to Node.js) with excellent TypeScript support.                           |
 | **Language**             | **TypeScript** for type safety and scalability.                                                                                                                   |
 | **Database**             | **PostgreSQL** for transactional data handling and support for complex queries.                                                                                  |
 | **Authorization**        | A **stateless and standardized approach** to authorization, ensuring compatibility with different client applications.                                             |
-| **ORM**                  | **DrizzleORM** for database migrations and efficient query handling.                                                                                             |
-| **Documentation**        | API documentation with **Scalar**.                                                                                                                               |
-| **External Services**    | - **AWS S3**: Used for storing and managing voice memos and images.<br>- **Expo Push API**: For sending push notifications to mobile devices.                     |
+| **ORM**                  | **[DrizzleORM](https://orm.drizzle.team/docs/overview)** for database migrations and efficient query handling.                                                                                             |
+| **Documentation**        | API documentation with **[Scalar](https://scalar.com/)**.                                                                                                                               |
+| **External Services**    | - **[AWS S3](https://docs.aws.amazon.com/AmazonS3/latest/API/Welcome.html)**: Used for storing and managing voice memos and images.<br>- **[Expo Push API](https://docs.expo.dev/push-notifications/sending-notifications/)**: For sending push notifications to mobile devices.                     |
 | **Layered Architecture** | The backend follows a **Model-View-Controller (MVC)**-inspired design, separating into Controller (C), Service (M), and Transaction layers.                      |
 | **Controller (C)**       | Manages incoming HTTP requests and outgoing responses, delegating client requests to appropriate services.                                                       |
 | **Service (M)**          | Core business rules and logic that define how the application behaves.                                                                                          |
@@ -30,10 +30,10 @@ For a visual representation of the architecture, see [Architecture Diagrams](htt
 
 | **Aspect**            | **Description**                                                                                                                                          |
 |-----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Framework**         | **React Native** with **Expo** for building cross-platform mobile applications.                                                                         |
+| **Framework**         |**[React Native](https://reactnative.dev/docs/environment-setup)** with **[Expo](https://docs.expo.dev/guides/overview/)** for building cross-platform mobile applications.                                                                         |
 | **Language**          | **TypeScript** for better maintainability and type safety.                                                                                              |
-| **Authentication**    | **Supabase Auth Service** for handling user authentication.                                                                                             |
-| **Main Libraries**    | - **Nativewind**: Tailwind CSS for styling in React Native.<br> - **Restyle**: A utility-first design system for theming and styling components.<br> - **Tanstack Query**: For data fetching, caching, and synchronization.<br> - **Zod**: Type-safe schema validation for form data and API calls.<br> - **React Hook Form**: For building and managing forms with built-in validation. |
+| **Authentication**    | **[Supabase Auth Service](https://supabase.com/docs/guides/auth)**) for handling user authentication.                                                                                             |
+| **Main Libraries**    | - **[Nativewind](https://www.nativewind.dev/)**: Tailwind CSS for styling in React Native.<br> - **[Restyle](https://shopify.github.io/restyle/fundamentals/)**): A utility-first design system for theming and styling components.<br> - **[Tanstack Query](https://tanstack.com/query/latest/docs/framework/react/quick-start)**: For data fetching, caching, and synchronization.<br> - **[Zod](https://zod.dev/)**: Type-safe schema validation for form data and API calls.<br> - **[React Hooks Form](https://react-hook-form.com/)**: For building and managing forms with built-in validation. |
 
 
 --- 
