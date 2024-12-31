@@ -7,7 +7,7 @@ Behold the most chad Generate Project to ever Generate
 ![frontend](https://github.com/GenerateNU/dearly/actions/workflows/frontend.yml/badge.svg)
 ![dependabot](https://img.shields.io/badge/dependencies-monitored-brightgreen)
 
-![Repo Activity](https://repobeats.axiom.co/api/embed/0c57b86b156d377fcc75a6e482bf921acc8c550b.svg "Repobeats Analytics Image")
+![Repo Beats](https://repobeats.axiom.co/api/embed/3e93568ac88a6144752bbc72a8964e63e2f470b7.svg "Repobeats analytics image")
 
 ## Project Required Dependencies
 
