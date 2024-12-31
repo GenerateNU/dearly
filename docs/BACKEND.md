@@ -279,6 +279,9 @@ assertMessage(msg: string)
 // Assert response body has a field called error(s) in response body and match with the expected error
 assertError(errors: unknown)
 
+// Assert that request returns plain text response and match with message
+assertResponseText(message: string)
+
 // Debugging
 debug() // Logs response body
 

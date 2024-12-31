@@ -65,6 +65,8 @@ describe("DELETE /users/me", () => {
         type: HTTPRequest.DELETE,
         route: `/api/v1/users/me`,
       })
-    ).assertStatusCode(Status.NoContent);
+    )
+      .assertStatusCode(Status.NoContent)
+      .assertResponseText("User Successfully Deleted");
   });
 });
