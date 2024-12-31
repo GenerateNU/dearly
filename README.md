@@ -1,5 +1,7 @@
 # Dearly
 
+![code-ql](https://github.com/GenerateNU/dearly/actions/workflows/codeql.yml/badge.svg)
+
 Behold the most chad Generate Project to ever Generate
 
 ## Project Required Dependencies
