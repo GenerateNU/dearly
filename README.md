@@ -1,11 +1,13 @@
 # Dearly
 
+Behold the most chad Generate Project to ever Generate
+
 ![code-ql](https://github.com/GenerateNU/dearly/actions/workflows/codeql.yml/badge.svg)
 ![backend](https://github.com/GenerateNU/dearly/actions/workflows/backend.yml/badge.svg)
 ![frontend](https://github.com/GenerateNU/dearly/actions/workflows/frontend.yml/badge.svg)
 ![dependabot](https://img.shields.io/badge/dependencies-monitored-brightgreen)
 
-Behold the most chad Generate Project to ever Generate
+![Repo Activity](https://repobeats.axiom.co/api/embed/0c57b86b156d377fcc75a6e482bf921acc8c550b.svg "Repobeats Analytics Image")
 
 ## Project Required Dependencies
 
