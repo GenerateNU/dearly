@@ -16,7 +16,7 @@ export const setUpRoutes = (app: Hono, db: PostgresJsDatabase) => {
     }),
   );
   app.get("/healthcheck", (ctx: Context): HEALTHCHECK => {
-    return ctx.json({ message: "OK" }, 200)
+    return ctx.json({ message: "OK" }, 200);
   });
   app.route("/api/v1", apiRoutes(db));
 };

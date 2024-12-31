@@ -1,4 +1,4 @@
-name: Continuous Integration
+name: Backend CI
 
 on:
   pull_request:
@@ -15,25 +15,6 @@ jobs:
     steps:
       - id: check
         run: echo "should-run=true" >> $GITHUB_OUTPUT
-
-  frontend-checks:
-    needs: should-run-checks
-    if: needs.should-run-checks.outputs.should-run == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
-        
-      - name: Install dependencies
-        run: cd frontend && bun install
-        
-      - name: Check formatting
-        run: cd frontend && bun format:check
-        
-      - name: Run linter
-        run: cd frontend && bun lint:fix
 
   backend-checks:
     needs: should-run-checks
@@ -53,6 +34,14 @@ jobs:
         
       - name: Run linter
         run: cd backend && bun lint:fix
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+      
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
         
       - name: Run tests
         run: cd backend && bun run test
