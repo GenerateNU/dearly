@@ -19,3 +19,4 @@ updates:
     ignore:
       - dependency-name: "tailwindcss"
         versions: ["*"]
+      
