@@ -5,7 +5,7 @@
 ![frontend](https://github.com/GenerateNU/dearly/actions/workflows/frontend.yml/badge.svg)
 ![dependabot](https://img.shields.io/badge/dependencies-monitored-brightgreen)
 
-Behold the most chad Generate Project to ever Generate
+Behold the most chad Generate Project to ever Generate.
 
 ## Project Required Dependencies
 
