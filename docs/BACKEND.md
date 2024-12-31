@@ -293,7 +293,7 @@ getResponseId() // Non-chainable, pulls the 'id' field from the response
 > [!NOTE]
 > `request` method is async, so we will have to await it and wrap it with parentheses to enable chaining more methods
 
-In the examples, the request body for POST should contain 3 fields: firstName, lastName. Response return body should contain firstName, lastName, and id.
+In the examples, the request body should contain 2 fields: firstName, lastName. Returned response body should contain firstName, lastName, and id.
 
 1. **POST and GET Workflow**
 
@@ -348,7 +348,10 @@ testBuilder
   })
 )
   .assertStatusCode(Status.BadRequest)
-  .assertError([{ path: "lastName", message: "Required" }])
+  .assertError([{ 
+    path: "lastName", 
+    message: "Required" 
+  }])
   .assertMessage("Validation failed")
   .debug();
 ```
