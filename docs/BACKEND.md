@@ -296,7 +296,7 @@ getResponseId() // Non-chainable, pulls the 'id' field from the response
 > [!NOTE]
 > `request` method is async, so we will have to await it and wrap it with parentheses to enable chaining more methods
 
-In the examples, the request body should contain 2 fields: firstName, lastName. Returned response body should contain firstName, lastName, and id.
+In the examples, the request body should contain 2 fields: firstName, lastName. Returned response body should contain 3 fields: firstName, lastName, and id.
 
 1. **POST and GET Workflow**
 
@@ -347,7 +347,7 @@ testBuilder
     app,
     type: HTTPRequest.POST,
     route: "/api/v1/users",
-    requestBody: { firstName: "Jane", id: `${generateUUID()}` }, // Missing lastName
+    requestBody: { firstName: "Jane" }, // Missing lastName
   })
 )
   .assertStatusCode(Status.BadRequest)
