@@ -28,6 +28,9 @@ jobs:
         
       - name: Install dependencies
         run: cd frontend && bun install
+
+      - name: Install Prettier
+        run: cd frontend && bun add -D prettier
         
       - name: Check formatting
         run: cd frontend && bun format:check
