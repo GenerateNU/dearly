@@ -52,3 +52,4 @@ nix develop
 > The nix shell script attempts to pass up ios or android sdks into the nix shell, so install xcode or android locally to be able to
 > run simulators in the shell.
 
+
