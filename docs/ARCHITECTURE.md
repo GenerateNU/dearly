@@ -6,7 +6,7 @@ For a visual representation of the architecture, see [Architecture Diagrams](htt
 
 --- 
 
-## 2. Key Components & Tech Stack
+## 2. Key Components & Technology Stack
 
 ### Backend
 
