@@ -32,7 +32,7 @@ For a visual representation of the architecture, see [Architecture Diagrams](htt
 |-----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Framework**         |**[React Native](https://reactnative.dev/docs/environment-setup)** with **[Expo](https://docs.expo.dev/guides/overview/)** for building cross-platform mobile applications.                                                                         |
 | **Language**          | **TypeScript** for better maintainability and type safety.                                                                                              |
-| **Authentication**    | **[Supabase Auth Service](https://supabase.com/docs/guides/auth)**) for handling user authentication.                                                                                             |
+| **Authentication**    | **[Supabase Auth Service](https://supabase.com/docs/guides/auth)** for handling user authentication.                                                                                             |
 | **Main Libraries**    | - **[Nativewind](https://www.nativewind.dev/)**: Tailwind CSS for styling in React Native.<br> - **[Restyle](https://shopify.github.io/restyle/fundamentals/)**): A utility-first design system for theming and styling components.<br> - **[Tanstack Query](https://tanstack.com/query/latest/docs/framework/react/quick-start)**: For data fetching, caching, and synchronization.<br> - **[Zod](https://zod.dev/)**: Type-safe schema validation for form data and API calls.<br> - **[React Hooks Form](https://react-hook-form.com/)**: For building and managing forms with built-in validation. |
 
 
