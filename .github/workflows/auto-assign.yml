@@ -8,22 +8,15 @@ jobs:
   auto-assign:
     runs-on: ubuntu-latest
     if: ${{ github.actor != 'dependabot[bot]' }}
+    permissions:
+      pull-requests: write
     steps:
-      - name: Auto-assign PR reviewers and assignee
-        if: ${{ !github.event.pull_request.draft }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # Get the PR number from GitHub context
-          PR_NUMBER="${{ github.event.pull_request.number }}"
-          REPO="${{ github.repository }}"
-
-          # Add reviewers 
-          gh pr edit $PR_NUMBER \
-            --repo $REPO \
-            --add-reviewer "stoneliuCS,in-mai-space"
-
-          # Add PR creator as assignee
-          gh pr edit $PR_NUMBER \
-            --repo $REPO \
-            --add-assignee "${{ github.event.pull_request.user.login }}"
+      - name: Auto-assign PR
+        uses: toshimaru/auto-author-assign@v2.0.1
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Add reviewers
+        uses: madrapps/add-reviewers@v1
+        with:
+          reviewers: stoneliuCS,in-mai-space
+          token: ${{ secrets.GITHUB_TOKEN }}
