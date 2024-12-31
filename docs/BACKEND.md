@@ -293,39 +293,45 @@ getResponseId() // Non-chainable, pulls the 'id' field from the response
 > [!NOTE]
 > `request` method is async, so we will have to await it and wrap it with parentheses to enable chaining more methods
 
+In the examples, the request body for POST should contain 3 fields: firstName, lastName. Response return body should contain firstName, lastName, and id.
+
 1. **POST and GET Workflow**
 
 ```ts
 // Create a new user and get the ID
-const id = (
+const responseId = (
   await testBuilder.request({
     app,
-       type: HTTPRequest.POST,
-       route: "/api/v1/users",
-       requestBody: { firstName: "Jane", lastName: "Doe" },
-     })
-   )
-    .assertStatusCode(Status.Created)
-     .getResponseId();
+    type: HTTPRequest.POST,
+    route: "/api/v1/users",
+    requestBody: {
+      firstName: "Jane",
+      lastName: "Doe",
+    },
+  })
+)
+  .assertStatusCode(Status.Created)
+  .getResponseId();
 
-   // Validate the response body
-   testBuilder.assertBody({
-     firstName: "Jane",
-     lastName: "Doe",
-     id,
-   });
+// assert that request body has the correct id
+testBuilder
+  .assertBody({
+    id: responseId,
+    firstName: "Jane",
+    lastName: "Doe",
+  });
 
-   // Fetch the user using the ID
+// get the user with id
 (
   await testBuilder.request({
     app,
-      route: `/api/v1/users/${id}`,
-    })
-  )
+    route: `/api/v1/users/${responseId}`,
+  })
+)
   .assertBody({
     firstName: "Jane",
     lastName: "Doe",
-    id,
+    id: responseId,
   })
   .assertStatusCode(Status.OK);
 ```
@@ -338,7 +344,7 @@ const id = (
     app,
     type: HTTPRequest.POST,
     route: "/api/v1/users",
-    requestBody: { firstName: "Jane" }, // Missing lastName
+    requestBody: { firstName: "Jane", id: `${generateUUID()}` }, // Missing lastName
   })
 )
   .assertStatusCode(Status.BadRequest)
