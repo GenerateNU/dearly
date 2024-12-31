@@ -43,6 +43,10 @@ To start the server:
    Make sure to shut down any running PostgreSQL instances if you encounter error like "testuser does not exist."
 
    ```bash
+    psql -h localhost -p 5432 -U testuser testdb
+   ```
+
+   ```bash
    task db:up
    ```
 
