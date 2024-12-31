@@ -86,7 +86,9 @@ describe("End-to-end User CRUD", () => {
         route: `api/v1/users/me`,
         ...authPayload,
       })
-    ).assertStatusCode(Status.NoContent);
+    )
+      .assertStatusCode(Status.NoContent)
+      .assertResponseText("User Successfully Deleted");
 
     // delete again
     (
@@ -96,7 +98,9 @@ describe("End-to-end User CRUD", () => {
         route: `api/v1/users/me`,
         ...authPayload,
       })
-    ).assertStatusCode(Status.NoContent);
+    )
+      .assertStatusCode(Status.NoContent)
+      .assertResponseText("User Successfully Deleted");
   });
 
   it("should be not found after deletion", async () => {

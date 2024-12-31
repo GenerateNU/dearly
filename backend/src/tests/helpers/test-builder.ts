@@ -18,7 +18,8 @@ interface Request {
 export class TestBuilder {
   private response: Response | undefined;
   private type: HTTPRequest;
-  private body: Record<string, unknown>;
+  private body: Record<string, unknown> | undefined;
+  private text: string | undefined;
 
   constructor() {
     this.response = undefined;
@@ -26,7 +27,9 @@ export class TestBuilder {
     this.body = {};
   }
 
-  // Make an async request and store the parsed JSON response
+  /**
+   * Make a HTTP request and store the response
+   */
   async request({
     app,
     type = HTTPRequest.GET,
@@ -37,15 +40,8 @@ export class TestBuilder {
     autoAuthorized = true,
   }: Request): Promise<TestBuilder> {
     this.type = type;
-
-    // format query
-    let requestedRoute = route;
-    if (queryParams && Object.keys(queryParams).length > 0) {
-      requestedRoute += TestBuilder.formatQuery(queryParams);
-    }
-
-    // format headers
-    const extraHeaders = this.formatHeaders(autoAuthorized, headers);
+    const requestedRoute = this.buildRoute(route, queryParams);
+    const extraHeaders = this.buildHeaders(autoAuthorized, headers);
 
     const options: RequestInit = {
       method: type,
@@ -54,18 +50,57 @@ export class TestBuilder {
     };
 
     this.response = await app.request(requestedRoute, options);
-
-    // set body
-    try {
-      this.body = await this.response.json();
-    } catch {
-      this.body = {};
-    }
+    await this.parseResponse();
 
     return this;
   }
 
-  // Format headers based on autoAuthorized.
+  /**
+   * Parse the response into JSON and text formats, if possible.
+   */
+  private async parseResponse(): Promise<void> {
+    if (!this.response) return;
+
+    try {
+      this.body = await this.response.clone().json();
+    } catch {
+      this.body = undefined;
+    }
+
+    try {
+      this.text = await this.response.clone().text();
+    } catch {
+      this.text = undefined;
+    }
+  }
+
+  /**
+   * Build the full route with query parameters.
+   */
+  private buildRoute(route: string, queryParams?: Record<string, string>): string {
+    if (!queryParams || Object.keys(queryParams).length === 0) return route;
+    const query = new URLSearchParams(queryParams).toString();
+    return `${route}?${query}`;
+  }
+
+  /**
+   * Build request headers, including optional auto-authorization.
+   */
+  private buildHeaders(autoAuthorized: boolean, headers: Record<string, string>): Headers {
+    const resultHeaders = new Headers(headers);
+
+    if (autoAuthorized) {
+      const token = generateJWTForTesting(getConfigurations().authorization.jwtSecretKey);
+      resultHeaders.set("Authorization", `Bearer ${token}`);
+    }
+
+    resultHeaders.set("Content-Type", "application/json");
+    return resultHeaders;
+  }
+
+  /**
+   * Format headers based on autoAuthorized.
+   */
   private formatHeaders(
     autoAuthorized?: boolean,
     headers?: Record<string, string>,
@@ -82,7 +117,9 @@ export class TestBuilder {
     }
   }
 
-  // Get the response ID (for non-DELETE requests)
+  /**
+   * Get the response ID (for non-DELETE requests)
+   */
   getResponseId(): string {
     if (this.type === HTTPRequest.DELETE) {
       throw new Error("Cannot retrieve id from DELETE request");
@@ -93,7 +130,9 @@ export class TestBuilder {
     return this.body.id as string;
   }
 
-  // Assert that the status code matches the expected one
+  /**
+   * Assert that the status code matches the expected one
+   */
   assertStatusCode(code: StatusCode): TestBuilder {
     if (!this.response) {
       throw new Error("Response is not defined.");
@@ -102,7 +141,20 @@ export class TestBuilder {
     return this;
   }
 
-  // Assert that field is not equal to a specific value
+  /**
+   * Assert that return text matches expected text
+   */
+  assertResponseText(message: string): TestBuilder {
+    if (!this.text) {
+      throw new Error("Text is not defined");
+    }
+    expect(this.text).toBe(message);
+    return this;
+  }
+
+  /**
+   * Assert that field is not equal to a specific value
+   */
   assertFieldNotEqual(fieldName: string, expected: string): TestBuilder {
     if (!this.body) {
       throw new Error("Response is not defined.");
@@ -112,7 +164,9 @@ export class TestBuilder {
     return this;
   }
 
-  // Assert a specific field in the response JSON matches the expected value
+  /**
+   * Assert a specific field in the response JSON matches the expected value
+   */
   assertField(fieldName: string, expected: string): TestBuilder {
     if (!this.body) {
       throw new Error("Response is not defined.");
@@ -122,7 +176,9 @@ export class TestBuilder {
     return this;
   }
 
-  // Assert that the entire response body matches the expected structure
+  /**
+   * Assert that the entire response body matches the expected structure
+   */
   assertBody(expectedResponseBody: unknown): TestBuilder {
     if (!this.body) {
       throw new Error("Body is not defined.");
@@ -131,7 +187,9 @@ export class TestBuilder {
     return this;
   }
 
-  // Assert that the response body is an array of the given size
+  /**
+   * Assert that the response body is an array of the given size
+   */
   assertArraySize(arraySize: number): TestBuilder {
     if (!this.body) {
       throw new Error("Response is not defined.");
@@ -141,7 +199,9 @@ export class TestBuilder {
     return this;
   }
 
-  // Assert that the response contains the specified message
+  /**
+   * Assert that the response contains the specified message field and match with expected message
+   */
   assertMessage(message: string): TestBuilder {
     if (!this.body || !this.response) {
       throw new Error("Response is not defined.");
@@ -151,6 +211,9 @@ export class TestBuilder {
     return this;
   }
 
+  /**
+   * Assert that the response contains error(s) field and matches with expected error(s)
+   */
   assertError(errors: unknown): TestBuilder {
     if (!this.body || !this.response) {
       throw new Error("Response is not defined.");
@@ -160,7 +223,9 @@ export class TestBuilder {
     return this;
   }
 
-  // Assert that a specific field exists in the response JSON
+  /**
+   * Assert that a specific field exists in the response JSON
+   */
   assertFieldExists(fieldName: string): TestBuilder {
     if (!this.body) {
       throw new Error("Response is not defined.");
@@ -169,7 +234,9 @@ export class TestBuilder {
     return this;
   }
 
-  // Assert that multiple fields in the response body match the expected values
+  /**
+   * Assert that multiple fields in the response body match the expected values
+   */
   assertFields(expectedFields: Record<string, unknown>): TestBuilder {
     if (!this.body) {
       throw new Error("Response is not defined.");
@@ -180,17 +247,14 @@ export class TestBuilder {
     return this;
   }
 
-  // Debug method to log response details
+  /**
+   * Debug method to log response details
+   */
   debug(): TestBuilder {
-    if (!this.response) {
+    if (!this.body) {
       throw new Error("Body is not defined.");
     }
     console.log("Response Body: ", JSON.stringify(this.body));
     return this;
-  }
-
-  // Private utility method to format query parameters into a query string
-  private static formatQuery(params: Record<string, string>): string {
-    return "?" + new URLSearchParams(params).toString();
   }
 }

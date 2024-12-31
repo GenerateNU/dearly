@@ -279,6 +279,9 @@ assertMessage(msg: string)
 // Assert response body has a field called error(s) in response body and match with the expected error
 assertError(errors: unknown)
 
+// Assert that request returns plain text response and match with the expected message
+assertResponseText(message: string)
+
 // Debugging
 debug() // Logs response body
 
@@ -293,39 +296,45 @@ getResponseId() // Non-chainable, pulls the 'id' field from the response
 > [!NOTE]
 > `request` method is async, so we will have to await it and wrap it with parentheses to enable chaining more methods
 
+In the examples, the request body should contain 2 fields: firstName, lastName. Returned response body should contain 3 fields: firstName, lastName, and id.
+
 1. **POST and GET Workflow**
 
 ```ts
 // Create a new user and get the ID
-const id = (
+const responseId = (
   await testBuilder.request({
     app,
-       type: HTTPRequest.POST,
-       route: "/api/v1/users",
-       requestBody: { firstName: "Jane", lastName: "Doe" },
-     })
-   )
-    .assertStatusCode(Status.Created)
-     .getResponseId();
+    type: HTTPRequest.POST,
+    route: "/api/v1/users",
+    requestBody: {
+      firstName: "Jane",
+      lastName: "Doe",
+    },
+  })
+)
+  .assertStatusCode(Status.Created)
+  .getResponseId();
 
-   // Validate the response body
-   testBuilder.assertBody({
-     firstName: "Jane",
-     lastName: "Doe",
-     id,
-   });
+// assert that request body has the correct id
+testBuilder
+  .assertBody({
+    id: responseId,
+    firstName: "Jane",
+    lastName: "Doe",
+  });
 
-   // Fetch the user using the ID
+// get the user with id
 (
   await testBuilder.request({
     app,
-      route: `/api/v1/users/${id}`,
-    })
-  )
+    route: `/api/v1/users/${responseId}`,
+  })
+)
   .assertBody({
     firstName: "Jane",
     lastName: "Doe",
-    id,
+    id: responseId,
   })
   .assertStatusCode(Status.OK);
 ```
@@ -342,7 +351,10 @@ const id = (
   })
 )
   .assertStatusCode(Status.BadRequest)
-  .assertError([{ path: "lastName", message: "Required" }])
+  .assertError([{ 
+    path: "lastName", 
+    message: "Required" 
+  }])
   .assertMessage("Validation failed")
   .debug();
 ```
