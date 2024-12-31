@@ -16,3 +16,7 @@ updates:
       mobile:
         patterns:
           - "*"
+    ignore:
+      - dependency-name: "tailwindcss"
+        versions: ["*"]
+      
