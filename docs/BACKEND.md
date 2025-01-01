@@ -63,7 +63,9 @@ const createUserPayload = createUserValidate.parse(await ctx.req.json());
 
 ### **Payload Type and Return Type**
 
-DrizzleORM also allows us to easily define payload and return types. We can utilize these types as payload type after parsing request body and return types for service and transaction methods.
+DrizzleORM also allows us to easily define payload and return types. We can utilize these types as payload type after parsing request body and return types for service and transaction methods. 
+
+These will work well if the return types is similar to the database schema. In other cases, we will need to define our own return type. 
 
 ```ts
 const usersTable = pgTable("users", {
@@ -79,6 +81,7 @@ type UpdateUserPayload = Partial<typeof usersTable.$inferInsert>;
 // Type for retrieving and returning a user
 type User = typeof usersTable.$inferSelect;
 ```
+
 ---
 
 ## **Error Handling**
