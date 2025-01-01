@@ -7,7 +7,7 @@ import * as yaml from "yaml";
  * a proper API specification, *NOTE* It is generally bad to do read and write operations
  * at run time.
  */
-export const getOpenAPISpecification = () => {
+export const getOpenAPISpecification = (): string => {
   try {
     const yamlLocation = path.resolve(__dirname, "../../../openapi.yaml");
     const yamlSpec = fs.readFileSync(yamlLocation, "utf-8");
