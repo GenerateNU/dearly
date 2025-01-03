@@ -1,5 +1,8 @@
 # Frontend Practices
 
+> [!NOTE]
+> If you notice any inconsistencies between our data representation and the design, or have questions regarding user experience (UX) (e.g., interactions, swipe gestures, or button states), please reach out to us and the design team. This will help ensure that our frontend remains aligned with the design and delivers a seamless UX.
+
 ## 1. Component Design
 | **Principle**                             | **Description**                                                                                                                                                          |
 |-------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
