@@ -7,7 +7,7 @@ export const isAuthorized = (jwtSecretKey: string) => {
     const authHeader = ctx.req.header("Authorization");
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return ctx.json({ message: "Unauthorized" }, 401);
+      return ctx.json({ error: "Unauthorized" }, 401);
     }
 
     const token = authHeader.split(" ")[1];
@@ -16,7 +16,7 @@ export const isAuthorized = (jwtSecretKey: string) => {
       const decoded = jwt.verify(token!, jwtSecretKey) as jwt.JwtPayload;
 
       if (!decoded.sub || !validate(decoded.sub)) {
-        return ctx.json({ message: "Unauthorized" }, 401);
+        return ctx.json({ error: "Unauthorized" }, 401);
       }
 
       const userId = decoded.sub;
@@ -24,7 +24,7 @@ export const isAuthorized = (jwtSecretKey: string) => {
       ctx.set("userId", userId);
       await next();
     } catch {
-      return ctx.json({ message: "Unauthorized" }, 401);
+      return ctx.json({ error: "Unauthorized" }, 401);
     }
   };
 };

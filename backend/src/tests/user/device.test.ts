@@ -6,7 +6,7 @@ import { HTTPRequest, Status } from "../../constants/http";
 import { Configuration } from "../../types/config";
 import { getConfigurations } from "../../config/config";
 
-describe("POST and DELETE /devices", () => {
+describe("POST and DELETE /users/devices", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
   const config: Configuration = getConfigurations();
