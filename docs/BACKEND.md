@@ -116,7 +116,7 @@ throw new InternalServerError("Server is down!"); // error.message = "Server is 
 
 // BadRequestError (400)
 throw new BadRequestError(); // default error.message = "Bad Request"
-throw new BadRequestError("Invalid ID format"); // error.messag = "Invalid ID format"
+throw new BadRequestError("Invalid ID format"); // error.message = "Invalid ID format"
 
 // ConflictError (409)
 throw new ConflictError(); // default error.message = "Conflict"
