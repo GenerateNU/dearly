@@ -27,7 +27,9 @@ describe("Healthcheck and Routes", () => {
         app,
         route: "/api/v1",
       })
-    ).assertStatusCode(404);
+    )
+      .assertStatusCode(404)
+      .assertError("The requested route does not exist");
   });
 
   it("should return 401 if unauthorized", async () => {
@@ -37,6 +39,8 @@ describe("Healthcheck and Routes", () => {
         route: "/api/v1",
         autoAuthorized: false,
       })
-    ).assertStatusCode(401);
+    )
+      .assertStatusCode(401)
+      .assertError("Unauthorized");
   });
 });

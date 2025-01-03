@@ -19,6 +19,10 @@ export const setUpRoutes = (app: Hono, db: PostgresJsDatabase) => {
     return ctx.json({ message: "OK" }, 200);
   });
   app.route("/api/v1", apiRoutes(db));
+
+  app.notFound((ctx: Context) => {
+    return ctx.json({ error: "The requested route does not exist" }, 404);
+  });
 };
 
 const apiRoutes = (db: PostgresJsDatabase): Hono => {

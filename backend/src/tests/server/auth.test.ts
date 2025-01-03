@@ -37,7 +37,7 @@ describe("Authorization Middleware", () => {
       })
     )
       .assertStatusCode(401)
-      .assertMessage("Unauthorized");
+      .assertError("Unauthorized");
   });
 
   it("should return 401 if Authorization header doesn't start with Bearer", async () => {
@@ -52,7 +52,7 @@ describe("Authorization Middleware", () => {
       })
     )
       .assertStatusCode(401)
-      .assertMessage("Unauthorized");
+      .assertError("Unauthorized");
   });
 
   it("should return 401 if token is invalid", async () => {
@@ -67,7 +67,7 @@ describe("Authorization Middleware", () => {
       })
     )
       .assertStatusCode(401)
-      .assertMessage("Unauthorized");
+      .assertError("Unauthorized");
   });
 
   it("should return 401 if token has expired", async () => {
@@ -83,7 +83,7 @@ describe("Authorization Middleware", () => {
       })
     )
       .assertStatusCode(401)
-      .assertMessage("Unauthorized");
+      .assertError("Unauthorized");
   });
 
   it("should return 200 if token is valid", async () => {
@@ -115,7 +115,7 @@ describe("Authorization Middleware", () => {
       })
     )
       .assertStatusCode(401)
-      .assertMessage("Unauthorized");
+      .assertError("Unauthorized");
   });
 
   it("should return 401 if decoded JWT has no sub field", async () => {
@@ -136,7 +136,7 @@ describe("Authorization Middleware", () => {
       })
     )
       .assertStatusCode(401)
-      .assertMessage("Unauthorized");
+      .assertError("Unauthorized");
   });
 
   it("decoded sub should match given ID when encode in sub", async () => {

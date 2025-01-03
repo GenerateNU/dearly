@@ -1,5 +1,5 @@
 {
-  "id": "6fb6e17b-3930-46b3-929b-241ce03d7e1f",
+  "id": "8329c3ee-3834-4061-8968-cf60e307697a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -42,7 +42,7 @@
           "tableTo": "users",
           "columnsFrom": ["userId"],
           "columnsTo": ["id"],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "comments_postId_posts_id_fk": {
@@ -51,7 +51,7 @@
           "tableTo": "posts",
           "columnsFrom": ["postId"],
           "columnsTo": ["id"],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -99,7 +99,7 @@
           "tableTo": "users",
           "columnsFrom": ["managerId"],
           "columnsTo": ["id"],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -162,7 +162,7 @@
           "tableTo": "groups",
           "columnsFrom": ["groupId"],
           "columnsTo": ["id"],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "invitations_invitationLinkId_links_id_fk": {
@@ -171,7 +171,7 @@
           "tableTo": "links",
           "columnsFrom": ["invitationLinkId"],
           "columnsTo": ["id"],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "invitations_recipientId_users_id_fk": {
@@ -180,7 +180,7 @@
           "tableTo": "users",
           "columnsFrom": ["recipientId"],
           "columnsTo": ["id"],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -222,7 +222,7 @@
           "tableTo": "users",
           "columnsFrom": ["userId"],
           "columnsTo": ["id"],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "likes_postId_posts_id_fk": {
@@ -231,7 +231,7 @@
           "tableTo": "posts",
           "columnsFrom": ["postId"],
           "columnsTo": ["id"],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -286,7 +286,7 @@
           "tableTo": "groups",
           "columnsFrom": ["groupId"],
           "columnsTo": ["id"],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -341,7 +341,7 @@
           "tableTo": "posts",
           "columnsFrom": ["postId"],
           "columnsTo": ["id"],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "media_commentId_comments_id_fk": {
@@ -350,7 +350,7 @@
           "tableTo": "comments",
           "columnsFrom": ["commentId"],
           "columnsTo": ["id"],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -400,7 +400,7 @@
           "tableTo": "users",
           "columnsFrom": ["userId"],
           "columnsTo": ["id"],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "members_groupId_groups_id_fk": {
@@ -409,7 +409,7 @@
           "tableTo": "groups",
           "columnsFrom": ["groupId"],
           "columnsTo": ["id"],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -500,7 +500,7 @@
           "tableTo": "users",
           "columnsFrom": ["actorId"],
           "columnsTo": ["id"],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "notifications_receiverId_users_id_fk": {
@@ -509,7 +509,7 @@
           "tableTo": "users",
           "columnsFrom": ["receiverId"],
           "columnsTo": ["id"],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "notifications_groupId_groups_id_fk": {
@@ -518,7 +518,7 @@
           "tableTo": "groups",
           "columnsFrom": ["groupId"],
           "columnsTo": ["id"],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "notifications_postId_posts_id_fk": {
@@ -527,7 +527,7 @@
           "tableTo": "posts",
           "columnsFrom": ["postId"],
           "columnsTo": ["id"],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "notifications_commentId_comments_id_fk": {
@@ -536,7 +536,7 @@
           "tableTo": "comments",
           "columnsFrom": ["commentId"],
           "columnsTo": ["id"],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "notifications_likeId_likes_id_fk": {
@@ -545,7 +545,7 @@
           "tableTo": "likes",
           "columnsFrom": ["likeId"],
           "columnsTo": ["id"],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "notifications_invitationId_invitations_id_fk": {
@@ -554,7 +554,7 @@
           "tableTo": "invitations",
           "columnsFrom": ["invitationId"],
           "columnsTo": ["id"],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -615,7 +615,7 @@
           "tableTo": "groups",
           "columnsFrom": ["groupId"],
           "columnsTo": ["id"],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "posts_userId_users_id_fk": {
@@ -624,7 +624,7 @@
           "tableTo": "users",
           "columnsFrom": ["userId"],
           "columnsTo": ["id"],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },

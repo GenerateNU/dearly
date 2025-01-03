@@ -161,7 +161,9 @@ describe("POST /users", () => {
         route: "/api/v1/users",
         requestBody,
       })
-    ).assertStatusCode(Status.Conflict);
+    )
+      .assertStatusCode(Status.Conflict)
+      .assertError("Username has been taken. Please try another username.");
   });
 
   it("should return 409 if try to create user with same JWT", async () => {
@@ -199,6 +201,8 @@ describe("POST /users", () => {
           Authorization: `Bearer ${generatedJWT}`,
         },
       })
-    ).assertStatusCode(409);
+    )
+      .assertStatusCode(409)
+      .assertError("User already exists. Please try again.");
   });
 });

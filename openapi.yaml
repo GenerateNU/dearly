@@ -101,7 +101,7 @@ paths:
   /api/v1/users:
     post:
       summary: Creates a User
-      description: Creates a user from the specified body.
+      description: Creates a user from the specified body (with ID being the decoded ID from JWT).
       security:
         - BearerAuth: []
       requestBody:
@@ -156,6 +156,18 @@ paths:
                 oneOf:
                   - $ref: "#/components/schemas/Error"
                   - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        409:
+          description: Same JWT creates multiple users or username already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         500:
           description: Internal server error
           content:
@@ -191,6 +203,12 @@ paths:
                 oneOf:
                   - $ref: "#/components/schemas/Error"
                   - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         404:
           description: User not found
           content:
@@ -207,7 +225,7 @@ paths:
   /api/v1/users/me:
     put:
       summary: Updates a user
-      description: Updates the user profile for the currently authenticated user (identified by the token).
+      description: Updates the user profile for the currently authenticated user (identified by the decoded ID from JWT).
       security:
         - BearerAuth: []
       requestBody:
@@ -241,6 +259,12 @@ paths:
                 oneOf:
                   - $ref: "#/components/schemas/Error"
                   - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         404:
           description: User not found
           content:
@@ -255,7 +279,7 @@ paths:
                 $ref: "#/components/schemas/Error"
     delete:
       summary: Deletes a user
-      description: Deletes the user account for the currently authenticated user (identified by the token).
+      description: Deletes the user account for the currently authenticated user (identified by the decoded ID from JWT).
       security:
         - BearerAuth: []
       responses:
@@ -275,9 +299,105 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         500:
           description: Internal server error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /api/v1/users/devices:
+    post:
+      summary: Register user's device token
+      description: Registers a Expo Device Token for the currently authenticated user to receive notification.
+      security:
+        - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                expoToken:
+                  type: string
+                  description: The Expo Device Token of the user.
+              required:
+                - expoToken
+              additionalProperties: true
+      responses:
+        200:
+          description: Successfully registered the device token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Remove user's device token
+      description: Removes a registered Expo Device Token for the currently authenticated user to not receive notification.
+      security:
+        - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                expoToken:
+                  type: string
+                  description: The Expo Device Token of the user.
+              required:
+                - expoToken
+              additionalProperties: true
+      responses:
+        200:
+          description: Successfully registered the device token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+   
