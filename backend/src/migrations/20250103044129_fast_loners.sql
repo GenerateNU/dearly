@@ -1,3 +1,10 @@
+DROP TYPE IF EXISTS "ageGroup" CASCADE;
+DROP TYPE IF EXISTS "mode" CASCADE;
+DROP TYPE IF EXISTS "mediaType" CASCADE;
+DROP TYPE IF EXISTS "role" CASCADE;
+DROP TYPE IF EXISTS "referenceType" CASCADE;
+DROP TYPE IF EXISTS "status" CASCADE;
+
 CREATE TYPE "public"."ageGroup" AS ENUM('CHILD', 'TEEN', 'ADULT', 'SENIOR');--> statement-breakpoint
 CREATE TYPE "public"."status" AS ENUM('PENDING', 'ACCEPTED');--> statement-breakpoint
 CREATE TYPE "public"."mediaType" AS ENUM('IMAGE', 'VIDEO', 'AUDIO');--> statement-breakpoint
