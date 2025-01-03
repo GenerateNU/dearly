@@ -4,7 +4,6 @@ import { connectDB } from "./database/connect";
 import { configureMiddlewares } from "./middlewares/init";
 import { setUpRoutes } from "./routes/init";
 import { automigrateDB } from "./database/migrate";
-import { generateJWTForTesting } from "./tests/helpers/test-token";
 
 const app = new Hono();
 
@@ -13,8 +12,6 @@ const config = getConfigurations();
 (async function setUpServer() {
   try {
     const db = connectDB(config);
-
-    console.log(generateJWTForTesting(config.authorization.jwtSecretKey));
 
     await automigrateDB(db, config);
 
