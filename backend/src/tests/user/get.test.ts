@@ -8,6 +8,11 @@ import { HTTPRequest, Status } from "../../constants/http";
 describe("GET /users/:id", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
+  const requestBody = {
+    name: "Jane Doe",
+    username: "janedoe",
+    ageGroup: "TEEN",
+  };
 
   beforeAll(async () => {
     app = await startTestApp();
@@ -19,10 +24,7 @@ describe("GET /users/:id", () => {
         app,
         type: HTTPRequest.POST,
         route: "/api/v1/users",
-        requestBody: {
-          firstName: "Jane",
-          lastName: "Doe",
-        },
+        requestBody,
       })
     )
       .assertStatusCode(Status.Created)
@@ -35,9 +37,11 @@ describe("GET /users/:id", () => {
       })
     )
       .assertBody({
-        firstName: "Jane",
-        lastName: "Doe",
         id,
+        ...requestBody,
+        deviceTokens: [],
+        mode: "ADVANCED",
+        profilePhoto: null,
       })
       .assertStatusCode(Status.OK);
   });

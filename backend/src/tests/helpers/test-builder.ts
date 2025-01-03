@@ -167,12 +167,19 @@ export class TestBuilder {
   /**
    * Assert a specific field in the response JSON matches the expected value
    */
-  assertField(fieldName: string, expected: string): TestBuilder {
+  assertField(fieldName: string, expected: unknown): TestBuilder {
     if (!this.body) {
       throw new Error("Response is not defined.");
     }
     const actualValue = this.body[fieldName];
-    expect(actualValue).toBe(expected);
+    if (Array.isArray(expected) && Array.isArray(actualValue)) {
+      // Handle array comparison (exact match)
+      expect(actualValue).toEqual(expect.arrayContaining(expected));
+      expect(expected).toEqual(expect.arrayContaining(actualValue));
+    } else {
+      // For non-array types, use deep equality check
+      expect(actualValue).toEqual(expected);
+    }
     return this;
   }
 

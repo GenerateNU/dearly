@@ -21,10 +21,12 @@ const InitialLayout = () => {
   }, [isAuthenticated]);
 
   return (
-    <Stack>
-      <Stack.Screen name="(auth)" options={{ headerShown: false, gestureEnabled: false }} />
-      <Stack.Screen name="(app)" options={{ headerShown: false, gestureEnabled: false }} />
-    </Stack>
+    <ThemeProvider theme={theme}>
+      <Stack>
+        <Stack.Screen name="(auth)" options={{ headerShown: false, gestureEnabled: false }} />
+        <Stack.Screen name="(app)" options={{ headerShown: false, gestureEnabled: false }} />
+      </Stack>
+    </ThemeProvider>
   );
 };
 
@@ -32,12 +34,10 @@ const RootLayout = () => {
   return (
     <GestureHandlerRootView>
       <AuthProvider>
-        <ThemeProvider theme={theme}>
-          <QueryClientProvider client={queryClient}>
-            <StatusBar />
-            <InitialLayout />
-          </QueryClientProvider>
-        </ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <StatusBar />
+          <InitialLayout />
+        </QueryClientProvider>
       </AuthProvider>
     </GestureHandlerRootView>
   );

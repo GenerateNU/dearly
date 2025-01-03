@@ -3,7 +3,8 @@ openapi: 3.1.0
 info:
   title: Dearly API
   summary: Dearly makes connecting with loved ones easy.
-  description: "Dearly is a private family-sharing app that bridges generational gaps and makes staying connected easier and more meaningful. The platform allows families to share photos, voice memos, and other media in a secure, invite-only space. With two thoughtfully designed modes, Dearly caters to every generation: a streamlined, user-friendly interface for those less familiar with technology and a dynamic, feature-rich experience for younger users"
+  description: |
+    Dearly is a private family-sharing app that bridges generational gaps and makes staying connected easier and more meaningful. The platform allows families to share photos, voice memos, and other media in a secure, invite-only space. With two thoughtfully designed modes, Dearly caters to every generation: a streamlined, user-friendly interface for those less familiar with technology and a dynamic, feature-rich experience for younger users
   version: 1.0.0
 
 components:
@@ -13,7 +14,6 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
-    # Application Error Schemas
     Error:
       type: object
       required:
@@ -42,25 +42,44 @@ components:
               message:
                 type: string
 
-    # User Schema
     User:
       type: object
       properties:
-        firstName:
+        name:
           type: string
-          description: The first name of the user.
-        lastName:
+          description: Display name of the user.
+        username:
           type: string
-          description: The last name of the user.
+          description: The username of the user.
         id:
           type: string
           format: uuid
           example: 5e91507e-5630-4efd-9fd4-799178870b10
           description: A unique identifier for the user.
+        ageGroup:
+          type: string
+          enum: ["CHILD", "TEEN", "ADULT", "SENIOR"]
+          description: The age group of the user.
+        mode:
+          type: string
+          enum: ["BASIC", "ADVANCED", null]
+          description: The mode for the user (e.g., "BASIC" or "ADVANCED").
+        profilePhoto:
+          type: string
+          nullable: true
+          description: A URL to the user's profile photo.
+        deviceTokens:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: The device tokens for notifications.
       required:
-        - firstName
-        - lastName
+        - name
+        - username
         - id
+        - ageGroup
+        - mode
 
 paths:
   /healthcheck:
@@ -91,17 +110,36 @@ paths:
             schema:
               type: object
               properties:
-                firstName:
+                name:
                   type: string
                   minLength: 1
-                  description: The first name of the user.
-                lastName:
+                  description: Display name of the user.
+                username:
                   type: string
                   minLength: 1
-                  description: The last name of the user.
+                  description: The username of the user.
+                ageGroup:
+                  type: string
+                  enum: ["CHILD", "TEEN", "ADULT", "SENIOR"]
+                  description: The age group of the user.
+                mode:
+                  type: string
+                  enum: ["BASIC", "ADVANCED", null]
+                  description: The mode for the user (e.g., "BASIC" or "ADVANCED").
+                profilePhoto:
+                  type: string
+                  nullable: true
+                  description: A URL to the user's profile photo.
+                deviceTokens:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                  description: The device tokens for notifications.
               required:
-                - firstName
-                - lastName
+                - name
+                - username
+                - ageGroup
               additionalProperties: true
       responses:
         201:
@@ -221,14 +259,16 @@ paths:
       security:
         - BearerAuth: []
       responses:
-        204:
-          description: Successfully deleted the user account
+        200:
+          description: Successfully delete user
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-                enum:
-                  - "User Successfully Deleted"
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Successfully delete user"
         400:
           description: Malformed request
           content:

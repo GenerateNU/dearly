@@ -9,8 +9,9 @@ describe("PUT /users/me", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
   const requestBody = {
-    firstName: "Jane",
-    lastName: "Doe",
+    name: "Jane Doe",
+    username: "janedoe",
+    ageGroup: "TEEN",
   };
   const userId = generateUUID();
   const jwt = generateJWTToken(3600, getConfigurations().authorization.jwtSecretKey, userId);
@@ -37,8 +38,9 @@ describe("PUT /users/me", () => {
     )
       .assertStatusCode(Status.Created)
       .assertFields({
-        firstName: "Jane",
-        lastName: "Doe",
+        name: "Jane Doe",
+        username: "janedoe",
+        ageGroup: "TEEN",
       });
 
     const irrelevantID = generateUUID();
@@ -50,14 +52,18 @@ describe("PUT /users/me", () => {
         route: `/api/v1/users/me`,
         requestBody: {
           id: irrelevantID, // ignored field
-          firstName: "John",
+          name: "John Smith",
+          ageGroup: "SENIOR",
+          mode: "BASIC",
         },
         ...authPayload,
       })
     )
-      .assertBody({
-        firstName: "John",
-        lastName: "Doe",
+      .assertFields({
+        name: "John Smith",
+        username: "janedoe",
+        ageGroup: "SENIOR",
+        mode: "BASIC",
         id: userId,
       })
       .assertStatusCode(Status.OK)
