@@ -4,15 +4,15 @@ import { createUserValidate, expoTokenValidate, updateUserValidate } from "./val
 import { parseUUID } from "../../utilities/uuid";
 import { handleAppError } from "../../utilities/errors/app-error";
 import { Status } from "../../constants/http";
-import { CREATE_USER, DEL_USER, GET_USER, PUT_USER } from "../../types/api/routes/users";
+import { DEL_USER, USER_RESPONSE } from "../../types/api/routes/users";
 
 export interface UserController {
-  createUser(ctx: Context): Promise<CREATE_USER>;
-  getUser(ctx: Context): Promise<GET_USER>;
-  updateUser(ctx: Context): Promise<PUT_USER>;
+  createUser(ctx: Context): Promise<USER_RESPONSE>;
+  getUser(ctx: Context): Promise<USER_RESPONSE>;
+  updateUser(ctx: Context): Promise<USER_RESPONSE>;
   deleteUser(ctx: Context): Promise<DEL_USER>;
-  registerDevice(ctx: Context): Promise<Response>;
-  removeDevice(ctx: Context): Promise<Response>;
+  registerDevice(ctx: Context): Promise<USER_RESPONSE>;
+  removeDevice(ctx: Context): Promise<USER_RESPONSE>;
 }
 
 export class UserControllerImpl implements UserController {
@@ -22,7 +22,7 @@ export class UserControllerImpl implements UserController {
     this.userService = service;
   }
 
-  async createUser(ctx: Context): Promise<CREATE_USER> {
+  async createUser(ctx: Context): Promise<USER_RESPONSE> {
     const createUserImpl = async () => {
       // get userId from decoded JWT
       const userId = ctx.get("userId");
@@ -37,7 +37,7 @@ export class UserControllerImpl implements UserController {
     return await handleAppError(createUserImpl)(ctx);
   }
 
-  async getUser(ctx: Context): Promise<GET_USER> {
+  async getUser(ctx: Context): Promise<USER_RESPONSE> {
     const getUserImpl = async () => {
       const id = ctx.req.param("id");
       const idAsUUID = parseUUID(id);
@@ -47,7 +47,7 @@ export class UserControllerImpl implements UserController {
     return await handleAppError(getUserImpl)(ctx);
   }
 
-  async updateUser(ctx: Context): Promise<PUT_USER> {
+  async updateUser(ctx: Context): Promise<USER_RESPONSE> {
     const updateUserImpl = async () => {
       // get the userId from decoding JWT
       const userId = ctx.get("userId");
@@ -70,7 +70,7 @@ export class UserControllerImpl implements UserController {
     return await handleAppError(deleteUserImpl)(ctx);
   }
 
-  async registerDevice(ctx: Context): Promise<Response> {
+  async registerDevice(ctx: Context): Promise<USER_RESPONSE> {
     const registerDeviceImpl = async () => {
       const userId = ctx.get("userId");
       const idAsUUID = parseUUID(userId);
@@ -81,7 +81,7 @@ export class UserControllerImpl implements UserController {
     return await handleAppError(registerDeviceImpl)(ctx);
   }
 
-  async removeDevice(ctx: Context): Promise<Response> {
+  async removeDevice(ctx: Context): Promise<USER_RESPONSE> {
     const removeDeviceImpl = async () => {
       const userId = ctx.get("userId");
       const idAsUUID = parseUUID(userId);

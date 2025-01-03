@@ -37,7 +37,6 @@
     "pino-pretty": "^13.0.0",
     "postgres": "^3.4.5",
     "prettier": "^3.4.2",
-    "ts-to-zod": "^3.15.0",
     "tsx": "^4.19.2",
     "typescript-eslint": "^8.18.1",
     "uuid": "^11.0.3",
