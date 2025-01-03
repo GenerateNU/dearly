@@ -38,10 +38,11 @@ const DB_ERROR_TO_APP_ERROR_MAP: Partial<
 // function that maps a database error to app error
 const mapDBErrorToAppError = (error: unknown): AppError => {
   const dbError = DatabaseErrorSchema.safeParse(error);
+  const fallbackServerError = new InternalServerError("An unexpected database error occurred.");
 
   if (!dbError.success) {
     logger.error("Invalid database error:", error);
-    return new InternalServerError("An unexpected database error occurred.");
+    return fallbackServerError;
   }
 
   const { code, detail, message } = dbError.data;
@@ -54,7 +55,7 @@ const mapDBErrorToAppError = (error: unknown): AppError => {
     return formatDBErrorHandler(dbError.data);
   }
 
-  return new InternalServerError("Unexpected error occurred.");
+  return fallbackServerError;
 };
 
 // logging database error for more details
