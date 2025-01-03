@@ -34,9 +34,5 @@ export const DatabaseErrorSchema = z
     table_name: z.string(),
     schema_name: z.string().optional(),
     constraint_name: z.string().optional(),
-    file: z.string().optional(),
-    originalLine: z.number().optional(),
-    originalColumn: z.number().optional(),
-    routine: z.string().optional(),
   })
   .passthrough();
