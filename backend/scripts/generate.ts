@@ -7,10 +7,13 @@ const PROJECT_ROOT = resolve(__dirname, "../..");
 
 //Specification for OpenAPI and Generated Outputs
 const spec = new URL(`${PROJECT_ROOT}/openapi.yaml`, import.meta.url);
-const output = `${PROJECT_ROOT}/backend/src/gen/schema.d.ts`;
+const output = `${PROJECT_ROOT}/backend/src/gen/openapi.d.ts`;
 
 const generate = async () => {
-  const ast = await openapiTS(spec, {});
+  const ast = await openapiTS(spec, {
+    immutable: true,
+    rootTypes: true,
+  });
   const contents = astToString(ast);
   fs.writeFileSync(output, contents);
 };
