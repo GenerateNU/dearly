@@ -1,6 +1,6 @@
 import { Context } from "hono";
 import { UserService } from "./service";
-import { createUserValidate, updateUserValidate } from "./model";
+import { createUserValidate, expoTokenValidate, updateUserValidate } from "./validator";
 import { parseUUID } from "../../utilities/uuid";
 import { handleAppError } from "../../utilities/errors/app-error";
 import { Status } from "../../constants/http";
@@ -11,6 +11,8 @@ export interface UserController {
   getUser(ctx: Context): Promise<GET_USER>;
   updateUser(ctx: Context): Promise<PUT_USER>;
   deleteUser(ctx: Context): Promise<DEL_USER>;
+  registerDevice(ctx: Context): Promise<Response>;
+  removeDevice(ctx: Context): Promise<Response>;
 }
 
 export class UserControllerImpl implements UserController {
@@ -63,8 +65,30 @@ export class UserControllerImpl implements UserController {
       const userId = ctx.get("userId");
       const idAsUUID = parseUUID(userId);
       await this.userService.deleteUser(idAsUUID);
-      return ctx.text("User Successfully Deleted", Status.NoContent);
+      return ctx.json({ message: "Successfully delete user" }, Status.OK);
     };
     return await handleAppError(deleteUserImpl)(ctx);
+  }
+
+  async registerDevice(ctx: Context): Promise<Response> {
+    const registerDeviceImpl = async () => {
+      const userId = ctx.get("userId");
+      const idAsUUID = parseUUID(userId);
+      const parsedBody = expoTokenValidate.parse(await ctx.req.json());
+      const user = await this.userService.registerDevice(idAsUUID, parsedBody.expoToken);
+      return ctx.json(user, Status.OK);
+    };
+    return await handleAppError(registerDeviceImpl)(ctx);
+  }
+
+  async removeDevice(ctx: Context): Promise<Response> {
+    const removeDeviceImpl = async () => {
+      const userId = ctx.get("userId");
+      const idAsUUID = parseUUID(userId);
+      const parsedBody = expoTokenValidate.parse(await ctx.req.json());
+      const user = await this.userService.removeDevice(idAsUUID, parsedBody.expoToken);
+      return ctx.json(user, Status.OK);
+    };
+    return await handleAppError(removeDeviceImpl)(ctx);
   }
 }

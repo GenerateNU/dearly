@@ -10,6 +10,12 @@ describe("POST /users", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
   const config: Configuration = getConfigurations();
+  const requestBody = {
+    name: "Jane Doe",
+    username: "janedoe",
+    ageGroup: "TEEN",
+    mode: "BASIC",
+  };
 
   beforeAll(async () => {
     app = await startTestApp();
@@ -25,8 +31,7 @@ describe("POST /users", () => {
         requestBody: {
           id: testId, // should be ignored
           hello: "world", // should be ignored
-          firstName: "Jane",
-          lastName: "Doe",
+          ...requestBody,
         },
       })
     )
@@ -36,17 +41,20 @@ describe("POST /users", () => {
     testBuilder
       .assertBody({
         id: responseId,
-        firstName: "Jane",
-        lastName: "Doe",
+        ...requestBody,
+        deviceTokens: [],
+        mode: "BASIC",
+        profilePhoto: null,
       })
       .assertFieldNotEqual("id", testId);
   });
 
-  const fields = ["firstName", "lastName"];
+  const fields = ["name", "username", "ageGroup"];
   it.each(fields)("should return 400 if missing %s", async (field) => {
     const requestBody = {
-      firstName: field !== "firstName" ? "Jane" : undefined,
-      lastName: field !== "lastName" ? "Doe" : undefined,
+      name: field !== "name" ? "Jane Doe" : undefined,
+      username: field !== "username" ? "jdoe" : undefined,
+      ageGroup: field !== "ageGroup" ? "ADULT" : undefined,
     };
 
     (
@@ -71,8 +79,9 @@ describe("POST /users", () => {
         type: HTTPRequest.POST,
         route: "/api/v1/users",
         requestBody: {
-          firstName: "",
-          lastName: "Doe",
+          name: "",
+          username: "",
+          ageGroup: "TEEN",
         },
       })
     )
@@ -81,8 +90,38 @@ describe("POST /users", () => {
         message: "Validation failed",
         errors: [
           {
-            path: "firstName",
+            path: "name",
             message: "String must contain at least 1 character(s)",
+          },
+          {
+            path: "username",
+            message: "String must contain at least 1 character(s)",
+          },
+        ],
+      });
+  });
+
+  it("should return 400 if invalid age group", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.POST,
+        route: "/api/v1/users",
+        requestBody: {
+          name: "jane doe",
+          username: "jdoe",
+          ageGroup: "BABY",
+        },
+      })
+    )
+      .assertStatusCode(Status.BadRequest)
+      .assertBody({
+        message: "Validation failed",
+        errors: [
+          {
+            message:
+              "Invalid enum value. Expected 'CHILD' | 'TEEN' | 'ADULT' | 'SENIOR', received 'BABY'",
+            path: "ageGroup",
           },
         ],
       });
@@ -99,8 +138,9 @@ describe("POST /users", () => {
         route: "/api/v1/users",
         requestBody: {
           id: irrelevantUUID,
-          firstName: "Jane",
-          lastName: "Doe",
+          name: "Jane Doe",
+          username: "jd",
+          ageGroup: "TEEN",
         },
         autoAuthorized: false,
         headers: {
@@ -113,7 +153,18 @@ describe("POST /users", () => {
       .assertField("id", encodeJWTUUID);
   });
 
-  it("should return 409 if try to create same user", async () => {
+  it("should return 409 if username already exists", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.POST,
+        route: "/api/v1/users",
+        requestBody,
+      })
+    ).assertStatusCode(Status.Conflict);
+  });
+
+  it("should return 409 if try to create user with same JWT", async () => {
     const generatedJWT = generateJWTToken(3600, config.authorization.jwtSecretKey, generateUUID());
     (
       await testBuilder.request({
@@ -121,8 +172,9 @@ describe("POST /users", () => {
         type: HTTPRequest.POST,
         route: "/api/v1/users",
         requestBody: {
-          firstName: "Jane",
-          lastName: "Doe",
+          name: "Jane",
+          username: "jane",
+          ageGroup: "TEEN",
         },
         autoAuthorized: false,
         headers: {
@@ -138,8 +190,9 @@ describe("POST /users", () => {
         type: HTTPRequest.POST,
         route: "/api/v1/users",
         requestBody: {
-          firstName: "John",
-          lastName: "Smith",
+          name: "John",
+          username: "john",
+          ageGroup: "ADULT",
         },
         autoAuthorized: false,
         headers: {

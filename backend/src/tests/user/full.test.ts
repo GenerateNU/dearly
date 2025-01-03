@@ -9,12 +9,15 @@ describe("End-to-end User CRUD", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
   const originalBody = {
-    firstName: "Jane",
-    lastName: "Doe",
+    name: "Jane Doe",
+    username: "janedoe",
+    ageGroup: "SENIOR",
   };
   const updatedBody = {
-    firstName: "John",
-    lastName: "Smith",
+    name: "John Smith",
+    username: "johnsmith",
+    ageGroup: "SENIOR",
+    mode: "ADVANCED",
   };
   const userId = generateUUID();
   const jwt = generateJWTToken(3600, getConfigurations().authorization.jwtSecretKey, userId);
@@ -43,6 +46,9 @@ describe("End-to-end User CRUD", () => {
       .assertBody({
         id: userId,
         ...originalBody,
+        deviceTokens: [],
+        mode: "BASIC",
+        profilePhoto: null,
       });
   });
 
@@ -58,6 +64,9 @@ describe("End-to-end User CRUD", () => {
       .assertBody({
         id: userId,
         ...originalBody,
+        deviceTokens: [],
+        mode: "BASIC",
+        profilePhoto: null,
       });
   });
 
@@ -71,7 +80,7 @@ describe("End-to-end User CRUD", () => {
         ...authPayload,
       })
     )
-      .assertBody({
+      .assertFields({
         id: userId,
         ...updatedBody,
       })
@@ -87,8 +96,8 @@ describe("End-to-end User CRUD", () => {
         ...authPayload,
       })
     )
-      .assertStatusCode(Status.NoContent)
-      .assertResponseText("User Successfully Deleted");
+      .assertStatusCode(Status.OK)
+      .assertMessage("Successfully delete user");
 
     // delete again
     (
@@ -99,8 +108,8 @@ describe("End-to-end User CRUD", () => {
         ...authPayload,
       })
     )
-      .assertStatusCode(Status.NoContent)
-      .assertResponseText("User Successfully Deleted");
+      .assertStatusCode(Status.OK)
+      .assertMessage("Successfully delete user");
   });
 
   it("should be not found after deletion", async () => {

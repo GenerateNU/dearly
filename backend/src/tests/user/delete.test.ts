@@ -19,21 +19,23 @@ describe("DELETE /users/me", () => {
       Authorization: `Bearer ${jwt}`,
     },
   };
+  const requestBody = {
+    name: "Jane Doe",
+    username: "janedoe",
+    ageGroup: "TEEN",
+  };
 
   beforeAll(async () => {
     app = await startTestApp();
   });
 
-  it("should return 204 if user exists", async () => {
+  it("should return 200 if user exists", async () => {
     (
       await testBuilder.request({
         app,
         type: HTTPRequest.POST,
         route: "/api/v1/users",
-        requestBody: {
-          firstName: "Jane",
-          lastName: "Doe",
-        },
+        requestBody,
         ...authPayload,
       })
     ).assertStatusCode(Status.Created);
@@ -45,7 +47,9 @@ describe("DELETE /users/me", () => {
         route: `/api/v1/users/me`,
         ...authPayload,
       })
-    ).assertStatusCode(Status.NoContent);
+    )
+      .assertStatusCode(Status.OK)
+      .assertMessage("Successfully delete user");
 
     // idempotency test by deleting again
     (
@@ -55,10 +59,12 @@ describe("DELETE /users/me", () => {
         route: `/api/v1/users/me`,
         ...authPayload,
       })
-    ).assertStatusCode(Status.NoContent);
+    )
+      .assertStatusCode(Status.OK)
+      .assertMessage("Successfully delete user");
   });
 
-  it("should return 204 if user not found", async () => {
+  it("should return 200 if user not found", async () => {
     (
       await testBuilder.request({
         app,
@@ -66,7 +72,7 @@ describe("DELETE /users/me", () => {
         route: `/api/v1/users/me`,
       })
     )
-      .assertStatusCode(Status.NoContent)
-      .assertResponseText("User Successfully Deleted");
+      .assertStatusCode(Status.OK)
+      .assertMessage("Successfully delete user");
   });
 });

@@ -1,6 +1,8 @@
+import { Mode } from "../../constants/database";
+import { AgeGroup } from "../../constants/database";
 import { InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
-import { CreateUserPayload, UpdateUserPayload, User } from "./model";
+import { CreateUserPayload, UpdateUserPayload, User } from "./validator";
 import { UserTransaction } from "./transaction";
 
 export interface UserService {
@@ -8,6 +10,8 @@ export interface UserService {
   getUser(id: string): Promise<User>;
   updateUser(id: string, payload: UpdateUserPayload): Promise<User>;
   deleteUser(id: string): Promise<void>;
+  registerDevice(id: string, expoToken: string): Promise<User>;
+  removeDevice(id: string, expoToken: string): Promise<User>;
 }
 
 export class UserServiceImpl implements UserService {
@@ -19,7 +23,11 @@ export class UserServiceImpl implements UserService {
 
   async createUser(payload: CreateUserPayload): Promise<User> {
     const createUserImpl = async () => {
-      const user = await this.userTransaction.insertUser(payload);
+      const mode = payload.ageGroup === AgeGroup.SENIOR ? Mode.BASIC : Mode.ADVANCED;
+      const user = await this.userTransaction.insertUser({
+        mode,
+        ...payload,
+      });
       if (!user) {
         throw new InternalServerError("Failed to create user");
       }
@@ -55,5 +63,27 @@ export class UserServiceImpl implements UserService {
       await this.userTransaction.deleteUser(id);
     };
     return handleServiceError(deleteUserImpl)();
+  }
+
+  async registerDevice(id: string, expoToken: string): Promise<User> {
+    const registerDevieceImpl = async () => {
+      const user = await this.userTransaction.insertDeviceToken(id, expoToken);
+      if (!user) {
+        throw new NotFoundError("User");
+      }
+      return user;
+    };
+    return handleServiceError(registerDevieceImpl)();
+  }
+
+  async removeDevice(id: string, expoToken: string): Promise<User> {
+    const removeDeviceImpl = async () => {
+      const user = await this.userTransaction.deleteDeviceToken(id, expoToken);
+      if (!user) {
+        throw new NotFoundError("User");
+      }
+      return user;
+    };
+    return handleServiceError(removeDeviceImpl)();
   }
 }

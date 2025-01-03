@@ -1,13 +1,15 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { CreateUserPayload, UpdateUserPayload, User } from "./model";
+import { CreateUserPayload, UpdateUserPayload, User } from "./validator";
 import { usersTable } from "../schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 export interface UserTransaction {
   insertUser(payload: CreateUserPayload): Promise<User | null>;
   selectUser(id: string): Promise<User | null>;
   updateUser(id: string, payload: UpdateUserPayload): Promise<User | null>;
   deleteUser(id: string): Promise<User | null>;
+  insertDeviceToken(id: string, expoToken: string): Promise<User | null>;
+  deleteDeviceToken(id: string, expoToken: string): Promise<User | null>;
 }
 
 export class UserTransactionImpl implements UserTransaction {
@@ -31,8 +33,12 @@ export class UserTransactionImpl implements UserTransaction {
     const result = await this.db
       .update(usersTable)
       .set({
-        firstName: payload.firstName,
-        lastName: payload.lastName,
+        name: payload.name,
+        username: payload.username,
+        ageGroup: payload.ageGroup,
+        mode: payload.mode,
+        profilePhoto: payload.profilePhoto,
+        deviceTokens: payload.deviceTokens,
       })
       .where(eq(usersTable.id, id))
       .returning();
@@ -41,6 +47,44 @@ export class UserTransactionImpl implements UserTransaction {
 
   async deleteUser(id: string): Promise<User | null> {
     const result = await this.db.delete(usersTable).where(eq(usersTable.id, id)).returning();
+    return result[0] ?? null;
+  }
+
+  async insertDeviceToken(id: string, expoToken: string): Promise<User | null> {
+    const result = await this.db.transaction(async (tx) => {
+      let user = await tx.select().from(usersTable).where(eq(usersTable.id, id)).limit(1);
+
+      if (user[0] && !user[0].deviceTokens?.includes(expoToken)) {
+        user = await tx
+          .update(usersTable)
+          .set({
+            deviceTokens: sql`array_append(${usersTable.deviceTokens}, ${expoToken})`,
+          })
+          .where(eq(usersTable.id, id))
+          .returning();
+      }
+      return user;
+    });
+
+    return result[0] ?? null;
+  }
+
+  async deleteDeviceToken(id: string, expoToken: string): Promise<User | null> {
+    const result = await this.db.transaction(async (tx) => {
+      let user = await tx.select().from(usersTable).where(eq(usersTable.id, id)).limit(1);
+
+      if (user[0] && user[0].deviceTokens?.includes(expoToken)) {
+        user = await tx
+          .update(usersTable)
+          .set({
+            deviceTokens: sql`array_remove(${usersTable.deviceTokens}, ${expoToken})`,
+          })
+          .where(eq(usersTable.id, id))
+          .returning();
+      }
+      return user;
+    });
+
     return result[0] ?? null;
   }
 }
