@@ -1,5 +1,5 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { seed, reset } from "drizzle-seed";
+import { reset } from "drizzle-seed";
 import {
   postsTable,
   usersTable,
@@ -13,7 +13,7 @@ import {
   commentsTable,
 } from "../entities/schema";
 
-export const seedWithRandomData = async (db: PostgresJsDatabase) => {
+export const resetDB = async (db: PostgresJsDatabase) => {
   const tables = {
     postsTable,
     usersTable,
@@ -27,5 +27,4 @@ export const seedWithRandomData = async (db: PostgresJsDatabase) => {
     commentsTable,
   };
   await reset(db, tables);
-  await seed(db, tables);
 };

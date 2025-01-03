@@ -4,7 +4,6 @@ import { connectDB } from "./database/connect";
 import { configureMiddlewares } from "./middlewares/init";
 import { setUpRoutes } from "./routes/init";
 import { automigrateDB } from "./database/migrate";
-import { seedWithRandomData } from "./database/seed";
 
 const app = new Hono();
 
@@ -15,8 +14,6 @@ const config = getConfigurations();
     const db = connectDB(config);
 
     await automigrateDB(db, config);
-
-    await seedWithRandomData(db);
 
     configureMiddlewares(app, config);
 

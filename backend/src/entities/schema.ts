@@ -30,17 +30,17 @@ export const groupsTable = pgTable("groups", {
   description: varchar({ length: 500 }),
   managerId: uuid()
     .notNull()
-    .references(() => usersTable.id),
+    .references(() => usersTable.id, { onDelete: "cascade" }),
 });
 
 export const postsTable = pgTable("posts", {
   id: uuid().primaryKey().defaultRandom(),
   groupId: uuid()
     .notNull()
-    .references(() => groupsTable.id),
+    .references(() => groupsTable.id, { onDelete: "cascade" }),
   userId: uuid()
     .notNull()
-    .references(() => usersTable.id),
+    .references(() => usersTable.id, { onDelete: "cascade" }),
   createdAt: timestamp().notNull().defaultNow(),
   caption: varchar({ length: 500 }),
   thumbnail: varchar(),
@@ -50,17 +50,17 @@ export const mediaTable = pgTable("media", {
   id: uuid().primaryKey().defaultRandom(),
   mediaType: mediaTypeEnum().notNull(),
   media: varchar().notNull(),
-  postId: uuid().references(() => postsTable.id),
-  commentId: uuid().references(() => commentsTable.id),
+  postId: uuid().references(() => postsTable.id, { onDelete: "cascade" }),
+  commentId: uuid().references(() => commentsTable.id, { onDelete: "cascade" }),
 });
 
 export const membersTable = pgTable("members", {
   userId: uuid()
     .notNull()
-    .references(() => usersTable.id),
+    .references(() => usersTable.id, { onDelete: "cascade" }),
   groupId: uuid()
     .notNull()
-    .references(() => groupsTable.id),
+    .references(() => groupsTable.id, { onDelete: "cascade" }),
   joinedAt: timestamp().notNull().defaultNow(),
   role: memberRoleEnum().notNull().default("MEMBER"),
 });
@@ -69,20 +69,20 @@ export const likesTable = pgTable("likes", {
   id: uuid().primaryKey().defaultRandom(),
   userId: uuid()
     .notNull()
-    .references(() => usersTable.id),
+    .references(() => usersTable.id, { onDelete: "cascade" }),
   postId: uuid()
     .notNull()
-    .references(() => postsTable.id),
+    .references(() => postsTable.id, { onDelete: "cascade" }),
 });
 
 export const commentsTable = pgTable("comments", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid()
     .notNull()
-    .references(() => usersTable.id),
+    .references(() => usersTable.id, { onDelete: "cascade" }),
   postId: uuid()
     .notNull()
-    .references(() => postsTable.id),
+    .references(() => postsTable.id, { onDelete: "cascade" }),
   content: varchar({ length: 500 }),
 });
 
@@ -90,16 +90,16 @@ export const notificationsTable = pgTable("notifications", {
   id: uuid().primaryKey().defaultRandom(),
   actorId: uuid()
     .notNull()
-    .references(() => usersTable.id),
+    .references(() => usersTable.id, { onDelete: "cascade" }),
   receiverId: uuid()
     .notNull()
-    .references(() => usersTable.id),
-  groupId: uuid().references(() => groupsTable.id),
+    .references(() => usersTable.id, { onDelete: "cascade" }),
+  groupId: uuid().references(() => groupsTable.id, { onDelete: "cascade" }),
   referenceType: referenceTypeEnum().notNull(),
-  postId: uuid().references(() => postsTable.id),
-  commentId: uuid().references(() => commentsTable.id),
-  likeId: uuid().references(() => likesTable.id),
-  invitationId: uuid().references(() => invitationsTable.id),
+  postId: uuid().references(() => postsTable.id, { onDelete: "cascade" }),
+  commentId: uuid().references(() => commentsTable.id, { onDelete: "cascade" }),
+  likeId: uuid().references(() => likesTable.id, { onDelete: "cascade" }),
+  invitationId: uuid().references(() => invitationsTable.id, { onDelete: "cascade" }),
   title: varchar({ length: 100 }).notNull(),
   description: varchar({ length: 300 }).notNull(),
 });
@@ -108,7 +108,7 @@ export const linksTable = pgTable("links", {
   id: uuid().primaryKey().defaultRandom(),
   groupId: uuid()
     .notNull()
-    .references(() => groupsTable.id),
+    .references(() => groupsTable.id, { onDelete: "cascade" }),
   token: varchar().notNull(),
   expiresAt: timestamp().notNull(),
   createdAt: timestamp().notNull().defaultNow(),
@@ -118,11 +118,11 @@ export const invitationsTable = pgTable("invitations", {
   id: uuid().primaryKey().defaultRandom(),
   groupId: uuid()
     .notNull()
-    .references(() => groupsTable.id),
-  invitationLinkId: uuid().references(() => linksTable.id),
+    .references(() => groupsTable.id, { onDelete: "cascade" }),
+  invitationLinkId: uuid().references(() => linksTable.id, { onDelete: "cascade" }),
   recipientId: uuid()
     .notNull()
-    .references(() => usersTable.id),
+    .references(() => usersTable.id, { onDelete: "cascade" }),
   status: invitationStatusEnum().notNull().default("PENDING"),
   createdAt: timestamp().notNull().defaultNow(),
 });

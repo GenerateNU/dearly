@@ -4,7 +4,7 @@ import { connectDB } from "../../database/connect";
 import { configureMiddlewares } from "../../middlewares/init";
 import { setUpRoutes } from "../../routes/init";
 import { automigrateDB } from "../../database/migrate";
-import { seedWithRandomData } from "../../database/seed";
+import { resetDB } from "../../database/reset";
 
 export const startTestApp = async (): Promise<Hono> => {
   const app = new Hono();
@@ -15,7 +15,7 @@ export const startTestApp = async (): Promise<Hono> => {
 
   await automigrateDB(db, config);
 
-  await seedWithRandomData(db);
+  await resetDB(db);
 
   configureMiddlewares(app, config);
 
