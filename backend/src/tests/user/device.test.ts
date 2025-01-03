@@ -49,6 +49,7 @@ describe("POST and DELETE /users/devices", () => {
         route: "/api/v1/users/devices",
         requestBody: {
           expoToken,
+          hi: "world", // irrelevant field
         },
         autoAuthorized: false,
         headers: {
