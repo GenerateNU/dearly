@@ -31,7 +31,7 @@ export const DatabaseErrorSchema = z
     message: z.string(),
     severity: z.string().optional(),
     severity_local: z.string().optional(),
-    table_name: z.string(),
+    table_name: z.string().optional(),
     schema_name: z.string().optional(),
     constraint_name: z.string().optional(),
   })

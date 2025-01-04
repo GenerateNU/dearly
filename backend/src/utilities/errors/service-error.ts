@@ -11,7 +11,7 @@ export const handleServiceError = <T>(fn: () => T) => {
       } else if (isDatabaseError(error)) {
         throw mapDBErrorToAppError(error);
       } else {
-        throw new InternalServerError("An unexpected database error occurred.");
+        throw new InternalServerError("An unexpected server error occurred.");
       }
     }
   };

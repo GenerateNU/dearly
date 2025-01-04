@@ -118,6 +118,21 @@ describe("Authorization Middleware", () => {
       .assertError("Unauthorized");
   });
 
+  it("should return 401 if no JWT", async () => {
+    (
+      await testBuilder.request({
+        app,
+        route: "/protected",
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer `,
+        },
+      })
+    )
+      .assertStatusCode(401)
+      .assertError("Unauthorized");
+  });
+
   it("should return 401 if decoded JWT has no sub field", async () => {
     const now = Math.floor(Date.now() / 1000);
     const payload = {

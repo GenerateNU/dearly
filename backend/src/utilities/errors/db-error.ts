@@ -28,11 +28,11 @@ const DB_ERROR_TO_APP_ERROR_MAP: Partial<
 > = {
   [DatabaseErrorType.UniqueConstraintViolation]: (error) => {
     const { table_name, detail } = error;
-    return new ConflictError(getFriendlyErrorMessage(table_name, detail));
+    return new ConflictError(getFriendlyErrorMessage(table_name!, detail));
   },
   [DatabaseErrorType.ForeignKeyViolation]: (error) => {
     const { table_name, detail } = error;
-    return new NotFoundError("", getFriendlyErrorMessage(table_name, detail));
+    return new NotFoundError("", getFriendlyErrorMessage(table_name!, detail));
   },
   [DatabaseErrorType.CheckConstraintViolation]: () =>
     new BadRequestError(`The value provided is out of the acceptable range.`),
