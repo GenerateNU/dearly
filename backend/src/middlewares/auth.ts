@@ -12,8 +12,12 @@ export const isAuthorized = (jwtSecretKey: string) => {
 
     const token = authHeader.split(" ")[1];
 
+    if (!token) {
+      return ctx.json({ error: "Unauthorized" }, 401);
+    }
+
     try {
-      const decoded = jwt.verify(token!, jwtSecretKey) as jwt.JwtPayload;
+      const decoded = jwt.verify(token, jwtSecretKey) as jwt.JwtPayload;
 
       if (!decoded.sub || !validate(decoded.sub)) {
         return ctx.json({ error: "Unauthorized" }, 401);
