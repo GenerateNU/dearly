@@ -1,5 +1,5 @@
 {
-  "id": "8329c3ee-3834-4061-8968-cf60e307697a",
+  "id": "e29db6c7-c627-435c-b9d8-5021de3bcb46",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -19,7 +19,7 @@
           "name": "userId",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "postId": {
           "name": "postId",
@@ -88,7 +88,7 @@
           "name": "managerId",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         }
       },
       "indexes": {},
@@ -205,7 +205,7 @@
           "name": "userId",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "postId": {
           "name": "postId",
@@ -585,7 +585,7 @@
           "name": "userId",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "createdAt": {
           "name": "createdAt",

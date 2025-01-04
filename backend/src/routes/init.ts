@@ -6,6 +6,7 @@ import { getOpenAPISpecification } from "../utilities/docs";
 import { HEALTHCHECK } from "../types/api/routes/healthcheck";
 
 export const setUpRoutes = (app: Hono, db: PostgresJsDatabase) => {
+  // api documentation
   app.get(
     "/",
     apiReference({
@@ -15,11 +16,14 @@ export const setUpRoutes = (app: Hono, db: PostgresJsDatabase) => {
       },
     }),
   );
+
   app.get("/healthcheck", (ctx: Context): HEALTHCHECK => {
     return ctx.json({ message: "OK" }, 200);
   });
+
   app.route("/api/v1", apiRoutes(db));
 
+  // unsupported route
   app.notFound((ctx: Context) => {
     return ctx.json({ error: "The requested route does not exist" }, 404);
   });
@@ -27,6 +31,8 @@ export const setUpRoutes = (app: Hono, db: PostgresJsDatabase) => {
 
 const apiRoutes = (db: PostgresJsDatabase): Hono => {
   const api = new Hono();
+
   api.route("/users", userRoutes(db));
+
   return api;
 };

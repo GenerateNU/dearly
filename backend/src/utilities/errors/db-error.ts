@@ -1,7 +1,13 @@
 import { z } from "zod";
-import { AppError, BadRequestError, ConflictError, InternalServerError } from "./app-error";
+import {
+  AppError,
+  BadRequestError,
+  ConflictError,
+  InternalServerError,
+  NotFoundError,
+} from "./app-error";
 import logger from "../logger";
-import { formatConflictError } from "./db-conflict";
+import { getFriendlyErrorMessage } from "./friendly-errors";
 import { DatabaseErrorSchema, DatabaseErrorType } from "../../constants/db-error";
 
 type DatabaseError = z.infer<typeof DatabaseErrorSchema>;
@@ -22,12 +28,12 @@ const DB_ERROR_TO_APP_ERROR_MAP: Partial<
 > = {
   [DatabaseErrorType.UniqueConstraintViolation]: (error) => {
     const { table_name, detail } = error;
-    return new ConflictError(formatConflictError(table_name, detail));
+    return new ConflictError(getFriendlyErrorMessage(table_name, detail));
   },
-  [DatabaseErrorType.ForeignKeyViolation]: () =>
-    new BadRequestError(
-      `The related resource does not exist. Please ensure the referenced data exists.`,
-    ),
+  [DatabaseErrorType.ForeignKeyViolation]: (error) => {
+    const { table_name, detail } = error;
+    return new NotFoundError("", getFriendlyErrorMessage(table_name, detail));
+  },
   [DatabaseErrorType.CheckConstraintViolation]: () =>
     new BadRequestError(`The value provided is out of the acceptable range.`),
   [DatabaseErrorType.NullValueNotAllowed]: () => new BadRequestError(`Null value is not allowed`),
