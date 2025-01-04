@@ -12,15 +12,15 @@ const FRIENDLY_ERROR_MESSAGES = {
       username: "Username has been taken. Please try another username.",
     },
   } as Record<string, ErrorMessages>,
-  
+
   foreignKey: {
     users: "User does not exist.",
     groups: "Group does not exist.",
     posts: "Post does not exist.",
     invitations: "Invitation does not exist.",
   } as Record<string, string>,
-  
-  default: "The value you provided already exists or is invalid. Please try again."
+
+  default: "The value you provided already exists or is invalid. Please try again.",
 } as const;
 
 // regex pattern from database error details
@@ -39,7 +39,7 @@ class ErrorParser {
   static parseForeignKeyError(detail: string): ForeignKeyError | undefined {
     const match = detail.match(DB_ERROR_DETAILS_REGEX.foreignKey);
     if (!match) return undefined;
-    
+
     const [, column = "", , table = ""] = match;
     return { column, table };
   }
