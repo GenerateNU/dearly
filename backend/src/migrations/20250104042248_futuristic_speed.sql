@@ -1,3 +1,10 @@
+DROP TYPE IF EXISTS "public"."ageGroup";
+DROP TYPE IF EXISTS "public"."status";
+DROP TYPE IF EXISTS "public"."mediaType";
+DROP TYPE IF EXISTS "public"."role";
+DROP TYPE IF EXISTS "public"."referenceType";
+DROP TYPE IF EXISTS "public"."mode";
+
 CREATE TYPE "public"."ageGroup" AS ENUM('CHILD', 'TEEN', 'ADULT', 'SENIOR');--> statement-breakpoint
 CREATE TYPE "public"."status" AS ENUM('PENDING', 'ACCEPTED');--> statement-breakpoint
 CREATE TYPE "public"."mediaType" AS ENUM('IMAGE', 'VIDEO', 'AUDIO');--> statement-breakpoint
@@ -6,7 +13,7 @@ CREATE TYPE "public"."referenceType" AS ENUM('POST', 'COMMENT', 'LIKE', 'INVITE'
 CREATE TYPE "public"."mode" AS ENUM('BASIC', 'ADVANCED');--> statement-breakpoint
 CREATE TABLE "comments" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"userId" uuid NOT NULL,
+	"userId" uuid,
 	"postId" uuid NOT NULL,
 	"content" varchar(500)
 );
@@ -15,7 +22,7 @@ CREATE TABLE "groups" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar(100) NOT NULL,
 	"description" varchar(500),
-	"managerId" uuid NOT NULL
+	"managerId" uuid
 );
 --> statement-breakpoint
 CREATE TABLE "invitations" (
@@ -29,7 +36,7 @@ CREATE TABLE "invitations" (
 --> statement-breakpoint
 CREATE TABLE "likes" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"userId" uuid NOT NULL,
+	"userId" uuid,
 	"postId" uuid NOT NULL
 );
 --> statement-breakpoint
@@ -73,7 +80,7 @@ CREATE TABLE "notifications" (
 CREATE TABLE "posts" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"groupId" uuid NOT NULL,
-	"userId" uuid NOT NULL,
+	"userId" uuid,
 	"createdAt" timestamp DEFAULT now() NOT NULL,
 	"caption" varchar(500),
 	"thumbnail" varchar
