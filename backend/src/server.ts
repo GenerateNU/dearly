@@ -14,10 +14,10 @@ const config = getConfigurations();
   try {
     const db = connectDB(config);
 
-    console.log(generateJWTForTesting(config.authorization.jwtSecretKey));
+    console.log("JWT for manual testing:", generateJWTForTesting(config.authorization.jwtSecretKey), "\n");
 
     await automigrateDB(db, config);
-
+    
     configureMiddlewares(app, config);
 
     setUpRoutes(app, db);
