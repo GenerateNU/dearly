@@ -65,7 +65,7 @@ const createUserPayload = createUserValidate.parse(await ctx.req.json());
 
 DrizzleORM also allows us to easily define payload and return types. We can utilize these types as payload type after parsing request body and return types for service and transaction methods. 
 
-These will work well if the request body is similar to that of the database schema. In other cases, we will need to define our own return type. 
+These will work well if the response body is similar to that of the database schema. In other cases, we will need to define our own return type. 
 
 ```ts
 const usersTable = pgTable("users", {
