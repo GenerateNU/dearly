@@ -19,7 +19,7 @@ export const usersTable = pgTable("users", {
   name: varchar({ length: 100 }).notNull(),
   username: varchar({ length: 100 }).notNull().unique(),
   ageGroup: ageGroupEnum().notNull(),
-  mode: userModeEnum().default("BASIC"),
+  mode: userModeEnum().notNull().default("BASIC"),
   profilePhoto: varchar(),
   deviceTokens: varchar({ length: 152 }).array().default([]),
 });
@@ -28,15 +28,13 @@ export const groupsTable = pgTable("groups", {
   id: uuid().primaryKey().defaultRandom(),
   name: varchar({ length: 100 }).notNull(),
   description: varchar({ length: 500 }),
-  managerId: uuid().references(() => usersTable.id, { onDelete: "cascade" }),
+  managerId: uuid().notNull().references(() => usersTable.id, { onDelete: "cascade" }),
 });
 
 export const postsTable = pgTable("posts", {
   id: uuid().primaryKey().defaultRandom(),
-  groupId: uuid()
-    .notNull()
-    .references(() => groupsTable.id, { onDelete: "cascade" }),
-  userId: uuid().references(() => usersTable.id, { onDelete: "cascade" }),
+  groupId: uuid().notNull().references(() => groupsTable.id, { onDelete: "cascade" }),
+  userId: uuid().notNull().references(() => usersTable.id, { onDelete: "cascade" }),
   createdAt: timestamp().notNull().defaultNow(),
   caption: varchar({ length: 500 }),
   thumbnail: varchar(),
@@ -46,8 +44,8 @@ export const mediaTable = pgTable("media", {
   id: uuid().primaryKey().defaultRandom(),
   mediaType: mediaTypeEnum().notNull(),
   media: varchar().notNull(),
-  postId: uuid().references(() => postsTable.id, { onDelete: "cascade" }),
-  commentId: uuid().references(() => commentsTable.id, { onDelete: "cascade" }),
+  postId: uuid().notNull().references(() => postsTable.id, { onDelete: "cascade" }),
+  commentId: uuid().notNull().references(() => commentsTable.id, { onDelete: "cascade" }),
 });
 
 export const membersTable = pgTable("members", {
@@ -63,7 +61,7 @@ export const membersTable = pgTable("members", {
 
 export const likesTable = pgTable("likes", {
   id: uuid().primaryKey().defaultRandom(),
-  userId: uuid().references(() => usersTable.id, { onDelete: "cascade" }),
+  userId: uuid().notNull().references(() => usersTable.id, { onDelete: "cascade" }),
   postId: uuid()
     .notNull()
     .references(() => postsTable.id, { onDelete: "cascade" }),
@@ -71,7 +69,7 @@ export const likesTable = pgTable("likes", {
 
 export const commentsTable = pgTable("comments", {
   id: uuid("id").primaryKey().defaultRandom(),
-  userId: uuid().references(() => usersTable.id, { onDelete: "cascade" }),
+  userId: uuid().notNull().references(() => usersTable.id, { onDelete: "cascade" }),
   postId: uuid()
     .notNull()
     .references(() => postsTable.id, { onDelete: "cascade" }),

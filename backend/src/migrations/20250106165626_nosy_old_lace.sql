@@ -13,7 +13,7 @@ CREATE TYPE "public"."referenceType" AS ENUM('POST', 'COMMENT', 'LIKE', 'INVITE'
 CREATE TYPE "public"."mode" AS ENUM('BASIC', 'ADVANCED');--> statement-breakpoint
 CREATE TABLE "comments" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"userId" uuid,
+	"userId" uuid NOT NULL,
 	"postId" uuid NOT NULL,
 	"content" varchar(500)
 );
@@ -22,7 +22,7 @@ CREATE TABLE "groups" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar(100) NOT NULL,
 	"description" varchar(500),
-	"managerId" uuid
+	"managerId" uuid NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "invitations" (
@@ -36,7 +36,7 @@ CREATE TABLE "invitations" (
 --> statement-breakpoint
 CREATE TABLE "likes" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"userId" uuid,
+	"userId" uuid NOT NULL,
 	"postId" uuid NOT NULL
 );
 --> statement-breakpoint
@@ -52,8 +52,8 @@ CREATE TABLE "media" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"mediaType" "mediaType" NOT NULL,
 	"media" varchar NOT NULL,
-	"postId" uuid,
-	"commentId" uuid
+	"postId" uuid NOT NULL,
+	"commentId" uuid NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "members" (
@@ -80,7 +80,7 @@ CREATE TABLE "notifications" (
 CREATE TABLE "posts" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"groupId" uuid NOT NULL,
-	"userId" uuid,
+	"userId" uuid NOT NULL,
 	"createdAt" timestamp DEFAULT now() NOT NULL,
 	"caption" varchar(500),
 	"thumbnail" varchar
@@ -91,7 +91,7 @@ CREATE TABLE "users" (
 	"name" varchar(100) NOT NULL,
 	"username" varchar(100) NOT NULL,
 	"ageGroup" "ageGroup" NOT NULL,
-	"mode" "mode" DEFAULT 'BASIC',
+	"mode" "mode" DEFAULT 'BASIC' NOT NULL,
 	"profilePhoto" varchar,
 	"deviceTokens" varchar(152)[] DEFAULT '{}',
 	CONSTRAINT "users_username_unique" UNIQUE("username")
