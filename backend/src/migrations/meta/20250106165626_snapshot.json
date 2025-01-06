@@ -1,5 +1,5 @@
 {
-  "id": "e29db6c7-c627-435c-b9d8-5021de3bcb46",
+  "id": "4fb32a94-662e-4ae9-83b3-55e303bc5463",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -19,7 +19,7 @@
           "name": "userId",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "postId": {
           "name": "postId",
@@ -88,7 +88,7 @@
           "name": "managerId",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
       "indexes": {},
@@ -205,7 +205,7 @@
           "name": "userId",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "postId": {
           "name": "postId",
@@ -324,13 +324,13 @@
           "name": "postId",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "commentId": {
           "name": "commentId",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
       "indexes": {},
@@ -585,7 +585,7 @@
           "name": "userId",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "createdAt": {
           "name": "createdAt",
@@ -669,7 +669,7 @@
           "type": "mode",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "'BASIC'"
         },
         "profilePhoto": {
