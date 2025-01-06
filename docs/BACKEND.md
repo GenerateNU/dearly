@@ -40,7 +40,7 @@ export interface UserController {
 
 ### **Payload Validation**
 
-We can use DrizzleORM for quick and easy payload validation in controller layer using database schema, which automatically throws a **400 Bad Request** error on failure. For example:
+We can use DrizzleORM for quick and easy payload validation in controller layer using database schema, which automatically throws a **400 Bad Request** error on failure. **These only work if the request body matches with the database schema. Most of the time, we will need to write our own validators with Zod.**
 
 ```ts
 // database user schema
@@ -65,7 +65,7 @@ const createUserPayload = createUserValidate.parse(await ctx.req.json());
 
 DrizzleORM also allows us to easily define payload and return types. We can utilize these types as payload type after parsing request body and return types for service and transaction methods. 
 
-These will work well if the return types is similar to the database schema. In other cases, we will need to define our own return type. 
+These will work well if the request body is similar to that of the database schema. In other cases, we will need to define our own return type. 
 
 ```ts
 const usersTable = pgTable("users", {
