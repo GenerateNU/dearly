@@ -14,7 +14,7 @@ const palette = {
   white: "#ffffff",
 };
 
-const theme = createTheme({
+const advancedTheme = createTheme({
   colors: {
     mainBackground: palette.white,
     cardPrimaryBackground: palette.purplePrimary,
@@ -48,5 +48,19 @@ const theme = createTheme({
   },
 });
 
-export type Theme = typeof theme;
-export default theme;
+export type Theme = typeof advancedTheme;
+
+const basicTheme: Theme = {
+  ...advancedTheme,
+  spacing: {
+    xxs: 2,
+    xs: 4,
+    s: 8,
+    m: 16,
+    l: 24,
+    xl: 40,
+    xxl: 60,
+  },
+};
+
+export { advancedTheme, basicTheme };

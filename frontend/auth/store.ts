@@ -4,12 +4,14 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Session } from "@supabase/supabase-js";
+import { Mode } from "@/types/mode";
 
 interface AuthState {
   isAuthenticated: boolean;
   userId: string | null;
   error: string | null;
   isPending: boolean;
+  mode: Mode;
 
   login: ({ email, password }: { email: string; password: string }) => Promise<void>;
   register: ({ email, password }: { email: string; password: string }) => Promise<void>;
@@ -27,6 +29,7 @@ export const useAuthStore = create<AuthState>()(
       userId: null,
       error: null,
       isPending: false,
+      mode: Mode.BASIC,
 
       login: async ({ email, password }: { email: string; password: string }) => {
         set({ isPending: true });
