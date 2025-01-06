@@ -82,8 +82,8 @@ const RegisterForm = () => {
               trigger("name");
             }}
             value={value}
-            title="First Name"
-            placeholder="Enter your first name"
+            title="Name"
+            placeholder="Enter your display name"
             error={errors.name && errors.name.message}
           />
         )}
