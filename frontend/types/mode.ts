@@ -1,4 +1,4 @@
 export enum Mode {
-    ADVANCED,
-    BASIC
+  ADVANCED,
+  BASIC,
 }
