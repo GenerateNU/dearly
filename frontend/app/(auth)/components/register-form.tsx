@@ -11,17 +11,15 @@ import { AuthRequest } from "@/types/auth";
 import Box from "@/design-system/base/box";
 
 type RegisterFormData = AuthRequest & {
-  firstName: string;
-  lastName: string;
+  name: string;
   username: string;
+  email: string;
+  password: string;
 };
 
 const REGISTER_SCHEMA = z.object({
-  firstName: z.string().min(1, {
-    message: "First name is required",
-  }),
-  lastName: z.string().min(1, {
-    message: "Last name is required",
+  name: z.string().min(1, {
+    message: "Display name is required",
   }),
   username: z.string().min(2, {
     message: "Username must be at least 2 characters long",
@@ -75,34 +73,18 @@ const RegisterForm = () => {
     <Box gap="l" flexDirection="column" className="w-full">
       {authError && <Text className="text-red-500">{authError}</Text>}
       <Controller
-        name="firstName"
+        name="name"
         control={control}
         render={({ field: { onChange, value } }) => (
           <Input
             onChangeText={(text: string) => {
               onChange(text);
-              trigger("firstName");
+              trigger("name");
             }}
             value={value}
             title="First Name"
             placeholder="Enter your first name"
-            error={errors.firstName && errors.firstName.message}
-          />
-        )}
-      />
-      <Controller
-        name="lastName"
-        control={control}
-        render={({ field: { onChange, value } }) => (
-          <Input
-            onChangeText={(text: string) => {
-              onChange(text);
-              trigger("lastName");
-            }}
-            value={value}
-            title="Last Name"
-            placeholder="Enter your last name"
-            error={errors.lastName && errors.lastName.message}
+            error={errors.name && errors.name.message}
           />
         )}
       />
@@ -152,8 +134,6 @@ const RegisterForm = () => {
             title="Password"
             placeholder="Enter your password"
             error={errors.password && errors.password.message}
-            onSubmitEditing={handleSubmit(onSignUpPress)}
-            returnKeyType="done"
           />
         )}
       />

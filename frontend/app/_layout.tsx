@@ -5,12 +5,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "@shopify/restyle";
 import { useEffect } from "react";
 import { AuthProvider, useAuth } from "@/auth/provider";
-import theme from "@/design-system/base/theme";
+import { advancedTheme, basicTheme } from "@/design-system/base/theme";
+import { Mode } from "@/types/mode";
 
 const queryClient = new QueryClient();
 
 const InitialLayout = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, mode } = useAuth();
+  let theme = basicTheme;
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -19,6 +21,10 @@ const InitialLayout = () => {
       router.push("/(auth)");
     }
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    theme = Mode.ADVANCED ? advancedTheme : basicTheme;
+  }, [mode]);
 
   return (
     <ThemeProvider theme={theme}>
