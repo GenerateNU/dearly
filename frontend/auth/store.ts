@@ -35,7 +35,7 @@ export const useAuthStore = create<AuthState>()(
       setMode: (mode: Mode) => {
         set({
           mode: mode,
-        })
+        });
       },
 
       login: async ({ email, password }: { email: string; password: string }) => {

@@ -9,7 +9,7 @@ const Index = () => {
 
   const toggleTheme = () => {
     setMode(mode === Mode.ADVANCED ? Mode.BASIC : Mode.ADVANCED);
-  }
+  };
 
   return (
     <Box gap="m" flex={1} justifyContent="center" alignItems="center">

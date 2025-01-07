@@ -19,7 +19,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { isAuthenticated, login, register, logout, userId, mode, setMode } = useAuthStore();
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, register, logout, userId, mode, setMode }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, login, register, logout, userId, mode, setMode }}
+    >
       {children}
     </AuthContext.Provider>
   );
