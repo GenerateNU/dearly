@@ -40,7 +40,9 @@ export interface UserController {
 
 ### **Payload Validation**
 
-We can use DrizzleORM for quick and easy payload validation in controller layer using database schema, which automatically throws a **400 Bad Request** error on failure. **These only work if the request body matches with the database schema. Most of the time, we will need to write our own validators with Zod.**
+We can use DrizzleORM for quick and easy payload validation in controller layer using database schema, which automatically throws a **400 Bad Request** error on failure. 
+
+**These only work if the request body matches with the database schema. Most of the time, we will need to write our own validators with Zod.**
 
 ```ts
 // database user schema
@@ -65,7 +67,7 @@ const createUserPayload = createUserValidate.parse(await ctx.req.json());
 
 DrizzleORM also allows us to easily define payload and return types. We can utilize these types as payload type after parsing request body and return types for service and transaction methods. 
 
-These will work well if the response body is similar to that of the database schema. In other cases, we will need to define our own return type. 
+**These will work well if the response body is similar to that of the database schema. In other cases, we will need to define our own return type.**
 
 ```ts
 const usersTable = pgTable("users", {
@@ -95,7 +97,7 @@ type User = typeof usersTable.$inferSelect;
 
 - **AppError** handles expected HTTP request errors (e.g., 404, 400, 500, 403, 409).
 - **AppError** is an interface that extends Error, and NotFoundError, InternalServerError, BadRequestError, ConflictError, ForbiddenError are classes that implement AppError. We create interface AppError and error classes to ensure consistent error handling.
-- **AppError** is thrown in the **service layer** and caught in the **controller layer** to format the output.
+- **AppError** is usually thrown in the **service layer** and caught in the **controller layer** to format the output.
 
 > [!NOTE]
 > - When writing controllers or tests, please use `Status` and `HTTPRequest` enums in **constants/http.ts** and classes of `AppError` so that we can standardize the handling of HTTP status codes and request methods throughout the application. 
@@ -157,7 +159,7 @@ async createUser(ctx: Context): Promise<CREATE_USER> {
 #### **Concept**
 
 - **Service Errors** are errors that are specific to the business logic of the app, it can include database error or external service errors (such as failing to upload a photo to AWS S3).
-- These errors are caught in the **service layer** and will be converted into **AppError** for the controller.
+- These **service layer** will convert these errors into **AppError** to be caught in the controller.
 
 #### **Implementation**
 
@@ -175,8 +177,6 @@ async getUser(id: string): Promise<User> {
   return handleServiceError(getUserImpl)();
 }
 ```
-> [!NOTE]
-> Currently **`handleServiceError`** only handles database errors, but if we incorporate external services (e.g. AWS S3), we can modify this to account for more service-related errors.
 
 ---
 
