@@ -25,6 +25,7 @@ describe("POST and DELETE /users/devices", () => {
   });
 
   it("should return 200 if valid expo token for register", async () => {
+    // create a user first
     (
       await testBuilder.request({
         app,
@@ -42,6 +43,7 @@ describe("POST and DELETE /users/devices", () => {
       .assertStatusCode(Status.Created)
       .getResponseId();
 
+    // 
     (
       await testBuilder.request({
         app,
@@ -133,4 +135,19 @@ describe("POST and DELETE /users/devices", () => {
         },
       ]);
   });
+
+  it("should return 404 if user not found", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.DELETE,
+        route: "/api/v1/users/devices",
+        requestBody: {
+          expoToken
+        },
+      })
+    )
+      .assertStatusCode(Status.NotFound)
+      .assertError("User not found");
+  })
 });
