@@ -61,6 +61,7 @@ backend/src/
 
 ```
 frontend/
+├── api/             # API calls to backend endpoints
 ├── app/             # Main entry point for the frontend application
 ├── assets/          # Static assets (e.g., images, fonts, icons)
 ├── auth/            # Authentication-related logic and components
@@ -84,6 +85,7 @@ frontend/
 - **Husky**: Hooks for enforcing pre-commit and pre-push hooks (linting and formatting checks).
 
 ### Pipelines
+Any pull request to the `main` branch will need to pass code reviews, have all green CI checkmarks, be fully updated with the latest changes from `main` before merging.
 
 1. **CodeQL**: Static code analysis tool to ensure the code is free of vulnerabilities and quality issues.
 2. **Linter**: Enforces consistent coding style using ESLint with a TypeScript configuration.
