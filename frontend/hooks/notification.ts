@@ -48,12 +48,16 @@ const manageDeviceNotificationToken = async (isAuthenticated: boolean) => {
  * Hook to handle notification permissions based on the user's authentication status or app state.
  * It listens for changes in authentication and app state to manage push notification token registration.
  */
-export const useNotificationPermission = async () => {
+export const useNotificationPermission = () => {
   const { isAuthenticated } = useAuth();
 
   // manage notification based on the authentication state
   const handleNotificationPermissions = useCallback(() => {
-    manageDeviceNotificationToken(isAuthenticated);
+    const managePermissions = async () => {
+      await manageDeviceNotificationToken(isAuthenticated);
+    };
+
+    managePermissions();
   }, [isAuthenticated]);
 
   // manage notification based on notification setting on user's device

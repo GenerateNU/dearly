@@ -13,8 +13,6 @@ import Box from "@/design-system/base/box";
 type RegisterFormData = AuthRequest & {
   name: string;
   username: string;
-  email: string;
-  password: string;
 };
 
 const REGISTER_SCHEMA = z.object({
@@ -53,8 +51,8 @@ const RegisterForm = () => {
     try {
       const validData = REGISTER_SCHEMA.parse(signupData);
       const data = {
-        email: validData.email,
-        password: validData.password,
+        ...validData,
+        ageGroup: "TEEN",
       };
 
       await register(data);

@@ -2,10 +2,11 @@ import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 import * as Device from "expo-device";
 import Constants from "expo-constants";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // retrieve JWT token from local storage
-export const getAuthToken = (): string | null => {
-  const tokenString = localStorage.getItem("supabase.auth.token");
+export const getAuthToken = async (): Promise<string | null> => {
+  const tokenString = await AsyncStorage.getItem("supabase.auth.token");
   if (!tokenString) return null;
 
   try {
@@ -47,13 +48,13 @@ export const getExpoDeviceToken = async (): Promise<string | null> => {
     }
 
     // get the Expo push token
-    const projectId = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
+    const projectId =
+      Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
     const { data: expoPushToken } = await Notifications.getExpoPushTokenAsync({ projectId });
 
     return expoPushToken;
-
   } catch (error) {
     console.error("Error getting Expo push token:", error);
     return null;
   }
-}
+};

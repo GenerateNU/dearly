@@ -18,10 +18,9 @@ export const registerDeviceToken = async (expoToken: string): Promise<string> =>
 
     if (!response.ok) {
       throw new Error(data.error || "Failed to register device token.");
-    }    
+    }
 
     return expoToken;
-    
   } catch (error: unknown) {
     if (error instanceof Error) {
       console.error("Error during device token registration:", error.message);

@@ -34,7 +34,7 @@ const Input: React.FC<TextboxProps> = ({
   value,
   maxLength,
   secureTextEntry = false,
-}) => {  
+}) => {
   return (
     <Box>
       <Text paddingBottom="s">{title}</Text>

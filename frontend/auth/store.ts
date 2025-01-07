@@ -5,6 +5,9 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Session } from "@supabase/supabase-js";
 import { Mode } from "@/types/mode";
+import { CreateUserPayload } from "@/types/user";
+import { AuthRequest } from "@/types/auth";
+import { createUser } from "@/api/user";
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -14,7 +17,7 @@ interface AuthState {
   mode: Mode;
 
   login: ({ email, password }: { email: string; password: string }) => Promise<void>;
-  register: ({ email, password }: { email: string; password: string }) => Promise<void>;
+  register: (data: CreateUserPayload & AuthRequest) => Promise<void>;
   logout: () => Promise<void>;
   forgotPassword: ({ email }: { email: string }) => Promise<void>;
   resetPassword: ({ password }: { password: string }) => Promise<void>;
@@ -52,7 +55,7 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      register: async ({ email, password }: { email: string; password: string }) => {
+      register: async ({ name, username, ageGroup, email, password }: CreateUserPayload & AuthRequest) => {
         set({ isPending: true });
         try {
           const session: Session = await authService.signUp({
@@ -63,6 +66,10 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: true,
             userId: session.user.id,
             isPending: false,
+          });
+          const user = await createUser({ name, username, ageGroup});
+          set({
+            mode: user.mode as Mode,
           });
         } catch (err) {
           handleError(err, set);
