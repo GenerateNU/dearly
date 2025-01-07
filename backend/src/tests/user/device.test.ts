@@ -145,11 +145,11 @@ describe("POST and DELETE /users/devices", () => {
         type: HTTPRequest.DELETE,
         route: "/api/v1/users/devices",
         requestBody: {
-          expoToken
+          expoToken,
         },
       })
     )
       .assertStatusCode(Status.NotFound)
       .assertError("User not found");
-  })
+  });
 });

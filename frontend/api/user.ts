@@ -17,7 +17,7 @@ export const createUser = async (payload: CreateUserPayload): Promise<User> => {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error || "Failed to register device token.");
+      throw new Error(data.error || "Failed to register user.");
     }
 
     return data;
