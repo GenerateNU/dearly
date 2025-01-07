@@ -18,6 +18,7 @@ interface AuthState {
   logout: () => Promise<void>;
   forgotPassword: ({ email }: { email: string }) => Promise<void>;
   resetPassword: ({ password }: { password: string }) => Promise<void>;
+  setMode: (mode: Mode) => void;
 }
 
 const authService: AuthService = new SupabaseAuth();
@@ -30,6 +31,12 @@ export const useAuthStore = create<AuthState>()(
       error: null,
       isPending: false,
       mode: Mode.BASIC,
+
+      setMode: (mode: Mode) => {
+        set({
+          mode: mode,
+        })
+      },
 
       login: async ({ email, password }: { email: string; password: string }) => {
         set({ isPending: true });
