@@ -43,7 +43,7 @@ describe("POST and DELETE /users/devices", () => {
       .assertStatusCode(Status.Created)
       .getResponseId();
 
-    // 
+    // register the device token
     (
       await testBuilder.request({
         app,
@@ -62,6 +62,7 @@ describe("POST and DELETE /users/devices", () => {
       .assertStatusCode(Status.OK)
       .assertField("deviceTokens", [expoToken]);
 
+    // register device token again and make sure it's not duplicated
     (
       await testBuilder.request({
         app,
@@ -98,6 +99,7 @@ describe("POST and DELETE /users/devices", () => {
       .assertStatusCode(Status.OK)
       .assertField("deviceTokens", []);
 
+    // remove token again and ensure no errors thrown
     (
       await testBuilder.request({
         app,
