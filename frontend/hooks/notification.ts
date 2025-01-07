@@ -7,71 +7,72 @@ import { getExpoDeviceToken } from "@/utilities/device-token";
 import { registerDeviceToken, unregisterDeviceToken } from "@/api/device";
 import { useAuth } from "@/auth/provider";
 
-// responsible for registering and unregistering notification
-// register if has not been registered, and unregistered when has not been unregistered
-const notificationRegisterHandler = async () => {
+/**
+ * Registers or unregisters the device token for push notifications
+ * based on the user's notification permissions and authentication state.
+ */
+const manageDeviceNotificationToken = async (isAuthenticated: boolean) => {
   try {
-    const { status: currentStatus } = await Notifications.getPermissionsAsync();
-    const savedToken = await AsyncStorage.getItem(NOTIFICATION_TOKEN_KEY);
     const expoToken = await getExpoDeviceToken();
 
     if (!expoToken) {
       return;
     }
 
-    if (currentStatus === "granted") {
-      if (!savedToken) {
+    const { status: currentStatus } = await Notifications.getPermissionsAsync();
+    const savedToken = await AsyncStorage.getItem(NOTIFICATION_TOKEN_KEY);
+
+    if (isAuthenticated) {
+      // if authenticated, register the device if not already registered
+      if (currentStatus === "granted" && !savedToken) {
         const token = await registerDeviceToken(expoToken);
-        console.log("Successfully registered for notification");
+        console.log("Successfully registered for notifications");
         if (token) {
           await AsyncStorage.setItem(NOTIFICATION_TOKEN_KEY, token);
         }
-      } else {
       }
     } else {
+      // if not authenticated, unregister the device if already registered
       if (savedToken) {
         await unregisterDeviceToken(expoToken);
-        console.log("Successfully unregistered for notification");
+        console.log("Successfully unregistered from notifications");
         await AsyncStorage.removeItem(NOTIFICATION_TOKEN_KEY);
       }
     }
   } catch (error) {
     console.error("Error handling notification permissions:", error);
   }
-}
+};
 
-// handle whole app notification permission
-export const useNotificationPermission = () => {
+/**
+ * Hook to handle notification permissions based on the user's authentication status or app state.
+ * It listens for changes in authentication and app state to manage push notification token registration.
+ */
+export const useNotificationPermission = async () => {
   const { isAuthenticated } = useAuth();
 
-  // manage notification if auth state changes (login, signup, logout)
-  const handleNotificationPermissions = useCallback(async () => {
-    notificationRegisterHandler();
+  // manage notification based on the authentication state
+  const handleNotificationPermissions = useCallback(() => {
+    manageDeviceNotificationToken(isAuthenticated);
   }, [isAuthenticated]);
 
-  // manage notification by listening to device's notification settings
+  // manage notification based on notification setting on user's device
   useEffect(() => {
-    if (isAuthenticated) {
-      handleNotificationPermissions();
+    handleNotificationPermissions();
 
-      const permissionSubscription = Notifications.addNotificationResponseReceivedListener(
-        handleNotificationPermissions,
-      );
+    const permissionSubscription = Notifications.addNotificationResponseReceivedListener(
+      handleNotificationPermissions,
+    );
 
-      const checkPermissionStatus = async () => {
+    const appStateSubscription = AppState.addEventListener("change", (nextAppState) => {
+      if (nextAppState === "active") {
         handleNotificationPermissions();
-      };
+      }
+    });
 
-      const appStateSubscription = AppState.addEventListener("change", (nextAppState) => {
-        if (nextAppState === "active") {
-          checkPermissionStatus();
-        }
-      });
-
-      return () => {
-        permissionSubscription.remove();
-        appStateSubscription.remove();
-      };
-    }
+    return () => {
+      permissionSubscription.remove();
+      appStateSubscription.remove();
+    };
   }, [isAuthenticated, handleNotificationPermissions]);
 };
