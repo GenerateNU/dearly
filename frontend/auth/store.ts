@@ -30,7 +30,7 @@ export const useAuthStore = create<AuthState>()(
       userId: null,
       error: null,
       isPending: false,
-      mode: Mode.BASIC,
+      mode: Mode.ADVANCED,
 
       setMode: (mode: Mode) => {
         set({

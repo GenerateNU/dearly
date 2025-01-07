@@ -79,8 +79,8 @@ const basicTheme: Theme = {
       lineHeight: 24,
     },
     defaults: {
-      fontSize: 32,
-      lineHeight: 48,
+      fontSize: 20,
+      lineHeight: 40,
     },
   },
 };
