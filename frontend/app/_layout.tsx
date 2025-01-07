@@ -6,13 +6,11 @@ import { ThemeProvider } from "@shopify/restyle";
 import { useEffect } from "react";
 import { AuthProvider, useAuth } from "@/auth/provider";
 import { advancedTheme, basicTheme } from "@/design-system/base/theme";
-import { Mode } from "@/types/mode";
 
 const queryClient = new QueryClient();
 
 const InitialLayout = () => {
   const { isAuthenticated, mode } = useAuth();
-  let theme = basicTheme;
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -22,12 +20,8 @@ const InitialLayout = () => {
     }
   }, [isAuthenticated]);
 
-  useEffect(() => {
-    theme = Mode.ADVANCED ? advancedTheme : basicTheme;
-  }, [mode]);
-
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={mode ? advancedTheme : basicTheme}>
       <Stack>
         <Stack.Screen name="(auth)" options={{ headerShown: false, gestureEnabled: false }} />
         <Stack.Screen name="(app)" options={{ headerShown: false, gestureEnabled: false }} />

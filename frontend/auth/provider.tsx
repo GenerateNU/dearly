@@ -10,15 +10,18 @@ interface AuthContextType {
   logout: () => Promise<void>;
   userId: string | null;
   mode: Mode;
+  setMode: (mode: Mode) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const { isAuthenticated, login, register, logout, userId, mode } = useAuthStore();
+  const { isAuthenticated, login, register, logout, userId, mode, setMode } = useAuthStore();
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, register, logout, userId, mode }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, login, register, logout, userId, mode, setMode }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -44,7 +44,10 @@ const advancedTheme = createTheme({
       fontSize: 16,
       lineHeight: 24,
     },
-    defaults: {},
+    defaults: {
+      fontSize: 16,
+      lineHeight: 24,
+    },
   },
 });
 
@@ -52,14 +55,33 @@ export type Theme = typeof advancedTheme;
 
 const basicTheme: Theme = {
   ...advancedTheme,
+  colors: {
+    mainBackground: palette.greenLight,
+    cardPrimaryBackground: palette.greenDark,
+    error: palette.red,
+  },
   spacing: {
-    xxs: 2,
-    xs: 4,
-    s: 8,
-    m: 16,
-    l: 24,
-    xl: 40,
-    xxl: 60,
+    xxs: 4,
+    xs: 8,
+    s: 16,
+    m: 32,
+    l: 48,
+    xl: 80,
+    xxl: 120,
+  },
+  textVariants: {
+    header: {
+      fontWeight: "bold",
+      fontSize: 34,
+    },
+    body: {
+      fontSize: 16,
+      lineHeight: 24,
+    },
+    defaults: {
+      fontSize: 20,
+      lineHeight: 40,
+    },
   },
 };
 
