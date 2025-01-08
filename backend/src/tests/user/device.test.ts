@@ -25,6 +25,7 @@ describe("POST and DELETE /users/devices", () => {
   });
 
   it("should return 200 if valid expo token for register", async () => {
+    // create a user first
     (
       await testBuilder.request({
         app,
@@ -42,6 +43,7 @@ describe("POST and DELETE /users/devices", () => {
       .assertStatusCode(Status.Created)
       .getResponseId();
 
+    // register the device token
     (
       await testBuilder.request({
         app,
@@ -60,6 +62,7 @@ describe("POST and DELETE /users/devices", () => {
       .assertStatusCode(Status.OK)
       .assertField("deviceTokens", [expoToken]);
 
+    // register device token again and make sure it's not duplicated
     (
       await testBuilder.request({
         app,
@@ -96,6 +99,7 @@ describe("POST and DELETE /users/devices", () => {
       .assertStatusCode(Status.OK)
       .assertField("deviceTokens", []);
 
+    // remove token again and ensure no errors thrown
     (
       await testBuilder.request({
         app,
@@ -132,5 +136,20 @@ describe("POST and DELETE /users/devices", () => {
           message: "Invalid Expo Push Token",
         },
       ]);
+  });
+
+  it("should return 404 if user not found", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.DELETE,
+        route: "/api/v1/users/devices",
+        requestBody: {
+          expoToken,
+        },
+      })
+    )
+      .assertStatusCode(Status.NotFound)
+      .assertError("User not found");
   });
 });

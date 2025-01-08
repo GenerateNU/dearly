@@ -5,6 +5,12 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Session } from "@supabase/supabase-js";
 import { Mode } from "@/types/mode";
+import { CreateUserPayload } from "@/types/user";
+import { AuthRequest } from "@/types/auth";
+import { createUser, getUser } from "@/api/user";
+import { NOTIFICATION_TOKEN_KEY } from "@/constants/notification";
+import { unregisterDeviceToken } from "@/api/device";
+import { getExpoDeviceToken } from "@/utilities/device-token";
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -14,7 +20,7 @@ interface AuthState {
   mode: Mode;
 
   login: ({ email, password }: { email: string; password: string }) => Promise<void>;
-  register: ({ email, password }: { email: string; password: string }) => Promise<void>;
+  register: (data: CreateUserPayload & AuthRequest) => Promise<void>;
   logout: () => Promise<void>;
   forgotPassword: ({ email }: { email: string }) => Promise<void>;
   resetPassword: ({ password }: { password: string }) => Promise<void>;
@@ -47,17 +53,31 @@ export const useAuthStore = create<AuthState>()(
             userId: session.user.id,
             isPending: false,
           });
+          const user = await getUser(useAuthStore.getState().userId!);
+          set({
+            mode: user.mode as Mode,
+          });
         } catch (err) {
           handleError(err, set);
         }
       },
 
-      register: async ({ email, password }: { email: string; password: string }) => {
+      register: async ({
+        name,
+        username,
+        ageGroup,
+        email,
+        password,
+      }: CreateUserPayload & AuthRequest) => {
         set({ isPending: true });
         try {
           const session: Session = await authService.signUp({
             email,
             password,
+          });
+          const user = await createUser({ name, username, ageGroup });
+          set({
+            mode: user.mode as Mode,
           });
           set({
             isAuthenticated: true,
@@ -88,11 +108,20 @@ export const useAuthStore = create<AuthState>()(
 
       logout: async () => {
         try {
+          const expoToken = await getExpoDeviceToken();
+          const savedToken = await AsyncStorage.getItem(NOTIFICATION_TOKEN_KEY);
+          if (savedToken && expoToken !== null) {
+            await unregisterDeviceToken(expoToken);
+            console.log("Successfully unregistered from notifications");
+            await AsyncStorage.removeItem(NOTIFICATION_TOKEN_KEY);
+          }
           await authService.logout();
           set({
             isAuthenticated: false,
             userId: null,
             isPending: false,
+            mode: Mode.ADVANCED,
+            error: null,
           });
         } catch (err) {
           handleError(err, set);

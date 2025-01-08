@@ -2,11 +2,12 @@ import React, { createContext, useContext, ReactNode } from "react";
 import { useAuthStore } from "./store";
 import { AuthRequest } from "@/types/auth";
 import { Mode } from "@/types/mode";
+import { CreateUserPayload } from "@/types/user";
 
 interface AuthContextType {
   isAuthenticated: boolean;
   login: (data: AuthRequest) => Promise<void>;
-  register: (data: AuthRequest) => Promise<void>;
+  register: (data: CreateUserPayload & AuthRequest) => Promise<void>;
   logout: () => Promise<void>;
   userId: string | null;
   mode: Mode;

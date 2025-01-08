@@ -1,5 +1,5 @@
 import React from "react";
-import { TextInput } from "react-native";
+import { TextInput, TextInputProps } from "react-native";
 
 import { BoxProps, createBox } from "@shopify/restyle";
 
@@ -21,7 +21,7 @@ type TextboxProps = {
   children?: React.ReactNode;
 } & BoxProps<Theme>;
 
-const BaseTextInput = createBox<Theme, TextboxProps>(TextInput);
+const BaseTextInput = createBox<Theme, TextboxProps & TextInputProps>(TextInput);
 
 const Input: React.FC<TextboxProps> = ({
   title,
@@ -43,6 +43,7 @@ const Input: React.FC<TextboxProps> = ({
         autoFocus={autoFocus}
         readOnly={readOnly}
         inputMode={inputMode}
+        placeholderTextColor="#D3D3D3"
         onChangeText={onChangeText}
         value={value}
         maxLength={maxLength}

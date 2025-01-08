@@ -6,6 +6,9 @@ import { ThemeProvider } from "@shopify/restyle";
 import { useEffect } from "react";
 import { AuthProvider, useAuth } from "@/auth/provider";
 import { advancedTheme, basicTheme } from "@/design-system/base/theme";
+import { NotificationProvider } from "@/contexts/notification";
+import { useNotificationPermission } from "@/hooks/notification";
+import { Mode } from "@/types/mode";
 
 const queryClient = new QueryClient();
 
@@ -20,8 +23,10 @@ const InitialLayout = () => {
     }
   }, [isAuthenticated]);
 
+  useNotificationPermission();
+
   return (
-    <ThemeProvider theme={mode ? advancedTheme : basicTheme}>
+    <ThemeProvider theme={mode === Mode.ADVANCED ? advancedTheme : basicTheme}>
       <Stack>
         <Stack.Screen name="(auth)" options={{ headerShown: false, gestureEnabled: false }} />
         <Stack.Screen name="(app)" options={{ headerShown: false, gestureEnabled: false }} />
@@ -33,12 +38,14 @@ const InitialLayout = () => {
 const RootLayout = () => {
   return (
     <GestureHandlerRootView>
-      <AuthProvider>
-        <QueryClientProvider client={queryClient}>
-          <StatusBar />
-          <InitialLayout />
-        </QueryClientProvider>
-      </AuthProvider>
+      <NotificationProvider>
+        <AuthProvider>
+          <QueryClientProvider client={queryClient}>
+            <StatusBar />
+            <InitialLayout />
+          </QueryClientProvider>
+        </AuthProvider>
+      </NotificationProvider>
     </GestureHandlerRootView>
   );
 };

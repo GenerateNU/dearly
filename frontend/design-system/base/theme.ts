@@ -19,6 +19,7 @@ const advancedTheme = createTheme({
     mainBackground: palette.white,
     cardPrimaryBackground: palette.purplePrimary,
     error: palette.red,
+    black: palette.black,
   },
   spacing: {
     xxs: 2,
@@ -59,6 +60,7 @@ const basicTheme: Theme = {
     mainBackground: palette.greenLight,
     cardPrimaryBackground: palette.greenDark,
     error: palette.red,
+    black: palette.black,
   },
   spacing: {
     xxs: 4,
