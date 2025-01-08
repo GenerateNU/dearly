@@ -52,14 +52,14 @@ export interface AuthService {
 
   /**
    * Sign a user in with phone number by sending their phone number OTP.
-   * 
+   *
    * @param {string} phoneNo - The phone number used for signing up.
    */
   signInWithPhoneNumber(phoneNo: string): Promise<void>;
 
   /**
    * Verify user's OTP code sent to their phone number.
-   * 
+   *
    * @param {string} payload.phone - Phone number that OTP code is sent to.
    * @param {string} payload.token - OTP code sent to user.
    */
@@ -138,7 +138,7 @@ export class SupabaseAuth implements AuthService {
   async verifyPhoneOTP(payload: PhoneAuth): Promise<Session> {
     const { data, error } = await supabase.auth.verifyOtp({
       ...payload,
-      type: 'sms',
+      type: "sms",
     });
 
     console.log(data);
