@@ -128,8 +128,6 @@ export class SupabaseAuth implements AuthService {
       phone: phoneNo,
     });
 
-    console.log(error);
-
     if (error) {
       throw new Error(error.message);
     }
@@ -140,8 +138,6 @@ export class SupabaseAuth implements AuthService {
       ...payload,
       type: "sms",
     });
-
-    console.log(data);
 
     if (error) {
       throw new Error(error.message);
