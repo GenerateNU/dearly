@@ -1,7 +1,7 @@
 import { AppState } from "react-native";
 import { supabase } from "./client";
 import { Session, User } from "@supabase/supabase-js";
-import { AuthRequest } from "@/types/auth";
+import { AuthRequest, PhoneAuth } from "@/types/auth";
 
 /**
  * Interface for authentication services, providing methods for user sign-up, login,
@@ -49,6 +49,21 @@ export interface AuthService {
    *                          upon successful password reset.
    */
   resetPassword({ password }: { password: string }): Promise<User>;
+
+  /**
+   * Sign a user in with phone number by sending their phone number OTP.
+   *
+   * @param {string} phoneNo - The phone number used for signing up.
+   */
+  signInWithPhoneNumber(phoneNo: string): Promise<void>;
+
+  /**
+   * Verify user's OTP code sent to their phone number.
+   *
+   * @param {string} payload.phone - Phone number that OTP code is sent to.
+   * @param {string} payload.token - OTP code sent to user.
+   */
+  verifyPhoneOTP(payload: PhoneAuth): Promise<Session>;
 }
 
 export class SupabaseAuth implements AuthService {
@@ -106,6 +121,33 @@ export class SupabaseAuth implements AuthService {
     }
 
     return data.user;
+  }
+
+  async signInWithPhoneNumber(phoneNo: string): Promise<void> {
+    const { error } = await supabase.auth.signInWithOtp({
+      phone: phoneNo,
+    });
+
+    console.log(error);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+  }
+
+  async verifyPhoneOTP(payload: PhoneAuth): Promise<Session> {
+    const { data, error } = await supabase.auth.verifyOtp({
+      ...payload,
+      type: "sms",
+    });
+
+    console.log(data);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data.session!;
   }
 }
 
