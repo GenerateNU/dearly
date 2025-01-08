@@ -1,22 +1,6 @@
-export interface User {
-  id: string;
-  name: string;
-  username: string;
-  ageGroup: string;
-  mode: string;
-  profilePhoto: string;
-  deviceTokens: string[];
-}
-
-export interface CreateUserPayload {
-  name: string;
-  username: string;
-  ageGroup: string;
-}
-
-export enum AgeGroup {
-  CHILD = "CHILD",
-  TEEN = "TEEN",
-  ADULT = "ADULT",
-  SENIOR = "SENIOR",
-}
+import { paths, components } from "@/gen/openapi";
+export type User = components["schemas"]["User"];
+export type CreateUserPayload =
+  paths["/api/v1/users"]["post"]["requestBody"]["content"]["application/json"];
+export type AgeGroup =
+  paths["/api/v1/users"]["post"]["requestBody"]["content"]["application/json"]["ageGroup"];
