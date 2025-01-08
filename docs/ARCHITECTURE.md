@@ -48,7 +48,7 @@ backend/src/
 ├── constants/       # Shared constants used in the app
 ├── database/        # Database connection and setup scripts
 ├── entities/        # Entity schema, controllers, services, and transactions
-├── middlewares/     # Custom middlewares (e.g., logging, request compression)
+├── middlewares/     # Custom middlewares (e.g., logging, authorization, compression)
 ├── migrations/      # Database migration files
 ├── routes/          # API routes and endpoints
 ├── tests/           # Unit and integration tests for the backend
