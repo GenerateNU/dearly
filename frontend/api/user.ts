@@ -5,7 +5,6 @@ import { handleHTTPStatusError, handleNetworkError } from "@/utilities/errors";
 import { fetchClient } from "./client";
 
 export const createUser = async (payload: CreateUserPayload): Promise<User> => {
-
   const token = await getAuthToken();
 
   if (!token) {
@@ -17,15 +16,14 @@ export const createUser = async (payload: CreateUserPayload): Promise<User> => {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: payload
-  })
+    body: payload,
+  });
 
   if (response.ok && data) {
     return data;
   } else {
     return handleHTTPStatusError(response.status, error);
   }
-
 };
 
 export const getUser = async (id: string): Promise<User> => {

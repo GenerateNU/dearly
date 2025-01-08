@@ -9,4 +9,3 @@ export const fetchClient = createFetchClient<paths>({
 
 // Add this to a provider inside frontend components
 export const $api = createClient(fetchClient);
-

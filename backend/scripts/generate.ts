@@ -1,5 +1,5 @@
 /* This File Injects Custom Types DO NOT TOUCH WITHOUT PERMISSION
-*/
+ */
 import fs from "node:fs";
 import { resolve } from "node:path";
 import openapiTS, { astToString } from "openapi-typescript";
