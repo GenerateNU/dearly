@@ -112,7 +112,6 @@ export const useAuthStore = create<AuthState>()(
           const savedToken = await AsyncStorage.getItem(NOTIFICATION_TOKEN_KEY);
           if (savedToken && expoToken !== null) {
             await unregisterDeviceToken(expoToken);
-            console.log("Successfully unregistered from notifications");
             await AsyncStorage.removeItem(NOTIFICATION_TOKEN_KEY);
           }
           await authService.logout();

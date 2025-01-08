@@ -35,9 +35,40 @@ task frontend:install
 
 -----
 
+### Database Setup and Migration
+
+We use different databases for each environment to ensure data integrity. We will apply migration to production database when PR is merged.
+
+- **Development and Testing**: Dockerized PostgreSQL database, which will remove all data when it is down
+- **Production Environment and Frontend Development**: PostgreSQL production database hosted on Supabase
+
+To apply schema changes, follow these steps:
+
+1. **Update the Schema**  
+   Modify the `/backend/entities/schema.ts` file.
+
+2. **Start the Local Database**  
+ 
+   ```bash
+   task db:up
+   ```
+
+3. **Generate SQL**  
+
+   ```bash
+   task db:generate
+   ```
+4. **Apply Migration**  
+
+   ```bash
+   task db:migrate
+   ```
+   
+-----
+
 ### Backend Development Server
 
-To start the server:
+To start the development server:
 
 1. **Start the database**:  
    Make sure to shut down any running PostgreSQL instances if you encounter error like "testuser does not exist."
@@ -74,36 +105,6 @@ task test
 
 -----
 
-### Database Setup and Migration
-
-We use different databases for each environment to ensure data integrity. We will apply migration to production database when PR is merged.
-
-- **Development and Testing**: Dockerized PostgreSQL database
-- **Production**: PostgreSQL database hosted on Supabase
-
-To apply schema changes, follow these steps:
-
-1. **Update the Schema**  
-   Modify the `/backend/entities/schema.ts` file.
-
-2. **Start the Local Database**  
- 
-   ```bash
-   task db:up
-   ```
-
-3. **Generate SQL**  
-
-   ```bash
-   task db:generate
-   ```
-4. **Apply Migration**  
-
-   ```bash
-   task db:migrate
-   ```
------
-
 ### API Documentation
 
 To generate the OpenAPI specification for API documentation, do:
@@ -121,7 +122,7 @@ Start the backend development server at "/" route and see latest changes.
 
 ### Code Formatting and Linting
 
-We have a commit hook that automatically formats the code and fixes any linting issues. However, if you prefer to do it manually or want to see more details of lint errors that cannot be automatically fixed, you can use the commands below:
+We have a commit hook that automatically formats the code and fixes any linting issues when you commit. However, if you prefer to do it manually or want to see more details of lint errors that cannot be automatically fixed, you can use the commands below:
 
 - **Format both backend and frontend**:
 
@@ -143,9 +144,15 @@ We have a commit hook that automatically formats the code and fixes any linting 
 
 -----
 
-### Frontend Development Server
+### Frontend Development Server & Backend Production Server
 ```bash
+task backend:prod
 task frontend:dev
+```
+
+Or run both of them at the same time
+```bash
+task start
 ```
 
 -----
