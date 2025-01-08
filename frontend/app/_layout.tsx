@@ -9,6 +9,7 @@ import { advancedTheme, basicTheme } from "@/design-system/base/theme";
 import { NotificationProvider } from "@/contexts/notification";
 import { useNotificationPermission } from "@/hooks/notification";
 import { Mode } from "@/types/mode";
+import { SupabaseAuth } from "@/auth/service";
 
 const queryClient = new QueryClient();
 

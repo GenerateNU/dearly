@@ -53,9 +53,9 @@ export interface AuthService {
   /**
    * Sign a user in with phone number by sending their phone number OTP.
    * 
-   * @param {string} param.phoneNo - The phone number used for signing up.
+   * @param {string} phoneNo - The phone number used for signing up.
    */
-  signInWithPhoneNumber({ phoneNo }: { phoneNo: string }): Promise<void>;
+  signInWithPhoneNumber(phoneNo: string): Promise<void>;
 
   /**
    * Verify user's OTP code sent to their phone number.
@@ -63,7 +63,7 @@ export interface AuthService {
    * @param {string} payload.phone - Phone number that OTP code is sent to.
    * @param {string} payload.token - OTP code sent to user.
    */
-  verifyPhoneOTP(payload: PhoneAuth): Promise<User>;
+  verifyPhoneOTP(payload: PhoneAuth): Promise<Session>;
 }
 
 export class SupabaseAuth implements AuthService {
@@ -123,27 +123,31 @@ export class SupabaseAuth implements AuthService {
     return data.user;
   }
 
-  async signInWithPhoneNumber({ phoneNo }: { phoneNo: string; }): Promise<void> {
+  async signInWithPhoneNumber(phoneNo: string): Promise<void> {
     const { error } = await supabase.auth.signInWithOtp({
       phone: phoneNo,
     });
+
+    console.log(error);
 
     if (error) {
       throw new Error(error.message);
     }
   }
 
-  async verifyPhoneOTP(payload: PhoneAuth): Promise<User> {
+  async verifyPhoneOTP(payload: PhoneAuth): Promise<Session> {
     const { data, error } = await supabase.auth.verifyOtp({
       ...payload,
       type: 'sms',
     });
 
+    console.log(data);
+
     if (error) {
       throw new Error(error.message);
     }
 
-    return data.user!;
+    return data.session!;
   }
 }
 
