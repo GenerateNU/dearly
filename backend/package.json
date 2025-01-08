@@ -12,7 +12,7 @@
     "test": "NODE_ENV=test ./scripts/test.sh",
     "db:up": "./scripts/start-db.sh",
     "db:down": "./scripts/stop-db.sh",
-    "gen": "./scripts/codegen.sh"
+    "gen": "bun scripts/generate.ts"
   },
   "type": "module",
   "dependencies": {

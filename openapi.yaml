@@ -105,6 +105,7 @@ paths:
       security:
         - BearerAuth: []
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -400,4 +401,4 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-   
+
