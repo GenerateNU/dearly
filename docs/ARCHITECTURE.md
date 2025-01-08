@@ -12,9 +12,9 @@ For a visual representation of the architecture, see [Architecture Diagrams](htt
 
 | **Aspect**               | **Description**                                                                                                                                                  |
 |--------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Framework**            | **[Hono](https://hono.dev/)** (lightweight alternative to Express) and **Bun** (high-performance alternative to Node.js) with excellent TypeScript support.                           |
+| **Framework**            | **[Hono](https://hono.dev/)** (lightweight alternative to Express) and **[Bun](https://bun.sh/)** (high-performance alternative to Node.js) with excellent TypeScript support.                           |
 | **Language**             | **TypeScript** for type safety and scalability.                                                                                                                   |
-| **Database**             | **PostgreSQL** for transactional data handling and support for complex queries.                                                                                  |
+| **Database**             | **[PostgreSQL](https://www.postgresql.org/docs/current/)** for transactional data handling and support for complex queries.                                                                                  |
 | **Authorization**        | **JSON Web Tokens (JWT)**, a stateless and standardized approach to authorization, ensuring compatibility with different client applications.                                             |
 | **ORM**                  | **[DrizzleORM](https://orm.drizzle.team/docs/overview)** for database migrations and efficient query handling.                                                                                             |
 | **Documentation**        | API documentation with **[Scalar](https://scalar.com/)**.                                                                                                                               |
@@ -48,12 +48,12 @@ backend/src/
 ├── constants/       # Shared constants used in the app
 ├── database/        # Database connection and setup scripts
 ├── entities/        # Entity schema, controllers, services, and transactions
-├── middlewares/     # Custom middlewares (e.g., logging, request compression)
+├── middlewares/     # Custom middlewares (e.g., logging, authorization, compression)
 ├── migrations/      # Database migration files
 ├── routes/          # API routes and endpoints
 ├── tests/           # Unit and integration tests for the backend
 ├── types/           # TypeScript type definitions for the backend
-└── utilities/       # Helper functions and utility modules
+└── utilities/       # Helper functions
 ```
 -----
 
@@ -63,12 +63,14 @@ backend/src/
 frontend/
 ├── api/             # API calls to backend endpoints
 ├── app/             # Main entry point for the frontend application
-├── assets/          # Static assets (e.g., images, fonts, icons)
+├── assets/          # Static assets (e.g., images, fonts, svgs, icons)
 ├── auth/            # Authentication-related logic and components
 ├── constants/       # Constants and configuration values shared across app
-├── design-system/   # Shared UI components and styling utilities
+├── contexts/        # Contexts used across the app
+├── design-system/   # Shared UI components and themes
 ├── hooks/           # Custom React hooks for reusable logic
-└── types/           # TypeScript type definitions for the frontend
+├── types/           # TypeScript type definitions for the frontend
+└── utilities/       # Helper functions
 ```
 
 --- 
