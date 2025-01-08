@@ -27,9 +27,14 @@ tasks:
       - cd frontend && bun run start
 
   backend:dev:
-    desc: "Run backend development server"
+    desc: "Run backend development server with Docker database"
     cmds:
       - cd backend && bun run dev
+
+  backend:prod:
+    desc: "Run backend production server with production database"
+    cmds:
+      - cd backend && bun start
 
   db:up:
     desc: "Start local database in Docker"
@@ -65,14 +70,14 @@ tasks:
     desc: "Install frontend and backend dependencies"
     deps: [frontend:install, backend:install]
 
-  dev:
-    desc: "Start frontend and backend in dev mode"
-    deps: [frontend:dev, backend:dev]
-
   test:
     desc: "Run tests in backend"
     cmds:
       - cd backend && bun run test
+
+  start:
+    desc: "Start frontend and backend production server"
+    deps: [frontend:dev, backend:prod]
 
   generate:
     desc: "Generate Schema from OpenAPI Specification"
