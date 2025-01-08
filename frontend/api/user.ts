@@ -2,7 +2,7 @@ import { API_BASE_URL } from "@/constants/api";
 import { CreateUserPayload, User } from "@/types/user";
 import { getAuthToken } from "@/utilities/device-token";
 import { handleHTTPStatusError, handleNetworkError } from "@/utilities/errors";
-import { fetchClient } from "./client";
+import fetchClient from "./client";
 
 export const createUser = async (payload: CreateUserPayload): Promise<User> => {
   const token = await getAuthToken();
