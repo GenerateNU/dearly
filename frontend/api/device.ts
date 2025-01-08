@@ -1,9 +1,13 @@
 import { API_BASE_URL } from "@/constants/api";
 import { getAuthToken } from "@/utilities/device-token";
 
-export const registerDeviceToken = async (expoToken: string): Promise<string> => {
+export const registerDeviceToken = async (expoToken: string): Promise<string | null> => {
   try {
-    const token = getAuthToken();
+    const token = await getAuthToken();
+
+    if (!token) {
+      return null;
+    }
 
     const response = await fetch(`${API_BASE_URL}/users/devices`, {
       method: "POST",
@@ -33,7 +37,7 @@ export const registerDeviceToken = async (expoToken: string): Promise<string> =>
 
 export const unregisterDeviceToken = async (expoToken: string): Promise<void> => {
   try {
-    const token = getAuthToken();
+    const token = await getAuthToken();
 
     const response = await fetch(`${API_BASE_URL}/users/devices`, {
       method: "DELETE",

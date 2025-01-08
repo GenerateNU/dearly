@@ -6,7 +6,7 @@ const statusCodeErrorMap = new Map<number, string>([
   [403, "Forbidden. You don't have permission to create a user."],
   [404, "The requested endpoint was not found."],
   [500, "Internal server error. Please try again later."],
-  [503, "Service unavailable. Please try again later."]
+  [503, "Service unavailable. Please try again later."],
 ]);
 
 export const handleHTTPStatusError = (status: number, data: any) => {

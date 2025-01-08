@@ -6,14 +6,24 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // retrieve JWT token from local storage
 export const getAuthToken = async (): Promise<string | null> => {
-  const tokenString = await AsyncStorage.getItem("supabase.auth.token");
-  if (!tokenString) return null;
-
   try {
+    // Get all keys and find the Supabase auth token key
+    const allKeys = await AsyncStorage.getAllKeys();
+    const supabaseTokenKey = allKeys.find(
+      (key) => key.startsWith("sb-") && key.endsWith("-auth-token"),
+    );
+
+    if (!supabaseTokenKey) {
+      return null;
+    }
+
+    const tokenString = await AsyncStorage.getItem(supabaseTokenKey);
+    if (!tokenString) return null;
+
     const parsedToken = JSON.parse(tokenString);
-    return parsedToken?.currentSession?.access_token ?? null;
+    return parsedToken?.access_token ?? null;
   } catch (error) {
-    console.error("Failed to parse auth token:", error);
+    console.error("Failed to get auth token:", error);
     return null;
   }
 };
