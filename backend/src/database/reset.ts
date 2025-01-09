@@ -36,4 +36,3 @@ export const resetDB = async (db: PostgresJsDatabase) => {
     console.log = originalLog;
   }
 };
-
