@@ -14,11 +14,11 @@ const config = getConfigurations();
   try {
     const db = connectDB(config);
 
-    console.log(
-      "JWT for manual testing:",
-      generateJWTForTesting(config.authorization.jwtSecretKey),
-      "\n",
-    );
+    // console.log(
+    //   "JWT for manual testing:",
+    //   generateJWTForTesting(config.authorization.jwtSecretKey),
+    //   "\n",
+    // );
 
     await automigrateDB(db, config);
 

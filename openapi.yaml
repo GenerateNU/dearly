@@ -4,7 +4,7 @@ info:
   title: Dearly API
   summary: Dearly makes connecting with loved ones easy.
   description: |
-    Dearly is a private family-sharing app that bridges generational gaps and makes staying connected easier and more meaningful. The platform allows families to share photos, voice memos, and other media in a secure, invite-only space. With two thoughtfully designed modes, Dearly caters to every generation: a streamlined, user-friendly interface for those less familiar with technology and a dynamic, feature-rich experience for younger users
+    Dearly is a private family-sharing app that bridges generational gaps and makes staying connected easier and more meaningful. The platform allows families to share photos, voice memos, and other media in a secure, invite-only space. With two thoughtfully designed modes, Dearly caters to every generation: a streamlined, user-friendly interface for those less familiar with technology and a dynamic, feature-rich experience for younger users.
   version: 1.0.0
 
 components:
@@ -41,7 +41,6 @@ components:
                 type: string
               message:
                 type: string
-
     User:
       type: object
       properties:
@@ -75,6 +74,8 @@ components:
 paths:
   /healthcheck:
     get:
+      tags:
+        - Healthcheck
       summary: Healthcheck endpoint
       description: Pings the server to check the health of the current server
       responses:
@@ -89,9 +90,12 @@ paths:
                     type: string
                     enum:
                       - OK
+
   /api/v1/users:
     post:
-      summary: Creates a User
+      tags:
+        - User Endpoints
+      summary: Creates a user
       description: Creates a user from the specified body (with ID being the decoded ID from JWT).
       security:
         - BearerAuth: []
@@ -158,6 +162,8 @@ paths:
 
   /api/v1/users/{id}:
     get:
+      tags:
+        - User Endpoints
       summary: Gets a user
       description: Gets the user by their UUID.
       parameters:
@@ -205,6 +211,8 @@ paths:
 
   /api/v1/users/me:
     put:
+      tags:
+        - User Endpoints
       summary: Updates a user
       description: Updates the user profile for the currently authenticated user (identified by the decoded ID from JWT).
       security:
@@ -269,6 +277,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
     delete:
+      tags:
+        - User Endpoints
       summary: Deletes a user
       description: Deletes the user account for the currently authenticated user (identified by the decoded ID from JWT).
       security:
@@ -289,7 +299,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
         401:
           description: Unauthorized due to invalid JWT
           content:
@@ -305,8 +317,10 @@ paths:
 
   /api/v1/users/devices:
     post:
+      tags:
+        - User Endpoints
       summary: Register user's device token
-      description: Registers a Expo Device Token for the currently authenticated user to receive notification.
+      description: Registers an Expo Device Token for the currently authenticated user to receive notifications.
       security:
         - BearerAuth: []
       requestBody:
@@ -335,9 +349,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
         401:
           description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: User not found
           content:
             application/json:
               schema:
@@ -349,8 +371,10 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
     delete:
+      tags:
+        - User Endpoints
       summary: Remove user's device token
-      description: Removes a registered Expo Device Token for the currently authenticated user to not receive notification.
+      description: Removes a registered Expo Device Token for the currently authenticated user to not receive notifications.
       security:
         - BearerAuth: []
       requestBody:
@@ -379,7 +403,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
         401:
           description: Unauthorized due to invalid JWT
           content:
