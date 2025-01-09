@@ -1,5 +1,5 @@
 import { TypedResponse } from "hono";
-import { paths } from "../../../gen/schema";
+import { paths } from "../../../gen/openapi";
 
 export type HEALTHCHECK = TypedResponse<
   paths["/healthcheck"]["get"]["responses"]["200"]["content"]["application/json"]

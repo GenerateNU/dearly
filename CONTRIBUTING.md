@@ -150,11 +150,6 @@ task backend:prod
 task frontend:dev
 ```
 
-Or run both of them at the same time
-```bash
-task start
-```
-
 -----
 
 ### Add new libraries or packages
