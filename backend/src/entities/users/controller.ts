@@ -4,15 +4,15 @@ import { createUserValidate, expoTokenValidate, updateUserValidate } from "./val
 import { parseUUID } from "../../utilities/uuid";
 import { handleAppError } from "../../utilities/errors/app-error";
 import { Status } from "../../constants/http";
-import { DEL_USER, USER_RESPONSE } from "../../types/api/routes/users";
+import { DEL_USER, DEVICE_RESPONSE, USER_RESPONSE } from "../../types/api/routes/users";
 
 export interface UserController {
   createUser(ctx: Context): Promise<USER_RESPONSE>;
   getUser(ctx: Context): Promise<USER_RESPONSE>;
   updateUser(ctx: Context): Promise<USER_RESPONSE>;
   deleteUser(ctx: Context): Promise<DEL_USER>;
-  registerDevice(ctx: Context): Promise<USER_RESPONSE>;
-  removeDevice(ctx: Context): Promise<USER_RESPONSE>;
+  registerDevice(ctx: Context): Promise<DEVICE_RESPONSE>;
+  removeDevice(ctx: Context): Promise<DEVICE_RESPONSE>;
 }
 
 export class UserControllerImpl implements UserController {
@@ -70,7 +70,7 @@ export class UserControllerImpl implements UserController {
     return await handleAppError(deleteUserImpl)(ctx);
   }
 
-  async registerDevice(ctx: Context): Promise<USER_RESPONSE> {
+  async registerDevice(ctx: Context): Promise<DEVICE_RESPONSE> {
     const registerDeviceImpl = async () => {
       const userId = ctx.get("userId");
       const idAsUUID = parseUUID(userId);
@@ -81,7 +81,7 @@ export class UserControllerImpl implements UserController {
     return await handleAppError(registerDeviceImpl)(ctx);
   }
 
-  async removeDevice(ctx: Context): Promise<USER_RESPONSE> {
+  async removeDevice(ctx: Context): Promise<DEVICE_RESPONSE> {
     const removeDeviceImpl = async () => {
       const userId = ctx.get("userId");
       const idAsUUID = parseUUID(userId);

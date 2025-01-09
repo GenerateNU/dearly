@@ -15,6 +15,13 @@
       "when": 1736391657831,
       "tag": "20250109030057_curious_proteus",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1736438662971,
+      "tag": "20250109160422_sparkling_doorman",
+      "breakpoints": true
     }
   ]
 }

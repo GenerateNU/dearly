@@ -38,7 +38,6 @@ describe("GET /users/:id", () => {
       .assertBody({
         id,
         ...requestBody,
-        deviceTokens: [],
         mode: "BASIC",
         notificationsEnabled: true,
         profilePhoto: null,

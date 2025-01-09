@@ -41,7 +41,6 @@ describe("POST /users", () => {
       .assertBody({
         id: responseId,
         ...requestBody,
-        deviceTokens: [],
         mode: "BASIC",
         profilePhoto: null,
         notificationsEnabled: true,
