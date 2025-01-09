@@ -2,6 +2,7 @@ import { timestamp, uuid, pgEnum, pgTable, varchar, boolean } from "drizzle-orm/
 import { relations } from "drizzle-orm";
 
 export const userModeEnum = pgEnum("mode", ["BASIC", "ADVANCED"]);
+export const postMediaEnum = pgEnum("mediaType", ["VIDEO", "PHOTO"]);
 export const memberRoleEnum = pgEnum("role", ["MEMBER", "MANAGER"]);
 export const referenceTypeEnum = pgEnum("referenceType", [
   "POST",
@@ -19,7 +20,14 @@ export const usersTable = pgTable("users", {
   mode: userModeEnum().notNull().default("BASIC"),
   profilePhoto: varchar(),
   notificationsEnabled: boolean().notNull().default(true),
-  deviceTokens: varchar({ length: 152 }).array().default([]),
+});
+
+export const devicesTable = pgTable("devices", {
+  id: uuid().primaryKey().defaultRandom(),
+  userId: uuid()
+    .notNull()
+    .references(() => usersTable.id, { onDelete: "cascade" }),
+  token: varchar({ length: 152 }).notNull(),
 });
 
 export const groupsTable = pgTable("groups", {
@@ -41,7 +49,15 @@ export const postsTable = pgTable("posts", {
     .references(() => usersTable.id, { onDelete: "cascade" }),
   createdAt: timestamp().notNull().defaultNow(),
   caption: varchar({ length: 500 }),
-  media: varchar().array().default([]),
+});
+
+export const mediaTable = pgTable("media", {
+  id: uuid().primaryKey().defaultRandom(),
+  postId: uuid()
+    .notNull()
+    .references(() => postsTable.id, { onDelete: "cascade" }),
+  url: varchar().notNull(),
+  type: postMediaEnum().notNull(),
 });
 
 export const membersTable = pgTable("members", {
@@ -123,13 +139,21 @@ export const userRelations = relations(usersTable, ({ many }) => ({
   comments: many(commentsTable),
   likes: many(likesTable),
   memberships: many(membersTable),
+  devices: many(devicesTable),
+  sentNotifications: many(notificationsTable, { relationName: "actorNotifications" }),
+  receivedNotifications: many(notificationsTable, { relationName: "receiverNotifications" }),
+  receivedInvitations: many(invitationsTable),
 }));
 
-export const groupRelations = relations(groupsTable, ({ many }) => ({
+export const groupRelations = relations(groupsTable, ({ one, many }) => ({
   posts: many(postsTable),
   members: many(membersTable),
   invitationLinks: many(linksTable),
   invitations: many(invitationsTable),
+  manager: one(usersTable, {
+    fields: [groupsTable.managerId],
+    references: [usersTable.id],
+  }),
 }));
 
 export const postRelations = relations(postsTable, ({ one, many }) => ({
@@ -143,4 +167,112 @@ export const postRelations = relations(postsTable, ({ one, many }) => ({
   }),
   comments: many(commentsTable),
   likes: many(likesTable),
+  media: many(mediaTable),
+  notifications: many(notificationsTable),
+}));
+
+export const deviceRelations = relations(devicesTable, ({ one }) => ({
+  user: one(usersTable, {
+    fields: [devicesTable.userId],
+    references: [usersTable.id],
+  }),
+}));
+
+export const mediaRelations = relations(mediaTable, ({ one }) => ({
+  post: one(postsTable, {
+    fields: [mediaTable.postId],
+    references: [postsTable.id],
+  }),
+}));
+
+export const commentRelations = relations(commentsTable, ({ one, many }) => ({
+  user: one(usersTable, {
+    fields: [commentsTable.userId],
+    references: [usersTable.id],
+  }),
+  post: one(postsTable, {
+    fields: [commentsTable.postId],
+    references: [postsTable.id],
+  }),
+  notifications: many(notificationsTable),
+}));
+
+export const likeRelations = relations(likesTable, ({ one, many }) => ({
+  user: one(usersTable, {
+    fields: [likesTable.userId],
+    references: [usersTable.id],
+  }),
+  post: one(postsTable, {
+    fields: [likesTable.postId],
+    references: [postsTable.id],
+  }),
+  notifications: many(notificationsTable),
+}));
+
+export const memberRelations = relations(membersTable, ({ one }) => ({
+  user: one(usersTable, {
+    fields: [membersTable.userId],
+    references: [usersTable.id],
+  }),
+  group: one(groupsTable, {
+    fields: [membersTable.groupId],
+    references: [groupsTable.id],
+  }),
+}));
+
+export const notificationRelations = relations(notificationsTable, ({ one }) => ({
+  actor: one(usersTable, {
+    fields: [notificationsTable.actorId],
+    references: [usersTable.id],
+    relationName: "actorNotifications",
+  }),
+  receiver: one(usersTable, {
+    fields: [notificationsTable.receiverId],
+    references: [usersTable.id],
+    relationName: "receiverNotifications",
+  }),
+  group: one(groupsTable, {
+    fields: [notificationsTable.groupId],
+    references: [groupsTable.id],
+  }),
+  post: one(postsTable, {
+    fields: [notificationsTable.postId],
+    references: [postsTable.id],
+  }),
+  comment: one(commentsTable, {
+    fields: [notificationsTable.commentId],
+    references: [commentsTable.id],
+  }),
+  like: one(likesTable, {
+    fields: [notificationsTable.likeId],
+    references: [likesTable.id],
+  }),
+  invitation: one(invitationsTable, {
+    fields: [notificationsTable.invitationId],
+    references: [invitationsTable.id],
+  }),
+}));
+
+export const linkRelations = relations(linksTable, ({ one, many }) => ({
+  group: one(groupsTable, {
+    fields: [linksTable.groupId],
+    references: [groupsTable.id],
+  }),
+  invitations: many(invitationsTable),
+}));
+
+export const invitationRelations = relations(invitationsTable, ({ one, many }) => ({
+  group: one(groupsTable, {
+    fields: [invitationsTable.groupId],
+    references: [groupsTable.id],
+  }),
+  invitationLink: one(linksTable, {
+    fields: [invitationsTable.invitationLinkId],
+    references: [linksTable.id],
+  }),
+  recipient: one(usersTable, {
+    fields: [invitationsTable.recipientId],
+    references: [usersTable.id],
+  }),
+  notifications: many(notificationsTable),
 }));

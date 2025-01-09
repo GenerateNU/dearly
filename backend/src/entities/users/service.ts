@@ -8,8 +8,8 @@ export interface UserService {
   getUser(id: string): Promise<User>;
   updateUser(id: string, payload: UpdateUserPayload): Promise<User>;
   deleteUser(id: string): Promise<void>;
-  registerDevice(id: string, expoToken: string): Promise<User>;
-  removeDevice(id: string, expoToken: string): Promise<User>;
+  registerDevice(id: string, expoToken: string): Promise<string[]>;
+  removeDevice(id: string, expoToken: string): Promise<string[]>;
 }
 
 export class UserServiceImpl implements UserService {
@@ -61,24 +61,18 @@ export class UserServiceImpl implements UserService {
     return handleServiceError(deleteUserImpl)();
   }
 
-  async registerDevice(id: string, expoToken: string): Promise<User> {
+  async registerDevice(id: string, expoToken: string): Promise<string[]> {
     const registerDevieceImpl = async () => {
-      const user = await this.userTransaction.insertDeviceToken(id, expoToken);
-      if (!user) {
-        throw new NotFoundError("User");
-      }
-      return user;
+      const devices = await this.userTransaction.insertDeviceToken(id, expoToken);
+      return devices;
     };
     return handleServiceError(registerDevieceImpl)();
   }
 
-  async removeDevice(id: string, expoToken: string): Promise<User> {
+  async removeDevice(id: string, expoToken: string): Promise<string[]> {
     const removeDeviceImpl = async () => {
-      const user = await this.userTransaction.deleteDeviceToken(id, expoToken);
-      if (!user) {
-        throw new NotFoundError("User");
-      }
-      return user;
+      const devices = await this.userTransaction.deleteDeviceToken(id, expoToken);
+      return devices;
     };
     return handleServiceError(removeDeviceImpl)();
   }

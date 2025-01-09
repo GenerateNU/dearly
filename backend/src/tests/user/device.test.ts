@@ -60,7 +60,8 @@ describe("POST and DELETE /users/devices", () => {
       })
     )
       .assertStatusCode(Status.OK)
-      .assertField("deviceTokens", [expoToken]);
+      .assertArraySize(1)
+      .assertBody([expoToken]);
 
     // register device token again and make sure it's not duplicated
     (
@@ -78,7 +79,8 @@ describe("POST and DELETE /users/devices", () => {
       })
     )
       .assertStatusCode(Status.OK)
-      .assertField("deviceTokens", [expoToken]);
+      .assertArraySize(1)
+      .assertBody([expoToken]);
   });
 
   it("should return 200 if valid expo token for remove", async () => {
@@ -97,7 +99,8 @@ describe("POST and DELETE /users/devices", () => {
       })
     )
       .assertStatusCode(Status.OK)
-      .assertField("deviceTokens", []);
+      .assertArraySize(0)
+      .assertBody([]);
 
     // remove token again and ensure no errors thrown
     (
@@ -115,7 +118,8 @@ describe("POST and DELETE /users/devices", () => {
       })
     )
       .assertStatusCode(Status.OK)
-      .assertField("deviceTokens", []);
+      .assertArraySize(0)
+      .assertBody([]);
   });
 
   it("should return 400 if expo token is invalid", async () => {
@@ -142,14 +146,12 @@ describe("POST and DELETE /users/devices", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.DELETE,
+        type: HTTPRequest.POST,
         route: "/api/v1/users/devices",
         requestBody: {
           expoToken,
         },
       })
-    )
-      .assertStatusCode(Status.NotFound)
-      .assertError("User not found");
+    ).assertStatusCode(Status.NotFound);
   });
 });

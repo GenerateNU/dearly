@@ -1,15 +1,15 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { CreateUserPayload, UpdateUserPayload, User } from "./validator";
-import { usersTable } from "../schema";
-import { eq, sql } from "drizzle-orm";
+import { devicesTable, usersTable } from "../schema";
+import { and, eq } from "drizzle-orm";
 
 export interface UserTransaction {
   insertUser(payload: CreateUserPayload): Promise<User | null>;
   selectUser(id: string): Promise<User | null>;
   updateUser(id: string, payload: UpdateUserPayload): Promise<User | null>;
   deleteUser(id: string): Promise<User | null>;
-  insertDeviceToken(id: string, expoToken: string): Promise<User | null>;
-  deleteDeviceToken(id: string, expoToken: string): Promise<User | null>;
+  insertDeviceToken(id: string, expoToken: string): Promise<string[]>;
+  deleteDeviceToken(id: string, expoToken: string): Promise<string[]>;
 }
 
 export class UserTransactionImpl implements UserTransaction {
@@ -37,7 +37,6 @@ export class UserTransactionImpl implements UserTransaction {
         username: payload.username,
         mode: payload.mode,
         profilePhoto: payload.profilePhoto,
-        deviceTokens: payload.deviceTokens,
         notificationsEnabled: payload.notificationsEnabled,
       })
       .where(eq(usersTable.id, id))
@@ -50,41 +49,25 @@ export class UserTransactionImpl implements UserTransaction {
     return result[0] ?? null;
   }
 
-  async insertDeviceToken(id: string, expoToken: string): Promise<User | null> {
-    const result = await this.db.transaction(async (tx) => {
-      let user = await tx.select().from(usersTable).where(eq(usersTable.id, id)).limit(1);
+  async getUserTokens(userId: string): Promise<string[]> {
+    const devices = await this.db
+      .select({ token: devicesTable.token })
+      .from(devicesTable)
+      .where(eq(devicesTable.userId, userId));
 
-      if (user[0] && !user[0].deviceTokens?.includes(expoToken)) {
-        user = await tx
-          .update(usersTable)
-          .set({
-            deviceTokens: sql`array_append(${usersTable.deviceTokens}, ${expoToken})`,
-          })
-          .where(eq(usersTable.id, id))
-          .returning();
-      }
-      return user;
-    });
-
-    return result[0] ?? null;
+    return devices.map((d) => d.token);
   }
 
-  async deleteDeviceToken(id: string, expoToken: string): Promise<User | null> {
-    const result = await this.db.transaction(async (tx) => {
-      let user = await tx.select().from(usersTable).where(eq(usersTable.id, id)).limit(1);
+  async insertDeviceToken(userId: string, token: string): Promise<string[]> {
+    await this.db.insert(devicesTable).values({ userId, token }).onConflictDoNothing();
+    return this.getUserTokens(userId);
+  }
 
-      if (user[0] && user[0].deviceTokens?.includes(expoToken)) {
-        user = await tx
-          .update(usersTable)
-          .set({
-            deviceTokens: sql`array_remove(${usersTable.deviceTokens}, ${expoToken})`,
-          })
-          .where(eq(usersTable.id, id))
-          .returning();
-      }
-      return user;
-    });
+  async deleteDeviceToken(userId: string, token: string): Promise<string[]> {
+    await this.db
+      .delete(devicesTable)
+      .where(and(eq(devicesTable.userId, userId), eq(devicesTable.token, token)));
 
-    return result[0] ?? null;
+    return this.getUserTokens(userId);
   }
 }

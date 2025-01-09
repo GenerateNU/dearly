@@ -64,12 +64,6 @@ components:
           type: string
           nullable: true
           description: A URL to the user's profile photo.
-        deviceTokens:
-          type: array
-          items:
-            type: string
-          nullable: true
-          description: The device tokens for notifications.
         notificationsEnabled:
           type: boolean
           description: True when user enables notification.
@@ -124,12 +118,6 @@ paths:
                   type: string
                   nullable: true
                   description: A URL to the user's profile photo.
-                deviceTokens:
-                  type: array
-                  items:
-                    type: string
-                  nullable: true
-                  description: The device tokens for notifications.
               required:
                 - name
                 - username
@@ -243,12 +231,6 @@ paths:
                   type: string
                   nullable: true
                   description: A URL to the user's profile photo.
-                deviceTokens:
-                  type: array
-                  items:
-                    type: string
-                  nullable: true
-                  description: The device tokens for notifications.
                 notificationsEnabled:
                   type: boolean
                   description: True when user wants to receive notifications.
@@ -320,6 +302,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+
   /api/v1/users/devices:
     post:
       summary: Register user's device token
@@ -337,22 +320,22 @@ paths:
                   description: The Expo Device Token of the user.
               required:
                 - expoToken
-              additionalProperties: true
       responses:
         200:
           description: Successfully registered the device token
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                type: array
+                items:
+                  type: string
+                description: Array of user's device tokens
         400:
           description: Malformed request
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: "#/components/schemas/Error"
-                  - $ref: "#/components/schemas/ValidationError"
+                $ref: "#/components/schemas/Error"
         401:
           description: Unauthorized due to invalid JWT
           content:
@@ -381,22 +364,22 @@ paths:
                   description: The Expo Device Token of the user.
               required:
                 - expoToken
-              additionalProperties: true
       responses:
         200:
-          description: Successfully registered the device token
+          description: Successfully removed the device token
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                type: array
+                items:
+                  type: string
+                description: Array of user's remaining device tokens
         400:
           description: Malformed request
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: "#/components/schemas/Error"
-                  - $ref: "#/components/schemas/ValidationError"
+                $ref: "#/components/schemas/Error"
         401:
           description: Unauthorized due to invalid JWT
           content:
@@ -409,4 +392,3 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-

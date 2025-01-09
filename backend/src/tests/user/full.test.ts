@@ -45,7 +45,6 @@ describe("End-to-end User CRUD", () => {
       .assertBody({
         id: userId,
         ...originalBody,
-        deviceTokens: [],
         mode: "BASIC",
         profilePhoto: null,
         notificationsEnabled: true,
@@ -64,7 +63,6 @@ describe("End-to-end User CRUD", () => {
       .assertBody({
         id: userId,
         ...originalBody,
-        deviceTokens: [],
         mode: "BASIC",
         profilePhoto: null,
         notificationsEnabled: true,
