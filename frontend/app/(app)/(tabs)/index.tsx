@@ -11,7 +11,6 @@ const Home = () => {
       justifyContent="center"
       backgroundColor="cardPrimaryBackground"
       flex={1}
-      margin="m"
     >
       <Button label="Logout" onPress={logout} />
     </Box>
