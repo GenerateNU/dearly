@@ -56,14 +56,10 @@ components:
           format: uuid
           example: 5e91507e-5630-4efd-9fd4-799178870b10
           description: A unique identifier for the user.
-        ageGroup:
-          type: string
-          enum: ["CHILD", "TEEN", "ADULT", "SENIOR"]
-          description: The age group of the user.
         mode:
           type: string
           enum: ["BASIC", "ADVANCED", null]
-          description: The mode for the user (e.g., "BASIC" or "ADVANCED").
+          description: The mode for the user (e.g., "BASIC" or "ADVANCED"). Default to "BASIC" if no mode is provided.
         profilePhoto:
           type: string
           nullable: true
@@ -74,11 +70,12 @@ components:
             type: string
           nullable: true
           description: The device tokens for notifications.
+        notificationsEnabled:
+          type: boolean
+          description: True when user enables notification.
       required:
         - name
         - username
-        - id
-        - ageGroup
         - mode
 
 paths:
@@ -119,10 +116,6 @@ paths:
                   type: string
                   minLength: 1
                   description: The username of the user.
-                ageGroup:
-                  type: string
-                  enum: ["CHILD", "TEEN", "ADULT", "SENIOR"]
-                  description: The age group of the user.
                 mode:
                   type: string
                   enum: ["BASIC", "ADVANCED", null]
@@ -140,7 +133,6 @@ paths:
               required:
                 - name
                 - username
-                - ageGroup
               additionalProperties: true
       responses:
         201:
@@ -235,15 +227,31 @@ paths:
             schema:
               type: object
               properties:
-                firstName:
+                name:
                   type: string
-                  description: The first name of the user.
-                lastName:
+                  minLength: 1
+                  description: Display name of the user.
+                username:
                   type: string
-                  description: The last name of the user.
-              required:
-                - firstName
-                - lastName
+                  minLength: 1
+                  description: The username of the user.
+                mode:
+                  type: string
+                  enum: ["BASIC", "ADVANCED", null]
+                  description: The mode for the user (e.g., "BASIC" or "ADVANCED").
+                profilePhoto:
+                  type: string
+                  nullable: true
+                  description: A URL to the user's profile photo.
+                deviceTokens:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                  description: The device tokens for notifications.
+                notificationsEnabled:
+                  type: boolean
+                  description: True when user wants to receive notifications.
               additionalProperties: true
       responses:
         200:

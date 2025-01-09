@@ -75,10 +75,6 @@ tasks:
     cmds:
       - cd backend && bun run test
 
-  start:
-    desc: "Start frontend and backend production server"
-    deps: [frontend:dev, backend:prod]
-
   generate:
     desc: "Generate Schema from OpenAPI Specification"
     cmds:

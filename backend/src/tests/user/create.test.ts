@@ -13,7 +13,6 @@ describe("POST /users", () => {
   const requestBody = {
     name: "Jane Doe",
     username: "janedoe",
-    ageGroup: "TEEN",
     mode: "BASIC",
   };
 
@@ -45,16 +44,16 @@ describe("POST /users", () => {
         deviceTokens: [],
         mode: "BASIC",
         profilePhoto: null,
+        notificationsEnabled: true,
       })
       .assertFieldNotEqual("id", testId);
   });
 
-  const fields = ["name", "username", "ageGroup"];
+  const fields = ["name", "username"];
   it.each(fields)("should return 400 if missing %s", async (field) => {
     const requestBody = {
       name: field !== "name" ? "Jane Doe" : undefined,
       username: field !== "username" ? "jdoe" : undefined,
-      ageGroup: field !== "ageGroup" ? "ADULT" : undefined,
     };
 
     (
@@ -101,7 +100,7 @@ describe("POST /users", () => {
       });
   });
 
-  it("should return 400 if invalid age group", async () => {
+  it("should return 400 if invalid mode", async () => {
     (
       await testBuilder.request({
         app,
@@ -110,7 +109,7 @@ describe("POST /users", () => {
         requestBody: {
           name: "jane doe",
           username: "jdoe",
-          ageGroup: "BABY",
+          mode: "EASY",
         },
       })
     )
@@ -119,9 +118,8 @@ describe("POST /users", () => {
         message: "Validation failed",
         errors: [
           {
-            message:
-              "Invalid enum value. Expected 'CHILD' | 'TEEN' | 'ADULT' | 'SENIOR', received 'BABY'",
-            path: "ageGroup",
+            message: "Invalid enum value. Expected 'BASIC' | 'ADVANCED', received 'EASY'",
+            path: "mode",
           },
         ],
       });

@@ -11,7 +11,6 @@ describe("GET /users/:id", () => {
   const requestBody = {
     name: "Jane Doe",
     username: "janedoe",
-    ageGroup: "TEEN",
   };
 
   beforeAll(async () => {
@@ -40,7 +39,8 @@ describe("GET /users/:id", () => {
         id,
         ...requestBody,
         deviceTokens: [],
-        mode: "ADVANCED",
+        mode: "BASIC",
+        notificationsEnabled: true,
         profilePhoto: null,
       })
       .assertStatusCode(Status.OK);

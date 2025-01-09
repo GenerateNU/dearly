@@ -9,6 +9,7 @@ import Input from "@/design-system/components/input";
 import Button from "@/design-system/components/button";
 import { AuthRequest } from "@/types/auth";
 import Box from "@/design-system/base/box";
+import { Mode } from "@/types/mode";
 
 type RegisterFormData = AuthRequest & {
   name: string;
@@ -52,7 +53,7 @@ const RegisterForm = () => {
       const validData = REGISTER_SCHEMA.parse(signupData);
       const data = {
         ...validData,
-        ageGroup: "TEEN",
+        mode: "BASIC" as Mode,
       };
 
       await register(data);
@@ -60,9 +61,10 @@ const RegisterForm = () => {
       if (isAuthenticated) {
         router.push("/(app)/(tabs)");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (err instanceof ZodError) {
-        Alert.alert(err.errors[0].message);
+        const errorMessages = err.errors.map((error) => error.message).join("\n");
+        Alert.alert("Validation Errors", errorMessages);
       }
     }
   };

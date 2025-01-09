@@ -8,7 +8,6 @@ import {
   notificationsTable,
   invitationsTable,
   linksTable,
-  mediaTable,
   likesTable,
   commentsTable,
 } from "../entities/schema";
@@ -22,7 +21,6 @@ export const resetDB = async (db: PostgresJsDatabase) => {
     notificationsTable,
     invitationsTable,
     linksTable,
-    mediaTable,
     likesTable,
     commentsTable,
   };
