@@ -1,5 +1,3 @@
-import { Mode } from "../../constants/database";
-import { AgeGroup } from "../../constants/database";
 import { InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
 import { CreateUserPayload, UpdateUserPayload, User } from "./validator";
@@ -23,9 +21,7 @@ export class UserServiceImpl implements UserService {
 
   async createUser(payload: CreateUserPayload): Promise<User> {
     const createUserImpl = async () => {
-      const mode = payload.ageGroup === AgeGroup.SENIOR ? Mode.BASIC : Mode.ADVANCED;
       const user = await this.userTransaction.insertUser({
-        mode,
         ...payload,
       });
       if (!user) {

@@ -1,9 +1,7 @@
-import { timestamp, uuid, pgEnum, pgTable, varchar } from "drizzle-orm/pg-core";
+import { timestamp, uuid, pgEnum, pgTable, varchar, boolean } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
-export const ageGroupEnum = pgEnum("ageGroup", ["CHILD", "TEEN", "ADULT", "SENIOR"]);
 export const userModeEnum = pgEnum("mode", ["BASIC", "ADVANCED"]);
-export const mediaTypeEnum = pgEnum("mediaType", ["IMAGE", "VIDEO", "AUDIO"]);
 export const memberRoleEnum = pgEnum("role", ["MEMBER", "MANAGER"]);
 export const referenceTypeEnum = pgEnum("referenceType", [
   "POST",
@@ -18,9 +16,9 @@ export const usersTable = pgTable("users", {
   id: uuid().primaryKey().defaultRandom(),
   name: varchar({ length: 100 }).notNull(),
   username: varchar({ length: 100 }).notNull().unique(),
-  ageGroup: ageGroupEnum().notNull(),
   mode: userModeEnum().notNull().default("BASIC"),
   profilePhoto: varchar(),
+  notificationsEnabled: boolean().notNull().default(true),
   deviceTokens: varchar({ length: 152 }).array().default([]),
 });
 
@@ -43,19 +41,7 @@ export const postsTable = pgTable("posts", {
     .references(() => usersTable.id, { onDelete: "cascade" }),
   createdAt: timestamp().notNull().defaultNow(),
   caption: varchar({ length: 500 }),
-  thumbnail: varchar(),
-});
-
-export const mediaTable = pgTable("media", {
-  id: uuid().primaryKey().defaultRandom(),
-  mediaType: mediaTypeEnum().notNull(),
-  media: varchar().notNull(),
-  postId: uuid()
-    .notNull()
-    .references(() => postsTable.id, { onDelete: "cascade" }),
-  commentId: uuid()
-    .notNull()
-    .references(() => commentsTable.id, { onDelete: "cascade" }),
+  media: varchar().array().default([]),
 });
 
 export const membersTable = pgTable("members", {
@@ -88,6 +74,7 @@ export const commentsTable = pgTable("comments", {
     .notNull()
     .references(() => postsTable.id, { onDelete: "cascade" }),
   content: varchar({ length: 500 }),
+  voiceMemo: varchar(),
 });
 
 export const notificationsTable = pgTable("notifications", {
@@ -154,7 +141,6 @@ export const postRelations = relations(postsTable, ({ one, many }) => ({
     fields: [postsTable.userId],
     references: [usersTable.id],
   }),
-  media: many(mediaTable),
   comments: many(commentsTable),
   likes: many(likesTable),
 }));

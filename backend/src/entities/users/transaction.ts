@@ -35,10 +35,10 @@ export class UserTransactionImpl implements UserTransaction {
       .set({
         name: payload.name,
         username: payload.username,
-        ageGroup: payload.ageGroup,
         mode: payload.mode,
         profilePhoto: payload.profilePhoto,
         deviceTokens: payload.deviceTokens,
+        notificationsEnabled: payload.notificationsEnabled,
       })
       .where(eq(usersTable.id, id))
       .returning();

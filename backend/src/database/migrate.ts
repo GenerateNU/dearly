@@ -6,12 +6,14 @@ export const automigrateDB = async (db: PostgresJsDatabase, config: Configuratio
   const originalLog = console.log;
   console.log = () => {};
 
-  try {
-    await migrate(db, config.automigrate);
-  } catch (error) {
-    console.error(error);
-    console.log("Failed to auto-migrate database");
-  } finally {
-    console.log = originalLog;
+  if (config.environment !== "production") {
+    try {
+      await migrate(db, config.automigrate);
+    } catch (error) {
+      console.error(error);
+      console.log("Failed to auto-migrate database");
+    } finally {
+      console.log = originalLog;
+    }
   }
 };

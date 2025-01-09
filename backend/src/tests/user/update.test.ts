@@ -11,7 +11,8 @@ describe("PUT /users/me", () => {
   const requestBody = {
     name: "Jane Doe",
     username: "janedoe",
-    ageGroup: "TEEN",
+    mode: "BASIC",
+    notificationsEnabled: false,
   };
   const userId = generateUUID();
   const jwt = generateJWTToken(3600, getConfigurations().authorization.jwtSecretKey, userId);
@@ -40,7 +41,6 @@ describe("PUT /users/me", () => {
       .assertFields({
         name: "Jane Doe",
         username: "janedoe",
-        ageGroup: "TEEN",
       });
 
     const irrelevantID = generateUUID();
@@ -53,7 +53,6 @@ describe("PUT /users/me", () => {
         requestBody: {
           id: irrelevantID, // ignored field
           name: "John Smith",
-          ageGroup: "SENIOR",
           mode: "BASIC",
         },
         ...authPayload,
@@ -62,7 +61,6 @@ describe("PUT /users/me", () => {
       .assertFields({
         name: "John Smith",
         username: "janedoe",
-        ageGroup: "SENIOR",
         mode: "BASIC",
         id: userId,
       })

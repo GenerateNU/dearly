@@ -11,12 +11,11 @@ describe("End-to-end User CRUD", () => {
   const originalBody = {
     name: "Jane Doe",
     username: "janedoe",
-    ageGroup: "SENIOR",
+    mode: "BASIC",
   };
   const updatedBody = {
     name: "John Smith",
     username: "johnsmith",
-    ageGroup: "SENIOR",
     mode: "ADVANCED",
   };
   const userId = generateUUID();
@@ -49,6 +48,7 @@ describe("End-to-end User CRUD", () => {
         deviceTokens: [],
         mode: "BASIC",
         profilePhoto: null,
+        notificationsEnabled: true,
       });
   });
 
@@ -67,6 +67,7 @@ describe("End-to-end User CRUD", () => {
         deviceTokens: [],
         mode: "BASIC",
         profilePhoto: null,
+        notificationsEnabled: true,
       });
   });
 

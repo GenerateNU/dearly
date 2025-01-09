@@ -36,9 +36,10 @@ const LoginForm = () => {
       if (isAuthenticated) {
         router.push("/(app)/(tabs)");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (err instanceof ZodError) {
-        Alert.alert(err.errors[0].message);
+        const errorMessages = err.errors.map((error) => error.message).join("\n");
+        Alert.alert("Validation Errors", errorMessages);
       }
     }
   };

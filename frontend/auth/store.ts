@@ -65,7 +65,7 @@ export const useAuthStore = create<AuthState>()(
       register: async ({
         name,
         username,
-        ageGroup,
+        mode,
         email,
         password,
       }: CreateUserPayload & AuthRequest) => {
@@ -75,7 +75,7 @@ export const useAuthStore = create<AuthState>()(
             email,
             password,
           });
-          const user = await createUser({ name, username, ageGroup });
+          const user = await createUser({ name, username, mode });
           set({
             mode: user.mode as Mode,
           });
