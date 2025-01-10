@@ -5,20 +5,10 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
-  should-run-checks:
-    runs-on: ubuntu-latest
+  backend-checks:
     if: |
       github.event.pull_request.draft == false &&
       github.actor != 'dependabot[bot]'
-    outputs:
-      should-run: ${{ steps.check.outputs.should-run }}
-    steps:
-      - id: check
-        run: echo "should-run=true" >> $GITHUB_OUTPUT
-
-  backend-checks:
-    needs: should-run-checks
-    if: needs.should-run-checks.outputs.should-run == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
