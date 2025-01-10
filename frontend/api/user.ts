@@ -11,7 +11,7 @@ export const createUser = async (payload: CreateUserPayload): Promise<User> => {
     throw new Error("Authorization token is missing.");
   }
 
-  const { data, error, response } = await fetchClient.POST("/api/v1/users", {
+  const { data } = await fetchClient.POST("/api/v1/users", {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
@@ -19,11 +19,8 @@ export const createUser = async (payload: CreateUserPayload): Promise<User> => {
     body: payload,
   });
 
-  if (response.ok && data) {
-    return data;
-  } else {
-    return handleHTTPStatusError(response.status, error);
-  }
+  //It is okay to type the data as defined because of the fetchClient API
+  return data!;
 };
 
 export const getUser = async (id: string): Promise<User> => {
