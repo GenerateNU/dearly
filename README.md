@@ -45,6 +45,17 @@ nix --experimental-features 'nix-command flakes' develop
 nix develop
 ```
 
+> [!NOTE]
+> If you get an error saying ```error: experimental Nix feature 'nix-command' is disabled; add '--extra-experimental-features nix-command' to enable it``` you can edit the file directly from the path /etc/nix/nix.conf and add ```experimental-features = nix-command flakes```
+
+#### Download Docker Desktop
+
+Install docker desktop from [here](https://www.docker.com/products/docker-desktop/). You do not need to make an account.
+
+#### Test Everything Works
+
+While in the nix flake, run ``` task test```. Make sure that all tests pass.
+
 ### Mobile Development
 
 - `macOS`, utilize [Xcode](https://developer.apple.com/xcode/) to natively run IOS emulators
@@ -53,4 +64,3 @@ nix develop
 > [!NOTE]
 > The nix shell script attempts to pass up ios or android sdks into the nix shell, so install xcode or android locally to be able to
 > run simulators in the shell.
-
