@@ -1,10 +1,21 @@
 import { paths } from "@/gen/openapi";
-import createClient from "openapi-react-query";
-import createFetchClient from "openapi-fetch";
+import createFetchClient, { Middleware } from "openapi-fetch";
 import { API_BASE_URL } from "@/constants/api";
+import { handleHTTPStatusError } from "@/utilities/errors";
 
 const fetchClient = createFetchClient<paths>({
   baseUrl: API_BASE_URL,
 });
 
-export const $api = createClient(fetchClient);
+const middleware: Middleware = {
+  async onResponse(res) {
+    const response = res.response;
+    if (!response.ok) {
+      handleHTTPStatusError(response.status, `Error found ${response.statusText}`);
+    }
+  },
+};
+
+fetchClient.use(middleware);
+
+export default fetchClient;
