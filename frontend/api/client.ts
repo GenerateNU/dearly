@@ -11,7 +11,7 @@ const middleware: Middleware = {
   async onResponse(res) {
     const response = res.response;
     if (!response.ok) {
-      handleHTTPStatusError(response.status, "Sample Error");
+      handleHTTPStatusError(response.status, `Error found ${response.statusText}`);
     }
   },
 };
