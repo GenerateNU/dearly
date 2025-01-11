@@ -11,8 +11,7 @@ const authWrapper = async (userFn: (token: string) => Promise<User>) => {
     throw new Error("Authorization token is missing.");
   }
   return userFn(token);
-}
-
+};
 
 export const createUser = async (payload: CreateUserPayload): Promise<User> => {
   const req = async (token: string): Promise<User> => {
@@ -24,7 +23,7 @@ export const createUser = async (payload: CreateUserPayload): Promise<User> => {
       body: payload,
     });
     return data!;
-  }
+  };
   return authWrapper(req);
 };
 
@@ -37,11 +36,11 @@ export const getUser = async (id: string): Promise<User> => {
       },
       params: {
         path: {
-          id: id
-        }
-      }
-    })
+          id: id,
+        },
+      },
+    });
     return data!;
-  }
-  return authWrapper(req)
+  };
+  return authWrapper(req);
 };
