@@ -4,6 +4,7 @@ import { userRoutes } from "../entities/users/route";
 import { apiReference } from "@scalar/hono-api-reference";
 import { getOpenAPISpecification } from "../utilities/docs";
 import { HEALTHCHECK } from "../types/api/routes/healthcheck";
+import { groupRoutes } from "../entities/groups/route";
 
 export const setUpRoutes = (app: Hono, db: PostgresJsDatabase) => {
   // api documentation

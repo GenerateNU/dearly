@@ -86,6 +86,8 @@ components:
 paths:
   /api/v1/groups:
     post:
+      tags:
+        - Group Endpoints
       summary: Creates a Group
       description: Creates a group by a user.
       security:
@@ -119,7 +121,7 @@ paths:
                   description:
                     type: string
                     description: A description of the group.
-                     nullable: true
+                    nullable: true
                   id:
                     type: string
                     format: uuid
