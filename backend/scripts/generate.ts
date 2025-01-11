@@ -1,6 +1,5 @@
 /* This File Injects Custom Types DO NOT TOUCH WITHOUT PERMISSION
- * Note this must be run in conjuction with the bash script otherwise the generation
- * */
+ */
 import fs from "node:fs";
 import { resolve } from "node:path";
 import openapiTS, { astToString } from "openapi-typescript";
