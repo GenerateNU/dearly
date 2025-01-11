@@ -18,8 +18,6 @@ export const createUser = async (payload: CreateUserPayload): Promise<User> => {
     },
     body: payload,
   });
-
-  //It is okay to type the data as defined because of the fetchClient API
   return data!;
 };
 

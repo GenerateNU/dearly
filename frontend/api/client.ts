@@ -7,13 +7,11 @@ const fetchClient = createFetchClient<paths>({
   baseUrl: API_BASE_URL,
 });
 
-// Might need to break this up
 const middleware: Middleware = {
   async onResponse(res) {
     const response = res.response;
-    const error = await response.json();
     if (!response.ok) {
-      handleHTTPStatusError(response.status, error);
+      handleHTTPStatusError(response.status, "Sample Error");
     }
   },
 };
