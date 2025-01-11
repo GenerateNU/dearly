@@ -9,7 +9,7 @@ export const registerDeviceToken = async (expoToken: string): Promise<string | n
       return null;
     }
 
-    const response = await fetch(`${API_BASE_URL}/users/devices`, {
+    const response = await fetch(`${API_BASE_URL}/api/v1/users/devices`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -39,7 +39,7 @@ export const unregisterDeviceToken = async (expoToken: string): Promise<void> =>
   try {
     const token = await getAuthToken();
 
-    const response = await fetch(`${API_BASE_URL}/users/devices`, {
+    const response = await fetch(`${API_BASE_URL}/api/v1/users/devices`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
