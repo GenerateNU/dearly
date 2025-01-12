@@ -1,4 +1,3 @@
-import { API_BASE_URL } from "@/constants/api";
 import { getAuthToken } from "@/utilities/device-token";
 import fetchClient from "./client";
 
@@ -8,9 +7,9 @@ const registerWrapper = <T>() => {
     if (!token) {
       return null;
     }
-    return await registerFn(token)
-  }
-}
+    return await registerFn(token);
+  };
+};
 
 export const registerDeviceToken = async (expoToken: string): Promise<string | null> => {
   const req = async (token: string) => {
@@ -19,10 +18,10 @@ export const registerDeviceToken = async (expoToken: string): Promise<string | n
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: { expoToken: expoToken }
-    })
+      body: { expoToken: expoToken },
+    });
     return expoToken;
-  }
+  };
   return registerWrapper<string | null>()(req);
 };
 
@@ -33,8 +32,8 @@ export const unregisterDeviceToken = async (expoToken: string): Promise<void | n
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: { expoToken: expoToken }
-    })
-  }
+      body: { expoToken: expoToken },
+    });
+  };
   return registerWrapper<void>()(req);
 };
