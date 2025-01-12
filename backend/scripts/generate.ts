@@ -3,7 +3,6 @@
 import fs from "node:fs";
 import { resolve } from "node:path";
 import openapiTS, { astToString } from "openapi-typescript";
-import ts from "typescript"
 
 const PROJECT_ROOT = resolve(__dirname, "../..");
 const BACKEND_DIR = `${PROJECT_ROOT}/backend/src/gen`;
@@ -32,6 +31,6 @@ const generate = async () => {
 
 generate().then(() => {
   console.log(
-    `.Successfully applied transformations and generated types. See ${BACKEND_DIR} and ${FRONTEND_DIR}`,
+    `Successfully applied transformations and generated types.\nSee ${BACKEND_DIR} and ${FRONTEND_DIR}.`,
   );
 });

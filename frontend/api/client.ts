@@ -8,8 +8,7 @@ const fetchClient = createFetchClient<paths>({
 });
 
 const middleware: Middleware = {
-  async onResponse(res) {
-    const response = res.response;
+  async onResponse({ response }) {
     if (!response.ok) {
       handleHTTPStatusError(response.status, `Error found ${response.statusText}`);
     }
