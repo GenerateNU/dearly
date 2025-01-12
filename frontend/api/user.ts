@@ -1,6 +1,17 @@
 import { CreateUserPayload, User } from "@/types/user";
-import fetchClient, { authWrapper } from "./client";
+import fetchClient from "./client";
+import { getAuthToken } from "@/utilities/device-token";
 
+/**
+ * Wraps Client API Requests with authorizations
+ */
+const authWrapper = () => async (userFn: (token: string) => Promise<User>) => {
+  const token = await getAuthToken();
+  if (!token) {
+    throw new Error("Authorization token is missing.");
+  }
+  return userFn(token);
+};
 
 export const createUser = async (payload: CreateUserPayload): Promise<User> => {
   const req = async (token: string): Promise<User> => {

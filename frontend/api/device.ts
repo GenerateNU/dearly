@@ -1,66 +1,40 @@
 import { API_BASE_URL } from "@/constants/api";
 import { getAuthToken } from "@/utilities/device-token";
+import fetchClient from "./client";
 
-export const registerDeviceToken = async (expoToken: string): Promise<string | null> => {
-  try {
+const registerWrapper = <T>() => {
+  return async (registerFn: (expoToken: string) => Promise<T>) => {
     const token = await getAuthToken();
-
     if (!token) {
       return null;
     }
+    return await registerFn(token)
+  }
+}
 
-    const response = await fetch(`${API_BASE_URL}/api/v1/users/devices`, {
-      method: "POST",
+export const registerDeviceToken = async (expoToken: string): Promise<string | null> => {
+  const req = async (token: string) => {
+    await fetchClient.POST("/api/v1/users/devices", {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ expoToken }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || "Failed to register device token.");
-    }
-
+      body: { expoToken: expoToken }
+    })
     return expoToken;
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error("Error during device token registration:", error.message);
-    } else {
-      console.error("An unknown error occurred during device token registration.");
-    }
-    throw error;
   }
+  return registerWrapper<string | null>()(req);
 };
 
-export const unregisterDeviceToken = async (expoToken: string): Promise<void> => {
-  try {
-    const token = await getAuthToken();
-
-    const response = await fetch(`${API_BASE_URL}/api/v1/users/devices`, {
-      method: "DELETE",
+export const unregisterDeviceToken = async (expoToken: string): Promise<void | null> => {
+  const req = async (token: string) => {
+    await fetchClient.DELETE("/api/v1/users/devices", {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ expoToken }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || "Failed to unregister device token.");
-    }
-
-    console.log("Device token unregistered successfully.");
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error("Error during device token unregistration:", error.message);
-    } else {
-      console.error("An unknown error occurred during device token unregistration.");
-    }
-    throw error;
+      body: { expoToken: expoToken }
+    })
   }
+  return registerWrapper<void>()(req);
 };
