@@ -3,6 +3,7 @@
 import fs from "node:fs";
 import { resolve } from "node:path";
 import openapiTS, { astToString } from "openapi-typescript";
+import ts from "typescript"
 
 const PROJECT_ROOT = resolve(__dirname, "../..");
 const BACKEND_DIR = `${PROJECT_ROOT}/backend/src/gen`;
