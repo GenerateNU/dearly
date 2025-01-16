@@ -1,15 +1,12 @@
 import { Hono } from "hono";
 import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
-import { generateJWTToken, generateUUID } from "../helpers/test-token";
+import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
-import { Configuration } from "../../types/config";
-import { getConfigurations } from "../../config/config";
 
 describe("POST /users", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
-  const config: Configuration = getConfigurations();
   const requestBody = {
     name: "Jane Doe",
     username: "janedoe",
@@ -127,7 +124,7 @@ describe("POST /users", () => {
   it("should return 201 with id match id used to encode JWT", async () => {
     const encodeJWTUUID = generateUUID();
     const irrelevantUUID = generateUUID();
-    const generatedJWT = generateJWTToken(3600, config.authorization.jwtSecretKey, encodeJWTUUID);
+    const generatedJWT = generateJWTFromID(encodeJWTUUID);
     (
       await testBuilder.request({
         app,
@@ -164,7 +161,7 @@ describe("POST /users", () => {
   });
 
   it("should return 409 if try to create user with same JWT", async () => {
-    const generatedJWT = generateJWTToken(3600, config.authorization.jwtSecretKey, generateUUID());
+    const generatedJWT = generateJWTFromID(generateUUID());
     (
       await testBuilder.request({
         app,

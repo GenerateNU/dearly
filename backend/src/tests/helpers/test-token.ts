@@ -1,5 +1,6 @@
 import * as jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
+import { getConfigurations } from "../../config/config";
 
 export const generateJWTToken = (
   validDuration: number,
@@ -19,11 +20,11 @@ export const generateJWTToken = (
   return token;
 };
 
-export const generateJWTForTesting = (secretKey: string) => {
-  return generateJWTToken(60 * 60 * 5, secretKey);
+export const generateJWTFromID = (id: string = generateUUID()) => {
+  return generateJWTToken(3600, getConfigurations().authorization.jwtSecretKey, id);
 };
 
-export const generateExpiredJWT = (secretKey: string): string => {
+export const generateExpiredJWT = (): string => {
   const expiredTime = Math.floor(Date.now() / 1000) - 3600;
   const finalPayload = {
     sub: generateUUID(),
@@ -31,7 +32,7 @@ export const generateExpiredJWT = (secretKey: string): string => {
     exp: expiredTime,
   };
 
-  return jwt.sign(finalPayload, secretKey);
+  return jwt.sign(finalPayload, getConfigurations().authorization.jwtSecretKey);
 };
 
 export const generateUUID = (): string => {

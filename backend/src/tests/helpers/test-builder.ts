@@ -1,9 +1,8 @@
 import { Hono } from "hono";
 import { StatusCode } from "hono/utils/http-status";
-import { generateJWTForTesting } from "./test-token";
-import { getConfigurations } from "../../config/config";
 import { expect } from "@jest/globals";
 import { HTTPRequest } from "../../constants/http";
+import { generateJWTFromID, generateUUID } from "./test-token";
 
 interface Request {
   app: Hono;
@@ -90,7 +89,7 @@ export class TestBuilder {
     const resultHeaders = new Headers(headers);
 
     if (autoAuthorized) {
-      const token = generateJWTForTesting(getConfigurations().authorization.jwtSecretKey);
+      const token = generateJWTFromID(generateUUID());
       resultHeaders.set("Authorization", `Bearer ${token}`);
     }
 
@@ -111,7 +110,7 @@ export class TestBuilder {
       };
     } else {
       return {
-        Authorization: `Bearer ${generateJWTForTesting(getConfigurations().authorization.jwtSecretKey)}`,
+        Authorization: `Bearer ${generateJWTFromID(generateUUID())}`,
         ...headers,
       };
     }

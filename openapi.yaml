@@ -70,8 +70,98 @@ components:
         - name
         - username
         - mode
+    Group:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the group.
+        description:
+          type: string
+          description: A description of the group.
+      required:
+        - name
 
 paths:
+  /api/v1/groups:
+    post:
+      tags:
+        - Group Endpoints
+      summary: Creates a group
+      description: Creates a group, a specific circle of family members or friends that are connected within the app.
+      security:
+        - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  description: The name of the group.
+                description:
+                  type: string
+                  description: A description of the group.
+              required:
+                - name
+      responses:
+        201:
+          description: Successfully created a group
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The name of the group.
+                  description:
+                    type: string
+                    description: A description of the group.
+                    nullable: true
+                  id:
+                    type: string
+                    format: uuid
+                    example: 5e91507e-5630-4efd-9fd4-799178870b10
+                    description: A unique identifier for the group.
+                  managerId:
+                    type: string
+                    format: uuid
+                    example: 5e91507e-5630-4efd-9fd4-799178870b10
+                    description: A unique identifier of the group manager.
+                required:
+                  - name
+                  - id
+                  - managerId
+                  - description
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /healthcheck:
     get:
       tags:
@@ -79,7 +169,7 @@ paths:
       summary: Healthcheck endpoint
       description: Pings the server to check the health of the current server
       responses:
-        "200":
+        200:
           description: Success!
           content:
             application/json:

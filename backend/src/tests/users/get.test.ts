@@ -66,6 +66,6 @@ describe("GET /users/:id", () => {
       })
     )
       .assertStatusCode(Status.NotFound)
-      .assertError("User not found");
+      .assertError("User does not exist.");
   });
 });

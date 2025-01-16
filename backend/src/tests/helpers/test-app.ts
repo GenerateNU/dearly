@@ -5,6 +5,7 @@ import { configureMiddlewares } from "../../middlewares/init";
 import { setUpRoutes } from "../../routes/init";
 import { automigrateDB } from "../../database/migrate";
 import { resetDB } from "../../database/reset";
+import { seedDatabase } from "./seed-db";
 
 export const startTestApp = async (): Promise<Hono> => {
   const app = new Hono();
@@ -16,6 +17,8 @@ export const startTestApp = async (): Promise<Hono> => {
   await automigrateDB(db, config);
 
   await resetDB(db);
+
+  await seedDatabase(db);
 
   configureMiddlewares(app, config);
 

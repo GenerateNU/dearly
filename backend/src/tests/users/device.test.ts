@@ -1,15 +1,12 @@
 import { Hono } from "hono";
 import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
-import { generateJWTForTesting } from "../helpers/test-token";
+import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
-import { Configuration } from "../../types/config";
-import { getConfigurations } from "../../config/config";
 
 describe("POST and DELETE /users/devices", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
-  const config: Configuration = getConfigurations();
   const expoToken = "ExponentPushToken[Z9Hfn6ZxWVXaAs7MG3Pya8]";
 
   const requestBody = {
@@ -18,7 +15,7 @@ describe("POST and DELETE /users/devices", () => {
     ageGroup: "TEEN",
     mode: "BASIC",
   };
-  const jwt = generateJWTForTesting(config.authorization.jwtSecretKey);
+  const jwt = generateJWTFromID(generateUUID());
 
   beforeAll(async () => {
     app = await startTestApp();
