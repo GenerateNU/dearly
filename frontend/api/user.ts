@@ -1,11 +1,11 @@
 import { CreateUserPayload, User } from "@/types/user";
-import { getAuthToken } from "@/utilities/device-token";
 import fetchClient from "./client";
+import { getAuthToken } from "@/utilities/device-token";
 
 /**
  * Wraps Client API Requests with authorizations
  */
-const authWrapper = async (userFn: (token: string) => Promise<User>) => {
+const authWrapper = () => async (userFn: (token: string) => Promise<User>) => {
   const token = await getAuthToken();
   if (!token) {
     throw new Error("Authorization token is missing.");
@@ -24,7 +24,7 @@ export const createUser = async (payload: CreateUserPayload): Promise<User> => {
     });
     return data!;
   };
-  return authWrapper(req);
+  return authWrapper()(req);
 };
 
 export const getUser = async (id: string): Promise<User> => {
@@ -42,5 +42,5 @@ export const getUser = async (id: string): Promise<User> => {
     });
     return data!;
   };
-  return authWrapper(req);
+  return authWrapper()(req);
 };

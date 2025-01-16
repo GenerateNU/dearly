@@ -31,6 +31,6 @@ const generate = async () => {
 
 generate().then(() => {
   console.log(
-    `.Successfully applied transformations and generated types. See ${BACKEND_DIR} and ${FRONTEND_DIR}`,
+    `Successfully applied transformations and generated types.\nSee ${BACKEND_DIR} and ${FRONTEND_DIR}.`,
   );
 });
