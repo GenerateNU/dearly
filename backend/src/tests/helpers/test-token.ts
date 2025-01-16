@@ -20,8 +20,8 @@ export const generateJWTToken = (
   return token;
 };
 
-export const generateJWTFromID = (id: string = generateUUID(), duration: number = 3600) => {
-  return generateJWTToken(duration, getConfigurations().authorization.jwtSecretKey, id);
+export const generateJWTFromID = (id: string = generateUUID()) => {
+  return generateJWTToken(3600, getConfigurations().authorization.jwtSecretKey, id);
 };
 
 export const generateExpiredJWT = (): string => {

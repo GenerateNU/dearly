@@ -195,7 +195,7 @@ Integration tests ensure components work correctly together, validating end-to-e
 - Easy to write tests before implementation and easy to modify.
 - We also have some helper functions that are not part of test builder but can be used when needed.
   - `generateUUID`: generate a valid UUID (can be used for testing NotFoundError)
-  - `generateJWTFromID`: generate a valid JWT for authorization from UUID
+  - `generateJWTFromID`: generate a valid JWT for authorization from a UUID. This will generate a new JWT by encoding a randomized UUID if no arguments are provided.
 
 ### **1. Test Setup**
 

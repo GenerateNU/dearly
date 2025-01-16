@@ -14,11 +14,7 @@ const config = getConfigurations();
   try {
     const db = connectDB(config);
 
-    console.log(
-      "JWT for manual testing:",
-      generateJWTFromID(),
-      "\n",
-    );
+    console.log("JWT for manual testing:", generateJWTFromID(), "\n");
 
     await automigrateDB(db, config);
 
