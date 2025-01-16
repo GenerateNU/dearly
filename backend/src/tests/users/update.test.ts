@@ -1,9 +1,8 @@
 import { Hono } from "hono";
 import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
-import { generateJWTToken, generateUUID } from "../helpers/test-token";
+import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
-import { getConfigurations } from "../../config/config";
 
 describe("PUT /users/me", () => {
   let app: Hono;
@@ -15,7 +14,7 @@ describe("PUT /users/me", () => {
     notificationsEnabled: false,
   };
   const userId = generateUUID();
-  const jwt = generateJWTToken(3600, getConfigurations().authorization.jwtSecretKey, userId);
+  const jwt = generateJWTFromID(userId);
   const authPayload = {
     autoAuthorized: false,
     headers: {
@@ -78,6 +77,6 @@ describe("PUT /users/me", () => {
       })
     )
       .assertStatusCode(Status.NotFound)
-      .assertError("User not found");
+      .assertError("User does not exist.");
   });
 });

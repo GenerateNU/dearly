@@ -27,7 +27,7 @@ abstract class AbstractAppError implements AppError {
 }
 
 class NotFoundError extends AbstractAppError {
-  constructor(resource: string, message: string = `${resource} not found`) {
+  constructor(resource: string, message: string = `${resource} does not exist.`) {
     super("NotFoundError", message, Status.NotFound);
   }
 }

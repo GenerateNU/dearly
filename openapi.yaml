@@ -70,7 +70,6 @@ components:
         - name
         - username
         - mode
-        # Group Schema
     Group:
       type: object
       properties:
@@ -88,8 +87,8 @@ paths:
     post:
       tags:
         - Group Endpoints
-      summary: Creates a Group
-      description: Creates a group by a user.
+      summary: Creates a group
+      description: Creates a group, a specific circle of family members or friends that are connected within the app.
       security:
         - BearerAuth: []
       requestBody:
@@ -127,9 +126,16 @@ paths:
                     format: uuid
                     example: 5e91507e-5630-4efd-9fd4-799178870b10
                     description: A unique identifier for the group.
+                  managerId:
+                    type: string
+                    format: uuid
+                    example: 5e91507e-5630-4efd-9fd4-799178870b10
+                    description: A unique identifier of the group manager.
                 required:
                   - name
                   - id
+                  - managerId
+                  - description
         400:
           description: Malformed request
           content:

@@ -1,18 +1,19 @@
 import { groupsTable } from "../schema";
-import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
 import z from "zod";
-import { Expo } from "expo-server-sdk";
 
-export type CreateGroupPayLoad = typeof groupsTable.$inferInsert;
+export type CreateGroupPayload = typeof groupsTable.$inferInsert;
 export type Group = typeof groupsTable.$inferSelect;
 
-export const createGroupValidate = createInsertSchema(groupsTable, {
-  name: (schema) => schema.min(1),
-  description: (schema) => schema.min(1),
-}).omit({ id: true, managerId: true });
-
-export const expoTokenValidate = z.object({
-  expoToken: z.string().refine((token) => Expo.isExpoPushToken(token), {
-    message: "Invalid Expo Push Token",
-  }),
-});
+export const createGroupValidate = z
+  .object({
+    name: z
+      .string()
+      .min(1, "Name must be at least 1 character long")
+      .max(100, "Name must be at most 100 characters long"),
+    description: z
+      .string()
+      .min(1, "Description must be at least 1 character long")
+      .max(500, "Description must be at most 500 characters long")
+      .optional(),
+  })
+  .passthrough();

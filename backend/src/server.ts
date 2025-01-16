@@ -4,7 +4,7 @@ import { connectDB } from "./database/connect";
 import { configureMiddlewares } from "./middlewares/init";
 import { setUpRoutes } from "./routes/init";
 import { automigrateDB } from "./database/migrate";
-import { generateJWTForTesting } from "./tests/helpers/test-token";
+import { generateJWTFromID } from "./tests/helpers/test-token";
 
 const app = new Hono();
 
@@ -16,7 +16,7 @@ const config = getConfigurations();
 
     console.log(
       "JWT for manual testing:",
-      generateJWTForTesting(config.authorization.jwtSecretKey),
+      generateJWTFromID(),
       "\n",
     );
 

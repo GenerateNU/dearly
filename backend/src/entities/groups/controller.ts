@@ -12,10 +12,15 @@ export interface GroupController {
 export class GroupControllerImpl implements GroupController {
   private groupService: GroupService;
 
+  constructor(groupService: GroupService) {
+    this.groupService = groupService;
+  }
+
   async createGroup(ctx: Context): Promise<GROUP_API> {
     const createGroupImpl = async () => {
       const body = await ctx.req.json();
       const payload = createGroupValidate.parse(body);
+
       const userId = ctx.get("userId");
       const newGroup = {
         managerId: userId,
@@ -24,11 +29,6 @@ export class GroupControllerImpl implements GroupController {
       const group = await this.groupService.createGroup(newGroup);
       return ctx.json(group, Status.Created);
     };
-    const groupRes = await handleAppError(createGroupImpl)(ctx);
-    return groupRes;
-  }
-
-  constructor(groupService: GroupService) {
-    this.groupService = groupService;
+    return await handleAppError(createGroupImpl)(ctx);
   }
 }

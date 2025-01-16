@@ -6,6 +6,7 @@ import { UserController, UserControllerImpl } from "./controller";
 
 export const userRoutes = (db: PostgresJsDatabase): Hono => {
   const user = new Hono();
+
   const userTransaction: UserTransaction = new UserTransactionImpl(db);
   const userService: UserService = new UserServiceImpl(userTransaction);
   const userController: UserController = new UserControllerImpl(userService);

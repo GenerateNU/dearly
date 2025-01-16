@@ -1,18 +1,27 @@
+import { InternalServerError } from "../../utilities/errors/app-error";
+import { handleServiceError } from "../../utilities/errors/service-error";
 import { GroupTransaction } from "./transaction";
-import { CreateGroupPayLoad, Group } from "./validator";
+import { CreateGroupPayload, Group } from "./validator";
 
 export interface GroupService {
-    createGroup(payload: CreateGroupPayLoad): Promise<Group>;
+  createGroup(payload: CreateGroupPayload): Promise<Group>;
 }
 
 export class GroupServiceImpl implements GroupService {
-    private groupTransaction: GroupTransaction
-    createGroup(payload: CreateGroupPayLoad): Promise<Group> {
-        throw new Error("Method not implemented.");
-    }
-    
-    constructor(groupTransaction: GroupTransaction){
-        this.groupTransaction = groupTransaction
+  private groupTransaction: GroupTransaction;
 
-    }
+  constructor(groupTransaction: GroupTransaction) {
+    this.groupTransaction = groupTransaction;
+  }
+
+  async createGroup(payload: CreateGroupPayload): Promise<Group> {
+    const createGroupImpl = async () => {
+      const group = await this.groupTransaction.insertGroup(payload);
+      if (!group) {
+        throw new InternalServerError("Failed to create group");
+      }
+      return group;
+    };
+    return handleServiceError(createGroupImpl)();
+  }
 }

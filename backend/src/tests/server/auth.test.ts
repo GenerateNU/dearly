@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { isAuthorized } from "../../middlewares/auth";
 import {
   generateExpiredJWT,
-  generateJWTForTesting,
+  generateJWTFromID,
   generateJWTToken,
   generateUUID,
 } from "../helpers/test-token";
@@ -71,7 +71,7 @@ describe("Authorization Middleware", () => {
   });
 
   it("should return 401 if token has expired", async () => {
-    const expiredToken = generateExpiredJWT(config.authorization.jwtSecretKey);
+    const expiredToken = generateExpiredJWT();
     (
       await testBuilder.request({
         app,
@@ -87,7 +87,7 @@ describe("Authorization Middleware", () => {
   });
 
   it("should return 200 if token is valid", async () => {
-    const validToken = generateJWTForTesting(config.authorization.jwtSecretKey);
+    const validToken = generateJWTFromID(generateUUID());
     (
       await testBuilder.request({
         app,
