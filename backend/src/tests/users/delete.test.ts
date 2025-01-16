@@ -2,17 +2,13 @@ import { Hono } from "hono";
 import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
 import { HTTPRequest, Status } from "../../constants/http";
-import { generateJWTToken, generateUUID } from "../helpers/test-token";
-import { getConfigurations } from "../../config/config";
+import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 
 describe("DELETE /users/me", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
-  const jwt = generateJWTToken(
-    3600,
-    getConfigurations().authorization.jwtSecretKey,
-    generateUUID(),
-  );
+  const jwt = generateJWTFromID(generateUUID());
+
   const authPayload = {
     autoAuthorized: false,
     headers: {
