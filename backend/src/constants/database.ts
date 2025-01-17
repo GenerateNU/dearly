@@ -3,15 +3,8 @@ export enum Mode {
   BASIC = "BASIC",
 }
 
-export enum AgeGroup {
-  CHILD = "CHILD",
-  TEEN = "TEEN",
-  ADULT = "ADULT",
-  SENIOR = "SENIOR",
-}
-
 export enum MediaType {
-  IMAGE = "IMAGE",
+  PHOTO = "PHOTO",
   VIDEO = "VIDEO",
   AUDIO = "AUDIO",
 }
@@ -33,3 +26,9 @@ export enum InvitationStatus {
   PENDING = "PENDING",
   ACCEPTED = "ACCEPTED",
 }
+
+export const TEXT_MAX_LIMIT = 500;
+export const NAME_MAX_LIMIT = 100;
+export const DEVICE_TOKEN_MAX_LIMIT = 152;
+export const MIN_LIMIT = 1;
+export const NOTIFICATION_BODY_MAX_LIMIT = 300;
