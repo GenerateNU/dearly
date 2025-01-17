@@ -1,5 +1,11 @@
+import {
+  TEXT_MAX_LIMIT,
+  DEVICE_TOKEN_MAX_LIMIT,
+  NOTIFICATION_BODY_MAX_LIMIT,
+} from "./../constants/database";
 import { timestamp, uuid, pgEnum, pgTable, varchar, boolean } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
+import { NAME_MAX_LIMIT } from "../constants/database";
 
 export const userModeEnum = pgEnum("mode", ["BASIC", "ADVANCED"]);
 export const postMediaEnum = pgEnum("mediaType", ["VIDEO", "PHOTO"]);
@@ -15,8 +21,8 @@ export const invitationStatusEnum = pgEnum("status", ["PENDING", "ACCEPTED"]);
 
 export const usersTable = pgTable("users", {
   id: uuid().primaryKey().defaultRandom(),
-  name: varchar({ length: 100 }).notNull(),
-  username: varchar({ length: 100 }).notNull().unique(),
+  name: varchar({ length: NAME_MAX_LIMIT }).notNull(),
+  username: varchar({ length: NAME_MAX_LIMIT }).notNull().unique(),
   mode: userModeEnum().notNull().default("BASIC"),
   profilePhoto: varchar(),
   notificationsEnabled: boolean().notNull().default(true),
@@ -27,13 +33,13 @@ export const devicesTable = pgTable("devices", {
   userId: uuid()
     .notNull()
     .references(() => usersTable.id, { onDelete: "cascade" }),
-  token: varchar({ length: 152 }).notNull(),
+  token: varchar({ length: DEVICE_TOKEN_MAX_LIMIT }).notNull(),
 });
 
 export const groupsTable = pgTable("groups", {
   id: uuid().primaryKey().defaultRandom(),
-  name: varchar({ length: 100 }).notNull(),
-  description: varchar({ length: 500 }),
+  name: varchar({ length: NAME_MAX_LIMIT }).notNull(),
+  description: varchar({ length: TEXT_MAX_LIMIT }),
   managerId: uuid()
     .notNull()
     .references(() => usersTable.id, { onDelete: "cascade" }),
@@ -48,7 +54,7 @@ export const postsTable = pgTable("posts", {
     .notNull()
     .references(() => usersTable.id, { onDelete: "cascade" }),
   createdAt: timestamp().notNull().defaultNow(),
-  caption: varchar({ length: 500 }),
+  caption: varchar({ length: TEXT_MAX_LIMIT }),
 });
 
 export const mediaTable = pgTable("media", {
@@ -89,7 +95,7 @@ export const commentsTable = pgTable("comments", {
   postId: uuid()
     .notNull()
     .references(() => postsTable.id, { onDelete: "cascade" }),
-  content: varchar({ length: 500 }),
+  content: varchar({ length: TEXT_MAX_LIMIT }),
   voiceMemo: varchar(),
 });
 
@@ -107,8 +113,8 @@ export const notificationsTable = pgTable("notifications", {
   commentId: uuid().references(() => commentsTable.id, { onDelete: "cascade" }),
   likeId: uuid().references(() => likesTable.id, { onDelete: "cascade" }),
   invitationId: uuid().references(() => invitationsTable.id, { onDelete: "cascade" }),
-  title: varchar({ length: 100 }).notNull(),
-  description: varchar({ length: 300 }).notNull(),
+  title: varchar({ length: NAME_MAX_LIMIT }).notNull(),
+  description: varchar({ length: NOTIFICATION_BODY_MAX_LIMIT }).notNull(),
 });
 
 export const linksTable = pgTable("links", {
