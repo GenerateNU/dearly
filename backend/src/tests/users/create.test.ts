@@ -3,6 +3,7 @@ import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
+import { MIN_LIMIT } from "../../constants/database";
 
 describe("POST /users", () => {
   let app: Hono;
@@ -86,11 +87,11 @@ describe("POST /users", () => {
         errors: [
           {
             path: "name",
-            message: "String must contain at least 1 character(s)",
+            message: `String must contain at least ${MIN_LIMIT} character(s)`,
           },
           {
             path: "username",
-            message: "String must contain at least 1 character(s)",
+            message: `String must contain at least ${MIN_LIMIT} character(s)`,
           },
         ],
       });
