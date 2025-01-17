@@ -4,6 +4,7 @@ import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID } from "../helpers/test-token";
 import { HTTPRequest } from "../../constants/http";
 import { GROUP_EMPTY_FIELDS_ERRORS, USER_ALICE_ID } from "../helpers/test-constants";
+import { NAME_MAX_LIMIT, TEXT_MAX_LIMIT } from "../../constants/database";
 
 describe("POST /groups", () => {
   let app: Hono;
@@ -92,14 +93,14 @@ describe("POST /groups", () => {
       ]);
   });
 
-  it("should return 400 if name's length > 100 chars", async () => {
+  it(`should return 400 if name's length > ${NAME_MAX_LIMIT} chars`, async () => {
     (
       await testBuilder.request({
         app,
         type: HTTPRequest.POST,
         route: "/api/v1/groups",
         requestBody: {
-          name: "a".repeat(101),
+          name: "a".repeat(NAME_MAX_LIMIT + 1),
           description: requestBody.description,
         },
       })
@@ -108,12 +109,12 @@ describe("POST /groups", () => {
       .assertError([
         {
           path: "name",
-          message: "Name must be at most 100 characters long",
+          message: `Name must be at most ${NAME_MAX_LIMIT} characters long`,
         },
       ]);
   });
 
-  it("should return 400 if description's length > 500 chars", async () => {
+  it(`should return 400 if description's length > ${TEXT_MAX_LIMIT} chars`, async () => {
     (
       await testBuilder.request({
         app,
@@ -121,7 +122,7 @@ describe("POST /groups", () => {
         route: "/api/v1/groups",
         requestBody: {
           name: requestBody.name,
-          description: "a".repeat(501),
+          description: "a".repeat(TEXT_MAX_LIMIT + 1),
         },
       })
     )
@@ -129,7 +130,7 @@ describe("POST /groups", () => {
       .assertError([
         {
           path: "description",
-          message: "Description must be at most 500 characters long",
+          message: `Description must be at most ${TEXT_MAX_LIMIT} characters long`,
         },
       ]);
   });
