@@ -1,12 +1,7 @@
 import { CreatePostPayload, PostWithMedia, UpdatePostPayload, IDPayload } from "./validator";
 import { PostTransaction } from "./transaction";
-import {
-  ForbiddenError,
-  InternalServerError,
-  NotFoundError,
-} from "../../utilities/errors/app-error";
+import { InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
-import { CheckMemberTransaction } from "./role-transaction";
 
 export interface PostService {
   createPost(payload: CreatePostPayload): Promise<PostWithMedia>;
@@ -15,23 +10,16 @@ export interface PostService {
   deletePost(payload: IDPayload): Promise<void>;
 }
 
-interface PostServiceDep {
-  postTransaction: PostTransaction;
-  checkMemberTransaction: CheckMemberTransaction;
-}
-
 export class PostServiceImpl implements PostService {
   private postTransaction: PostTransaction;
-  private checkMemberTransaction: CheckMemberTransaction;
+  private ERROR_MESSAGE = "Post not found or you do not have permission.";
 
-  constructor(dep: PostServiceDep) {
-    this.postTransaction = dep.postTransaction;
-    this.checkMemberTransaction = dep.checkMemberTransaction;
+  constructor(postTransaction: PostTransaction) {
+    this.postTransaction = postTransaction;
   }
 
   async createPost(payload: CreatePostPayload): Promise<PostWithMedia> {
     const createPostImpl = async () => {
-      await this.checkIsMember(payload.groupId, payload.userId);
       const post = await this.postTransaction.createPost(payload);
       if (!post) {
         throw new InternalServerError("Failed to create post");
@@ -43,10 +31,9 @@ export class PostServiceImpl implements PostService {
 
   async getPost(payload: IDPayload): Promise<PostWithMedia> {
     const getPostImpl = async () => {
-      await this.checkIsMember(payload.groupId, payload.userId);
-      const post = await this.postTransaction.getPost(payload.id);
+      const post = await this.postTransaction.getPost(payload);
       if (!post) {
-        throw new NotFoundError("Post does not exist.");
+        throw new NotFoundError("", this.ERROR_MESSAGE);
       }
       return post;
     };
@@ -55,10 +42,9 @@ export class PostServiceImpl implements PostService {
 
   async updatePost(payload: UpdatePostPayload): Promise<PostWithMedia> {
     const createPostImpl = async () => {
-      await this.checkIsOwner(payload.id, payload.userId);
       const updatedPost = await this.postTransaction.updatePost(payload);
       if (!updatedPost) {
-        throw new NotFoundError("Post does not exist.");
+        throw new NotFoundError("", this.ERROR_MESSAGE);
       }
       return updatedPost;
     };
@@ -67,28 +53,8 @@ export class PostServiceImpl implements PostService {
 
   async deletePost(payload: IDPayload): Promise<void> {
     const deletePostImpl = async () => {
-      await this.checkIsOwner(payload.id, payload.userId);
-      await this.postTransaction.deletePost(payload.id);
+      await this.postTransaction.deletePost(payload.id, payload.userId);
     };
     return await handleServiceError(deletePostImpl)();
-  }
-
-  async checkIsMember(groupId: string, userId: string): Promise<void> {
-    if (!(await this.checkMemberTransaction.isMember(groupId, userId))) {
-      throw new ForbiddenError("User is not a member of the group");
-    }
-  }
-
-  async checkIsManager(groupId: string, userId: string): Promise<void> {
-    if (!(await this.checkMemberTransaction.isManager(groupId, userId))) {
-      throw new ForbiddenError("User is not a manager of the group");
-    }
-  }
-
-  async checkIsOwner(postId: string, userId: string): Promise<void> {
-    const isOwner = await this.postTransaction.isOwner(postId, userId);
-    if (!isOwner) {
-      throw new ForbiddenError("User can only update their own posts.");
-    }
   }
 }

@@ -570,7 +570,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
                 
-  /api/v1/groups/{id}/posts:
+  /api/v1/groups/{groupId}/posts:
     post:
       tags:
         - Post Endpoints

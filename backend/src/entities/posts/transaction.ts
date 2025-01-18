@@ -1,14 +1,21 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { CreatePostPayload, PostWithMedia, UpdatePostPayload } from "./validator";
-import { commentsTable, likesTable, mediaTable, postsTable } from "../schema";
+import { CreatePostPayload, IDPayload, PostWithMedia, UpdatePostPayload } from "./validator";
+import {
+  commentsTable,
+  groupsTable,
+  likesTable,
+  mediaTable,
+  membersTable,
+  postsTable,
+} from "../schema";
 import { eq, and } from "drizzle-orm";
+import { ForbiddenError } from "../../utilities/errors/app-error";
 
 export interface PostTransaction {
   createPost(post: CreatePostPayload): Promise<PostWithMedia | null>;
-  getPost(id: string): Promise<PostWithMedia | null>;
+  getPost(payload: IDPayload): Promise<PostWithMedia | null>;
   updatePost(payload: UpdatePostPayload): Promise<PostWithMedia | null>;
-  deletePost(id: string): Promise<void>;
-  isOwner(postId: string, userId: string): Promise<boolean>;
+  deletePost(postId: string, userId: string): Promise<void>;
 }
 
 export class PostTransactionImpl implements PostTransaction {
@@ -16,16 +23,6 @@ export class PostTransactionImpl implements PostTransaction {
 
   constructor(db: PostgresJsDatabase) {
     this.db = db;
-  }
-
-  async isOwner(postId: string, userId: string): Promise<boolean> {
-    const [post] = await this.db
-      .select()
-      .from(postsTable)
-      .where(and(eq(postsTable.id, postId), eq(postsTable.userId, userId)))
-      .limit(1);
-
-    return post !== undefined;
   }
 
   async createPost(post: CreatePostPayload): Promise<PostWithMedia | null> {
@@ -37,6 +34,16 @@ export class PostTransactionImpl implements PostTransaction {
     const mediaPayload = post.media;
 
     const postWithMedia = await this.db.transaction(async (tx) => {
+      const isMember = await tx
+        .select()
+        .from(membersTable)
+        .where(and(eq(membersTable.userId, post.userId), eq(membersTable.groupId, post.groupId)))
+        .limit(1);
+
+      if (isMember.length === 0) {
+        throw new ForbiddenError("User is not a member of the group.");
+      }
+
       // insert the post
       const [newPost] = await tx.insert(postsTable).values(postPayload).returning();
 
@@ -66,14 +73,19 @@ export class PostTransactionImpl implements PostTransaction {
     return postWithMedia;
   }
 
-  async getPost(postId: string): Promise<PostWithMedia | null> {
+  async getPost(payload: IDPayload): Promise<PostWithMedia | null> {
     const result = await this.db
       .select()
       .from(postsTable)
       .innerJoin(mediaTable, eq(postsTable.id, mediaTable.postId))
+      .innerJoin(groupsTable, eq(postsTable.groupId, groupsTable.id))
+      .innerJoin(
+        membersTable,
+        and(eq(groupsTable.id, membersTable.groupId), eq(membersTable.userId, payload.userId)),
+      )
       .leftJoin(commentsTable, eq(postsTable.id, commentsTable.postId))
       .leftJoin(likesTable, eq(postsTable.id, likesTable.postId))
-      .where(eq(postsTable.id, postId));
+      .where(eq(postsTable.id, payload.id));
 
     if (!result[0]) return null;
 
@@ -96,7 +108,7 @@ export class PostTransactionImpl implements PostTransaction {
       const [updatedPost] = await tx
         .update(postsTable)
         .set(updatedPostData)
-        .where(eq(postsTable.id, payload.id))
+        .where(and(eq(postsTable.id, payload.id), eq(postsTable.userId, payload.userId)))
         .returning();
 
       if (!updatedPost) {
@@ -128,7 +140,7 @@ export class PostTransactionImpl implements PostTransaction {
     return updatedPostWithMedia;
   }
 
-  async deletePost(id: string): Promise<void> {
-    await this.db.delete(postsTable).where(eq(postsTable.id, id)).returning();
+  async deletePost(postId: string, userId: string): Promise<void> {
+    await this.db.delete(postsTable).where(and(eq(postsTable.id, postId), eq(postsTable.userId, userId)));
   }
 }

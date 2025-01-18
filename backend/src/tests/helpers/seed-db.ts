@@ -45,8 +45,8 @@ const seedGroup = async (db: PostgresJsDatabase) => {
       name: "dearly",
       description: "dearly",
       managerId: USER_ALICE_ID,
-      id: DEARLY_GROUP_ID
-    }
+      id: DEARLY_GROUP_ID,
+    },
   ];
 
   try {
@@ -54,10 +54,10 @@ const seedGroup = async (db: PostgresJsDatabase) => {
   } catch (error) {
     console.error("Error seeding database:", error);
   }
-}
+};
 
 const seedMember = async (db: PostgresJsDatabase) => {
-  const seedData: typeof membersTable.$inferInsert[] = [
+  const seedData: (typeof membersTable.$inferInsert)[] = [
     {
       userId: USER_ALICE_ID,
       groupId: DEARLY_GROUP_ID,
@@ -80,4 +80,4 @@ const seedMember = async (db: PostgresJsDatabase) => {
   } catch (error) {
     console.error("Error seeding database:", error);
   }
-}
+};

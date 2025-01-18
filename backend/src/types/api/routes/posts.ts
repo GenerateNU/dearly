@@ -9,5 +9,6 @@ export type POST_API = TypedResponse<
 >;
 
 export type DEL_POST = TypedResponse<
-paths["/api/v1/groups/{groupId}/posts/{postId}"]["delete"]["responses"]["200"]["content"]["application/json"]["message"] | API_ERROR
+  | paths["/api/v1/groups/{groupId}/posts/{postId}"]["delete"]["responses"]["200"]["content"]["application/json"]["message"]
+  | API_ERROR
 >;

@@ -27,7 +27,8 @@ export class PostControllerImpl implements PostController {
 
   async createPost(ctx: Context): Promise<POST_API> {
     const createPostImpl = async () => {
-      const groupId = parseUUID(ctx.req.param("postId"));
+      const groupId = parseUUID(ctx.req.param("groupId"));
+      console.log(groupId);
       const userId = parseUUID(ctx.get("userId"));
 
       const postInfoPayload = createPostValidate.parse(await ctx.req.json());
@@ -46,7 +47,7 @@ export class PostControllerImpl implements PostController {
     const getPostImpl = async () => {
       const id = parseUUID(ctx.req.param("postId"));
       const userId = parseUUID(ctx.get("userId"));
-      const groupId = parseUUID(ctx.get("groupId"));
+      const groupId = parseUUID(ctx.req.param("groupId"));
 
       const post = await this.postService.getPost({ userId, id, groupId });
       return ctx.json(post, Status.OK);
@@ -77,7 +78,7 @@ export class PostControllerImpl implements PostController {
     const deletePostImpl = async () => {
       const id = parseUUID(ctx.req.param("postId"));
       const userId = parseUUID(ctx.get("userId"));
-      const groupId = parseUUID(ctx.get("groupId"));
+      const groupId = parseUUID(ctx.req.param("groupId"));
 
       await this.postService.deletePost({ userId, id, groupId });
       return ctx.json("Successfully delete post", Status.OK);
