@@ -14,7 +14,7 @@ import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest } from "../../constants/http";
 import { MAX_MEDIA_COUNT, MIN_LIMIT, TEXT_MAX_LIMIT } from "../../constants/database";
 
-describe("POST /groups/:groupId/posts", () => {
+describe("PATCH /groups/:groupId/posts/:postId", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
   const goodRequestBody = {
@@ -244,7 +244,7 @@ describe("POST /groups/:groupId/posts", () => {
       .assertError("Post does not exist.");
   });
 
-  it("should return 404 if member is not owner", async () => {
+  it("should return 403 if member is not owner", async () => {
     (
       await testBuilder.request({
         app,
@@ -258,10 +258,10 @@ describe("POST /groups/:groupId/posts", () => {
           Authorization: `Bearer ${BOB_JWT}`,
         },
       })
-    ).assertStatusCode(404);
+    ).assertStatusCode(403);
   });
 
-  it("should return 404 if not member of group", async () => {
+  it("should return 403 if not member of group", async () => {
     (
       await testBuilder.request({
         app,
@@ -275,6 +275,6 @@ describe("POST /groups/:groupId/posts", () => {
           Authorization: `Bearer ${ANA_JWT}`,
         },
       })
-    ).assertStatusCode(404);
+    ).assertStatusCode(403);
   });
 });

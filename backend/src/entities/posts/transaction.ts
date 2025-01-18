@@ -40,6 +40,7 @@ export class PostTransactionImpl implements PostTransaction {
         .where(and(eq(membersTable.userId, post.userId), eq(membersTable.groupId, post.groupId)))
         .limit(1);
 
+      // throw error if user not member of group
       if (isMember.length === 0) {
         throw new NotFoundError("Group");
       }
@@ -100,6 +101,17 @@ export class PostTransactionImpl implements PostTransaction {
   }
 
   async updatePost(payload: UpdatePostPayload): Promise<PostWithMedia | null> {
+    const [post] = await this.db.select().from(postsTable).where(eq(postsTable.id, payload.id));
+
+    if (!post) {
+      throw new NotFoundError("Post");
+    }
+
+    // throw forbidden error if user not owner of post
+    if (post.userId != payload.userId) {
+      throw new ForbiddenError();
+    }
+
     const updatedPostWithMedia = await this.db.transaction(async (tx) => {
       const updatedPostData: Partial<CreatePostPayload> = {};
       if (payload.caption !== undefined) updatedPostData.caption = payload.caption;
@@ -147,6 +159,7 @@ export class PostTransactionImpl implements PostTransaction {
       throw new NotFoundError("Post");
     }
 
+    // throw forbidden error if user not owner of post
     if (post.userId != userId) {
       throw new ForbiddenError();
     }

@@ -42,6 +42,7 @@ export class PostServiceImpl implements PostService {
   async updatePost(payload: UpdatePostPayload): Promise<PostWithMedia> {
     const createPostImpl = async () => {
       const updatedPost = await this.postTransaction.updatePost(payload);
+      // throw NotFoundError if user is not owner of post
       if (!updatedPost) {
         throw new NotFoundError("Post");
       }

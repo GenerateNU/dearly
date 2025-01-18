@@ -27,10 +27,13 @@ export class PostControllerImpl implements PostController {
 
   async createPost(ctx: Context): Promise<POST_API> {
     const createPostImpl = async () => {
+      // pull out essential IDs
       const groupId = parseUUID(ctx.req.param("groupId"));
       const userId = parseUUID(ctx.get("userId"));
 
+      // validate input
       const postInfoPayload = createPostValidate.parse(await ctx.req.json());
+      // format input to send to service layer
       const createPostPayload: CreatePostPayload = {
         groupId,
         userId,
@@ -44,6 +47,7 @@ export class PostControllerImpl implements PostController {
 
   async getPost(ctx: Context): Promise<POST_API> {
     const getPostImpl = async () => {
+      // pull out essential IDs
       const id = parseUUID(ctx.req.param("postId"));
       const userId = parseUUID(ctx.get("userId"));
       const groupId = parseUUID(ctx.req.param("groupId"));
@@ -56,11 +60,16 @@ export class PostControllerImpl implements PostController {
 
   async updatePost(ctx: Context): Promise<POST_API> {
     const updatePostImpl = async () => {
+      // pull out essential IDs
       const userId = parseUUID(ctx.get("userId"));
       const postId = parseUUID(ctx.req.param("postId"));
       const groupId = parseUUID(ctx.req.param("groupId"));
 
+
+      // validate update payload
       const postInfoPayload = updatePostValidate.parse(await ctx.req.json());
+
+      // format input to send to service layer
       const updatePostPayload: UpdatePostPayload = {
         userId,
         id: postId,
@@ -75,6 +84,7 @@ export class PostControllerImpl implements PostController {
 
   async deletePost(ctx: Context): Promise<DEL_POST> {
     const deletePostImpl = async () => {
+      // pull out essential IDs
       const id = parseUUID(ctx.req.param("postId"));
       const userId = parseUUID(ctx.get("userId"));
       const groupId = parseUUID(ctx.req.param("groupId"));

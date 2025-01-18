@@ -13,7 +13,7 @@ import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest } from "../../constants/http";
 
-describe("POST /groups/:groupId/posts", () => {
+describe("GET /groups/:groupId/posts/:postId", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
   const goodRequestBody = {
