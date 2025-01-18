@@ -103,12 +103,8 @@ export class PostTransactionImpl implements PostTransaction {
   async updatePost(payload: UpdatePostPayload): Promise<PostWithMedia | null> {
     const [post] = await this.db.select().from(postsTable).where(eq(postsTable.id, payload.id));
 
-    if (!post) {
-      throw new NotFoundError("Post");
-    }
-
     // throw forbidden error if user not owner of post
-    if (post.userId != payload.userId) {
+    if (post && post.userId != payload.userId) {
       throw new ForbiddenError();
     }
 
@@ -155,12 +151,8 @@ export class PostTransactionImpl implements PostTransaction {
   async deletePost(postId: string, userId: string): Promise<void> {
     const [post] = await this.db.select().from(postsTable).where(eq(postsTable.id, postId));
 
-    if (!post) {
-      throw new NotFoundError("Post");
-    }
-
     // throw forbidden error if user not owner of post
-    if (post.userId != userId) {
+    if (post && post.userId != userId) {
       throw new ForbiddenError();
     }
 
