@@ -51,6 +51,14 @@ describe("POST /groups/:groupId/posts", () => {
       })
     )
       .assertStatusCode(201)
+      .assertFieldExists("id")
+      .assertFieldExists("createdAt")
+      .assertFieldExists("media")
+      .assertFields({
+        caption: goodRequestBody.caption,
+        groupId: DEARLY_GROUP_ID,
+        userId: USER_ALICE_ID,
+      })
       .getResponseId();
 
     // member of group
