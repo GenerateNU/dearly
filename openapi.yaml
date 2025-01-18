@@ -108,6 +108,7 @@ components:
           type: string
           example: "This is a sample caption for the post."
           description: A textual description or caption for the post.
+          nullable: true
         media:
           type: array
           items:
@@ -617,7 +618,6 @@ paths:
                       - url
                   description: A list of media items, each with a type and URL.
               required:
-                - caption
                 - media
               additionalProperties: true
       responses:

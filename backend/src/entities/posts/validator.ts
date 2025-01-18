@@ -7,7 +7,8 @@ export const createPostValidate = z
     caption: z
       .string()
       .min(MIN_LIMIT, `Caption must be at least ${MIN_LIMIT} character long`)
-      .max(TEXT_MAX_LIMIT, `Caption must be at most ${TEXT_MAX_LIMIT} characters long`),
+      .max(TEXT_MAX_LIMIT, `Caption must be at most ${TEXT_MAX_LIMIT} characters long`)
+      .optional(),
     media: z
       .array(
         z.object({

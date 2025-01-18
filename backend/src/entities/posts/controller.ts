@@ -9,12 +9,13 @@ import {
   updatePostValidate,
 } from "./validator";
 import { Status } from "../../constants/http";
+import { DEL_POST, POST_API } from "../../types/api/routes/posts";
 
 export interface PostController {
-  createPost(ctx: Context): Promise<Response>;
-  getPost(ctx: Context): Promise<Response>;
-  updatePost(ctx: Context): Promise<Response>;
-  deletePost(ctx: Context): Promise<Response>;
+  createPost(ctx: Context): Promise<POST_API>;
+  getPost(ctx: Context): Promise<POST_API>;
+  updatePost(ctx: Context): Promise<POST_API>;
+  deletePost(ctx: Context): Promise<DEL_POST>;
 }
 
 export class PostControllerImpl implements PostController {
@@ -24,7 +25,7 @@ export class PostControllerImpl implements PostController {
     this.postService = postService;
   }
 
-  async createPost(ctx: Context): Promise<Response> {
+  async createPost(ctx: Context): Promise<POST_API> {
     const createPostImpl = async () => {
       const groupId = parseUUID(ctx.req.param("postId"));
       const userId = parseUUID(ctx.get("userId"));
@@ -41,7 +42,7 @@ export class PostControllerImpl implements PostController {
     return await handleAppError(createPostImpl)(ctx);
   }
 
-  async getPost(ctx: Context): Promise<Response> {
+  async getPost(ctx: Context): Promise<POST_API> {
     const getPostImpl = async () => {
       const id = parseUUID(ctx.req.param("postId"));
       const userId = parseUUID(ctx.get("userId"));
@@ -53,7 +54,7 @@ export class PostControllerImpl implements PostController {
     return await handleAppError(getPostImpl)(ctx);
   }
 
-  async updatePost(ctx: Context): Promise<Response> {
+  async updatePost(ctx: Context): Promise<POST_API> {
     const updatePostImpl = async () => {
       const userId = parseUUID(ctx.get("userId"));
       const postId = parseUUID(ctx.req.param("postId"));
@@ -72,7 +73,7 @@ export class PostControllerImpl implements PostController {
     return await handleAppError(updatePostImpl)(ctx);
   }
 
-  async deletePost(ctx: Context): Promise<Response> {
+  async deletePost(ctx: Context): Promise<DEL_POST> {
     const deletePostImpl = async () => {
       const id = parseUUID(ctx.req.param("postId"));
       const userId = parseUUID(ctx.get("userId"));
