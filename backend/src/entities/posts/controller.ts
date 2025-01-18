@@ -58,7 +58,7 @@ export class PostControllerImpl implements PostController {
     const updatePostImpl = async () => {
       const userId = parseUUID(ctx.get("userId"));
       const postId = parseUUID(ctx.req.param("postId"));
-      const groupId = parseUUID(ctx.get("groupId"));
+      const groupId = parseUUID(ctx.req.param("groupId"));
 
       const postInfoPayload = updatePostValidate.parse(await ctx.req.json());
       const updatePostPayload: UpdatePostPayload = {

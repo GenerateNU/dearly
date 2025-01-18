@@ -116,7 +116,7 @@ describe("POST /groups/:groupId/posts", () => {
       .assertMessage("Successfully delete post");
   });
 
-  it("should return 200 if post does not exist", async () => {
+  it("should return 404 if post does not exist", async () => {
     (
       await testBuilder.request({
         app,

@@ -13,7 +13,7 @@ export const postRoutes = (db: PostgresJsDatabase): Hono => {
 
   post.post("/", (ctx) => postController.createPost(ctx));
   post.get("/:postId", (ctx) => postController.getPost(ctx));
-  post.patch("/", (ctx) => postController.updatePost(ctx));
+  post.patch("/:postId", (ctx) => postController.updatePost(ctx));
   post.delete("/:postId", (ctx) => postController.deletePost(ctx));
 
   return post;
