@@ -22,7 +22,7 @@ export interface CorsConfig {
 }
 
 export interface S3Config {
-  secertKey: string,
+  secretKey: string,
   publicKey: string,
   region: string,
   name: string,

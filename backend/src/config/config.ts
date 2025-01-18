@@ -48,7 +48,7 @@ export const getConfigurations = (): Configuration => {
       migrationsFolder: "./src/migrations",
     },
     s3Config: {
-      secertKey: parseEnv("AWS_SECERET_KEY"),
+      secretKey: parseEnv("AWS_SECERET_KEY"),
       publicKey: parseEnv("AWS_PUBLIC_KEY"),
       region: parseEnv("AWS_REGION"),
       name: parseEnv("AWS_BUCKET_NAME"),
