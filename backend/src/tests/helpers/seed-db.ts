@@ -1,13 +1,27 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { groupsTable, membersTable, usersTable } from "../../entities/schema";
+import {
+  groupsTable,
+  mediaTable,
+  membersTable,
+  postsTable,
+  usersTable,
+} from "../../entities/schema";
 import { CreateUserPayload } from "../../entities/users/validator";
-import { DEARLY_GROUP_ID, USER_ALICE_ID, USER_ANA_ID, USER_BOB_ID } from "./test-constants";
+import {
+  DEARLY_GROUP_ID,
+  MEDIA_MOCK,
+  POST_MOCK,
+  USER_ALICE_ID,
+  USER_ANA_ID,
+  USER_BOB_ID,
+} from "./test-constants";
 import { CreateGroupPayload } from "../../entities/groups/validator";
 
 export const seedDatabase = async (db: PostgresJsDatabase) => {
   await seedUser(db);
   await seedGroup(db);
   await seedMember(db);
+  await seedPostAndMedia(db);
 };
 
 const seedUser = async (db: PostgresJsDatabase) => {
@@ -72,6 +86,15 @@ const seedMember = async (db: PostgresJsDatabase) => {
 
   try {
     await db.insert(membersTable).values(seedData);
+  } catch (error) {
+    console.error("Error seeding database:", error);
+  }
+};
+
+const seedPostAndMedia = async (db: PostgresJsDatabase) => {
+  try {
+    await db.insert(postsTable).values(POST_MOCK);
+    await db.insert(mediaTable).values(MEDIA_MOCK);
   } catch (error) {
     console.error("Error seeding database:", error);
   }

@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { MIN_LIMIT, TEXT_MAX_LIMIT } from "../../constants/database";
+import {
+  MAX_MEDIA_COUNT,
+  MIN_LIMIT,
+  MIN_MEDIA_COUNT,
+  TEXT_MAX_LIMIT,
+} from "../../constants/database";
 import { mediaTable, postsTable } from "../schema";
 
 export const createPostValidate = z
@@ -16,9 +21,10 @@ export const createPostValidate = z
           url: z.string().url(),
         }),
       )
-      .refine((media) => media.length > 0, {
-        message: "At least one media item (PHOTO or VIDEO) is required.",
-      }),
+      .min(MIN_MEDIA_COUNT, {
+        message: `At least ${MIN_MEDIA_COUNT} media item (PHOTO or VIDEO) is required.`,
+      })
+      .max(MAX_MEDIA_COUNT, { message: `At most ${MAX_MEDIA_COUNT} media items are allowed.` }),
   })
   .passthrough();
 

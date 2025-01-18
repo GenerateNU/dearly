@@ -9,7 +9,7 @@ import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest } from "../../constants/http";
-import { MIN_LIMIT, TEXT_MAX_LIMIT } from "../../constants/database";
+import { MAX_MEDIA_COUNT, MIN_LIMIT, TEXT_MAX_LIMIT } from "../../constants/database";
 
 describe("POST /groups/:groupId/posts", () => {
   let app: Hono;
@@ -212,5 +212,95 @@ describe("POST /groups/:groupId/posts", () => {
     )
       .assertStatusCode(404)
       .assertError("Group does not exist.");
+  });
+
+  it("should return 400 if no media field", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.POST,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/posts`,
+        requestBody: {
+          caption: "test",
+        },
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${BOB_JWT}`,
+        },
+      })
+    )
+      .assertStatusCode(400)
+      .assertError([
+        {
+          path: "media",
+          message: "Required",
+        },
+      ]);
+  });
+
+  it("should return 400 if media count < 1", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.POST,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/posts`,
+        requestBody: {
+          caption: "test",
+          media: [],
+        },
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${BOB_JWT}`,
+        },
+      })
+    )
+      .assertStatusCode(400)
+      .assertError([
+        {
+          message: "At least 1 media item (PHOTO or VIDEO) is required.",
+          path: "media",
+        },
+      ]);
+  });
+
+  it("should return 400 if more than 3 media", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.POST,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/posts`,
+        requestBody: {
+          media: [
+            {
+              type: "VIDEO",
+              url: "https://www.google.com",
+            },
+            {
+              type: "VIDEO",
+              url: "https://www.google.com",
+            },
+            {
+              type: "VIDEO",
+              url: "https://www.google.com",
+            },
+            {
+              type: "VIDEO",
+              url: "https://www.google.com",
+            },
+          ],
+        },
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${BOB_JWT}`,
+        },
+      })
+    )
+      .assertStatusCode(400)
+      .assertError([
+        {
+          path: "media",
+          message: `At most ${MAX_MEDIA_COUNT} media items are allowed.`,
+        },
+      ]);
   });
 });
