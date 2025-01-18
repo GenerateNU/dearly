@@ -5,6 +5,7 @@ import { apiReference } from "@scalar/hono-api-reference";
 import { getOpenAPISpecification } from "../utilities/docs";
 import { HEALTHCHECK } from "../types/api/routes/healthcheck";
 import { groupRoutes } from "../entities/groups/route";
+import { postRoutes } from "../entities/posts/route";
 
 export const setUpRoutes = (app: Hono, db: PostgresJsDatabase) => {
   // api documentation
@@ -35,6 +36,7 @@ const apiRoutes = (db: PostgresJsDatabase): Hono => {
 
   api.route("/users", userRoutes(db));
   api.route("/groups", groupRoutes(db));
+  api.route("/groups/:groupId/posts", postRoutes(db));
 
   return api;
 };

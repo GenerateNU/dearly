@@ -178,7 +178,7 @@ describe("POST /users", () => {
           Authorization: `Bearer ${generatedJWT}`,
         },
       })
-    ).assertStatusCode(201);
+    ).assertStatusCode(Status.Created);
 
     // create a user that already exists (same JWT)
     (
@@ -197,7 +197,7 @@ describe("POST /users", () => {
         },
       })
     )
-      .assertStatusCode(409)
+      .assertStatusCode(Status.Conflict)
       .assertError("User already exists. Please try again.");
   });
 });

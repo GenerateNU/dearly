@@ -300,7 +300,7 @@ paths:
                 $ref: "#/components/schemas/Error"
 
   /api/v1/users/me:
-    put:
+    patch:
       tags:
         - User Endpoints
       summary: Updates a user

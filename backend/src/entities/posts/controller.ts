@@ -1,0 +1,86 @@
+import { Context } from "hono";
+import { PostService } from "./service";
+import { handleAppError } from "../../utilities/errors/app-error";
+import { parseUUID } from "../../utilities/uuid";
+import {
+  CreatePostPayload,
+  createPostValidate,
+  UpdatePostPayload,
+  updatePostValidate,
+} from "./validator";
+import { Status } from "../../constants/http";
+
+export interface PostController {
+  createPost(ctx: Context): Promise<Response>;
+  getPost(ctx: Context): Promise<Response>;
+  updatePost(ctx: Context): Promise<Response>;
+  deletePost(ctx: Context): Promise<Response>;
+}
+
+export class PostControllerImpl implements PostController {
+  private postService: PostService;
+
+  constructor(postService: PostService) {
+    this.postService = postService;
+  }
+
+  async createPost(ctx: Context): Promise<Response> {
+    const createPostImpl = async () => {
+      const groupId = parseUUID(ctx.req.param("postId"));
+      const userId = parseUUID(ctx.get("userId"));
+
+      const postInfoPayload = createPostValidate.parse(await ctx.req.json());
+      const createPostPayload: CreatePostPayload = {
+        groupId,
+        userId,
+        ...postInfoPayload,
+      };
+      const post = await this.postService.createPost(createPostPayload);
+      return ctx.json(post, Status.Created);
+    };
+    return await handleAppError(createPostImpl)(ctx);
+  }
+
+  async getPost(ctx: Context): Promise<Response> {
+    const getPostImpl = async () => {
+      const id = parseUUID(ctx.req.param("postId"));
+      const userId = parseUUID(ctx.get("userId"));
+      const groupId = parseUUID(ctx.get("groupId"));
+
+      const post = await this.postService.getPost({ userId, id, groupId });
+      return ctx.json(post, Status.OK);
+    };
+    return await handleAppError(getPostImpl)(ctx);
+  }
+
+  async updatePost(ctx: Context): Promise<Response> {
+    const updatePostImpl = async () => {
+      const userId = parseUUID(ctx.get("userId"));
+      const postId = parseUUID(ctx.req.param("postId"));
+      const groupId = parseUUID(ctx.get("groupId"));
+
+      const postInfoPayload = updatePostValidate.parse(await ctx.req.json());
+      const updatePostPayload: UpdatePostPayload = {
+        userId,
+        id: postId,
+        ...postInfoPayload,
+        groupId,
+      };
+      const post = await this.postService.updatePost(updatePostPayload);
+      return ctx.json(post, Status.OK);
+    };
+    return await handleAppError(updatePostImpl)(ctx);
+  }
+
+  async deletePost(ctx: Context): Promise<Response> {
+    const deletePostImpl = async () => {
+      const id = parseUUID(ctx.req.param("postId"));
+      const userId = parseUUID(ctx.get("userId"));
+      const groupId = parseUUID(ctx.get("groupId"));
+
+      await this.postService.deletePost({ userId, id, groupId });
+      return ctx.json("Successfully delete post", Status.OK);
+    };
+    return await handleAppError(deletePostImpl)(ctx);
+  }
+}
