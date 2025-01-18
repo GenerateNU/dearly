@@ -641,12 +641,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-        403:
-          description: Forbidden since user is not a member of a group
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
         404:
           description: Post not found
           content:

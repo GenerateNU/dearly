@@ -9,7 +9,7 @@ import {
   postsTable,
 } from "../schema";
 import { eq, and } from "drizzle-orm";
-import { ForbiddenError } from "../../utilities/errors/app-error";
+import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
 
 export interface PostTransaction {
   createPost(post: CreatePostPayload): Promise<PostWithMedia | null>;
@@ -41,7 +41,7 @@ export class PostTransactionImpl implements PostTransaction {
         .limit(1);
 
       if (isMember.length === 0) {
-        throw new ForbiddenError("User is not a member of the group.");
+        throw new NotFoundError("Group");
       }
 
       // insert the post
@@ -141,6 +141,18 @@ export class PostTransactionImpl implements PostTransaction {
   }
 
   async deletePost(postId: string, userId: string): Promise<void> {
-    await this.db.delete(postsTable).where(and(eq(postsTable.id, postId), eq(postsTable.userId, userId)));
+    const [post] = await this.db.select().from(postsTable).where(eq(postsTable.id, postId));
+
+    if (!post) {
+      throw new NotFoundError("Post");
+    }
+
+    if (post.userId != userId) {
+      throw new ForbiddenError();
+    }
+
+    await this.db
+      .delete(postsTable)
+      .where(and(eq(postsTable.id, postId), eq(postsTable.userId, userId)));
   }
 }

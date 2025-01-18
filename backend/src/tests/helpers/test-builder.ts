@@ -61,13 +61,13 @@ export class TestBuilder {
     if (!this.response) return;
 
     try {
-      this.body = await this.response.clone().json();
+      this.body = await this.response.json();
     } catch {
       this.body = undefined;
     }
 
     try {
-      this.text = await this.response.clone().text();
+      this.text = await this.response.text();
     } catch {
       this.text = undefined;
     }

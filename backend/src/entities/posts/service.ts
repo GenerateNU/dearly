@@ -12,7 +12,6 @@ export interface PostService {
 
 export class PostServiceImpl implements PostService {
   private postTransaction: PostTransaction;
-  private ERROR_MESSAGE = "Post not found or you do not have permission.";
 
   constructor(postTransaction: PostTransaction) {
     this.postTransaction = postTransaction;
@@ -33,7 +32,7 @@ export class PostServiceImpl implements PostService {
     const getPostImpl = async () => {
       const post = await this.postTransaction.getPost(payload);
       if (!post) {
-        throw new NotFoundError("", this.ERROR_MESSAGE);
+        throw new NotFoundError("Post");
       }
       return post;
     };
@@ -44,7 +43,7 @@ export class PostServiceImpl implements PostService {
     const createPostImpl = async () => {
       const updatedPost = await this.postTransaction.updatePost(payload);
       if (!updatedPost) {
-        throw new NotFoundError("", this.ERROR_MESSAGE);
+        throw new NotFoundError("Post");
       }
       return updatedPost;
     };

@@ -68,11 +68,6 @@ const seedMember = async (db: PostgresJsDatabase) => {
       groupId: DEARLY_GROUP_ID,
       role: "MEMBER",
     },
-    {
-      userId: USER_ANA_ID,
-      groupId: DEARLY_GROUP_ID,
-      role: "MEMBER",
-    },
   ];
 
   try {
