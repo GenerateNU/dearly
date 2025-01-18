@@ -2,6 +2,7 @@ import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { membersTable } from "../schema";
 import { and, eq } from "drizzle-orm";
 
+// TODO: probably put this somewhere else, maybe with members?
 export interface CheckMemberTransaction {
   isMember(groupId: string, userId: string): Promise<boolean>;
   isManager(groupId: string, userId: string): Promise<boolean>;
