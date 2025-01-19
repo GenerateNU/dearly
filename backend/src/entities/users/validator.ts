@@ -34,15 +34,35 @@ export interface SearchedUser {
 
 export interface SearchedInfo {
   groupId: string;
-  searchTerm: string;
+  username: string;
   limit: number;
-  offset: number;
+  page: number;
   userId: string;
 }
 
 export const querySchema = z.object({
-  searchTerm: z.string(),
+  username: z.string(),
   groupId: z.string().uuid({ message: "Invalid ID format" }),
-  limit: z.number().int().positive().optional().default(10),
-  offset: z.number().int().nonnegative().optional().default(1),
+  limit: z
+    .string()
+    .transform((val) => {
+      const parsed = Number(val);
+      return parsed;
+    })
+    .refine((val) => !isNaN(val) && val > 0, {
+      message: "Limit must be a positive number",
+    })
+    .optional()
+    .default("10"),
+  page: z
+    .string()
+    .transform((val) => {
+      const parsed = Number(val);
+      return parsed;
+    })
+    .refine((val) => !isNaN(val) && val >= 0, {
+      message: "Page must be a non-negative number",
+    })
+    .optional()
+    .default("1"),
 });

@@ -1,5 +1,11 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { CreateUserPayload, SearchedInfo, SearchedUser, UpdateUserPayload, User } from "./validator";
+import {
+  CreateUserPayload,
+  SearchedInfo,
+  SearchedUser,
+  UpdateUserPayload,
+  User,
+} from "./validator";
 import { devicesTable, membersTable, usersTable } from "../schema";
 import { and, eq, sql, not } from "drizzle-orm";
 
@@ -72,37 +78,51 @@ export class UserTransactionImpl implements UserTransaction {
     return this.getUserTokens(userId);
   }
 
-  async getUsersByUsername({ userId, groupId, limit, offset, searchTerm }: SearchedInfo): Promise<SearchedUser[]> {
+  async getUsersByUsername({
+    userId,
+    groupId,
+    limit,
+    page,
+    username,
+  }: SearchedInfo): Promise<SearchedUser[]> {
     const joinedResult = await this.db
       .select({
         id: usersTable.id,
         name: usersTable.name,
         username: usersTable.username,
         profilePhoto: usersTable.profilePhoto,
-        isMember: sql<boolean>`CASE WHEN ${membersTable.groupId} IS NOT NULL THEN true ELSE false END`.as("isMember"),
+        isMember:
+          sql<boolean>`CASE WHEN ${membersTable.groupId} IS NOT NULL THEN true ELSE false END`.as(
+            "isMember",
+          ),
       })
       .from(usersTable)
       // left join to check for membership of user in the group
-      .leftJoin(membersTable, and(eq(membersTable.groupId, groupId), eq(membersTable.userId, usersTable.id)))
+      .leftJoin(
+        membersTable,
+        and(eq(membersTable.groupId, groupId), eq(membersTable.userId, usersTable.id)),
+      )
       // search by username
       .where(
         and(
           // check if the user is a manager of the group
           eq(membersTable.groupId, groupId),
           eq(membersTable.userId, userId),
-          eq(membersTable.role, 'MANAGER'),
+          eq(membersTable.role, "MANAGER"),
           // exclude the user who is searching from the result
           not(eq(usersTable.id, userId)),
           // vectorize username for search
-          sql`to_tsvector('english', ${usersTable.username}) @@ plainto_tsquery('english', ${searchTerm})`, 
-        )
+          sql`to_tsvector('english', ${usersTable.username}) @@ plainto_tsquery('english', ${username})`,
+        ),
       )
       // sort by most relevance
-      .orderBy(sql`ts_rank(to_tsvector('english', ${usersTable.username}), plainto_tsquery('english', ${searchTerm})) DESC`)
+      .orderBy(
+        sql`ts_rank(to_tsvector('english', ${usersTable.username}), plainto_tsquery('english', ${username})) DESC`,
+      )
       // handle pagination
       .limit(limit)
-      .offset(offset - 1);
-    
+      .offset(page - 1);
+
     return joinedResult;
   }
 }

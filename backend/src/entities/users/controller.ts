@@ -1,10 +1,20 @@
 import { Context } from "hono";
 import { UserService } from "./service";
-import { createUserValidate, expoTokenValidate, querySchema, updateUserValidate } from "./validator";
+import {
+  createUserValidate,
+  expoTokenValidate,
+  querySchema,
+  updateUserValidate,
+} from "./validator";
 import { parseUUID } from "../../utilities/uuid";
 import { handleAppError } from "../../utilities/errors/app-error";
 import { Status } from "../../constants/http";
-import { DEL_USER, DEVICE_RESPONSE, SEARCHED_USERS, USER_RESPONSE } from "../../types/api/routes/users";
+import {
+  DEL_USER,
+  DEVICE_RESPONSE,
+  SEARCHED_USERS,
+  USER_RESPONSE,
+} from "../../types/api/routes/users";
 
 export interface UserController {
   createUser(ctx: Context): Promise<USER_RESPONSE>;
@@ -95,22 +105,20 @@ export class UserControllerImpl implements UserController {
 
   async searchByUsername(ctx: Context): Promise<SEARCHED_USERS> {
     const search = async () => {
-      const searchTerm = ctx.req.query("username");
-      const groupId = ctx.req.query("groupId");
+      const { username, groupId, limit, page } = ctx.req.query();
       const userId = ctx.get("userId");
-      const limit = parseInt(ctx.get("limit")) || 10;
-      const offset = parseInt(ctx.get("page")) || 1;
-  
-      // handle validation using zod  
+
+      // handle validation using zod
       const parsedQuery = querySchema.parse({
-        searchTerm,
+        username,
         limit,
-        offset,
-        groupId
+        page,
+        groupId,
       });
+
       const result = await this.userService.searchByUsername({
         ...parsedQuery,
-        userId
+        userId,
       });
       return ctx.json(result, Status.OK);
     };

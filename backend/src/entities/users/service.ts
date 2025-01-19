@@ -1,6 +1,12 @@
 import { InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
-import { CreateUserPayload, SearchedInfo, SearchedUser, UpdateUserPayload, User } from "./validator";
+import {
+  CreateUserPayload,
+  SearchedInfo,
+  SearchedUser,
+  UpdateUserPayload,
+  User,
+} from "./validator";
 import { UserTransaction } from "./transaction";
 
 export interface UserService {
