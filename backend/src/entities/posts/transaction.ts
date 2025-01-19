@@ -47,10 +47,7 @@ export class PostTransactionImpl implements PostTransaction {
 
       // insert post
       const [newPost] = await tx.insert(postsTable).values(postPayload).returning();
-
-      if (!newPost) {
-        return null;
-      }
+      if (!newPost) return null;
 
       // insert media if provided
       if (mediaPayload && mediaPayload.length > 0) {
@@ -101,29 +98,19 @@ export class PostTransactionImpl implements PostTransaction {
   }
 
   async updatePost(payload: UpdatePostPayload): Promise<PostWithMedia | null> {
-    // check for ownership of the post
-    const [post] = await this.db.select().from(postsTable).where(eq(postsTable.id, payload.id));
-    if (post && post.userId != payload.userId) {
-      throw new ForbiddenError();
-    }
+    await this.checkPostOwnership(payload.id, payload.userId);
 
-    // update post in database
+    // update post
     const updatedPostWithMedia = await this.db.transaction(async (tx) => {
-      const updatedPostData: Partial<CreatePostPayload> = {};
-      if (payload.caption !== undefined) updatedPostData.caption = payload.caption;
-      if (payload.groupId !== undefined) updatedPostData.groupId = payload.groupId;
-
       const [updatedPost] = await tx
         .update(postsTable)
-        .set(updatedPostData)
+        .set({ caption: payload.caption })
         .where(and(eq(postsTable.id, payload.id), eq(postsTable.userId, payload.userId)))
         .returning();
 
-      if (!updatedPost) {
-        return null;
-      }
+      if (!updatedPost) return null;
 
-      // update associated media in database
+      // update associated media
       let media;
       if (payload.media) {
         await tx.delete(mediaTable).where(eq(mediaTable.postId, payload.id));
@@ -149,15 +136,16 @@ export class PostTransactionImpl implements PostTransaction {
   }
 
   async deletePost(postId: string, userId: string): Promise<void> {
-    const [post] = await this.db.select().from(postsTable).where(eq(postsTable.id, postId));
-
-    // throw forbidden error if user not owner of post
-    if (post && post.userId != userId) {
-      throw new ForbiddenError();
-    }
-
+    await this.checkPostOwnership(postId, userId);
     await this.db
       .delete(postsTable)
       .where(and(eq(postsTable.id, postId), eq(postsTable.userId, userId)));
+  }
+
+  async checkPostOwnership(postId: string, userId: string): Promise<void> {
+    const [post] = await this.db.select().from(postsTable).where(eq(postsTable.id, postId));
+    if (post && post.userId != userId) {
+      throw new ForbiddenError();
+    }
   }
 }
