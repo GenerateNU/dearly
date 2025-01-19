@@ -30,9 +30,6 @@ export const createPostValidate = z
 
 export const updatePostValidate = createPostValidate.partial();
 
-export type Media = typeof mediaTable.$inferSelect;
-type Post = typeof postsTable.$inferSelect;
-
 export type CreatePostPayload = z.infer<typeof createPostValidate> & {
   groupId: string;
   userId: string;
@@ -45,6 +42,9 @@ export type IDPayload = {
   id: string;
   groupId: string;
 };
+
+type Media = typeof mediaTable.$inferSelect;
+type Post = typeof postsTable.$inferSelect;
 
 export type PostWithMedia = Post & {
   media: Media[];
