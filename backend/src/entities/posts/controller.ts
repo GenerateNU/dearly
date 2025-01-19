@@ -33,6 +33,7 @@ export class PostControllerImpl implements PostController {
 
       // validate input
       const postInfoPayload = createPostValidate.parse(await ctx.req.json());
+      
       // format input to send to service layer
       const createPostPayload: CreatePostPayload = {
         groupId,
@@ -64,7 +65,6 @@ export class PostControllerImpl implements PostController {
       const userId = parseUUID(ctx.get("userId"));
       const postId = parseUUID(ctx.req.param("postId"));
       const groupId = parseUUID(ctx.req.param("groupId"));
-
 
       // validate update payload
       const postInfoPayload = updatePostValidate.parse(await ctx.req.json());

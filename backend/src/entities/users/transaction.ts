@@ -20,17 +20,17 @@ export class UserTransactionImpl implements UserTransaction {
   }
 
   async insertUser(payload: CreateUserPayload): Promise<User | null> {
-    const result = await this.db.insert(usersTable).values(payload).returning();
-    return result[0] ?? null;
+    const [result] = await this.db.insert(usersTable).values(payload).returning();
+    return result ?? null;
   }
 
   async selectUser(id: string): Promise<User | null> {
-    const result = await this.db.select().from(usersTable).where(eq(usersTable.id, id)).limit(1);
-    return result[0] ?? null;
+    const [result] = await this.db.select().from(usersTable).where(eq(usersTable.id, id)).limit(1);
+    return result ?? null;
   }
 
   async updateUser(id: string, payload: UpdateUserPayload): Promise<User | null> {
-    const result = await this.db
+    const [result] = await this.db
       .update(usersTable)
       .set({
         name: payload.name,
@@ -41,12 +41,12 @@ export class UserTransactionImpl implements UserTransaction {
       })
       .where(eq(usersTable.id, id))
       .returning();
-    return result[0] ?? null;
+    return result ?? null;
   }
 
   async deleteUser(id: string): Promise<User | null> {
-    const result = await this.db.delete(usersTable).where(eq(usersTable.id, id)).returning();
-    return result[0] ?? null;
+    const [result] = await this.db.delete(usersTable).where(eq(usersTable.id, id)).returning();
+    return result ?? null;
   }
 
   async getUserTokens(userId: string): Promise<string[]> {

@@ -34,18 +34,18 @@ export class PostTransactionImpl implements PostTransaction {
     const mediaPayload = post.media;
 
     const postWithMedia = await this.db.transaction(async (tx) => {
+      // check if a user is member of a group
       const isMember = await tx
         .select()
         .from(membersTable)
         .where(and(eq(membersTable.userId, post.userId), eq(membersTable.groupId, post.groupId)))
         .limit(1);
 
-      // throw error if user not member of group
       if (isMember.length === 0) {
         throw new NotFoundError("Group");
       }
 
-      // insert the post
+      // insert post
       const [newPost] = await tx.insert(postsTable).values(postPayload).returning();
 
       if (!newPost) {
@@ -101,13 +101,13 @@ export class PostTransactionImpl implements PostTransaction {
   }
 
   async updatePost(payload: UpdatePostPayload): Promise<PostWithMedia | null> {
+    // check for ownership of the post
     const [post] = await this.db.select().from(postsTable).where(eq(postsTable.id, payload.id));
-
-    // throw forbidden error if user not owner of post
     if (post && post.userId != payload.userId) {
       throw new ForbiddenError();
     }
 
+    // update post in database
     const updatedPostWithMedia = await this.db.transaction(async (tx) => {
       const updatedPostData: Partial<CreatePostPayload> = {};
       if (payload.caption !== undefined) updatedPostData.caption = payload.caption;
@@ -123,8 +123,8 @@ export class PostTransactionImpl implements PostTransaction {
         return null;
       }
 
+      // update associated media in database
       let media;
-
       if (payload.media) {
         await tx.delete(mediaTable).where(eq(mediaTable.postId, payload.id));
         media = await tx
