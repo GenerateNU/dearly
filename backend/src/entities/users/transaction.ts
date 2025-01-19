@@ -79,7 +79,7 @@ export class UserTransactionImpl implements UserTransaction {
         name: usersTable.name,
         username: usersTable.username,
         profilePhoto: usersTable.profilePhoto,
-        isMember: sql`CASE WHEN ${membersTable.groupId} IS NOT NULL THEN true ELSE false END`.as("isMember"),
+        isMember: sql<boolean>`CASE WHEN ${membersTable.groupId} IS NOT NULL THEN true ELSE false END`.as("isMember"),
       })
       .from(usersTable)
       // left join to check for membership of user in the group
@@ -97,6 +97,6 @@ export class UserTransactionImpl implements UserTransaction {
       .limit(limit)
       .offset(offset - 1);
     
-    return joinedResult as SearchedUser[];
+    return joinedResult;
   }
 }
