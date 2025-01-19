@@ -17,6 +17,7 @@ export const userRoutes = (db: PostgresJsDatabase): Hono => {
   user.delete("/me", (ctx) => userController.deleteUser(ctx));
   user.post("/devices", (ctx) => userController.registerDevice(ctx));
   user.delete("/devices", (ctx) => userController.removeDevice(ctx));
+  user.get("/search", (ctx) => userController.searchByUsername(ctx));
 
   return user;
 };

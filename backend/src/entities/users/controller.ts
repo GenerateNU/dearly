@@ -2,7 +2,7 @@ import { Context } from "hono";
 import { UserService } from "./service";
 import { createUserValidate, expoTokenValidate, updateUserValidate } from "./validator";
 import { parseUUID } from "../../utilities/uuid";
-import { handleAppError } from "../../utilities/errors/app-error";
+import { BadRequestError, handleAppError } from "../../utilities/errors/app-error";
 import { Status } from "../../constants/http";
 import { DEL_USER, DEVICE_RESPONSE, USER_RESPONSE } from "../../types/api/routes/users";
 
@@ -13,6 +13,7 @@ export interface UserController {
   deleteUser(ctx: Context): Promise<DEL_USER>;
   registerDevice(ctx: Context): Promise<DEVICE_RESPONSE>;
   removeDevice(ctx: Context): Promise<DEVICE_RESPONSE>;
+  searchByUsername(ctx: Context): Promise<Response>;
 }
 
 export class UserControllerImpl implements UserController {
@@ -90,5 +91,24 @@ export class UserControllerImpl implements UserController {
       return ctx.json(user, Status.OK);
     };
     return await handleAppError(removeDeviceImpl)(ctx);
+  }
+
+  async searchByUsername(ctx: Context): Promise<Response> {
+    const search = async () => {
+      const searchTerm = ctx.req.query("username");
+      const groupId = ctx.req.query("groupId");
+
+      if (!searchTerm) {
+        throw new BadRequestError("Search term cannot be empty");
+      }
+      if (!groupId) {
+        throw new BadRequestError("Must have groupId to search for user");
+      }
+
+      const parsedGroupId = parseUUID(groupId);
+      const result = await this.userService.searchByUsername(searchTerm, parsedGroupId);
+      return ctx.json(result, Status.OK);
+    }
+    return await handleAppError(search)(ctx);
   }
 }

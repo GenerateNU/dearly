@@ -10,6 +10,7 @@ export interface UserService {
   deleteUser(id: string): Promise<void>;
   registerDevice(id: string, expoToken: string): Promise<string[]>;
   removeDevice(id: string, expoToken: string): Promise<string[]>;
+  searchByUsername(searchTerm: string, groupId: string): Promise<User[]>;
 }
 
 export class UserServiceImpl implements UserService {
@@ -75,5 +76,13 @@ export class UserServiceImpl implements UserService {
       return devices;
     };
     return handleServiceError(removeDeviceImpl)();
+  }
+
+  async searchByUsername(searchTerm: string, groupId: string): Promise<User[]> {
+    const search = async () => {
+      const devices = await this.userTransaction.getUsersByUsername(searchTerm, groupId);
+      return devices;
+    };
+    return handleServiceError(search)();
   }
 }

@@ -10,6 +10,7 @@ export interface UserTransaction {
   deleteUser(id: string): Promise<User | null>;
   insertDeviceToken(id: string, expoToken: string): Promise<string[]>;
   deleteDeviceToken(id: string, expoToken: string): Promise<string[]>;
+  getUsersByUsername(searchTerm: string, groupId: string): Promise<User[]>;
 }
 
 export class UserTransactionImpl implements UserTransaction {
@@ -69,5 +70,9 @@ export class UserTransactionImpl implements UserTransaction {
       .where(and(eq(devicesTable.userId, userId), eq(devicesTable.token, token)));
 
     return this.getUserTokens(userId);
+  }
+
+  async getUsersByUsername(searchTerm: string, groupId: string): Promise<User[]> {
+    return [];
   }
 }
