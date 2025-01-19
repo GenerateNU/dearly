@@ -85,43 +85,46 @@ export class UserTransactionImpl implements UserTransaction {
     page,
     username,
   }: SearchedInfo): Promise<SearchedUser[]> {
-    const joinedResult = await this.db
-      .select({
-        id: usersTable.id,
-        name: usersTable.name,
-        username: usersTable.username,
-        profilePhoto: usersTable.profilePhoto,
-        isMember:
-          sql<boolean>`CASE WHEN ${membersTable.groupId} IS NOT NULL THEN true ELSE false END`.as(
-            "isMember",
+    const joinedResult = await this.db.transaction(async (tx) => {
+      const [manager] = await tx
+        .select()
+        .from(membersTable)
+        .where(
+          and(
+            eq(membersTable.role, "MANAGER"),
+            eq(membersTable.userId, userId),
+            eq(membersTable.groupId, groupId),
           ),
-      })
-      .from(usersTable)
-      // left join to check for membership of user in the group
-      .leftJoin(
-        membersTable,
-        and(eq(membersTable.groupId, groupId), eq(membersTable.userId, usersTable.id)),
-      )
-      // search by username
-      .where(
-        and(
-          // check if the user is a manager of the group
-          eq(membersTable.groupId, groupId),
-          eq(membersTable.userId, userId),
-          eq(membersTable.role, "MANAGER"),
-          // exclude the user who is searching from the result
-          not(eq(usersTable.id, userId)),
-          // vectorize username for search
-          sql`to_tsvector('english', ${usersTable.username}) @@ plainto_tsquery('english', ${username})`,
-        ),
-      )
-      // sort by most relevance
-      .orderBy(
-        sql`ts_rank(to_tsvector('english', ${usersTable.username}), plainto_tsquery('english', ${username})) DESC`,
-      )
-      // handle pagination
-      .limit(limit)
-      .offset(page - 1);
+        );
+
+      if (!manager) return [];
+
+      const result = await tx
+        .select({
+          id: usersTable.id,
+          name: usersTable.name,
+          username: usersTable.username,
+          profilePhoto: usersTable.profilePhoto,
+          isMember:
+            sql<boolean>`CASE WHEN ${membersTable.groupId} IS NOT NULL THEN true ELSE false END`.as(
+              "isMember",
+            ),
+        })
+        .from(usersTable)
+        // left join to check for membership of user in the group
+        .leftJoin(membersTable, eq(membersTable.userId, usersTable.id))
+        // exclude the user who is searching out of result
+        .where(not(eq(usersTable.id, userId)))
+        // sort by most relevance
+        .orderBy(
+          sql`ts_rank(to_tsvector('english', ${usersTable.username}), plainto_tsquery('english', ${username})) DESC`,
+        )
+        // handle pagination
+        .limit(limit)
+        .offset((page - 1) * limit);
+
+      return result;
+    });
 
     return joinedResult;
   }

@@ -11,8 +11,11 @@ import {
   DEARLY_GROUP_ID,
   MEDIA_MOCK,
   POST_MOCK,
+  USER_ALICE,
   USER_ALICE_ID,
-  USER_ANA_ID,
+  USER_ANA,
+  USER_BILL,
+  USER_BOB,
   USER_BOB_ID,
 } from "./test-constants";
 import { CreateGroupPayload } from "../../entities/groups/validator";
@@ -25,26 +28,7 @@ export const seedDatabase = async (db: PostgresJsDatabase) => {
 };
 
 const seedUser = async (db: PostgresJsDatabase) => {
-  const seedData: CreateUserPayload[] = [
-    {
-      name: "Alice",
-      username: "alice123",
-      mode: "BASIC",
-      id: USER_ALICE_ID,
-    },
-    {
-      name: "Bob",
-      username: "bobthebuilder",
-      mode: "ADVANCED",
-      id: USER_BOB_ID,
-    },
-    {
-      name: "Ana",
-      username: "ana",
-      mode: "BASIC",
-      id: USER_ANA_ID,
-    },
-  ];
+  const seedData: CreateUserPayload[] = [USER_ALICE, USER_ANA, USER_BOB, USER_BILL];
 
   try {
     await db.insert(usersTable).values(seedData);
