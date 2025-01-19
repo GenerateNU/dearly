@@ -33,7 +33,7 @@ export class PostControllerImpl implements PostController {
 
       // validate input
       const postInfoPayload = createPostValidate.parse(await ctx.req.json());
-      
+
       // format input to send to service layer
       const createPostPayload: CreatePostPayload = {
         groupId,

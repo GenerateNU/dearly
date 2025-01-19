@@ -3,12 +3,13 @@ import {
   USER_BOB_ID,
   DEARLY_GROUP_ID,
   USER_ALICE_ID,
+  INVALID_ID_ARRAY,
 } from "./../helpers/test-constants";
 import { Hono } from "hono";
 import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID, generateUUID } from "../helpers/test-token";
-import { HTTPRequest } from "../../constants/http";
+import { HTTPRequest, Status } from "../../constants/http";
 import { MAX_MEDIA_COUNT, MIN_LIMIT, TEXT_MAX_LIMIT } from "../../constants/database";
 
 describe("POST /groups/:groupId/posts", () => {
@@ -302,5 +303,19 @@ describe("POST /groups/:groupId/posts", () => {
           message: `At most ${MAX_MEDIA_COUNT} media items are allowed.`,
         },
       ]);
+  });
+
+  it.each(
+    INVALID_ID_ARRAY.map((id) => [id === null ? "null" : id === undefined ? "undefined" : id, id]),
+  )("should return 400 if invalid ID %s", async (id) => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.POST,
+        route: `/api/v1/groups/${id}/posts`,
+      })
+    )
+      .assertStatusCode(Status.BadRequest)
+      .assertError("Invalid ID format");
   });
 });

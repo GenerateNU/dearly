@@ -6,12 +6,13 @@ import {
   POST_ID,
   POST_MOCK,
   MEDIA_MOCK,
+  INVALID_ID_ARRAY,
 } from "./../helpers/test-constants";
 import { Hono } from "hono";
 import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID, generateUUID } from "../helpers/test-token";
-import { HTTPRequest } from "../../constants/http";
+import { HTTPRequest, Status } from "../../constants/http";
 
 describe("GET /groups/:groupId/posts/:postId", () => {
   let app: Hono;
@@ -169,5 +170,33 @@ describe("GET /groups/:groupId/posts/:postId", () => {
     )
       .assertStatusCode(404)
       .assertError("Post does not exist.");
+  });
+
+  it.each(
+    INVALID_ID_ARRAY.map((id) => [id === null ? "null" : id === undefined ? "undefined" : id, id]),
+  )("should return 400 if invalid postId %s", async (id) => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.GET,
+        route: `/api/v1/groups/${generateUUID()}/posts/${id}`,
+      })
+    )
+      .debug()
+      .assertStatusCode(Status.BadRequest);
+  });
+
+  it.each(
+    INVALID_ID_ARRAY.map((id) => [id === null ? "null" : id === undefined ? "undefined" : id, id]),
+  )("should return 400 if invalid groupId %s", async (id) => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.GET,
+        route: `/api/v1/groups/${id}/posts/${generateUUID()}`,
+      })
+    )
+      .debug()
+      .assertStatusCode(Status.BadRequest);
   });
 });

@@ -6,12 +6,13 @@ import {
   POST_ID,
   POST_MOCK,
   MEDIA_MOCK,
+  INVALID_ID_ARRAY,
 } from "./../helpers/test-constants";
 import { Hono } from "hono";
 import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID, generateUUID } from "../helpers/test-token";
-import { HTTPRequest } from "../../constants/http";
+import { HTTPRequest, Status } from "../../constants/http";
 import { MAX_MEDIA_COUNT, MIN_LIMIT, TEXT_MAX_LIMIT } from "../../constants/database";
 
 describe("PATCH /groups/:groupId/posts/:postId", () => {
@@ -276,5 +277,33 @@ describe("PATCH /groups/:groupId/posts/:postId", () => {
         },
       })
     ).assertStatusCode(403);
+  });
+
+  it.each(
+    INVALID_ID_ARRAY.map((id) => [id === null ? "null" : id === undefined ? "undefined" : id, id]),
+  )("should return 400 if invalid postId %s", async (id) => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.PATCH,
+        route: `/api/v1/groups/${generateUUID()}/posts/${id}`,
+      })
+    )
+      .debug()
+      .assertStatusCode(Status.BadRequest);
+  });
+
+  it.each(
+    INVALID_ID_ARRAY.map((id) => [id === null ? "null" : id === undefined ? "undefined" : id, id]),
+  )("should return 400 if invalid groupId %s", async (id) => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.PATCH,
+        route: `/api/v1/groups/${id}/posts/${generateUUID()}`,
+      })
+    )
+      .debug()
+      .assertStatusCode(Status.BadRequest);
   });
 });
