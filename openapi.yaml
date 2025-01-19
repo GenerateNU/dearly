@@ -237,14 +237,76 @@ components:
           description: The type of the media (e.g., photo, video).
 
 paths:
-  /api/v1/groups/{id}/invites:
+  /api/v1/groups/{token}/verify:
+    put:
+      tags:
+        - Group Endpoints 
+      summary: Adds the user into the group 
+      description: Adds the user with the valid token into the group. 
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: token 
+          in: path 
+          description: token to be invited to the group 
+          required: true
+          schema:
+            type: string 
+      responses:
+        200:
+          description: Successfully added to group 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Successfully added to group"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      
+  /api/v1/groups/{groupId}/invites:
     get:
       tags:
         - Group Endpoints
-      summary: Get the token for the out of app invite
+      summary: Gets an invite token
       description: Creates a token that can be used for deeplinking on the client side.
       security:
         - BearerAuth: []
+      parameters:
+        - name: groupId
+          in: path
+          description: ID of the group
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
       responses:
         200:
           description: Successfully created the unique access token
@@ -255,8 +317,8 @@ paths:
                 properties:
                   token:
                     type: string
-                    format: base64
-                    example: ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/
+                required:
+                  - token
         400:
           description: Malformed request
           content:
@@ -1110,7 +1172,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-
   /api/v1/groups/{id}/posts:
     post:
       tags:
@@ -1384,7 +1445,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-
   /api/v1/groups/{id}/members/{userId}:
     post:
       tags:

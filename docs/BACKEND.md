@@ -376,6 +376,7 @@ Response Body:  {"message":"Validation failed","errors":[{"path":"lastName","mes
 Currently the dearly's focus is on IOS development, and therefore will support universal linking. 
 
 simulate an app deep-link in development from the command line:
+
 ```bash 
 bunx uri-scheme open exp://127.0.0.1:8081/ --ios
 ```
