@@ -4,7 +4,7 @@ import { createUserValidate, expoTokenValidate, querySchema, updateUserValidate 
 import { parseUUID } from "../../utilities/uuid";
 import { handleAppError } from "../../utilities/errors/app-error";
 import { Status } from "../../constants/http";
-import { DEL_USER, DEVICE_RESPONSE, USER_RESPONSE } from "../../types/api/routes/users";
+import { DEL_USER, DEVICE_RESPONSE, SEARCHED_USERS, USER_RESPONSE } from "../../types/api/routes/users";
 
 export interface UserController {
   createUser(ctx: Context): Promise<USER_RESPONSE>;
@@ -13,7 +13,7 @@ export interface UserController {
   deleteUser(ctx: Context): Promise<DEL_USER>;
   registerDevice(ctx: Context): Promise<DEVICE_RESPONSE>;
   removeDevice(ctx: Context): Promise<DEVICE_RESPONSE>;
-  searchByUsername(ctx: Context): Promise<Response>;
+  searchByUsername(ctx: Context): Promise<SEARCHED_USERS>;
 }
 
 export class UserControllerImpl implements UserController {
@@ -93,13 +93,13 @@ export class UserControllerImpl implements UserController {
     return await handleAppError(removeDeviceImpl)(ctx);
   }
 
-  async searchByUsername(ctx: Context): Promise<Response> {
+  async searchByUsername(ctx: Context): Promise<SEARCHED_USERS> {
     const search = async () => {
       const searchTerm = ctx.req.query("username");
       const groupId = ctx.req.query("groupId");
       const userId = ctx.get("userId");
       const limit = parseInt(ctx.get("limit")) || 10;
-      const offset = parseInt(ctx.get("offset")) || 1;
+      const offset = parseInt(ctx.get("page")) || 1;
   
       // handle validation using zod  
       const parsedQuery = querySchema.parse({
