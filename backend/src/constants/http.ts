@@ -15,4 +15,5 @@ export enum HTTPRequest {
   GET = "GET",
   PUT = "PUT",
   DELETE = "DELETE",
+  PATCH = "PATCH",
 }

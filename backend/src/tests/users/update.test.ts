@@ -47,7 +47,7 @@ describe("PUT /users/me", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.PUT,
+        type: HTTPRequest.PATCH,
         route: `/api/v1/users/me`,
         requestBody: {
           id: irrelevantID, // ignored field
@@ -71,7 +71,7 @@ describe("PUT /users/me", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.PUT,
+        type: HTTPRequest.PATCH,
         route: `/api/v1/users/me`,
         requestBody,
       })

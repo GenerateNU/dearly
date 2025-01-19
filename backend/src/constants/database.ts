@@ -32,3 +32,5 @@ export const NAME_MAX_LIMIT = 100;
 export const DEVICE_TOKEN_MAX_LIMIT = 152;
 export const MIN_LIMIT = 1;
 export const NOTIFICATION_BODY_MAX_LIMIT = 300;
+export const MAX_MEDIA_COUNT = 3;
+export const MIN_MEDIA_COUNT = 1;

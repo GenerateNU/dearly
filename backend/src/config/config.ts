@@ -41,7 +41,7 @@ export const getConfigurations = (): Configuration => {
     },
     cors: {
       origin: "*",
-      allowMethods: ["GET", "POST", "PUT", "DELETE"],
+      allowMethods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
       allowHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization"],
     },
     automigrate: {
