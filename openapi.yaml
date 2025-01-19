@@ -81,6 +81,64 @@ components:
           description: A description of the group.
       required:
         - name
+    Post:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: A unique identifier for the post.
+        groupId:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: A unique identifier for the group.
+        userId:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: A unique identifier for the user who makes the post.
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-01-17T00:00:00Z"
+          description: The date and time when the post was created.
+        caption:
+          type: string
+          example: "This is a sample caption for the post."
+          description: A textual description or caption for the post.
+          nullable: true
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
+          description: A list of media items attached to the post.
+    Media:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b11
+          description: A unique identifier for the media item.
+        postId:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: The ID of the post to which the media belongs.
+        url:
+          type: string
+          example: "https://example.com/media/image.jpg"
+          description: The URL of the media item.
+        type:
+          type: string
+          example: "PHOTO"
+          enum:
+            - PHOTO
+            - VIDEO
+          description: The type of the media (e.g., photo, video).
+
 
 paths:
   /api/v1/groups:
@@ -100,9 +158,11 @@ paths:
                 name:
                   type: string
                   minLength: 1
+                  maxLengthh: 100
                   description: The name of the group.
                 description:
                   type: string
+                  maxLength: 500
                   description: A description of the group.
               required:
                 - name
@@ -199,10 +259,12 @@ paths:
                 name:
                   type: string
                   minLength: 1
+                  maxLength: 100
                   description: Display name of the user.
                 username:
                   type: string
                   minLength: 1
+                  maxLength: 100
                   description: The username of the user.
                 mode:
                   type: string
@@ -300,7 +362,7 @@ paths:
                 $ref: "#/components/schemas/Error"
 
   /api/v1/users/me:
-    put:
+    patch:
       tags:
         - User Endpoints
       summary: Updates a user
@@ -507,3 +569,303 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+                
+  /api/v1/groups/{groupId}/posts:
+    post:
+      tags:
+        - Post Endpoints
+      summary: Creates a post
+      description: Creates a post from the specified body.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the group a post is made in
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                caption:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+                  description: Caption of the post.
+                media:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                          - VIDEO
+                          - PHOTO
+                        description: The type of media (either VIDEO or PHOTO).
+                      url:
+                        type: string
+                        description: The URL of the media item.
+                    required:
+                      - type
+                      - url
+                  description: A list of media items, each with a type and URL.
+              required:
+                - media
+              additionalProperties: true
+      responses:
+        201:
+          description: Successfully created a post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Group not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/v1/groups/{groupId}/posts/{postId}:
+    get:
+      tags:
+        - Post Endpoints
+      summary: Gets a post
+      description: Gets a post's details.
+      parameters:
+        - name: groupId
+          in: path
+          description: ID of the group a post is made in
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+        - name: postId
+          in: path
+          description: ID of the post
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Successfully created a post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    patch:
+      tags:
+        - Post Endpoints
+      summary: Updates a post
+      description: Updates a post from the specified body.
+      parameters:
+        - name: groupId
+          in: path
+          description: ID of the group a post is made in
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+        - name: postId
+          in: path
+          description: ID of the post
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                caption:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+                  description: Caption of the post.
+                media:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                          - VIDEO
+                          - PHOTO
+                        description: The type of media (either VIDEO or PHOTO).
+                      url:
+                        type: string
+                        description: The URL of the media item.
+                    required:
+                      - type
+                      - url
+                  description: A list of media items, each with a type and URL.
+              additionalProperties: true
+      responses:
+        200:
+          description: Successfully updated a post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: Forbidden since user is not a member of a group
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete: 
+      tags:
+        - Post Endpoints
+      summary: Deletes a post
+      description: Deletes a post.
+      parameters:
+        - name: groupId
+          in: path
+          description: ID of the group a post is made in
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+        - name: postId
+          in: path
+          description: ID of the post
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Successfully delete post
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Successfully delete post"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: Forbidden since user is not creator of post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+

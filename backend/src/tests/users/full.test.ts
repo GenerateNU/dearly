@@ -73,7 +73,7 @@ describe("End-to-end User CRUD", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.PUT,
+        type: HTTPRequest.PATCH,
         route: `api/v1/users/me`,
         requestBody: updatedBody,
         ...authPayload,
@@ -125,7 +125,7 @@ describe("End-to-end User CRUD", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.PUT,
+        type: HTTPRequest.PATCH,
         route: `api/v1/users/me`,
         requestBody: originalBody,
         ...authPayload,
