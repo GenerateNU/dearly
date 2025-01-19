@@ -23,3 +23,26 @@ export const expoTokenValidate = z.object({
     message: "Invalid Expo Push Token",
   }),
 });
+
+export interface SearchedUser {
+  id: string;
+  name: string;
+  username: string;
+  isMember: boolean;
+  profilePhoto: string | null;
+}
+
+export interface SearchedInfo {
+  groupId: string;
+  searchTerm: string;
+  limit: number;
+  offset: number;
+  userId: string;
+}
+
+export const querySchema = z.object({
+  searchTerm: z.string(),
+  groupId: z.string().uuid({ message: "Invalid ID format" }),
+  limit: z.number().int().positive().optional().default(10),
+  offset: z.number().int().nonnegative().optional().default(1),
+});

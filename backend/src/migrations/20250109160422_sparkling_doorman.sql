@@ -17,3 +17,5 @@ ALTER TABLE "devices" ADD CONSTRAINT "devices_userId_users_id_fk" FOREIGN KEY ("
 ALTER TABLE "media" ADD CONSTRAINT "media_postId_posts_id_fk" FOREIGN KEY ("postId") REFERENCES "public"."posts"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "posts" DROP COLUMN "media";--> statement-breakpoint
 ALTER TABLE "users" DROP COLUMN "deviceTokens";
+
+CREATE INDEX username_tsvector_idx ON users USING GIN (to_tsvector('english', username));

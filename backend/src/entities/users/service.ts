@@ -1,6 +1,6 @@
 import { InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
-import { CreateUserPayload, UpdateUserPayload, User } from "./validator";
+import { CreateUserPayload, SearchedInfo, SearchedUser, UpdateUserPayload, User } from "./validator";
 import { UserTransaction } from "./transaction";
 
 export interface UserService {
@@ -10,7 +10,7 @@ export interface UserService {
   deleteUser(id: string): Promise<void>;
   registerDevice(id: string, expoToken: string): Promise<string[]>;
   removeDevice(id: string, expoToken: string): Promise<string[]>;
-  searchByUsername(searchTerm: string, groupId: string): Promise<User[]>;
+  searchByUsername(payload: SearchedInfo): Promise<SearchedUser[]>;
 }
 
 export class UserServiceImpl implements UserService {
@@ -78,10 +78,9 @@ export class UserServiceImpl implements UserService {
     return handleServiceError(removeDeviceImpl)();
   }
 
-  async searchByUsername(searchTerm: string, groupId: string): Promise<User[]> {
+  async searchByUsername(payload: SearchedInfo): Promise<SearchedUser[]> {
     const search = async () => {
-      const devices = await this.userTransaction.getUsersByUsername(searchTerm, groupId);
-      return devices;
+      return await this.userTransaction.getUsersByUsername(payload);
     };
     return handleServiceError(search)();
   }

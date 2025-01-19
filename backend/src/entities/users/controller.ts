@@ -1,8 +1,8 @@
 import { Context } from "hono";
 import { UserService } from "./service";
-import { createUserValidate, expoTokenValidate, updateUserValidate } from "./validator";
+import { createUserValidate, expoTokenValidate, querySchema, updateUserValidate } from "./validator";
 import { parseUUID } from "../../utilities/uuid";
-import { BadRequestError, handleAppError } from "../../utilities/errors/app-error";
+import { handleAppError } from "../../utilities/errors/app-error";
 import { Status } from "../../constants/http";
 import { DEL_USER, DEVICE_RESPONSE, USER_RESPONSE } from "../../types/api/routes/users";
 
@@ -97,18 +97,23 @@ export class UserControllerImpl implements UserController {
     const search = async () => {
       const searchTerm = ctx.req.query("username");
       const groupId = ctx.req.query("groupId");
-
-      if (!searchTerm) {
-        throw new BadRequestError("Search term cannot be empty");
-      }
-      if (!groupId) {
-        throw new BadRequestError("Must have groupId to search for user");
-      }
-
-      const parsedGroupId = parseUUID(groupId);
-      const result = await this.userService.searchByUsername(searchTerm, parsedGroupId);
+      const userId = ctx.get("userId");
+      const limit = parseInt(ctx.get("limit")) || 10;
+      const offset = parseInt(ctx.get("offset")) || 1;
+  
+      // handle validation using zod  
+      const parsedQuery = querySchema.parse({
+        searchTerm,
+        limit,
+        offset,
+        groupId
+      });
+      const result = await this.userService.searchByUsername({
+        ...parsedQuery,
+        userId
+      });
       return ctx.json(result, Status.OK);
-    }
+    };
     return await handleAppError(search)(ctx);
   }
 }

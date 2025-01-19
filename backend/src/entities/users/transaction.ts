@@ -1,7 +1,7 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { CreateUserPayload, UpdateUserPayload, User } from "./validator";
-import { devicesTable, usersTable } from "../schema";
-import { and, eq } from "drizzle-orm";
+import { CreateUserPayload, SearchedInfo, SearchedUser, UpdateUserPayload, User } from "./validator";
+import { devicesTable, membersTable, usersTable } from "../schema";
+import { and, eq, sql, not } from "drizzle-orm";
 
 export interface UserTransaction {
   insertUser(payload: CreateUserPayload): Promise<User | null>;
@@ -10,7 +10,7 @@ export interface UserTransaction {
   deleteUser(id: string): Promise<User | null>;
   insertDeviceToken(id: string, expoToken: string): Promise<string[]>;
   deleteDeviceToken(id: string, expoToken: string): Promise<string[]>;
-  getUsersByUsername(searchTerm: string, groupId: string): Promise<User[]>;
+  getUsersByUsername(payload: SearchedInfo): Promise<SearchedUser[]>;
 }
 
 export class UserTransactionImpl implements UserTransaction {
@@ -72,7 +72,31 @@ export class UserTransactionImpl implements UserTransaction {
     return this.getUserTokens(userId);
   }
 
-  async getUsersByUsername(searchTerm: string, groupId: string): Promise<User[]> {
-    return [];
+  async getUsersByUsername({ userId, groupId, limit, offset, searchTerm }: SearchedInfo): Promise<SearchedUser[]> {
+    const joinedResult = await this.db
+      .select({
+        id: usersTable.id,
+        name: usersTable.name,
+        username: usersTable.username,
+        profilePhoto: usersTable.profilePhoto,
+        isMember: sql`CASE WHEN ${membersTable.groupId} IS NOT NULL THEN true ELSE false END`.as("isMember"),
+      })
+      .from(usersTable)
+      // left join to check for membership of user in the group
+      .leftJoin(membersTable, and(eq(membersTable.groupId, groupId), eq(membersTable.userId, usersTable.id)))
+      // search by username
+      .where(
+        and(
+          sql`to_tsvector('english', ${usersTable.username}) @@ plainto_tsquery('english', ${searchTerm})`, 
+          not(eq(usersTable.id, userId)) // exclude the user who is searching
+        )
+      )
+      // sort by most relevance
+      .orderBy(sql`ts_rank(to_tsvector('english', ${usersTable.username}), plainto_tsquery('english', ${searchTerm})) DESC`)
+      // handle pagination
+      .limit(limit)
+      .offset(offset - 1);
+    
+    return joinedResult as SearchedUser[];
   }
 }
