@@ -1,15 +1,14 @@
 import { mediaTable, postsTable } from "../../entities/schema";
-import { generateUUID } from "./test-token";
 
 export const INVALID_ID_ARRAY = ["1", "%2", "123abc", "!!$$", "123 456", "@ID", null, undefined];
 export const USER_ALICE_ID = "00000000-0000-0000-0000-000000000000";
-export const USER_BOB_ID = generateUUID();
-export const USER_ANA_ID = generateUUID();
-export const DEARLY_GROUP_ID = generateUUID();
-export const POST_ID = generateUUID();
-export const MEDIA_ONE_ID = generateUUID();
-export const MEDIA_TWO_ID = generateUUID();
-export const MEDIA_THREE_ID = generateUUID();
+export const USER_BOB_ID = "ae6be85f-157c-40db-afd2-2f388d8ff7b5";
+export const USER_ANA_ID = "6d56421d-4c0d-44d9-b2b1-8d897207fc5b";
+export const DEARLY_GROUP_ID = "ab674eaf-e6f0-47c1-8a38-81079577880b";
+export const POST_ID = "d1c51f6d-3a57-474a-872e-bde646fe338b";
+export const MEDIA_ONE_ID = "c41f01cf-2c1b-44ad-b80f-05bddd607ee1";
+export const MEDIA_TWO_ID = "43bd915c-122c-448f-8d2b-bdc983934e86";
+export const MEDIA_THREE_ID = "43bd915c-122c-448f-8d2b-bdc983934e86";
 
 export const GROUP_EMPTY_FIELDS_ERRORS = [
   {
