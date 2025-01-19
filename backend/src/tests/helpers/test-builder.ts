@@ -61,13 +61,13 @@ export class TestBuilder {
     if (!this.response) return;
 
     try {
-      this.body = await this.response.clone().json();
+      this.body = await this.response.json();
     } catch {
       this.body = undefined;
     }
 
     try {
-      this.text = await this.response.clone().text();
+      this.text = await this.response.text();
     } catch {
       this.text = undefined;
     }
@@ -154,12 +154,19 @@ export class TestBuilder {
   /**
    * Assert that field is not equal to a specific value
    */
-  assertFieldNotEqual(fieldName: string, expected: string): TestBuilder {
+  assertFieldNotEqual(fieldName: string, expected: unknown): TestBuilder {
     if (!this.body) {
       throw new Error("Response is not defined.");
     }
     const actualValue = this.body[fieldName];
-    expect(actualValue).not.toEqual(expected);
+    if (Array.isArray(expected) && Array.isArray(actualValue)) {
+      // Handle array comparison (exact match)
+      expect(actualValue).not.toEqual(expect.arrayContaining(expected));
+      expect(expected).not.toEqual(expect.arrayContaining(actualValue));
+    } else {
+      // For non-array types, use deep equality check
+      expect(actualValue).not.toEqual(expected);
+    }
     return this;
   }
 
