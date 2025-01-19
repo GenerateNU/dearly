@@ -40,14 +40,14 @@ export class PostServiceImpl implements PostService {
   }
 
   async updatePost(payload: UpdatePostPayload): Promise<PostWithMedia> {
-    const createPostImpl = async () => {
+    const updatePostImpl = async () => {
       const updatedPost = await this.postTransaction.updatePost(payload);
       if (!updatedPost) {
         throw new NotFoundError("Post");
       }
       return updatedPost;
     };
-    return await handleServiceError(createPostImpl)();
+    return await handleServiceError(updatePostImpl)();
   }
 
   async deletePost(payload: IDPayload): Promise<void> {
