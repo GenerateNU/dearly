@@ -237,6 +237,52 @@ components:
           description: The type of the media (e.g., photo, video).
 
 paths:
+  /api/v1/groups/{id}/invites:
+    get:
+      tags:
+        - Group Endpoints
+      summary: Get the token for the out of app invite
+      description: Creates a token that can be used for deeplinking on the client side.
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Successfully created the unique access token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    format: base64
+                    example: ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /api/v1/groups:
     post:
       tags:
