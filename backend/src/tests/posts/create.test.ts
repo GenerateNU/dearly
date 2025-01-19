@@ -61,7 +61,7 @@ describe("POST /groups/:groupId/posts", () => {
         },
       })
     )
-      .assertStatusCode(201)
+      .assertStatusCode(Status.Created)
       .assertFieldExists("id")
       .assertFieldExists("createdAt")
       .assertFieldExists("media")
@@ -87,7 +87,7 @@ describe("POST /groups/:groupId/posts", () => {
         },
       })
     )
-      .assertStatusCode(201)
+      .assertStatusCode(Status.Created)
       .assertFieldExists("id")
       .assertFieldExists("createdAt")
       .assertFieldExists("media")
@@ -113,7 +113,7 @@ describe("POST /groups/:groupId/posts", () => {
         },
       })
     )
-      .assertStatusCode(404)
+      .assertStatusCode(Status.NotFound)
       .assertError("Group does not exist.");
   });
 
@@ -132,7 +132,7 @@ describe("POST /groups/:groupId/posts", () => {
         },
       })
     )
-      .assertStatusCode(400)
+      .assertStatusCode(Status.BadRequest)
       .assertError([
         {
           message: "Required",
@@ -154,7 +154,7 @@ describe("POST /groups/:groupId/posts", () => {
         },
       })
     )
-      .assertStatusCode(400)
+      .assertStatusCode(Status.BadRequest)
       .assertError([
         {
           message: `Caption must be at least ${MIN_LIMIT} character long`,
@@ -187,7 +187,7 @@ describe("POST /groups/:groupId/posts", () => {
         },
       })
     )
-      .assertStatusCode(400)
+      .assertStatusCode(Status.BadRequest)
       .assertError([
         {
           message: `Caption must be at most ${TEXT_MAX_LIMIT} characters long`,
@@ -211,7 +211,7 @@ describe("POST /groups/:groupId/posts", () => {
         },
       })
     )
-      .assertStatusCode(404)
+      .assertStatusCode(Status.NotFound)
       .assertError("Group does not exist.");
   });
 
@@ -230,7 +230,7 @@ describe("POST /groups/:groupId/posts", () => {
         },
       })
     )
-      .assertStatusCode(400)
+      .assertStatusCode(Status.BadRequest)
       .assertError([
         {
           path: "media",
@@ -255,7 +255,7 @@ describe("POST /groups/:groupId/posts", () => {
         },
       })
     )
-      .assertStatusCode(400)
+      .assertStatusCode(Status.BadRequest)
       .assertError([
         {
           message: "At least 1 media item (PHOTO or VIDEO) is required.",
@@ -296,7 +296,7 @@ describe("POST /groups/:groupId/posts", () => {
         },
       })
     )
-      .assertStatusCode(400)
+      .assertStatusCode(Status.BadRequest)
       .assertError([
         {
           path: "media",

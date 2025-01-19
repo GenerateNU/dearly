@@ -51,7 +51,7 @@ describe("DELETE /groups/:groupId/posts/:postId", () => {
         },
       })
     )
-      .assertStatusCode(201)
+      .assertStatusCode(Status.Created)
       .assertFieldExists("id")
       .assertFieldExists("createdAt")
       .assertFieldExists("media")
@@ -77,7 +77,7 @@ describe("DELETE /groups/:groupId/posts/:postId", () => {
         },
       })
     )
-      .assertStatusCode(403)
+      .assertStatusCode(Status.Forbidden)
       .assertError("Forbidden");
 
     // not member of the group
@@ -95,7 +95,7 @@ describe("DELETE /groups/:groupId/posts/:postId", () => {
         },
       })
     )
-      .assertStatusCode(403)
+      .assertStatusCode(Status.Forbidden)
       .assertError("Forbidden");
 
     // owner of post delete
@@ -113,7 +113,7 @@ describe("DELETE /groups/:groupId/posts/:postId", () => {
         },
       })
     )
-      .assertStatusCode(200)
+      .assertStatusCode(Status.OK)
       .assertMessage("Successfully delete post");
   });
 
@@ -132,7 +132,7 @@ describe("DELETE /groups/:groupId/posts/:postId", () => {
         },
       })
     )
-      .assertStatusCode(404)
+      .assertStatusCode(Status.NotFound)
       .assertError("Post does not exist.");
   });
 
@@ -151,7 +151,7 @@ describe("DELETE /groups/:groupId/posts/:postId", () => {
         },
       })
     )
-      .assertStatusCode(400)
+      .assertStatusCode(Status.BadRequest)
       .assertError("Invalid ID format");
   });
 
@@ -170,7 +170,7 @@ describe("DELETE /groups/:groupId/posts/:postId", () => {
         },
       })
     )
-      .assertStatusCode(400)
+      .assertStatusCode(Status.BadRequest)
       .assertError("Invalid ID format");
   });
 
@@ -183,9 +183,7 @@ describe("DELETE /groups/:groupId/posts/:postId", () => {
         type: HTTPRequest.DELETE,
         route: `/api/v1/groups/${generateUUID()}/posts/${id}`,
       })
-    )
-      .debug()
-      .assertStatusCode(Status.BadRequest);
+    ).assertStatusCode(Status.BadRequest);
   });
 
   it.each(
@@ -197,8 +195,6 @@ describe("DELETE /groups/:groupId/posts/:postId", () => {
         type: HTTPRequest.DELETE,
         route: `/api/v1/groups/${id}/posts/${generateUUID()}`,
       })
-    )
-      .debug()
-      .assertStatusCode(Status.BadRequest);
+    ).assertStatusCode(Status.BadRequest);
   });
 });

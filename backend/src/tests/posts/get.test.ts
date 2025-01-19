@@ -76,7 +76,7 @@ describe("GET /groups/:groupId/posts/:postId", () => {
           Authorization: `Bearer ${BOB_JWT}`,
         },
       })
-    ).assertStatusCode(200);
+    ).assertStatusCode(Status.OK);
 
     // manager of group
     (
@@ -89,7 +89,7 @@ describe("GET /groups/:groupId/posts/:postId", () => {
           Authorization: `Bearer ${ALICE_JWT}`,
         },
       })
-    ).assertStatusCode(200);
+    ).assertStatusCode(Status.OK);
   });
 
   it("should return 200 with full actual seeded post", async () => {
@@ -104,7 +104,7 @@ describe("GET /groups/:groupId/posts/:postId", () => {
         },
       })
     )
-      .assertStatusCode(200)
+      .assertStatusCode(Status.OK)
       .assertBody({
         ...POST_MOCK[0],
         createdAt: POST_MOCK[0]!.createdAt?.toISOString(),
@@ -127,18 +127,20 @@ describe("GET /groups/:groupId/posts/:postId", () => {
         },
       })
     )
-      .assertStatusCode(201)
+      .assertStatusCode(Status.Created)
       .getResponseId();
 
-    await testBuilder.request({
-      app,
-      type: HTTPRequest.GET,
-      route: `/api/v1/groups/${DEARLY_GROUP_ID}/posts/${id}`,
-      autoAuthorized: false,
-      headers: {
-        Authorization: `Bearer ${ANA_JWT}`,
-      },
-    });
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.GET,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/posts/${id}`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${ANA_JWT}`,
+        },
+      })
+    ).assertStatusCode(Status.NotFound);
   });
 
   it("should return 404 if post not found for member", async () => {
@@ -168,7 +170,7 @@ describe("GET /groups/:groupId/posts/:postId", () => {
         },
       })
     )
-      .assertStatusCode(404)
+      .assertStatusCode(Status.NotFound)
       .assertError("Post does not exist.");
   });
 
@@ -181,9 +183,7 @@ describe("GET /groups/:groupId/posts/:postId", () => {
         type: HTTPRequest.GET,
         route: `/api/v1/groups/${generateUUID()}/posts/${id}`,
       })
-    )
-      .debug()
-      .assertStatusCode(Status.BadRequest);
+    ).assertStatusCode(Status.BadRequest);
   });
 
   it.each(
@@ -195,8 +195,6 @@ describe("GET /groups/:groupId/posts/:postId", () => {
         type: HTTPRequest.GET,
         route: `/api/v1/groups/${id}/posts/${generateUUID()}`,
       })
-    )
-      .debug()
-      .assertStatusCode(Status.BadRequest);
+    ).assertStatusCode(Status.BadRequest);
   });
 });

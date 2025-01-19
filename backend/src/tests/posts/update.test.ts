@@ -55,7 +55,7 @@ describe("PATCH /groups/:groupId/posts/:postId", () => {
         },
       })
     )
-      .assertStatusCode(200)
+      .assertStatusCode(Status.OK)
       .assertFieldNotEqual("media", MEDIA_MOCK)
       .assertFieldNotEqual("caption", POST_MOCK[0]!.caption)
       .assertField("caption", "updated");
@@ -76,7 +76,7 @@ describe("PATCH /groups/:groupId/posts/:postId", () => {
         },
       })
     )
-      .assertStatusCode(400)
+      .assertStatusCode(Status.BadRequest)
       .assertError([
         {
           message: `Caption must be at least ${MIN_LIMIT} character long`,
@@ -100,7 +100,7 @@ describe("PATCH /groups/:groupId/posts/:postId", () => {
         },
       })
     )
-      .assertStatusCode(400)
+      .assertStatusCode(Status.BadRequest)
       .assertError([
         {
           message: `Caption must be at most ${TEXT_MAX_LIMIT} characters long`,
@@ -124,7 +124,7 @@ describe("PATCH /groups/:groupId/posts/:postId", () => {
         },
       })
     )
-      .assertStatusCode(400)
+      .assertStatusCode(Status.BadRequest)
       .assertError([
         {
           message: `At least 1 media item (PHOTO or VIDEO) is required.`,
@@ -165,7 +165,7 @@ describe("PATCH /groups/:groupId/posts/:postId", () => {
         },
       })
     )
-      .assertStatusCode(400)
+      .assertStatusCode(Status.BadRequest)
       .assertError([
         {
           message: `At most ${MAX_MEDIA_COUNT} media items are allowed.`,
@@ -194,7 +194,7 @@ describe("PATCH /groups/:groupId/posts/:postId", () => {
         },
       })
     )
-      .assertStatusCode(400)
+      .assertStatusCode(Status.BadRequest)
       .assertError([
         {
           message: "Invalid enum value. Expected 'VIDEO' | 'PHOTO', received 'AUDIO'",
@@ -222,7 +222,7 @@ describe("PATCH /groups/:groupId/posts/:postId", () => {
         },
       })
     )
-      .assertStatusCode(404)
+      .assertStatusCode(Status.NotFound)
       .assertError("Post does not exist.");
   });
 
@@ -241,7 +241,7 @@ describe("PATCH /groups/:groupId/posts/:postId", () => {
         },
       })
     )
-      .assertStatusCode(404)
+      .assertStatusCode(Status.NotFound)
       .assertError("Post does not exist.");
   });
 
@@ -259,7 +259,7 @@ describe("PATCH /groups/:groupId/posts/:postId", () => {
           Authorization: `Bearer ${BOB_JWT}`,
         },
       })
-    ).assertStatusCode(403);
+    ).assertStatusCode(Status.Forbidden);
   });
 
   it("should return 403 if not member of group", async () => {
@@ -276,7 +276,7 @@ describe("PATCH /groups/:groupId/posts/:postId", () => {
           Authorization: `Bearer ${ANA_JWT}`,
         },
       })
-    ).assertStatusCode(403);
+    ).assertStatusCode(Status.Forbidden);
   });
 
   it.each(
@@ -288,9 +288,7 @@ describe("PATCH /groups/:groupId/posts/:postId", () => {
         type: HTTPRequest.PATCH,
         route: `/api/v1/groups/${generateUUID()}/posts/${id}`,
       })
-    )
-      .debug()
-      .assertStatusCode(Status.BadRequest);
+    ).assertStatusCode(Status.BadRequest);
   });
 
   it.each(
@@ -302,8 +300,6 @@ describe("PATCH /groups/:groupId/posts/:postId", () => {
         type: HTTPRequest.PATCH,
         route: `/api/v1/groups/${id}/posts/${generateUUID()}`,
       })
-    )
-      .debug()
-      .assertStatusCode(Status.BadRequest);
+    ).assertStatusCode(Status.BadRequest);
   });
 });
