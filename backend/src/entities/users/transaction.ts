@@ -87,8 +87,14 @@ export class UserTransactionImpl implements UserTransaction {
       // search by username
       .where(
         and(
+          // check if the user is a manager of the group
+          eq(membersTable.groupId, groupId),
+          eq(membersTable.userId, userId),
+          eq(membersTable.role, 'MANAGER'),
+          // exclude the user who is searching from the result
+          not(eq(usersTable.id, userId)),
+          // vectorize username for search
           sql`to_tsvector('english', ${usersTable.username}) @@ plainto_tsquery('english', ${searchTerm})`, 
-          not(eq(usersTable.id, userId)) // exclude the user who is searching
         )
       )
       // sort by most relevance
