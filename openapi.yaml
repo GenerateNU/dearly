@@ -497,7 +497,25 @@ paths:
                 schema:
                   type: array
                   items:
-                    $ref: "#/components/schemas/Group"
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        description: The name of the group.
+                      description:
+                        type: string
+                        description: A description of the group.
+                        nullable: true
+                      id:
+                        type: string
+                        format: uuid
+                        example: 5e91507e-5630-4efd-9fd4-799178870b10
+                        description: A unique identifier for the group.
+                      managerId:
+                        type: string
+                        format: uuid
+                        example: 5e91507e-5630-4efd-9fd4-799178870b10
+                        description: A unique identifier of the group manager.
           400:
             description: Malformed query params
             content:
