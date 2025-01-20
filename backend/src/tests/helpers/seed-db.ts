@@ -52,7 +52,7 @@ const seedGroup = async (db: PostgresJsDatabase) => {
       description: "family",
       managerId: USER_ANA_ID,
       id: ANOTHER_GROUP_ID,
-    }
+    },
   ];
 
   try {

@@ -84,7 +84,7 @@ export const USER_ANA: CreateUserPayload = {
 
 export const USER_BILL: CreateUserPayload = {
   name: "Bill",
-  username: "bobby",
+  username: "bill",
   mode: "BASIC",
   id: USER_BILL_ID,
 };

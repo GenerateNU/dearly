@@ -45,6 +45,30 @@ describe("GET /users/search", () => {
     isMember: false,
   };
 
+  it.each([
+    ["build", [BOB, ANA, BILL]],
+    ["ana", [ANA, BOB, BILL]],
+    ["bill", [BILL, BOB, ANA]],
+  ])("should return 200 if is manager with query param %s", async (username, expectedBody) => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.GET,
+        route: `/api/v1/users/search`,
+        queryParams: {
+          groupId: DEARLY_GROUP_ID,
+          username,
+        },
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
+        },
+      })
+    )
+      .assertStatusCode(Status.OK)
+      .assertBody(expectedBody);
+  });
+
   it("should return 200 if is manager of group and `ana` query", async () => {
     (
       await testBuilder.request({
