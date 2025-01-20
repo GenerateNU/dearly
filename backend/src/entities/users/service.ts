@@ -1,6 +1,13 @@
 import { InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
-import { CreateUserPayload, Pagination, UpdateUserPayload, User } from "./validator";
+import {
+  CreateUserPayload,
+  SearchedInfo,
+  SearchedUser,
+  UpdateUserPayload,
+  User,
+  Pagination,
+} from "./validator";
 import { UserTransaction } from "./transaction";
 import { PostWithMedia } from "../posts/validator";
 import { Group } from "../groups/validator";
@@ -14,6 +21,7 @@ export interface UserService {
   removeDevice(id: string, expoToken: string): Promise<string[]>;
   getPosts(payload: Pagination): Promise<PostWithMedia[]>;
   getGroups(payload: Pagination): Promise<Group[]>;
+  searchByUsername(payload: SearchedInfo): Promise<SearchedUser[]>;
 }
 
 export class UserServiceImpl implements UserService {
@@ -93,5 +101,12 @@ export class UserServiceImpl implements UserService {
       return await this.userTransaction.getGroups(payload);
     };
     return handleServiceError(getGroupsImpl)();
+  }
+
+  async searchByUsername(payload: SearchedInfo): Promise<SearchedUser[]> {
+    const search = async () => {
+      return await this.userTransaction.getUsersByUsername(payload);
+    };
+    return handleServiceError(search)();
   }
 }

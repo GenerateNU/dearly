@@ -70,6 +70,27 @@ components:
         - name
         - username
         - mode
+    SearchedUser:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Display name of the user.
+        username:
+          type: string
+          description: The username of the user.
+        id:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: A unique identifier for the user.
+        profilePhoto:
+          type: string
+          nullable: true
+          description: A URL to the user's profile photo.
+        isMember:
+          type: boolean
+          description: True when user is a member of a group.
     Group:
       type: object
       properties:
@@ -588,6 +609,69 @@ paths:
                 schema:
                   $ref: "#/components/schemas/Error"
 
+  /api/v1/users/search:
+    get:
+      tags: 
+        - User Endpoints
+      summary: Search users by username
+      description: Search in-app users so they can be invited directly to a group.
+      security: 
+        - BearerAuth: []
+      parameters:
+        - name: username
+          in: query
+          description: The username to search for.
+          required: true
+          schema:
+            type: string
+        - name: groupId
+          in: query
+          description: The group to check user's membership against.
+          required: true
+          schema:
+            type: uuid
+        - name: limit
+          in: query
+          description: The maximum number of users to return.
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: page
+          in: query
+          description: The page number for pagination.
+          required: false
+          schema:
+            type: integer
+            default: 1
+      responses:
+        200:
+          description: Successfully retrieve users by searching for username
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SearchedUser"
+        400:
+          description: Malformed query params
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      
   /api/v1/users/devices:
     post:
       tags:

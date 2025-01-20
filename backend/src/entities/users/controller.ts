@@ -4,6 +4,7 @@ import {
   createUserValidate,
   expoTokenValidate,
   paginationSchema,
+  querySchema,
   updateUserValidate,
 } from "./validator";
 import { parseUUID } from "../../utilities/uuid";
@@ -14,6 +15,7 @@ import {
   DEVICE_RESPONSE,
   USER_GROUPS,
   USER_POSTS,
+  SEARCHED_USERS,
   USER_RESPONSE,
 } from "../../types/api/routes/users";
 
@@ -26,6 +28,7 @@ export interface UserController {
   removeDevice(ctx: Context): Promise<DEVICE_RESPONSE>;
   getPosts(ctx: Context): Promise<USER_POSTS>;
   getGroups(ctx: Context): Promise<USER_GROUPS>;
+  searchByUsername(ctx: Context): Promise<SEARCHED_USERS>;
 }
 
 export class UserControllerImpl implements UserController {
@@ -125,5 +128,27 @@ export class UserControllerImpl implements UserController {
       return ctx.json(groups, Status.OK);
     };
     return await handleAppError(getGroupsImpl)(ctx);
+  }
+
+  async searchByUsername(ctx: Context): Promise<SEARCHED_USERS> {
+    const search = async () => {
+      const { username, groupId, limit, page } = ctx.req.query();
+      const userId = ctx.get("userId");
+
+      // handle validation using zod
+      const parsedQuery = querySchema.parse({
+        username,
+        limit,
+        page,
+        groupId,
+      });
+
+      const result = await this.userService.searchByUsername({
+        ...parsedQuery,
+        userId,
+      });
+      return ctx.json(result, Status.OK);
+    };
+    return await handleAppError(search)(ctx);
   }
 }

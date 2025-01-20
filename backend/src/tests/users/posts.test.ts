@@ -11,7 +11,7 @@ import {
   USER_BOB_ID,
 } from "../helpers/test-constants";
 
-describe("GET /users/search", () => {
+describe("GET /users/posts", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
 

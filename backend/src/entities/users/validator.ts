@@ -24,29 +24,56 @@ export const expoTokenValidate = z.object({
   }),
 });
 
+export interface SearchedUser {
+  id: string;
+  name: string;
+  username: string;
+  isMember: boolean;
+  profilePhoto: string | null;
+}
+
+export interface SearchedInfo {
+  groupId: string;
+  username: string;
+  limit: number;
+  page: number;
+  userId: string;
+}
+
+const limitValidate = z
+  .string()
+  .transform((val) => {
+    const parsed = Number(val);
+    return parsed;
+  })
+  .refine((val) => !isNaN(val) && val > 0, {
+    message: "Limit must be a positive number",
+  })
+  .optional()
+  .default("10");
+
+const pageValidate = z
+  .string()
+  .transform((val) => {
+    const parsed = Number(val);
+    return parsed;
+  })
+  .refine((val) => !isNaN(val) && val > 0, {
+    message: "Page must be a positive number",
+  })
+  .optional()
+  .default("1");
+
+export const querySchema = z.object({
+  username: z.string(),
+  groupId: z.string().uuid({ message: "Invalid ID format" }),
+  limit: limitValidate,
+  page: pageValidate,
+});
+
 export const paginationSchema = z.object({
-  limit: z
-    .string()
-    .transform((val) => {
-      const parsed = Number(val);
-      return parsed;
-    })
-    .refine((val) => !isNaN(val) && val > 0, {
-      message: "Limit must be a positive number",
-    })
-    .optional()
-    .default("10"),
-  page: z
-    .string()
-    .transform((val) => {
-      const parsed = Number(val);
-      return parsed;
-    })
-    .refine((val) => !isNaN(val) && val > 0, {
-      message: "Page must be a positive number",
-    })
-    .optional()
-    .default("1"),
+  limit: limitValidate,
+  page: pageValidate,
 });
 
 export type PaginationParams = z.infer<typeof paginationSchema>;

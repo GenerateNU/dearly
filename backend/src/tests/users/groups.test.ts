@@ -12,7 +12,7 @@ import {
   USER_BOB_ID,
 } from "../helpers/test-constants";
 
-describe("GET /users/search", () => {
+describe("GET /users/groups", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
 
