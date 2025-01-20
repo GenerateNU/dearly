@@ -31,7 +31,6 @@ describe("GET /users/search", () => {
         },
       })
     )
-      .debug()
       .assertStatusCode(Status.OK)
       .assertBody([]);
   });
