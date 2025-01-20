@@ -12,3 +12,10 @@ export type DEVICE_RESPONSE = TypedResponse<
   | paths["/api/v1/users/devices"]["delete"]["responses"]["200"]["content"]["application/json"]
   | API_ERROR
 >;
+export type USER_POSTS = TypedResponse<
+  paths["/api/v1/users/posts"]["get"]["responses"]["200"]["content"]["application/json"] | API_ERROR
+>;
+export type USER_GROUPS = TypedResponse<
+  | paths["/api/v1/users/groups"]["get"]["responses"]["200"]["content"]["application/json"]
+  | API_ERROR
+>;

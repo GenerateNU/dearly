@@ -9,7 +9,13 @@ import {
 import { parseUUID } from "../../utilities/uuid";
 import { handleAppError } from "../../utilities/errors/app-error";
 import { Status } from "../../constants/http";
-import { DEL_USER, DEVICE_RESPONSE, USER_RESPONSE } from "../../types/api/routes/users";
+import {
+  DEL_USER,
+  DEVICE_RESPONSE,
+  USER_GROUPS,
+  USER_POSTS,
+  USER_RESPONSE,
+} from "../../types/api/routes/users";
 
 export interface UserController {
   createUser(ctx: Context): Promise<USER_RESPONSE>;
@@ -18,8 +24,8 @@ export interface UserController {
   deleteUser(ctx: Context): Promise<DEL_USER>;
   registerDevice(ctx: Context): Promise<DEVICE_RESPONSE>;
   removeDevice(ctx: Context): Promise<DEVICE_RESPONSE>;
-  getPosts(ctx: Context): Promise<Response>;
-  getGroups(ctx: Context): Promise<Response>;
+  getPosts(ctx: Context): Promise<USER_POSTS>;
+  getGroups(ctx: Context): Promise<USER_GROUPS>;
 }
 
 export class UserControllerImpl implements UserController {
@@ -99,7 +105,7 @@ export class UserControllerImpl implements UserController {
     return await handleAppError(removeDeviceImpl)(ctx);
   }
 
-  async getPosts(ctx: Context): Promise<Response> {
+  async getPosts(ctx: Context): Promise<USER_POSTS> {
     const getPostsImpl = async () => {
       const { limit, page } = ctx.req.query();
       const queryParams = paginationSchema.parse({ limit, page });
@@ -110,7 +116,7 @@ export class UserControllerImpl implements UserController {
     return await handleAppError(getPostsImpl)(ctx);
   }
 
-  async getGroups(ctx: Context): Promise<Response> {
+  async getGroups(ctx: Context): Promise<USER_GROUPS> {
     const getGroupsImpl = async () => {
       const { limit, page } = ctx.req.query();
       const queryParams = paginationSchema.parse({ limit, page });

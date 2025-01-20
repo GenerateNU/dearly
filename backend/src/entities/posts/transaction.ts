@@ -1,11 +1,6 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { CreatePostPayload, IDPayload, Media, PostWithMedia, UpdatePostPayload } from "./validator";
-import {
-  groupsTable,
-  mediaTable,
-  membersTable,
-  postsTable,
-} from "../schema";
+import { groupsTable, mediaTable, membersTable, postsTable } from "../schema";
 import { eq, and, sql } from "drizzle-orm";
 import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
 
