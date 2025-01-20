@@ -43,7 +43,7 @@ export type IDPayload = {
   groupId: string;
 };
 
-type Media = typeof mediaTable.$inferSelect;
+export type Media = typeof mediaTable.$inferSelect;
 type Post = typeof postsTable.$inferSelect;
 
 export type PostWithMedia = Post & {

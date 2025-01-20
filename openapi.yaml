@@ -100,6 +100,7 @@ components:
         description:
           type: string
           description: A description of the group.
+          nullable: true
       required:
         - name
     Post:
@@ -472,9 +473,7 @@ paths:
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: "#/components/schemas/Error"
-                  - $ref: "#/components/schemas/ValidationError"
+                $ref: "#/components/schemas/ValidationError"
         401:
           description: Unauthorized due to invalid JWT
           content:
@@ -487,6 +486,128 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+
+  /api/v1/users/groups:
+      get:
+        tags: 
+          - User Endpoints
+        summary: Get all groups for user
+        description: Get all groups user is member of.
+        security: 
+          - BearerAuth: []
+        parameters:
+          - name: limit
+            in: query
+            description: The maximum number of groups to return.
+            required: false
+            schema:
+              type: integer
+              default: 10
+          - name: page
+            in: query
+            description: The page number for pagination.
+            required: false
+            schema:
+              type: integer
+              default: 1
+        responses:
+          200:
+            description: Successfully retrieve groups user is part of
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        description: The name of the group.
+                      description:
+                        type: string
+                        description: A description of the group.
+                        nullable: true
+                      id:
+                        type: string
+                        format: uuid
+                        example: 5e91507e-5630-4efd-9fd4-799178870b10
+                        description: A unique identifier for the group.
+                      managerId:
+                        type: string
+                        format: uuid
+                        example: 5e91507e-5630-4efd-9fd4-799178870b10
+                        description: A unique identifier of the group manager.
+          400:
+            description: Malformed query params
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/ValidationError"
+          401:
+            description: Unauthorized due to invalid JWT
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/Error"
+          500:
+            description: Internal server error
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/Error"
+
+  /api/v1/users/posts:
+      get:
+        tags: 
+          - User Endpoints
+        summary: Get all posts for user
+        description: Get all posts that a user posted.
+        security: 
+          - BearerAuth: []
+        parameters:
+          - name: limit
+            in: query
+            description: The maximum number of posts to return.
+            required: false
+            schema:
+              type: integer
+              default: 10
+          - name: page
+            in: query
+            description: The page number for pagination.
+            required: false
+            schema:
+              type: integer
+              default: 1
+        responses:
+          200:
+            description: Successfully retrieve posts user posted
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Post"
+          400:
+            description: Malformed query params
+            content:
+              application/json:
+                schema:
+                  oneOf:
+                    - $ref: "#/components/schemas/Error"
+                    - $ref: "#/components/schemas/ValidationError"
+          401:
+            description: Unauthorized due to invalid JWT
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/Error"
+          500:
+            description: Internal server error
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/Error"
 
   /api/v1/users/search:
     get:
