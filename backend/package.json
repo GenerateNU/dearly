@@ -17,6 +17,7 @@
   "type": "module",
   "dependencies": {
     "@blgc/openapi-router": "^0.1.0",
+    "@breezystack/lamejs": "^1.2.7",
     "@eslint/js": "^9.17.0",
     "@hono/zod-validator": "^0.4.2",
     "@jest/globals": "^29.7.0",
@@ -37,6 +38,7 @@
     "pino-pretty": "^13.0.0",
     "postgres": "^3.4.5",
     "prettier": "^3.4.2",
+    "sharp": "^0.33.5",
     "tsx": "^4.19.2",
     "typescript-eslint": "^8.19.1",
     "uuid": "^11.0.3",
