@@ -12,9 +12,12 @@ import { Status } from "../../constants/http";
 import {
   DEL_USER,
   DEVICE_RESPONSE,
+  USER_GROUPS,
+  USER_POSTS,
   SEARCHED_USERS,
   USER_RESPONSE,
 } from "../../types/api/routes/users";
+import { paginationSchema } from "../../utilities/pagination";
 
 export interface UserController {
   createUser(ctx: Context): Promise<USER_RESPONSE>;
@@ -23,6 +26,8 @@ export interface UserController {
   deleteUser(ctx: Context): Promise<DEL_USER>;
   registerDevice(ctx: Context): Promise<DEVICE_RESPONSE>;
   removeDevice(ctx: Context): Promise<DEVICE_RESPONSE>;
+  getPosts(ctx: Context): Promise<USER_POSTS>;
+  getGroups(ctx: Context): Promise<USER_GROUPS>;
   searchByUsername(ctx: Context): Promise<SEARCHED_USERS>;
 }
 
@@ -101,6 +106,28 @@ export class UserControllerImpl implements UserController {
       return ctx.json(user, Status.OK);
     };
     return await handleAppError(removeDeviceImpl)(ctx);
+  }
+
+  async getPosts(ctx: Context): Promise<USER_POSTS> {
+    const getPostsImpl = async () => {
+      const { limit, page } = ctx.req.query();
+      const queryParams = paginationSchema.parse({ limit, page });
+      const userId = ctx.get("userId");
+      const posts = await this.userService.getPosts({ id: userId, ...queryParams });
+      return ctx.json(posts, Status.OK);
+    };
+    return await handleAppError(getPostsImpl)(ctx);
+  }
+
+  async getGroups(ctx: Context): Promise<USER_GROUPS> {
+    const getGroupsImpl = async () => {
+      const { limit, page } = ctx.req.query();
+      const queryParams = paginationSchema.parse({ limit, page });
+      const userId = ctx.get("userId");
+      const groups = await this.userService.getGroups({ id: userId, ...queryParams });
+      return ctx.json(groups, Status.OK);
+    };
+    return await handleAppError(getGroupsImpl)(ctx);
   }
 
   async searchByUsername(ctx: Context): Promise<SEARCHED_USERS> {

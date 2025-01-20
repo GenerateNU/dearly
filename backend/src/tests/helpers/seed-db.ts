@@ -8,7 +8,9 @@ import {
 } from "../../entities/schema";
 import { CreateUserPayload } from "../../entities/users/validator";
 import {
+  ANOTHER_GROUP,
   ANOTHER_GROUP_ID,
+  DEARLY_GROUP,
   DEARLY_GROUP_ID,
   MEDIA_MOCK,
   POST_MOCK,
@@ -39,20 +41,7 @@ const seedUser = async (db: PostgresJsDatabase) => {
 };
 
 const seedGroup = async (db: PostgresJsDatabase) => {
-  const seedData: CreateGroupPayload[] = [
-    {
-      name: "dearly",
-      description: "dearly",
-      managerId: USER_ALICE_ID,
-      id: DEARLY_GROUP_ID,
-    },
-    {
-      name: "family",
-      description: "family",
-      managerId: USER_ANA_ID,
-      id: ANOTHER_GROUP_ID,
-    },
-  ];
+  const seedData: CreateGroupPayload[] = [DEARLY_GROUP, ANOTHER_GROUP];
 
   await db.insert(groupsTable).values(seedData);
 };
@@ -73,6 +62,11 @@ const seedMember = async (db: PostgresJsDatabase) => {
       userId: USER_ANA_ID,
       groupId: ANOTHER_GROUP_ID,
       role: "MANAGER",
+    },
+    {
+      userId: USER_ALICE_ID,
+      groupId: ANOTHER_GROUP_ID,
+      role: "MEMBER",
     },
   ];
 
