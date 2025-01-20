@@ -776,7 +776,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
                 
-  /api/v1/groups/{groupId}/posts:
+  /api/v1/groups/{id}/posts:
     post:
       tags:
         - Post Endpoints
@@ -860,22 +860,14 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /api/v1/groups/{groupId}/posts/{postId}:
+  /api/v1/posts/{id}:
     get:
       tags:
         - Post Endpoints
       summary: Gets a post
       description: Gets a post's details.
       parameters:
-        - name: groupId
-          in: path
-          description: ID of the group a post is made in
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: 5e91507e-5630-4efd-9fd4-799178870b10
-        - name: postId
+        - name: id
           in: path
           description: ID of the post
           required: true
@@ -887,7 +879,7 @@ paths:
         - BearerAuth: []
       responses:
         200:
-          description: Successfully created a post
+          description: Successfully retrieved a post
           content:
             application/json:
               schema:

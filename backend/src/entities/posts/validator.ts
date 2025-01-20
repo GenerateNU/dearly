@@ -40,7 +40,6 @@ export type UpdatePostPayload = z.infer<typeof updatePostValidate> & IDPayload;
 export type IDPayload = {
   userId: string;
   id: string;
-  groupId: string;
 };
 
 export type Media = typeof mediaTable.$inferSelect;

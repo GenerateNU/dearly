@@ -12,7 +12,7 @@ import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
 import { MAX_MEDIA_COUNT, MIN_LIMIT, TEXT_MAX_LIMIT } from "../../constants/database";
 
-describe("POST /groups/:groupId/posts", () => {
+describe("POST /groups/:id/posts", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
   const goodRequestBody = {

@@ -50,9 +50,9 @@ export class PostServiceImpl implements PostService {
     return await handleServiceError(updatePostImpl)();
   }
 
-  async deletePost(payload: IDPayload): Promise<void> {
+  async deletePost({ id, userId }: IDPayload): Promise<void> {
     const deletePostImpl = async () => {
-      await this.postTransaction.deletePost(payload.id, payload.userId);
+      await this.postTransaction.deletePost(id, userId);
     };
     return await handleServiceError(deletePostImpl)();
   }
