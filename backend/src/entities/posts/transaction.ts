@@ -64,7 +64,7 @@ export class PostTransactionImpl implements PostTransaction {
     return postWithMedia;
   }
 
-  async getPost(payload: IDPayload): Promise<PostWithMedia | null> {
+  async getPost({ id, userId }: IDPayload): Promise<PostWithMedia | null> {
     const [result] = await this.db
       .select({
         id: postsTable.id,
@@ -86,7 +86,7 @@ export class PostTransactionImpl implements PostTransaction {
       .innerJoin(groupsTable, eq(postsTable.groupId, groupsTable.id))
       .innerJoin(
         membersTable,
-        and(eq(groupsTable.id, membersTable.groupId), eq(membersTable.userId, payload.userId)),
+        and(eq(groupsTable.id, membersTable.groupId), eq(membersTable.userId, userId)),
       )
       .groupBy(
         postsTable.id,
@@ -95,7 +95,7 @@ export class PostTransactionImpl implements PostTransaction {
         postsTable.createdAt,
         postsTable.caption,
       )
-      .where(eq(postsTable.id, payload.id));
+      .where(eq(postsTable.id, id));
 
     if (!result) return null;
 
