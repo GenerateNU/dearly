@@ -7,7 +7,21 @@ import * as lame from '@breezystack/lamejs';
 
 interface IS3Operations {
     // group is the uuid of the group this photo is being sent to (used as tagging number) -> make public group id number
-    saveObject(file: Blob, group: string, fileType: "image" | "recording"): Promise<string | null>
+    
+    /**
+     * Will save a blob to s3 with some image type and and tag.
+     * @param file the file that will be saved to S3
+     * @param tag the tag that will be associated with the file
+     * @param fileType The type of the blob sent to the endpoint
+     * @returns Will return the url of the object in S3
+     */
+    saveObject(file: Blob, tag: string, fileType: "image" | "audio"): Promise<string | null>
+    
+    /**
+     * Will delete an object from S3 with the given S3 URL.
+     * @param url The URL of the object that will be deleted
+     * @throws NotFoundError: if the object was not able to be deleted
+     */
     deleteObject(url: string): void
 }
 
@@ -33,7 +47,14 @@ class S3Impl implements IS3Operations {
         })
     }
 
-    async saveObject(file: Blob, group: string, fileType: string): Promise<string | null> {
+    /**
+     * Will save a blob to s3 with some image type and and tag.
+     * @param file the file that will be saved to S3
+     * @param tag the tag that will be associated with the file
+     * @param fileType The type of the blob sent to the endpoint
+     * @returns Will return the url of the object in S3
+     */
+    async saveObject(file: Blob, tag: string, fileType: "image" | "audio"): Promise<string | null> {
         // to-do: compress blob, and deal with permission
         const objectKey: string = randomUUIDv7()
         await this.client.send(
@@ -41,7 +62,7 @@ class S3Impl implements IS3Operations {
                 Bucket: this.bucketName,
                 Key: objectKey,
                 Body: "",
-                Tagging: `GroupI=${group}`
+                Tagging: `GroupI=${tag}`
             })
         )
         const url: string = "https://" + this.bucketName + ".s3.amazonaws.com/" + objectKey;
@@ -70,7 +91,7 @@ class S3Impl implements IS3Operations {
      * @param file The audio blob that will be compressed
      * @returns A promise of the blob is the newly compressed audio recording
      */
-    async compressAudio(file: Blob, imageQuality: number = 80): Promise<Blob> {
+    async compressAudio(file: Blob): Promise<Blob> {
         var compressedAudio= [] // holds the final compressed audio
         const mp3encoder = new lame.Mp3Encoder(1, 44100, 128); 
         const audioBuffer: ArrayBuffer = await file.arrayBuffer()
@@ -85,8 +106,11 @@ class S3Impl implements IS3Operations {
         return new Blob(compressedAudio)
     }
 
-  
-
+    /**
+     * Will delete an object from S3 with the given S3 URL.
+     * @param url The URL of the object that will be deleted
+     * @throws NotFoundError: if the object was not able to be deleted
+     */
     async deleteObject(url: string) {
         const indexOfDotCom = url.indexOf(".com/")
         const objectKey: string = url.substring(indexOfDotCom + 5)
@@ -97,6 +121,5 @@ class S3Impl implements IS3Operations {
         if (res.$metadata.httpStatusCode! > 300) {
             throw new NotFoundError(url)
         }
-
     }
 }
