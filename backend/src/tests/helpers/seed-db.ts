@@ -8,49 +8,34 @@ import {
 } from "../../entities/schema";
 import { CreateUserPayload } from "../../entities/users/validator";
 import {
+  ANOTHER_GROUP_ID,
   DEARLY_GROUP_ID,
   MEDIA_MOCK,
   POST_MOCK,
+  USER_ALICE,
   USER_ALICE_ID,
+  USER_ANA,
   USER_ANA_ID,
+  USER_BILL,
+  USER_BOB,
   USER_BOB_ID,
 } from "./test-constants";
 import { CreateGroupPayload } from "../../entities/groups/validator";
 
 export const seedDatabase = async (db: PostgresJsDatabase) => {
-  await seedUser(db);
-  await seedGroup(db);
-  await seedMember(db);
-  await seedPostAndMedia(db);
+  try {
+    await seedUser(db);
+    await seedGroup(db);
+    await seedMember(db);
+    await seedPostAndMedia(db);
+  } catch (error) {
+    console.error("Failed to seed database", error);
+  }
 };
 
 const seedUser = async (db: PostgresJsDatabase) => {
-  const seedData: CreateUserPayload[] = [
-    {
-      name: "Alice",
-      username: "alice123",
-      mode: "BASIC",
-      id: USER_ALICE_ID,
-    },
-    {
-      name: "Bob",
-      username: "bobthebuilder",
-      mode: "ADVANCED",
-      id: USER_BOB_ID,
-    },
-    {
-      name: "Ana",
-      username: "ana",
-      mode: "BASIC",
-      id: USER_ANA_ID,
-    },
-  ];
-
-  try {
-    await db.insert(usersTable).values(seedData);
-  } catch (error) {
-    console.error("Error seeding database:", error);
-  }
+  const seedData: CreateUserPayload[] = [USER_ALICE, USER_ANA, USER_BOB, USER_BILL];
+  await db.insert(usersTable).values(seedData);
 };
 
 const seedGroup = async (db: PostgresJsDatabase) => {
@@ -61,13 +46,15 @@ const seedGroup = async (db: PostgresJsDatabase) => {
       managerId: USER_ALICE_ID,
       id: DEARLY_GROUP_ID,
     },
+    {
+      name: "family",
+      description: "family",
+      managerId: USER_ANA_ID,
+      id: ANOTHER_GROUP_ID,
+    },
   ];
 
-  try {
-    await db.insert(groupsTable).values(seedData);
-  } catch (error) {
-    console.error("Error seeding database:", error);
-  }
+  await db.insert(groupsTable).values(seedData);
 };
 
 const seedMember = async (db: PostgresJsDatabase) => {
@@ -82,20 +69,17 @@ const seedMember = async (db: PostgresJsDatabase) => {
       groupId: DEARLY_GROUP_ID,
       role: "MEMBER",
     },
+    {
+      userId: USER_ANA_ID,
+      groupId: ANOTHER_GROUP_ID,
+      role: "MANAGER",
+    },
   ];
 
-  try {
-    await db.insert(membersTable).values(seedData);
-  } catch (error) {
-    console.error("Error seeding database:", error);
-  }
+  await db.insert(membersTable).values(seedData);
 };
 
 const seedPostAndMedia = async (db: PostgresJsDatabase) => {
-  try {
-    await db.insert(postsTable).values(POST_MOCK);
-    await db.insert(mediaTable).values(MEDIA_MOCK);
-  } catch (error) {
-    console.error("Error seeding database:", error);
-  }
+  await db.insert(postsTable).values(POST_MOCK);
+  await db.insert(mediaTable).values(MEDIA_MOCK);
 };
