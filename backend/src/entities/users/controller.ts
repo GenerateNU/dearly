@@ -3,7 +3,6 @@ import { UserService } from "./service";
 import {
   createUserValidate,
   expoTokenValidate,
-  paginationSchema,
   querySchema,
   updateUserValidate,
 } from "./validator";
@@ -18,6 +17,7 @@ import {
   SEARCHED_USERS,
   USER_RESPONSE,
 } from "../../types/api/routes/users";
+import { paginationSchema } from "../../utilities/pagination";
 
 export interface UserController {
   createUser(ctx: Context): Promise<USER_RESPONSE>;
