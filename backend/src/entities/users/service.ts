@@ -1,7 +1,9 @@
 import { InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
-import { CreateUserPayload, UpdateUserPayload, User } from "./validator";
+import { CreateUserPayload, Pagination, UpdateUserPayload, User } from "./validator";
 import { UserTransaction } from "./transaction";
+import { PostWithMedia } from "../posts/validator";
+import { Group } from "../groups/validator";
 
 export interface UserService {
   createUser(payload: CreateUserPayload): Promise<User>;
@@ -10,6 +12,8 @@ export interface UserService {
   deleteUser(id: string): Promise<void>;
   registerDevice(id: string, expoToken: string): Promise<string[]>;
   removeDevice(id: string, expoToken: string): Promise<string[]>;
+  getPosts(payload: Pagination): Promise<PostWithMedia[]>;
+  getGroups(payload: Pagination): Promise<Group[]>;
 }
 
 export class UserServiceImpl implements UserService {
@@ -75,5 +79,19 @@ export class UserServiceImpl implements UserService {
       return devices;
     };
     return handleServiceError(removeDeviceImpl)();
+  }
+
+  async getPosts(payload: Pagination): Promise<PostWithMedia[]> {
+    const getPostsImpl = async () => {
+      return await this.userTransaction.getPosts(payload);
+    };
+    return handleServiceError(getPostsImpl)();
+  }
+
+  async getGroups(payload: Pagination): Promise<Group[]> {
+    const getGroupsImpl = async () => {
+      return await this.userTransaction.getGroups(payload);
+    };
+    return handleServiceError(getGroupsImpl)();
   }
 }

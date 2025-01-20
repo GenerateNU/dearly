@@ -1,7 +1,16 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { CreateUserPayload, UpdateUserPayload, User } from "./validator";
-import { devicesTable, usersTable } from "../schema";
-import { and, eq } from "drizzle-orm";
+import { CreateUserPayload, Pagination, UpdateUserPayload, User } from "./validator";
+import {
+  devicesTable,
+  groupsTable,
+  mediaTable,
+  membersTable,
+  postsTable,
+  usersTable,
+} from "../schema";
+import { and, eq, sql } from "drizzle-orm";
+import { Media, PostWithMedia } from "../posts/validator";
+import { Group } from "../groups/validator";
 
 export interface UserTransaction {
   insertUser(payload: CreateUserPayload): Promise<User | null>;
@@ -10,6 +19,8 @@ export interface UserTransaction {
   deleteUser(id: string): Promise<User | null>;
   insertDeviceToken(id: string, expoToken: string): Promise<string[]>;
   deleteDeviceToken(id: string, expoToken: string): Promise<string[]>;
+  getPosts(payload: Pagination): Promise<PostWithMedia[]>;
+  getGroups(payload: Pagination): Promise<Group[]>;
 }
 
 export class UserTransactionImpl implements UserTransaction {
@@ -69,5 +80,45 @@ export class UserTransactionImpl implements UserTransaction {
       .where(and(eq(devicesTable.userId, userId), eq(devicesTable.token, token)));
 
     return this.getUserTokens(userId);
+  }
+
+  async getPosts({ id, limit, page }: Pagination): Promise<PostWithMedia[]> {
+    return await this.db
+      .select({
+        id: postsTable.id,
+        userId: postsTable.userId,
+        groupId: postsTable.groupId,
+        createdAt: postsTable.createdAt,
+        caption: postsTable.caption,
+        media: sql<Media[]>`array_agg(
+          json_build_object(
+            'id', ${mediaTable.id},
+            'type', ${mediaTable.type},
+            'postId', ${mediaTable.postId},
+            'url', ${mediaTable.url}
+          )
+        )`,
+      })
+      .from(postsTable)
+      .innerJoin(mediaTable, eq(mediaTable.id, postsTable.id))
+      .where(eq(postsTable.userId, id))
+      .orderBy(postsTable.createdAt)
+      .limit(limit)
+      .offset((page - 1) * limit);
+  }
+
+  async getGroups({ id, limit, page }: Pagination): Promise<Group[]> {
+    return await this.db
+      .select({
+        id: groupsTable.id,
+        name: groupsTable.name,
+        description: groupsTable.description,
+        managerId: groupsTable.managerId,
+      })
+      .from(groupsTable)
+      .innerJoin(membersTable, eq(membersTable.userId, id))
+      .orderBy(groupsTable.name)
+      .limit(limit)
+      .offset((page - 1) * limit);
   }
 }

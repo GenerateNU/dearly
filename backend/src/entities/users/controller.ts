@@ -1,6 +1,11 @@
 import { Context } from "hono";
 import { UserService } from "./service";
-import { createUserValidate, expoTokenValidate, updateUserValidate } from "./validator";
+import {
+  createUserValidate,
+  expoTokenValidate,
+  paginationSchema,
+  updateUserValidate,
+} from "./validator";
 import { parseUUID } from "../../utilities/uuid";
 import { handleAppError } from "../../utilities/errors/app-error";
 import { Status } from "../../constants/http";
@@ -13,6 +18,8 @@ export interface UserController {
   deleteUser(ctx: Context): Promise<DEL_USER>;
   registerDevice(ctx: Context): Promise<DEVICE_RESPONSE>;
   removeDevice(ctx: Context): Promise<DEVICE_RESPONSE>;
+  getPosts(ctx: Context): Promise<Response>;
+  getGroups(ctx: Context): Promise<Response>;
 }
 
 export class UserControllerImpl implements UserController {
@@ -90,5 +97,27 @@ export class UserControllerImpl implements UserController {
       return ctx.json(user, Status.OK);
     };
     return await handleAppError(removeDeviceImpl)(ctx);
+  }
+
+  async getPosts(ctx: Context): Promise<Response> {
+    const getPostsImpl = async () => {
+      const { limit, page } = ctx.req.query();
+      const queryParams = paginationSchema.parse({ limit, page });
+      const userId = ctx.get("userId");
+      const posts = await this.userService.getPosts({ id: userId, ...queryParams });
+      return ctx.json(posts, Status.OK);
+    };
+    return await handleAppError(getPostsImpl)(ctx);
+  }
+
+  async getGroups(ctx: Context): Promise<Response> {
+    const getGroupsImpl = async () => {
+      const { limit, page } = ctx.req.query();
+      const queryParams = paginationSchema.parse({ limit, page });
+      const userId = ctx.get("userId");
+      const groups = await this.userService.getPosts({ id: userId, ...queryParams });
+      return ctx.json(groups, Status.OK);
+    };
+    return await handleAppError(getGroupsImpl)(ctx);
   }
 }
