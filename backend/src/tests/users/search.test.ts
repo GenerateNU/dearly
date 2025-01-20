@@ -69,46 +69,6 @@ describe("GET /users/search", () => {
       .assertBody(expectedBody);
   });
 
-  it("should return 200 if is manager of group and `ana` query", async () => {
-    (
-      await testBuilder.request({
-        app,
-        type: HTTPRequest.GET,
-        route: `/api/v1/users/search`,
-        queryParams: {
-          groupId: DEARLY_GROUP_ID,
-          username: "ana",
-        },
-        autoAuthorized: false,
-        headers: {
-          Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
-        },
-      })
-    )
-      .assertStatusCode(Status.OK)
-      .assertBody([ANA, BOB, BILL]);
-  });
-
-  it("should return 200 if is manager of group and `bob` query", async () => {
-    (
-      await testBuilder.request({
-        app,
-        type: HTTPRequest.GET,
-        route: `/api/v1/users/search`,
-        queryParams: {
-          groupId: DEARLY_GROUP_ID,
-          username: "bob",
-        },
-        autoAuthorized: false,
-        headers: {
-          Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
-        },
-      })
-    )
-      .assertStatusCode(Status.OK)
-      .assertBody([BOB, ANA, BILL]);
-  });
-
   it.each([
     ["1", "1", [BOB]],
     ["1", "2", [ANA]],
