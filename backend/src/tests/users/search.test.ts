@@ -213,7 +213,7 @@ describe("GET /users/search", () => {
           path: "limit",
         },
         {
-          message: "Page must be a non-negative number",
+          message: "Page must be a positive number",
           path: "page",
         },
       ]);
@@ -227,7 +227,7 @@ describe("GET /users/search", () => {
         route: `/api/v1/users/search`,
         queryParams: {
           limit: "-1",
-          page: "-5",
+          page: "0",
           groupId: generateUUID(),
           username: "janedoe",
         },
@@ -240,7 +240,7 @@ describe("GET /users/search", () => {
           path: "limit",
         },
         {
-          message: "Page must be a non-negative number",
+          message: "Page must be a positive number",
           path: "page",
         },
       ]);

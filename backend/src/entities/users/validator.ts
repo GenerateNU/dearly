@@ -60,8 +60,8 @@ export const querySchema = z.object({
       const parsed = Number(val);
       return parsed;
     })
-    .refine((val) => !isNaN(val) && val >= 0, {
-      message: "Page must be a non-negative number",
+    .refine((val) => !isNaN(val) && val > 0, {
+      message: "Page must be a positive number",
     })
     .optional()
     .default("1"),
