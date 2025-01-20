@@ -123,7 +123,10 @@ export class UserTransactionImpl implements UserTransaction {
         managerId: groupsTable.managerId,
       })
       .from(groupsTable)
-      .innerJoin(membersTable, eq(membersTable.userId, id))
+      .innerJoin(
+        membersTable,
+        and(eq(membersTable.groupId, groupsTable.id), eq(membersTable.userId, id)),
+      )
       .orderBy(groupsTable.name)
       .limit(limit)
       .offset((page - 1) * limit);
