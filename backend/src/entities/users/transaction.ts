@@ -100,8 +100,15 @@ export class UserTransactionImpl implements UserTransaction {
         )`,
       })
       .from(postsTable)
-      .innerJoin(mediaTable, eq(mediaTable.id, postsTable.id))
+      .innerJoin(mediaTable, eq(mediaTable.postId, postsTable.id))
       .where(eq(postsTable.userId, id))
+      .groupBy(
+        postsTable.id,
+        postsTable.userId,
+        postsTable.groupId,
+        postsTable.createdAt,
+        postsTable.caption,
+      )
       .orderBy(postsTable.createdAt)
       .limit(limit)
       .offset((page - 1) * limit);
