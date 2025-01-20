@@ -537,9 +537,7 @@ paths:
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: "#/components/schemas/Error"
-                  - $ref: "#/components/schemas/ValidationError"
+                $ref: "#/components/schemas/ValidationError"
         401:
           description: Unauthorized due to invalid JWT
           content:
