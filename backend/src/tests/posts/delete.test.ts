@@ -11,7 +11,7 @@ import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
 
-describe("DELETE /groups/:groupId/posts/:postId", () => {
+describe("DELETE /posts/:id", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
   const goodRequestBody = {
@@ -67,7 +67,7 @@ describe("DELETE /groups/:groupId/posts/:postId", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.DELETE,
-        route: `/api/v1/groups/${DEARLY_GROUP_ID}/posts/${id}`,
+        route: `/api/v1/posts/${id}`,
         requestBody: {
           ...goodRequestBody,
         },
@@ -85,7 +85,7 @@ describe("DELETE /groups/:groupId/posts/:postId", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.DELETE,
-        route: `/api/v1/groups/${DEARLY_GROUP_ID}/posts/${id}`,
+        route: `/api/v1/posts/${id}`,
         requestBody: {
           ...goodRequestBody,
         },
@@ -103,7 +103,7 @@ describe("DELETE /groups/:groupId/posts/:postId", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.DELETE,
-        route: `/api/v1/groups/${DEARLY_GROUP_ID}/posts/${id}`,
+        route: `/api/v1/posts/${id}`,
         requestBody: {
           ...goodRequestBody,
         },
@@ -122,7 +122,7 @@ describe("DELETE /groups/:groupId/posts/:postId", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.GET,
-        route: `/api/v1/groups/${DEARLY_GROUP_ID}/posts/${generateUUID()}`,
+        route: `/api/v1/posts/${generateUUID()}`,
         requestBody: {
           ...goodRequestBody,
         },
@@ -136,31 +136,12 @@ describe("DELETE /groups/:groupId/posts/:postId", () => {
       .assertError("Post does not exist.");
   });
 
-  it("should return 400 if invalid group ID", async () => {
-    (
-      await testBuilder.request({
-        app,
-        type: HTTPRequest.GET,
-        route: `/api/v1/groups/bad/posts/${generateUUID()}`,
-        requestBody: {
-          ...goodRequestBody,
-        },
-        autoAuthorized: false,
-        headers: {
-          Authorization: `Bearer ${ALICE_JWT}`,
-        },
-      })
-    )
-      .assertStatusCode(Status.BadRequest)
-      .assertError("Invalid ID format");
-  });
-
   it("should return 400 if invalid post ID", async () => {
     (
       await testBuilder.request({
         app,
         type: HTTPRequest.GET,
-        route: `/api/v1/groups/${DEARLY_GROUP_ID}/posts/bad`,
+        route: `/api/v1/posts/bad`,
         requestBody: {
           ...goodRequestBody,
         },
@@ -181,19 +162,7 @@ describe("DELETE /groups/:groupId/posts/:postId", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.DELETE,
-        route: `/api/v1/groups/${generateUUID()}/posts/${id}`,
-      })
-    ).assertStatusCode(Status.BadRequest);
-  });
-
-  it.each(
-    INVALID_ID_ARRAY.map((id) => [id === null ? "null" : id === undefined ? "undefined" : id, id]),
-  )("should return 400 if invalid groupId %s", async (id) => {
-    (
-      await testBuilder.request({
-        app,
-        type: HTTPRequest.DELETE,
-        route: `/api/v1/groups/${id}/posts/${generateUUID()}`,
+        route: `/api/v1/posts/${id}`,
       })
     ).assertStatusCode(Status.BadRequest);
   });

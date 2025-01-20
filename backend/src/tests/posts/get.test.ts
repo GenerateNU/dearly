@@ -14,7 +14,7 @@ import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
 
-describe("GET /groups/:groupId/posts/:postId", () => {
+describe("GET /posts/:id", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
   const goodRequestBody = {
@@ -54,7 +54,7 @@ describe("GET /groups/:groupId/posts/:postId", () => {
         },
       })
     )
-      .assertStatusCode(201)
+      .assertStatusCode(Status.Created)
       .assertFieldExists("id")
       .assertFieldExists("createdAt")
       .assertFieldExists("media")
@@ -70,7 +70,7 @@ describe("GET /groups/:groupId/posts/:postId", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.GET,
-        route: `/api/v1/groups/${DEARLY_GROUP_ID}/posts/${id}`,
+        route: `/api/v1/posts/${id}`,
         autoAuthorized: false,
         headers: {
           Authorization: `Bearer ${BOB_JWT}`,
@@ -83,7 +83,7 @@ describe("GET /groups/:groupId/posts/:postId", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.GET,
-        route: `/api/v1/groups/${DEARLY_GROUP_ID}/posts/${id}`,
+        route: `/api/v1/posts/${id}`,
         autoAuthorized: false,
         headers: {
           Authorization: `Bearer ${ALICE_JWT}`,
@@ -97,7 +97,7 @@ describe("GET /groups/:groupId/posts/:postId", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.GET,
-        route: `/api/v1/groups/${DEARLY_GROUP_ID}/posts/${POST_ID}`,
+        route: `/api/v1/posts/${POST_ID}`,
         autoAuthorized: false,
         headers: {
           Authorization: `Bearer ${ALICE_JWT}`,
@@ -134,7 +134,7 @@ describe("GET /groups/:groupId/posts/:postId", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.GET,
-        route: `/api/v1/groups/${DEARLY_GROUP_ID}/posts/${id}`,
+        route: `/api/v1/posts/${id}`,
         autoAuthorized: false,
         headers: {
           Authorization: `Bearer ${ANA_JWT}`,
@@ -147,7 +147,7 @@ describe("GET /groups/:groupId/posts/:postId", () => {
     await testBuilder.request({
       app,
       type: HTTPRequest.GET,
-      route: `/api/v1/groups/${DEARLY_GROUP_ID}/posts/${generateUUID()}`,
+      route: `/api/v1/posts/${generateUUID()}`,
       autoAuthorized: false,
       headers: {
         Authorization: `Bearer ${BOB_JWT}`,
@@ -155,12 +155,12 @@ describe("GET /groups/:groupId/posts/:postId", () => {
     });
   });
 
-  it("should return 404 if group not found", async () => {
+  it("should return 404 if post not found", async () => {
     (
       await testBuilder.request({
         app,
         type: HTTPRequest.GET,
-        route: `/api/v1/groups/${generateUUID()}/posts/${generateUUID()}`,
+        route: `/api/v1/posts/${generateUUID()}`,
         requestBody: {
           ...goodRequestBody,
         },
@@ -181,19 +181,7 @@ describe("GET /groups/:groupId/posts/:postId", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.GET,
-        route: `/api/v1/groups/${generateUUID()}/posts/${id}`,
-      })
-    ).assertStatusCode(Status.BadRequest);
-  });
-
-  it.each(
-    INVALID_ID_ARRAY.map((id) => [id === null ? "null" : id === undefined ? "undefined" : id, id]),
-  )("should return 400 if invalid groupId %s", async (id) => {
-    (
-      await testBuilder.request({
-        app,
-        type: HTTPRequest.GET,
-        route: `/api/v1/groups/${id}/posts/${generateUUID()}`,
+        route: `/api/v1/posts/${id}`,
       })
     ).assertStatusCode(Status.BadRequest);
   });

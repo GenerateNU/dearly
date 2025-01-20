@@ -28,7 +28,7 @@ export class PostControllerImpl implements PostController {
   async createPost(ctx: Context): Promise<POST_API> {
     const createPostImpl = async () => {
       // pull out essential IDs
-      const groupId = parseUUID(ctx.req.param("groupId"));
+      const groupId = parseUUID(ctx.req.param("id"));
       const userId = parseUUID(ctx.get("userId"));
 
       // validate input
@@ -49,11 +49,10 @@ export class PostControllerImpl implements PostController {
   async getPost(ctx: Context): Promise<POST_API> {
     const getPostImpl = async () => {
       // pull out essential IDs
-      const id = parseUUID(ctx.req.param("postId"));
+      const id = parseUUID(ctx.req.param("id"));
       const userId = parseUUID(ctx.get("userId"));
-      const groupId = parseUUID(ctx.req.param("groupId"));
 
-      const post = await this.postService.getPost({ userId, id, groupId });
+      const post = await this.postService.getPost({ userId, id });
       return ctx.json(post, Status.OK);
     };
     return await handleAppError(getPostImpl)(ctx);
@@ -63,8 +62,7 @@ export class PostControllerImpl implements PostController {
     const updatePostImpl = async () => {
       // pull out essential IDs
       const userId = parseUUID(ctx.get("userId"));
-      const postId = parseUUID(ctx.req.param("postId"));
-      const groupId = parseUUID(ctx.req.param("groupId"));
+      const postId = parseUUID(ctx.req.param("id"));
 
       // validate update payload
       const postInfoPayload = updatePostValidate.parse(await ctx.req.json());
@@ -74,7 +72,6 @@ export class PostControllerImpl implements PostController {
         userId,
         id: postId,
         ...postInfoPayload,
-        groupId,
       };
       const post = await this.postService.updatePost(updatePostPayload);
       return ctx.json(post, Status.OK);
@@ -85,11 +82,10 @@ export class PostControllerImpl implements PostController {
   async deletePost(ctx: Context): Promise<DEL_POST> {
     const deletePostImpl = async () => {
       // pull out essential IDs
-      const id = parseUUID(ctx.req.param("postId"));
+      const id = parseUUID(ctx.req.param("id"));
       const userId = parseUUID(ctx.get("userId"));
-      const groupId = parseUUID(ctx.req.param("groupId"));
 
-      await this.postService.deletePost({ userId, id, groupId });
+      await this.postService.deletePost({ userId, id });
       return ctx.json({ message: "Successfully delete post" }, Status.OK);
     };
     return await handleAppError(deletePostImpl)(ctx);

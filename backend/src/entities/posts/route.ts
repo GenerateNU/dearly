@@ -11,10 +11,10 @@ export const postRoutes = (db: PostgresJsDatabase): Hono => {
   const postService: PostService = new PostServiceImpl(postTransaction);
   const postController: PostController = new PostControllerImpl(postService);
 
-  post.post("/", (ctx) => postController.createPost(ctx));
-  post.get("/:postId", (ctx) => postController.getPost(ctx));
-  post.patch("/:postId", (ctx) => postController.updatePost(ctx));
-  post.delete("/:postId", (ctx) => postController.deletePost(ctx));
+  post.post("/groups/:id/posts", (ctx) => postController.createPost(ctx));
+  post.get("/posts/:id", (ctx) => postController.getPost(ctx));
+  post.patch("/posts/:id", (ctx) => postController.updatePost(ctx));
+  post.delete("/posts/:id", (ctx) => postController.deletePost(ctx));
 
   return post;
 };
