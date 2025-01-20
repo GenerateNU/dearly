@@ -64,7 +64,7 @@ export class PostTransactionImpl implements PostTransaction {
     return postWithMedia;
   }
 
-  async getPost(payload: IDPayload): Promise<PostWithMedia | null> {
+  async getPost({ id, userId }: IDPayload): Promise<PostWithMedia | null> {
     const [result] = await this.db
       .select({
         id: postsTable.id,
@@ -86,7 +86,7 @@ export class PostTransactionImpl implements PostTransaction {
       .innerJoin(groupsTable, eq(postsTable.groupId, groupsTable.id))
       .innerJoin(
         membersTable,
-        and(eq(groupsTable.id, membersTable.groupId), eq(membersTable.userId, payload.userId)),
+        and(eq(groupsTable.id, membersTable.groupId), eq(membersTable.userId, userId)),
       )
       .groupBy(
         postsTable.id,
@@ -95,7 +95,7 @@ export class PostTransactionImpl implements PostTransaction {
         postsTable.createdAt,
         postsTable.caption,
       )
-      .where(eq(postsTable.id, payload.id));
+      .where(eq(postsTable.id, id));
 
     if (!result) return null;
 
@@ -103,29 +103,37 @@ export class PostTransactionImpl implements PostTransaction {
     return result;
   }
 
-  async updatePost(payload: UpdatePostPayload): Promise<PostWithMedia | null> {
-    await this.checkPostOwnership(payload.id, payload.userId);
+  async updatePost({
+    id,
+    userId,
+    caption,
+    media,
+  }: UpdatePostPayload): Promise<PostWithMedia | null> {
+    await this.checkPostOwnership(id, userId);
 
     // update post
     const updatedPostWithMedia = await this.db.transaction(async (tx) => {
       const [updatedPost] = await tx
         .update(postsTable)
-        .set({ caption: payload.caption })
-        .where(and(eq(postsTable.id, payload.id), eq(postsTable.userId, payload.userId)))
+        .set({ caption: caption })
+        .where(and(eq(postsTable.id, id), eq(postsTable.userId, userId)))
         .returning();
 
       if (!updatedPost) return null;
 
       // update associated media
-      let media;
-      if (payload.media) {
-        await tx.delete(mediaTable).where(eq(mediaTable.postId, payload.id));
-        media = await tx
+      let updatedMedia;
+      if (media) {
+        await tx.delete(mediaTable).where(eq(mediaTable.postId, id));
+        updatedMedia = await tx
           .insert(mediaTable)
-          .values(payload.media.map((m) => ({ postId: updatedPost.id, ...m })))
+          .values(media.map((m) => ({ postId: updatedPost.id, ...m })))
           .returning();
       } else {
-        media = await tx.select().from(mediaTable).where(eq(mediaTable.postId, updatedPost.id));
+        updatedMedia = await tx
+          .select()
+          .from(mediaTable)
+          .where(eq(mediaTable.postId, updatedPost.id));
       }
 
       return {
@@ -134,7 +142,7 @@ export class PostTransactionImpl implements PostTransaction {
         groupId: updatedPost.groupId,
         caption: updatedPost.caption,
         createdAt: updatedPost.createdAt,
-        media: media,
+        media: updatedMedia,
       };
     });
 

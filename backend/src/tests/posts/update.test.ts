@@ -1,7 +1,6 @@
 import {
   USER_ANA_ID,
   USER_BOB_ID,
-  DEARLY_GROUP_ID,
   USER_ALICE_ID,
   POST_ID,
   POST_MOCK,
@@ -15,7 +14,7 @@ import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
 import { MAX_MEDIA_COUNT, MIN_LIMIT, TEXT_MAX_LIMIT } from "../../constants/database";
 
-describe("PATCH /groups/:groupId/posts/:postId", () => {
+describe("PATCH /posts/:id", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
   const goodRequestBody = {
@@ -45,7 +44,7 @@ describe("PATCH /groups/:groupId/posts/:postId", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.PATCH,
-        route: `/api/v1/groups/${DEARLY_GROUP_ID}/posts/${POST_ID}`,
+        route: `/api/v1/posts/${POST_ID}`,
         requestBody: {
           ...goodRequestBody,
         },
@@ -66,7 +65,7 @@ describe("PATCH /groups/:groupId/posts/:postId", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.PATCH,
-        route: `/api/v1/groups/${DEARLY_GROUP_ID}/posts/${POST_ID}`,
+        route: `/api/v1/posts/${POST_ID}`,
         requestBody: {
           caption: "",
         },
@@ -90,7 +89,7 @@ describe("PATCH /groups/:groupId/posts/:postId", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.PATCH,
-        route: `/api/v1/groups/${DEARLY_GROUP_ID}/posts/${POST_ID}`,
+        route: `/api/v1/posts/${POST_ID}`,
         requestBody: {
           caption: "a".repeat(TEXT_MAX_LIMIT + 1),
         },
@@ -114,7 +113,7 @@ describe("PATCH /groups/:groupId/posts/:postId", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.PATCH,
-        route: `/api/v1/groups/${DEARLY_GROUP_ID}/posts/${POST_ID}`,
+        route: `/api/v1/posts/${POST_ID}`,
         requestBody: {
           media: [],
         },
@@ -138,7 +137,7 @@ describe("PATCH /groups/:groupId/posts/:postId", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.PATCH,
-        route: `/api/v1/groups/${DEARLY_GROUP_ID}/posts/${POST_ID}`,
+        route: `/api/v1/posts/${POST_ID}`,
         requestBody: {
           media: [
             {
@@ -178,8 +177,8 @@ describe("PATCH /groups/:groupId/posts/:postId", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.POST,
-        route: `/api/v1/groups/${DEARLY_GROUP_ID}/posts`,
+        type: HTTPRequest.PATCH,
+        route: `/api/v1/posts/${generateUUID()}`,
         requestBody: {
           media: [
             {
@@ -212,7 +211,7 @@ describe("PATCH /groups/:groupId/posts/:postId", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.PATCH,
-        route: `/api/v1/groups/${DEARLY_GROUP_ID}/posts/${generateUUID()}`,
+        route: `/api/v1/posts/${generateUUID()}`,
         requestBody: {
           ...goodRequestBody,
         },
@@ -231,7 +230,7 @@ describe("PATCH /groups/:groupId/posts/:postId", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.PATCH,
-        route: `/api/v1/groups/${generateUUID()}/posts/${generateUUID()}`,
+        route: `/api/v1/posts/${generateUUID()}`,
         requestBody: {
           ...goodRequestBody,
         },
@@ -250,7 +249,7 @@ describe("PATCH /groups/:groupId/posts/:postId", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.PATCH,
-        route: `/api/v1/groups/${DEARLY_GROUP_ID}/posts/${POST_ID}`,
+        route: `/api/v1/posts/${POST_ID}`,
         requestBody: {
           ...goodRequestBody,
         },
@@ -267,7 +266,7 @@ describe("PATCH /groups/:groupId/posts/:postId", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.PATCH,
-        route: `/api/v1/groups/${DEARLY_GROUP_ID}/posts/${POST_ID}`,
+        route: `/api/v1/posts/${POST_ID}`,
         requestBody: {
           ...goodRequestBody,
         },
@@ -286,19 +285,7 @@ describe("PATCH /groups/:groupId/posts/:postId", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.PATCH,
-        route: `/api/v1/groups/${generateUUID()}/posts/${id}`,
-      })
-    ).assertStatusCode(Status.BadRequest);
-  });
-
-  it.each(
-    INVALID_ID_ARRAY.map((id) => [id === null ? "null" : id === undefined ? "undefined" : id, id]),
-  )("should return 400 if invalid groupId %s", async (id) => {
-    (
-      await testBuilder.request({
-        app,
-        type: HTTPRequest.PATCH,
-        route: `/api/v1/groups/${id}/posts/${generateUUID()}`,
+        route: `/api/v1/posts/${id}`,
       })
     ).assertStatusCode(Status.BadRequest);
   });
