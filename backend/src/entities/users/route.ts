@@ -11,6 +11,7 @@ export const userRoutes = (db: PostgresJsDatabase): Hono => {
   const userService: UserService = new UserServiceImpl(userTransaction);
   const userController: UserController = new UserControllerImpl(userService);
 
+  user.get("/search", (ctx) => userController.searchByUsername(ctx));
   user.post("/", (ctx) => userController.createUser(ctx));
   user.get("/:id", (ctx) => userController.getUser(ctx));
   user.patch("/me", (ctx) => userController.updateUser(ctx));

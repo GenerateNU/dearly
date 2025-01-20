@@ -12,3 +12,7 @@ export type DEVICE_RESPONSE = TypedResponse<
   | paths["/api/v1/users/devices"]["delete"]["responses"]["200"]["content"]["application/json"]
   | API_ERROR
 >;
+export type SEARCHED_USERS = TypedResponse<
+  | paths["/api/v1/users/search"]["get"]["responses"]["200"]["content"]["application/json"]
+  | API_ERROR
+>;
