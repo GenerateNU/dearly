@@ -5,6 +5,7 @@ import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
 import {
   DEARLY_GROUP_ID,
+  INVALID_ID_ARRAY,
   USER_ALICE_ID,
   USER_ANA,
   USER_ANA_ID,
@@ -81,234 +82,47 @@ describe("GET /users/search", () => {
       })
     )
       .assertStatusCode(Status.OK)
-      .assertBody([BOB, BILL, ANA]);
+      .assertBody([BOB, ANA, BILL]);
   });
 
-  it("should return 200 if is manager with increasing page", async () => {
-    (
-      await testBuilder.request({
-        app,
-        type: HTTPRequest.GET,
-        route: `/api/v1/users/search`,
-        queryParams: {
-          groupId: DEARLY_GROUP_ID,
-          username: "bob",
-          limit: "1",
-          page: "1",
-        },
-        autoAuthorized: false,
-        headers: {
-          Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
-        },
-      })
-    )
-      .assertStatusCode(Status.OK)
-      .assertBody([BOB]);
-
-    (
-      await testBuilder.request({
-        app,
-        type: HTTPRequest.GET,
-        route: `/api/v1/users/search`,
-        queryParams: {
-          groupId: DEARLY_GROUP_ID,
-          username: "bob",
-          limit: "1",
-          page: "2",
-        },
-        autoAuthorized: false,
-        headers: {
-          Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
-        },
-      })
-    )
-      .assertStatusCode(Status.OK)
-      .assertBody([BILL]);
-
-    (
-      await testBuilder.request({
-        app,
-        type: HTTPRequest.GET,
-        route: `/api/v1/users/search`,
-        queryParams: {
-          groupId: DEARLY_GROUP_ID,
-          username: "bob",
-          limit: "1",
-          page: "3",
-        },
-        autoAuthorized: false,
-        headers: {
-          Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
-        },
-      })
-    )
-      .assertStatusCode(Status.OK)
-      .assertBody([ANA]);
-
-    (
-      await testBuilder.request({
-        app,
-        type: HTTPRequest.GET,
-        route: `/api/v1/users/search`,
-        queryParams: {
-          groupId: DEARLY_GROUP_ID,
-          username: "bob",
-          limit: "1",
-          page: "4",
-        },
-        autoAuthorized: false,
-        headers: {
-          Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
-        },
-      })
-    )
-      .assertStatusCode(Status.OK)
-      .assertBody([]);
-  });
-
-  it("should return 200 if is manager and increasing limit", async () => {
-    (
-      await testBuilder.request({
-        app,
-        type: HTTPRequest.GET,
-        route: `/api/v1/users/search`,
-        queryParams: {
-          groupId: DEARLY_GROUP_ID,
-          username: "bob",
-          limit: "1",
-          page: "1",
-        },
-        autoAuthorized: false,
-        headers: {
-          Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
-        },
-      })
-    )
-      .assertStatusCode(Status.OK)
-      .assertBody([BOB]);
-
-    (
-      await testBuilder.request({
-        app,
-        type: HTTPRequest.GET,
-        route: `/api/v1/users/search`,
-        queryParams: {
-          groupId: DEARLY_GROUP_ID,
-          username: "bob",
-          limit: "2",
-          page: "1",
-        },
-        autoAuthorized: false,
-        headers: {
-          Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
-        },
-      })
-    )
-      .assertStatusCode(Status.OK)
-      .assertBody([BOB, BILL]);
-
-    (
-      await testBuilder.request({
-        app,
-        type: HTTPRequest.GET,
-        route: `/api/v1/users/search`,
-        queryParams: {
-          groupId: DEARLY_GROUP_ID,
-          username: "bob",
-          limit: "3",
-          page: "1",
-        },
-        autoAuthorized: false,
-        headers: {
-          Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
-        },
-      })
-    )
-      .assertStatusCode(Status.OK)
-      .assertBody([BOB, BILL, ANA]);
-
-    (
-      await testBuilder.request({
-        app,
-        type: HTTPRequest.GET,
-        route: `/api/v1/users/search`,
-        queryParams: {
-          groupId: DEARLY_GROUP_ID,
-          username: "bob",
-          limit: "4",
-          page: "1",
-        },
-        autoAuthorized: false,
-        headers: {
-          Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
-        },
-      })
-    )
-      .assertStatusCode(Status.OK)
-      .assertBody([BOB, BILL, ANA]);
-  });
-
-  it("should return 200 if is manager and limit = 2", async () => {
-    (
-      await testBuilder.request({
-        app,
-        type: HTTPRequest.GET,
-        route: `/api/v1/users/search`,
-        queryParams: {
-          groupId: DEARLY_GROUP_ID,
-          username: "bob",
-          limit: "2",
-          page: "1",
-        },
-        autoAuthorized: false,
-        headers: {
-          Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
-        },
-      })
-    )
-      .assertStatusCode(Status.OK)
-      .assertBody([BOB, BILL]);
-
-    (
-      await testBuilder.request({
-        app,
-        type: HTTPRequest.GET,
-        route: `/api/v1/users/search`,
-        queryParams: {
-          groupId: DEARLY_GROUP_ID,
-          username: "bob",
-          limit: "2",
-          page: "2",
-        },
-        autoAuthorized: false,
-        headers: {
-          Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
-        },
-      })
-    )
-      .assertStatusCode(Status.OK)
-      .assertBody([ANA]);
-
-    (
-      await testBuilder.request({
-        app,
-        type: HTTPRequest.GET,
-        route: `/api/v1/users/search`,
-        queryParams: {
-          groupId: DEARLY_GROUP_ID,
-          username: "bob",
-          limit: "2",
-          page: "3",
-        },
-        autoAuthorized: false,
-        headers: {
-          Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
-        },
-      })
-    )
-      .assertStatusCode(Status.OK)
-      .assertBody([]);
-  });
+  it.each([
+    ["1", "1", [BOB]],
+    ["1", "2", [ANA]],
+    ["1", "3", [BILL]],
+    ["1", "4", []],
+    ["2", "1", [BOB, ANA]],
+    ["2", "2", [BILL]],
+    ["2", "3", []],
+    ["1", "1", [BOB]],
+    ["2", "1", [BOB, ANA]],
+    ["3", "1", [BOB, ANA, BILL]],
+    ["4", "1", [BOB, ANA, BILL]],
+    ["3", "1", [BOB, ANA, BILL]],
+    ["3", "2", []],
+  ])(
+    "should return 200 if is manager with limit %s and page %s",
+    async (limit, page, expectedBody) => {
+      (
+        await testBuilder.request({
+          app,
+          type: HTTPRequest.GET,
+          route: `/api/v1/users/search`,
+          queryParams: {
+            groupId: DEARLY_GROUP_ID,
+            username: "bob",
+            limit,
+            page,
+          },
+          autoAuthorized: false,
+          headers: {
+            Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
+          },
+        })
+      )
+        .assertStatusCode(Status.OK)
+        .assertBody(expectedBody);
+    },
+  );
 
   it("should return 200 (empty array) if is member but not manager and valid query", async () => {
     (
@@ -366,6 +180,29 @@ describe("GET /users/search", () => {
         },
         {
           message: "Required",
+          path: "groupId",
+        },
+      ]);
+  });
+
+  it.each(
+    INVALID_ID_ARRAY.map((id) => [id === null ? "null" : id === undefined ? "undefined" : id, id]),
+  )("should return 400 if invalid ID %s", async (id) => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.GET,
+        route: `/api/v1/users/search`,
+        queryParams: {
+          groupId: id,
+          username: "janedoe",
+        },
+      })
+    )
+      .assertStatusCode(Status.BadRequest)
+      .assertError([
+        {
+          message: "Invalid ID format",
           path: "groupId",
         },
       ]);

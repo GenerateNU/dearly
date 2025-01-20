@@ -7,7 +7,7 @@ import {
   User,
 } from "./validator";
 import { devicesTable, membersTable, usersTable } from "../schema";
-import { and, eq, sql, not } from "drizzle-orm";
+import { and, eq, sql, not, exists } from "drizzle-orm";
 
 export interface UserTransaction {
   insertUser(payload: CreateUserPayload): Promise<User | null>;
@@ -86,35 +86,39 @@ export class UserTransactionImpl implements UserTransaction {
     username,
   }: SearchedInfo): Promise<SearchedUser[]> {
     const joinedResult = await this.db.transaction(async (tx) => {
-      const [manager] = await tx
-        .select()
-        .from(membersTable)
-        .where(
-          and(
-            eq(membersTable.role, "MANAGER"),
-            eq(membersTable.userId, userId),
-            eq(membersTable.groupId, groupId),
-          ),
-        );
-
-      if (!manager) return [];
-
       const result = await tx
         .select({
           id: usersTable.id,
           name: usersTable.name,
           username: usersTable.username,
           profilePhoto: usersTable.profilePhoto,
+          // return true if the user is member of group
           isMember:
-            sql<boolean>`CASE WHEN ${membersTable.groupId} IS NOT NULL THEN true ELSE false END`.as(
+            sql<boolean>`CASE WHEN ${membersTable.groupId} = ${groupId} THEN true ELSE false END`.as(
               "isMember",
             ),
         })
         .from(usersTable)
-        // left join to check for membership of user in the group
         .leftJoin(membersTable, eq(membersTable.userId, usersTable.id))
-        // exclude the user who is searching out of result
-        .where(not(eq(usersTable.id, userId)))
+        .where(
+          and(
+            // exclude the user who is searching
+            not(eq(usersTable.id, userId)),
+            // true if user is manager of the group
+            exists(
+              tx
+                .select()
+                .from(membersTable)
+                .where(
+                  and(
+                    eq(membersTable.role, "MANAGER"),
+                    eq(membersTable.userId, userId),
+                    eq(membersTable.groupId, groupId),
+                  ),
+                ),
+            ),
+          ),
+        )
         // sort by most relevance
         .orderBy(
           sql`ts_rank(to_tsvector('english', ${usersTable.username}), plainto_tsquery('english', ${username})) DESC`,
@@ -125,7 +129,6 @@ export class UserTransactionImpl implements UserTransaction {
 
       return result;
     });
-
     return joinedResult;
   }
 }

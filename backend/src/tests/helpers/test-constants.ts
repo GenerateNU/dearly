@@ -11,6 +11,7 @@ export const POST_ID = "d1c51f6d-3a57-474a-872e-bde646fe338b";
 export const MEDIA_ONE_ID = "c41f01cf-2c1b-44ad-b80f-05bddd607ee1";
 export const MEDIA_TWO_ID = "43bd915c-122c-448f-8d2b-bdc983934e86";
 export const MEDIA_THREE_ID = "43bd915c-122c-448f-8d2b-bdc983934e86";
+export const ANOTHER_GROUP_ID = "678d8ff3-c24c-8002-ad06-052ae4f44075";
 
 export const GROUP_EMPTY_FIELDS_ERRORS = [
   {

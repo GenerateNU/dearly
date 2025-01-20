@@ -8,12 +8,14 @@ import {
 } from "../../entities/schema";
 import { CreateUserPayload } from "../../entities/users/validator";
 import {
+  ANOTHER_GROUP_ID,
   DEARLY_GROUP_ID,
   MEDIA_MOCK,
   POST_MOCK,
   USER_ALICE,
   USER_ALICE_ID,
   USER_ANA,
+  USER_ANA_ID,
   USER_BILL,
   USER_BOB,
   USER_BOB_ID,
@@ -45,6 +47,12 @@ const seedGroup = async (db: PostgresJsDatabase) => {
       managerId: USER_ALICE_ID,
       id: DEARLY_GROUP_ID,
     },
+    {
+      name: "family",
+      description: "family",
+      managerId: USER_ANA_ID,
+      id: ANOTHER_GROUP_ID,
+    }
   ];
 
   try {
@@ -65,6 +73,11 @@ const seedMember = async (db: PostgresJsDatabase) => {
       userId: USER_BOB_ID,
       groupId: DEARLY_GROUP_ID,
       role: "MEMBER",
+    },
+    {
+      userId: USER_ANA_ID,
+      groupId: ANOTHER_GROUP_ID,
+      role: "MANAGER",
     },
   ];
 
