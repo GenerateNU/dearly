@@ -107,6 +107,7 @@ export const notificationsTable = pgTable("notifications", {
   receiverId: uuid()
     .notNull()
     .references(() => usersTable.id, { onDelete: "cascade" }),
+  createdAt: timestamp().notNull().defaultNow(),
   groupId: uuid().references(() => groupsTable.id, { onDelete: "cascade" }),
   referenceType: referenceTypeEnum().notNull(),
   postId: uuid().references(() => postsTable.id, { onDelete: "cascade" }),
