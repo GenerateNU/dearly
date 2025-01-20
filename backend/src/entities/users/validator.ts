@@ -3,6 +3,7 @@ import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
 import z from "zod";
 import { Expo } from "expo-server-sdk";
 import { MIN_LIMIT } from "../../constants/database";
+import { PaginationParams, paginationSchema } from "../../utilities/pagination";
 
 export type CreateUserPayload = typeof usersTable.$inferInsert;
 export type UpdateUserPayload = Partial<typeof usersTable.$inferInsert>;
@@ -40,29 +41,13 @@ export interface SearchedInfo {
   userId: string;
 }
 
-export const querySchema = z.object({
-  username: z.string(),
-  groupId: z.string().uuid({ message: "Invalid ID format" }),
-  limit: z
-    .string()
-    .transform((val) => {
-      const parsed = Number(val);
-      return parsed;
-    })
-    .refine((val) => !isNaN(val) && val > 0, {
-      message: "Limit must be a positive number",
-    })
-    .optional()
-    .default("10"),
-  page: z
-    .string()
-    .transform((val) => {
-      const parsed = Number(val);
-      return parsed;
-    })
-    .refine((val) => !isNaN(val) && val > 0, {
-      message: "Page must be a positive number",
-    })
-    .optional()
-    .default("1"),
-});
+export type Pagination = PaginationParams & {
+  id: string;
+};
+
+export const querySchema = z
+  .object({
+    username: z.string(),
+    groupId: z.string().uuid({ message: "Invalid ID format" }),
+  })
+  .merge(paginationSchema);

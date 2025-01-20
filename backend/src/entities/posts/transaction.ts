@@ -1,14 +1,7 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { CreatePostPayload, IDPayload, PostWithMedia, UpdatePostPayload } from "./validator";
-import {
-  commentsTable,
-  groupsTable,
-  likesTable,
-  mediaTable,
-  membersTable,
-  postsTable,
-} from "../schema";
-import { eq, and } from "drizzle-orm";
+import { CreatePostPayload, IDPayload, Media, PostWithMedia, UpdatePostPayload } from "./validator";
+import { groupsTable, mediaTable, membersTable, postsTable } from "../schema";
+import { eq, and, sql } from "drizzle-orm";
 import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
 
 export interface PostTransaction {
@@ -72,8 +65,22 @@ export class PostTransactionImpl implements PostTransaction {
   }
 
   async getPost(payload: IDPayload): Promise<PostWithMedia | null> {
-    const result = await this.db
-      .select()
+    const [result] = await this.db
+      .select({
+        id: postsTable.id,
+        userId: postsTable.userId,
+        groupId: postsTable.groupId,
+        createdAt: postsTable.createdAt,
+        caption: postsTable.caption,
+        media: sql<Media[]>`array_agg(
+        json_build_object(
+          'id', ${mediaTable.id},
+          'type', ${mediaTable.type},
+          'postId', ${mediaTable.postId},
+          'url', ${mediaTable.url}
+        )
+      )`,
+      })
       .from(postsTable)
       .innerJoin(mediaTable, eq(postsTable.id, mediaTable.postId))
       .innerJoin(groupsTable, eq(postsTable.groupId, groupsTable.id))
@@ -81,20 +88,19 @@ export class PostTransactionImpl implements PostTransaction {
         membersTable,
         and(eq(groupsTable.id, membersTable.groupId), eq(membersTable.userId, payload.userId)),
       )
-      .leftJoin(commentsTable, eq(postsTable.id, commentsTable.postId))
-      .leftJoin(likesTable, eq(postsTable.id, likesTable.postId))
+      .groupBy(
+        postsTable.id,
+        postsTable.userId,
+        postsTable.groupId,
+        postsTable.createdAt,
+        postsTable.caption,
+      )
       .where(eq(postsTable.id, payload.id));
 
-    if (!result[0]) return null;
-
-    const post = result[0].posts;
-    const media = result.map((r) => r.media).filter((m) => m !== null);
+    if (!result) return null;
 
     // TODO: return post with comments and likes later
-    return {
-      ...post,
-      media,
-    };
+    return result;
   }
 
   async updatePost(payload: UpdatePostPayload): Promise<PostWithMedia | null> {
