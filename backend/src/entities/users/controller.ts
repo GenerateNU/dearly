@@ -115,7 +115,7 @@ export class UserControllerImpl implements UserController {
       const { limit, page } = ctx.req.query();
       const queryParams = paginationSchema.parse({ limit, page });
       const userId = ctx.get("userId");
-      const groups = await this.userService.getPosts({ id: userId, ...queryParams });
+      const groups = await this.userService.getGroups({ id: userId, ...queryParams });
       return ctx.json(groups, Status.OK);
     };
     return await handleAppError(getGroupsImpl)(ctx);
