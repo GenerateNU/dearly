@@ -138,8 +138,8 @@ export class UserTransactionImpl implements UserTransaction {
       .orderBy(groupsTable.name)
       .limit(limit)
       .offset((page - 1) * limit);
-    }
-    
+  }
+
   async getUsersByUsername({
     userId,
     groupId,
