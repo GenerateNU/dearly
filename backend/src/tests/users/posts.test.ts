@@ -4,10 +4,9 @@ import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
 import {
-  ANOTHER_GROUP,
-  DEARLY_GROUP,
+  MEDIA_MOCK,
+  POST_MOCK,
   USER_ALICE_ID,
-  USER_ANA_ID,
   USER_BILL_ID,
   USER_BOB_ID,
 } from "../helpers/test-constants";
@@ -25,32 +24,37 @@ describe("GET /users/search", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.GET,
-        route: `/api/v1/users/groups`,
-        queryParams: {
-          limit: "1",
-          page: "1",
-        },
+        route: `/api/v1/users/posts`,
         autoAuthorized: false,
         headers: {
           Authorization: `Bearer ${generateJWTFromID()}`,
         },
       })
     )
+      .debug()
       .assertStatusCode(Status.OK)
       .assertBody([]);
   });
 
   it.each([
-    [USER_ANA_ID, [ANOTHER_GROUP]],
-    [USER_BOB_ID, [DEARLY_GROUP]],
+    [USER_BOB_ID, []],
     [USER_BILL_ID, []],
-    [USER_ALICE_ID, [DEARLY_GROUP, ANOTHER_GROUP]],
-  ])("should return 200 if for user with ID %s", async (id, expectedGroups) => {
+    [
+      USER_ALICE_ID,
+      [
+        {
+          ...POST_MOCK[0],
+          media: MEDIA_MOCK,
+          createdAt: POST_MOCK[0]!.createdAt?.toISOString(),
+        },
+      ],
+    ],
+  ])("should return 200 if for user with ID %s", async (id, expectedPosts) => {
     (
       await testBuilder.request({
         app,
         type: HTTPRequest.GET,
-        route: `/api/v1/users/groups`,
+        route: `/api/v1/users/posts`,
         autoAuthorized: false,
         headers: {
           Authorization: `Bearer ${generateJWTFromID(id)}`,
@@ -58,21 +62,41 @@ describe("GET /users/search", () => {
       })
     )
       .assertStatusCode(Status.OK)
-      .assertBody(expectedGroups);
+      .assertBody(expectedPosts);
   });
 
   it.each([
-    ["1", "1", [DEARLY_GROUP]],
-    ["1", "2", [ANOTHER_GROUP]],
+    [
+      "1",
+      "1",
+      [
+        {
+          ...POST_MOCK[0],
+          media: MEDIA_MOCK,
+          createdAt: POST_MOCK[0]!.createdAt?.toISOString(),
+        },
+      ],
+    ],
+    ["1", "2", []],
     ["1", "3", []],
-    ["2", "1", [DEARLY_GROUP, ANOTHER_GROUP]],
+    [
+      "2",
+      "1",
+      [
+        {
+          ...POST_MOCK[0],
+          media: MEDIA_MOCK,
+          createdAt: POST_MOCK[0]!.createdAt?.toISOString(),
+        },
+      ],
+    ],
     ["2", "2", []],
   ])("should return 200 with limit %s and page %s", async (limit, page, expectedBody) => {
     (
       await testBuilder.request({
         app,
         type: HTTPRequest.GET,
-        route: `/api/v1/users/groups`,
+        route: `/api/v1/users/posts`,
         queryParams: {
           limit,
           page,
@@ -92,7 +116,7 @@ describe("GET /users/search", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.GET,
-        route: `/api/v1/users/groups`,
+        route: `/api/v1/users/posts`,
         queryParams: {
           limit: "limit",
           page: "page",
@@ -121,7 +145,7 @@ describe("GET /users/search", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.GET,
-        route: `/api/v1/users/groups`,
+        route: `/api/v1/users/posts`,
         queryParams: {
           limit: "0",
           page: "-1",
