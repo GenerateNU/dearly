@@ -98,8 +98,9 @@ export class PostControllerImpl implements PostController {
     const toggleLikeImpl = async () => {
       const postId = parseUUID(ctx.req.param("id"));
       const userId = ctx.get("userId");
-      await this.postService.toggleLike({ id: postId, userId });
-      return ctx.json({ message: "Successfully toggle like" }, Status.OK);
+      const isLiking = await this.postService.toggleLike({ id: postId, userId });
+      const action = isLiking ? "like" : "unlike";
+      return ctx.json({ message: `Successfully ${action} post` }, Status.OK);
     };
     return await handleAppError(toggleLikeImpl)(ctx);
   }

@@ -10,7 +10,7 @@ export interface PostService {
   getPost(payload: IDPayload): Promise<PostWithMedia>;
   updatePost(payload: UpdatePostPayload): Promise<PostWithMedia>;
   deletePost(payload: IDPayload): Promise<void>;
-  toggleLike(payload: IDPayload): Promise<void>;
+  toggleLike(payload: IDPayload): Promise<boolean>;
   getLikeUsers(payload: IDPayload & PaginationParams): Promise<SearchedUser[]>;
 }
 
@@ -61,9 +61,9 @@ export class PostServiceImpl implements PostService {
     return await handleServiceError(deletePostImpl)();
   }
 
-  async toggleLike(payload: IDPayload): Promise<void> {
+  async toggleLike(payload: IDPayload): Promise<boolean> {
     const toggleLikeImpl = async () => {
-      await this.postTransaction.toggleLike(payload);
+      return await this.postTransaction.toggleLike(payload);
     };
     return await handleServiceError(toggleLikeImpl)();
   }

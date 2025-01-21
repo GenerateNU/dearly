@@ -18,7 +18,7 @@ export interface PostTransaction {
   getPost(payload: IDPayload): Promise<PostWithMedia | null>;
   updatePost(payload: UpdatePostPayload): Promise<PostWithMedia | null>;
   deletePost(payload: IDPayload): Promise<void>;
-  toggleLike(payload: IDPayload): Promise<void>;
+  toggleLike(payload: IDPayload): Promise<boolean>;
   getLikeUsers(payload: IDPayload & PaginationParams): Promise<SearchedUser[]>;
 }
 
@@ -174,8 +174,10 @@ export class PostTransactionImpl implements PostTransaction {
     }
   }
 
-  async toggleLike({ id, userId }: IDPayload): Promise<void> {
+  async toggleLike({ id, userId }: IDPayload): Promise<boolean> {
     await this.checkMembership(id, userId);
+    let isLiked = false;
+
     await this.db.transaction(async (tx) => {
       const existingLike = await tx
         .select()
@@ -187,10 +189,14 @@ export class PostTransactionImpl implements PostTransaction {
         await tx
           .delete(likesTable)
           .where(and(eq(likesTable.postId, id), eq(likesTable.userId, userId)));
+        isLiked = false;
       } else {
         await tx.insert(likesTable).values({ postId: id, userId });
+        isLiked = true;
       }
     });
+
+    return isLiked;
   }
 
   async getLikeUsers({
