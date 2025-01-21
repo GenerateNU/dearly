@@ -9,7 +9,7 @@ import {
   updatePostValidate,
 } from "./validator";
 import { Status } from "../../constants/http";
-import { DEL_POST, POST_API } from "../../types/api/routes/posts";
+import { DEL_POST, LIKE_USERS, POST_API, TOGGLE_LIKE } from "../../types/api/routes/posts";
 import { paginationSchema } from "../../utilities/pagination";
 
 export interface PostController {
@@ -17,8 +17,8 @@ export interface PostController {
   getPost(ctx: Context): Promise<POST_API>;
   updatePost(ctx: Context): Promise<POST_API>;
   deletePost(ctx: Context): Promise<DEL_POST>;
-  toggleLike(ctx: Context): Promise<Response>;
-  getLikeUsers(ctx: Context): Promise<Response>;
+  toggleLike(ctx: Context): Promise<TOGGLE_LIKE>;
+  getLikeUsers(ctx: Context): Promise<LIKE_USERS>;
 }
 
 export class PostControllerImpl implements PostController {
@@ -94,7 +94,7 @@ export class PostControllerImpl implements PostController {
     return await handleAppError(deletePostImpl)(ctx);
   }
 
-  async toggleLike(ctx: Context): Promise<Response> {
+  async toggleLike(ctx: Context): Promise<TOGGLE_LIKE> {
     const toggleLikeImpl = async () => {
       const postId = parseUUID(ctx.req.param("id"));
       const userId = ctx.get("userId");
@@ -105,7 +105,7 @@ export class PostControllerImpl implements PostController {
     return await handleAppError(toggleLikeImpl)(ctx);
   }
 
-  async getLikeUsers(ctx: Context): Promise<Response> {
+  async getLikeUsers(ctx: Context): Promise<LIKE_USERS> {
     const getLikeUsersImpl = async () => {
       const { limit, page } = ctx.req.query();
       const postId = parseUUID(ctx.req.param("id"));

@@ -916,15 +916,7 @@ paths:
       summary: Updates a post
       description: Updates a post from the specified body.
       parameters:
-        - name: groupId
-          in: path
-          description: ID of the group a post is made in
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: 5e91507e-5630-4efd-9fd4-799178870b10
-        - name: postId
+        - name: id
           in: path
           description: ID of the post
           required: true
@@ -1010,15 +1002,7 @@ paths:
       summary: Deletes a post
       description: Deletes a post.
       parameters:
-        - name: groupId
-          in: path
-          description: ID of the group a post is made in
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: 5e91507e-5630-4efd-9fd4-799178870b10
-        - name: postId
+        - name: id
           in: path
           description: ID of the post
           required: true
@@ -1081,6 +1065,20 @@ paths:
               type: string
               format: uuid
               example: 5e91507e-5630-4efd-9fd4-799178870b10
+          - name: limit
+            in: query
+            description: The maximum number of groups to return.
+            required: false
+            schema:
+              type: integer
+              default: 10
+          - name: page
+            in: query
+            description: The page number for pagination.
+            required: false
+            schema:
+              type: integer
+              default: 1
         security:
           - BearerAuth: []
         responses:
@@ -1093,7 +1091,7 @@ paths:
                 items:
                   $ref: "#/components/schemas/SearchedUser"
           400:
-            description: Malformed ID
+            description: Malformed ID and query params
             content:
               application/json:
                 schema:
@@ -1107,7 +1105,7 @@ paths:
                 schema:
                   $ref: "#/components/schemas/Error"
           403:
-            description: User is not member of the group
+            description: Forbidden since user is not member of the group
             content:
               application/json:
                 schema:
@@ -1130,15 +1128,7 @@ paths:
         summary: Toggle like on a post
         description: Like if user has not liked the post, unlike otherwise
         parameters:
-          - name: groupId
-            in: path
-            description: ID of the group a post is made in
-            required: true
-            schema:
-              type: string
-              format: uuid
-              example: 5e91507e-5630-4efd-9fd4-799178870b10
-          - name: postId
+          - name: id
             in: path
             description: ID of the post
             required: true
@@ -1148,44 +1138,17 @@ paths:
               example: 5e91507e-5630-4efd-9fd4-799178870b10
         security:
           - BearerAuth: []
-        requestBody:
-          required: true
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  caption:
-                    type: string
-                    minLength: 1
-                    maxLength: 500
-                    description: Caption of the post.
-                  media:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        type:
-                          type: string
-                          enum:
-                            - VIDEO
-                            - PHOTO
-                          description: The type of media (either VIDEO or PHOTO).
-                        url:
-                          type: string
-                          description: The URL of the media item.
-                      required:
-                        - type
-                        - url
-                    description: A list of media items, each with a type and URL.
-                additionalProperties: true
         responses:
           200:
-            description: Successfully updated a post
+            description: Successfully toggle like of the post
             content:
               application/json:
                 schema:
-                  $ref: "#/components/schemas/Post"
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      example: "Successfully like post"
           400:
             description: Malformed request
             content:
