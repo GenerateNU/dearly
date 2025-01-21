@@ -491,8 +491,8 @@ paths:
       get:
         tags: 
           - User Endpoints
-        summary: Get all groups for user
-        description: Get all groups user is member of.
+        summary: Gets all groups for user
+        description: Gets all groups user is member of.
         security: 
           - BearerAuth: []
         parameters:
@@ -560,8 +560,8 @@ paths:
       get:
         tags: 
           - User Endpoints
-        summary: Get all posts for user
-        description: Get all posts that a user posted.
+        summary: Gets all posts for user
+        description: Gets all posts that a user posted.
         security: 
           - BearerAuth: []
         parameters:
@@ -613,8 +613,8 @@ paths:
     get:
       tags: 
         - User Endpoints
-      summary: Search users by username
-      description: Search in-app users so they can be invited directly to a group.
+      summary: Searches users by username
+      description: Searches in-app users so they can be invited directly to a group.
       security: 
         - BearerAuth: []
       parameters:
@@ -676,7 +676,7 @@ paths:
     post:
       tags:
         - User Endpoints
-      summary: Register user's device token
+      summary: Registers user's device token
       description: Registers an Expo Device Token for the currently authenticated user to receive notifications.
       security:
         - BearerAuth: []
@@ -730,7 +730,7 @@ paths:
     delete:
       tags:
         - User Endpoints
-      summary: Remove user's device token
+      summary: Removes user's device token
       description: Removes a registered Expo Device Token for the currently authenticated user to not receive notifications.
       security:
         - BearerAuth: []
@@ -916,15 +916,7 @@ paths:
       summary: Updates a post
       description: Updates a post from the specified body.
       parameters:
-        - name: groupId
-          in: path
-          description: ID of the group a post is made in
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: 5e91507e-5630-4efd-9fd4-799178870b10
-        - name: postId
+        - name: id
           in: path
           description: ID of the post
           required: true
@@ -1010,15 +1002,7 @@ paths:
       summary: Deletes a post
       description: Deletes a post.
       parameters:
-        - name: groupId
-          in: path
-          description: ID of the group a post is made in
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: 5e91507e-5630-4efd-9fd4-799178870b10
-        - name: postId
+        - name: id
           in: path
           description: ID of the post
           required: true
@@ -1066,4 +1050,134 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-
+  /api/v1/posts/{id}/likes:
+      get:
+        tags:
+          - Post Endpoints
+        summary: Gets all users who like the post
+        description: Retrieves list of users who like the post
+        parameters:
+          - name: id
+            in: path
+            description: ID of the post
+            required: true
+            schema:
+              type: string
+              format: uuid
+              example: 5e91507e-5630-4efd-9fd4-799178870b10
+          - name: limit
+            in: query
+            description: The maximum number of groups to return.
+            required: false
+            schema:
+              type: integer
+              default: 10
+          - name: page
+            in: query
+            description: The page number for pagination.
+            required: false
+            schema:
+              type: integer
+              default: 1
+        security:
+          - BearerAuth: []
+        responses:
+          200:
+            description: Successfully retrieve users who like the post
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/SearchedUser"
+          400:
+            description: Malformed ID and query params
+            content:
+              application/json:
+                schema:
+                  oneOf:
+                    - $ref: "#/components/schemas/Error"
+                    - $ref: "#/components/schemas/ValidationError"
+          401:
+            description: Unauthorized due to invalid JWT
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/Error"
+          403:
+            description: Forbidden since user is not member of the group
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/Error"
+          404:
+            description: Post not found
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/Error"
+          500:
+            description: Internal server error
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/Error"
+      patch:
+        tags:
+          - Post Endpoints
+        summary: Toggles like on a post
+        description: Likes if user has not liked the post, unlikes otherwise
+        parameters:
+          - name: id
+            in: path
+            description: ID of the post
+            required: true
+            schema:
+              type: string
+              format: uuid
+              example: 5e91507e-5630-4efd-9fd4-799178870b10
+        security:
+          - BearerAuth: []
+        responses:
+          200:
+            description: Successfully toggle like of the post
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      example: "Successfully like post"
+          400:
+            description: Malformed request
+            content:
+              application/json:
+                schema:
+                  oneOf:
+                    - $ref: "#/components/schemas/Error"
+                    - $ref: "#/components/schemas/ValidationError"
+          401:
+            description: Unauthorized due to invalid JWT
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/Error"
+          403:
+            description: Forbidden since user is not a member of a group
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/Error"
+          404:
+            description: Post not found
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/Error"
+          500:
+            description: Internal server error
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/Error"
