@@ -1,9 +1,17 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { CreatePostPayload, IDPayload, Media, PostWithMedia, UpdatePostPayload } from "./validator";
-import { groupsTable, mediaTable, membersTable, postsTable } from "../schema";
+import {
+  groupsTable,
+  likesTable,
+  mediaTable,
+  membersTable,
+  postsTable,
+  usersTable,
+} from "../schema";
 import { eq, and, sql } from "drizzle-orm";
 import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
 import { SearchedUser } from "../users/validator";
+import { PaginationParams } from "../../utilities/pagination";
 
 export interface PostTransaction {
   createPost(post: CreatePostPayload): Promise<PostWithMedia | null>;
@@ -11,7 +19,7 @@ export interface PostTransaction {
   updatePost(payload: UpdatePostPayload): Promise<PostWithMedia | null>;
   deletePost(payload: IDPayload): Promise<void>;
   toggleLike(payload: IDPayload): Promise<void>;
-  getLikeUsers(payload: IDPayload): Promise<SearchedUser[]>;
+  getLikeUsers(payload: IDPayload & PaginationParams): Promise<SearchedUser[]>;
 }
 
 export class PostTransactionImpl implements PostTransaction {
@@ -152,7 +160,7 @@ export class PostTransactionImpl implements PostTransaction {
     return updatedPostWithMedia;
   }
 
-  async deletePost({id, userId}: IDPayload): Promise<void> {
+  async deletePost({ id, userId }: IDPayload): Promise<void> {
     await this.checkPostOwnership(id, userId);
     await this.db
       .delete(postsTable)
@@ -167,10 +175,72 @@ export class PostTransactionImpl implements PostTransaction {
   }
 
   async toggleLike({ id, userId }: IDPayload): Promise<void> {
-    
+    await this.checkMembership(id, userId);
+    await this.db.transaction(async (tx) => {
+      const existingLike = await tx
+        .select()
+        .from(likesTable)
+        .where(and(eq(likesTable.postId, id), eq(likesTable.userId, userId)))
+        .limit(1);
+
+      if (existingLike.length > 0) {
+        await tx
+          .delete(likesTable)
+          .where(and(eq(likesTable.postId, id), eq(likesTable.userId, userId)));
+      } else {
+        await tx.insert(likesTable).values({ postId: id, userId });
+      }
+    });
   }
 
-  async getLikeUsers({ id, userId }: IDPayload): Promise<SearchedUser[]> {
-    return [];
+  async getLikeUsers({
+    id,
+    userId,
+    limit,
+    page,
+  }: IDPayload & PaginationParams): Promise<SearchedUser[]> {
+    await this.checkMembership(id, userId);
+    const likedUsers = await this.db
+      .select({
+        id: usersTable.id,
+        name: usersTable.name,
+        username: usersTable.username,
+        isMember: sql<boolean>`
+          EXISTS (
+            SELECT 1 FROM membersTable 
+            WHERE membersTable.userId = usersTable.id
+          )
+        `,
+        profilePhoto: usersTable.profilePhoto,
+      })
+      .from(usersTable)
+      .innerJoin(likesTable, eq(likesTable.userId, usersTable.id))
+      .innerJoin(postsTable, eq(likesTable.postId, postsTable.id))
+      .where(eq(postsTable.id, id))
+      .limit(limit)
+      .offset((page - 1) * limit);
+
+    return likedUsers;
+  }
+
+  async checkMembership(postId: string, userId: string): Promise<void> {
+    const [result] = await this.db
+      .select({
+        memberId: membersTable.userId,
+      })
+      .from(postsTable)
+      .innerJoin(groupsTable, eq(groupsTable.id, postsTable.groupId))
+      .leftJoin(membersTable, eq(membersTable.groupId, groupsTable.id))
+      .where(and(eq(postsTable.id, postId), eq(membersTable.userId, userId)));
+
+    if (!result) {
+      throw new NotFoundError("Post");
+    }
+
+    const { memberId } = result;
+
+    if (!memberId) {
+      throw new ForbiddenError();
+    }
   }
 }

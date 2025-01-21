@@ -10,6 +10,7 @@ import {
 } from "./validator";
 import { Status } from "../../constants/http";
 import { DEL_POST, POST_API } from "../../types/api/routes/posts";
+import { paginationSchema } from "../../utilities/pagination";
 
 export interface PostController {
   createPost(ctx: Context): Promise<POST_API>;
@@ -97,20 +98,21 @@ export class PostControllerImpl implements PostController {
     const toggleLikeImpl = async () => {
       const postId = parseUUID(ctx.req.param("id"));
       const userId = ctx.get("userId");
-      await this.postService.toggleLike({id: postId, userId});
+      await this.postService.toggleLike({ id: postId, userId });
       return ctx.json({ message: "Successfully toggle like" }, Status.OK);
-    }
+    };
     return await handleAppError(toggleLikeImpl)(ctx);
   }
 
   async getLikeUsers(ctx: Context): Promise<Response> {
     const getLikeUsersImpl = async () => {
+      const { limit, page } = ctx.req.query();
       const postId = parseUUID(ctx.req.param("id"));
       const userId = ctx.get("userId");
-      const users = await this.postService.getLikeUsers({id: postId, userId});
+      const pagination = paginationSchema.parse({ limit, page });
+      const users = await this.postService.getLikeUsers({ id: postId, userId, ...pagination });
       return ctx.json(users, Status.OK);
-    }
+    };
     return await handleAppError(getLikeUsersImpl)(ctx);
   }
 }
-                                                                                              
