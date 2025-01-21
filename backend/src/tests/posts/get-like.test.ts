@@ -176,6 +176,36 @@ describe("GET /posts/:id/likes", () => {
       ]);
   });
 
+  it("should return 200 if a user unlikes the post", async () => {
+    // Bob unlikes the post
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.PATCH,
+        route: `/api/v1/posts/${POST_ID}/likes`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${BOB_JWT}`,
+        },
+      })
+    ).assertStatusCode(Status.OK);
+
+    // list of users should only have Alice left
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.GET,
+        route: `/api/v1/posts/${POST_ID}/likes`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${BOB_JWT}`,
+        },
+      })
+    )
+      .assertStatusCode(Status.OK)
+      .assertBody([SEARCHED_ALICE]);
+  });
+
   it.each(
     INVALID_ID_ARRAY.map((id) => [id === null ? "null" : id === undefined ? "undefined" : id, id]),
   )("should return 400 if invalid ID %s", async (id) => {
