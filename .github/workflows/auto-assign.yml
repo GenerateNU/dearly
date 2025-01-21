@@ -7,7 +7,7 @@ on:
 jobs:
   auto-assign:
     runs-on: ubuntu-latest
-    if: ${{ github.actor != 'dependabot[bot]' }}
+    if: ${{ github.actor != 'dependabot[bot]' && github.event.pull_request.draft == false }}
     permissions:
       pull-requests: write
     steps:
