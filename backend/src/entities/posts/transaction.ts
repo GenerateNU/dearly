@@ -208,12 +208,7 @@ export class PostTransactionImpl implements PostTransaction {
         id: usersTable.id,
         name: usersTable.name,
         username: usersTable.username,
-        isMember: sql<boolean>`
-          EXISTS (
-            SELECT 1 FROM membersTable 
-            WHERE membersTable.userId = usersTable.id
-          )
-        `,
+        isMember: sql<boolean>`TRUE`,
         profilePhoto: usersTable.profilePhoto,
       })
       .from(usersTable)
