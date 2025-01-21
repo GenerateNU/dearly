@@ -491,8 +491,8 @@ paths:
       get:
         tags: 
           - User Endpoints
-        summary: Get all groups for user
-        description: Get all groups user is member of.
+        summary: Gets all groups for user
+        description: Gets all groups user is member of.
         security: 
           - BearerAuth: []
         parameters:
@@ -560,8 +560,8 @@ paths:
       get:
         tags: 
           - User Endpoints
-        summary: Get all posts for user
-        description: Get all posts that a user posted.
+        summary: Gets all posts for user
+        description: Gets all posts that a user posted.
         security: 
           - BearerAuth: []
         parameters:
@@ -613,8 +613,8 @@ paths:
     get:
       tags: 
         - User Endpoints
-      summary: Search users by username
-      description: Search in-app users so they can be invited directly to a group.
+      summary: Searches users by username
+      description: Searches in-app users so they can be invited directly to a group.
       security: 
         - BearerAuth: []
       parameters:
@@ -676,7 +676,7 @@ paths:
     post:
       tags:
         - User Endpoints
-      summary: Register user's device token
+      summary: Registers user's device token
       description: Registers an Expo Device Token for the currently authenticated user to receive notifications.
       security:
         - BearerAuth: []
@@ -730,7 +730,7 @@ paths:
     delete:
       tags:
         - User Endpoints
-      summary: Remove user's device token
+      summary: Removes user's device token
       description: Removes a registered Expo Device Token for the currently authenticated user to not receive notifications.
       security:
         - BearerAuth: []
@@ -1054,8 +1054,8 @@ paths:
       get:
         tags:
           - Post Endpoints
-        summary: Get all users who like the post
-        description: Retrieve list of users who like the post
+        summary: Gets all users who like the post
+        description: Retrieves list of users who like the post
         parameters:
           - name: id
             in: path
@@ -1125,8 +1125,8 @@ paths:
       patch:
         tags:
           - Post Endpoints
-        summary: Toggle like on a post
-        description: Like if user has not liked the post, unlike otherwise
+        summary: Toggles like on a post
+        description: Likes if user has not liked the post, unlikes otherwise
         parameters:
           - name: id
             in: path
