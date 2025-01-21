@@ -103,6 +103,10 @@ components:
           nullable: true
       required:
         - name
+    Member:
+      type: object
+      properties:
+      required:
     Post:
       type: object
       properties:
@@ -1066,4 +1070,104 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /api/v1/groups/{id}/members/{userId}:
+    post:
+      tags:
+        - Members Endpoints
+      summary: Adds a member to a group.
+      description: Adds the member to a group.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the group.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+        - name: userId
+          in: path
+          description: ID of the member to be added.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+              required:
+              additionalProperties: true
+      responses:
+        201:
+          description: Successfully added member to group.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Members"
+    delete:
+      tags:
+        - Members Endpoints
+      summary: Deletes member from group.
+      description: Deletes member from group.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the group.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+        - name: userId
+          in: path
+          description: ID of the member to be removed.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Successfully removed a member from a group
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Successfully removed a member from this group"
+  /api/v1/groups/{id}/members:
+    get:
+      tags:
+        - Members Endpoints
+      summary: Gets members of this group.
+      description: Gets all the members in this group.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the group
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Successfully retrieved a members
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Members"
 
