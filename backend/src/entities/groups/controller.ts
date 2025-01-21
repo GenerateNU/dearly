@@ -7,6 +7,8 @@ import { handleAppError } from "../../utilities/errors/app-error";
 
 export interface GroupController {
   createGroup(ctx: Context): Promise<GROUP_API>;
+  getCalendar(ctx: Context): Promise<Response>;
+  getFeed(ctx: Context): Promise<Response>;
 }
 
 export class GroupControllerImpl implements GroupController {
@@ -30,5 +32,13 @@ export class GroupControllerImpl implements GroupController {
       return ctx.json(group, Status.Created);
     };
     return await handleAppError(createGroupImpl)(ctx);
+  }
+
+  async getCalendar(ctx: Context): Promise<Response> {
+    return ctx.json({}, Status.Created);
+  }
+
+  async getFeed(ctx: Context): Promise<Response> {
+    return ctx.json({}, Status.Created);
   }
 }
