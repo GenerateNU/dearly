@@ -1,7 +1,8 @@
-import { CreatePostPayload, PostWithMedia, UpdatePostPayload, IDPayload } from "./validator";
+import { CreatePostPayload, PostWithMedia, UpdatePostPayload } from "./validator";
 import { PostTransaction } from "./transaction";
 import { InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
+import { IDPayload } from "../../types/id";
 
 export interface PostService {
   createPost(payload: CreatePostPayload): Promise<PostWithMedia>;
@@ -50,9 +51,9 @@ export class PostServiceImpl implements PostService {
     return await handleServiceError(updatePostImpl)();
   }
 
-  async deletePost({ id, userId }: IDPayload): Promise<void> {
+  async deletePost(payload: IDPayload): Promise<void> {
     const deletePostImpl = async () => {
-      await this.postTransaction.deletePost(id, userId);
+      await this.postTransaction.deletePost(payload);
     };
     return await handleServiceError(deletePostImpl)();
   }
