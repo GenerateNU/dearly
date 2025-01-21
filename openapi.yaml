@@ -1087,9 +1087,9 @@ paths:
             content:
               application/json:
                 schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/SearchedUser"
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/SearchedUser"
           400:
             description: Malformed ID and query params
             content:
