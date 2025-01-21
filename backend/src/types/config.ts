@@ -22,10 +22,10 @@ export interface CorsConfig {
 }
 
 export interface S3Config {
-  secretKey: string,
-  publicKey: string,
-  region: string,
-  name: string,
+  secretKey: string;
+  publicKey: string;
+  region: string;
+  name: string;
 }
 
 export interface Configuration {
