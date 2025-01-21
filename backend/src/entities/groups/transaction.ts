@@ -1,9 +1,12 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { groupsTable, membersTable } from "../schema";
+import { groupsTable, membersTable, postsTable } from "../schema";
 import { CreateGroupPayload, Group } from "./validator";
+import { ForbiddenError } from "../../utilities/errors/app-error";
+import { and, eq } from "drizzle-orm";
 
 export interface GroupTransaction {
   insertGroup(payload: CreateGroupPayload): Promise<Group | null>;
+  deleteGroup(groupId: string, userId: string): Promise<void>;
 }
 
 export class GroupTransactionImpl implements GroupTransaction {
@@ -31,5 +34,19 @@ export class GroupTransactionImpl implements GroupTransaction {
       return null;
     });
     return createdGroup ?? null;
+  }
+
+  async deleteGroup(groupId: string, userId: string): Promise<void> {
+    await this.checkGroupOwnership(groupId, userId);
+    await this.db
+      .delete(groupsTable)
+      .where(and(eq(groupsTable.id, groupId), eq(groupsTable.managerId, userId)));
+  }
+
+  async checkGroupOwnership(groupId: string, userId: string): Promise<void> {
+    const [group] = await this.db.select().from(groupsTable).where(eq(groupsTable.id, groupId));
+    if (group && group.managerId != userId) {
+      throw new ForbiddenError();
+    }
   }
 }

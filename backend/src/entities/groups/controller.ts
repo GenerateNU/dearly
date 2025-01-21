@@ -4,9 +4,12 @@ import { GroupService } from "./service";
 import { createGroupValidate } from "./validator";
 import { Status } from "../../constants/http";
 import { handleAppError } from "../../utilities/errors/app-error";
+import { DELETE_GROUP } from "../../types/api/routes/groups";
+import { parseUUID } from "../../utilities/uuid";
 
 export interface GroupController {
   createGroup(ctx: Context): Promise<GROUP_API>;
+  deleteGroup(ctx: Context): Promise<DELETE_GROUP>;
 }
 
 export class GroupControllerImpl implements GroupController {
@@ -30,5 +33,17 @@ export class GroupControllerImpl implements GroupController {
       return ctx.json(group, Status.Created);
     };
     return await handleAppError(createGroupImpl)(ctx);
+  }
+
+  async deleteGroup(ctx: Context): Promise<DELETE_GROUP> {
+    const deleteGroupImpl = async () => {
+      // pull out essential IDs
+      const id = parseUUID(ctx.req.param("id"));
+      const userId = parseUUID(ctx.get("userId"));
+
+      await this.groupService.deleteGroup({ userId, id });
+      return ctx.json({ message: "Successfully delete group" }, Status.OK);
+    };
+    return await handleAppError(deleteGroupImpl)(ctx);
   }
 }

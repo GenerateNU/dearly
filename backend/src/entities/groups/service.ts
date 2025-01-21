@@ -1,10 +1,12 @@
 import { InternalServerError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
+import { IDPayload } from "../posts/validator";
 import { GroupTransaction } from "./transaction";
 import { CreateGroupPayload, Group } from "./validator";
 
 export interface GroupService {
   createGroup(payload: CreateGroupPayload): Promise<Group>;
+  deleteGroup(payload: IDPayload): Promise<void>;
 }
 
 export class GroupServiceImpl implements GroupService {
@@ -23,5 +25,12 @@ export class GroupServiceImpl implements GroupService {
       return group;
     };
     return handleServiceError(createGroupImpl)();
+  }
+
+  async deleteGroup({ id, userId }: IDPayload): Promise<void> {
+    const deletePostImpl = async () => {
+      await this.groupTransaction.deleteGroup(id, userId);
+    };
+    return await handleServiceError(deletePostImpl)();
   }
 }
