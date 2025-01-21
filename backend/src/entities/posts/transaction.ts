@@ -176,9 +176,7 @@ export class PostTransactionImpl implements PostTransaction {
 
   async toggleLike({ id, userId }: IDPayload): Promise<boolean> {
     await this.checkMembership(id, userId);
-    let isLiked = false;
-
-    await this.db.transaction(async (tx) => {
+    const isLiked = await this.db.transaction(async (tx) => {
       const existingLike = await tx
         .select()
         .from(likesTable)
@@ -189,13 +187,12 @@ export class PostTransactionImpl implements PostTransaction {
         await tx
           .delete(likesTable)
           .where(and(eq(likesTable.postId, id), eq(likesTable.userId, userId)));
-        isLiked = false;
+        return false;
       } else {
         await tx.insert(likesTable).values({ postId: id, userId });
-        isLiked = true;
+        return true;
       }
     });
-
     return isLiked;
   }
 
@@ -232,12 +229,16 @@ export class PostTransactionImpl implements PostTransaction {
   async checkMembership(postId: string, userId: string): Promise<void> {
     const [result] = await this.db
       .select({
+        postId: postsTable.id,
         memberId: membersTable.userId,
       })
       .from(postsTable)
       .innerJoin(groupsTable, eq(groupsTable.id, postsTable.groupId))
-      .leftJoin(membersTable, eq(membersTable.groupId, groupsTable.id))
-      .where(and(eq(postsTable.id, postId), eq(membersTable.userId, userId)));
+      .leftJoin(
+        membersTable,
+        and(eq(membersTable.groupId, groupsTable.id), eq(membersTable.userId, userId)),
+      )
+      .where(eq(postsTable.id, postId));
 
     if (!result) {
       throw new NotFoundError("Post");
@@ -245,7 +246,7 @@ export class PostTransactionImpl implements PostTransaction {
 
     const { memberId } = result;
 
-    if (!memberId) {
+    if (memberId === null) {
       throw new ForbiddenError();
     }
   }
