@@ -36,6 +36,7 @@ export type CreatePostPayload = z.infer<typeof createPostValidate> & {
 };
 
 export type UpdatePostPayload = z.infer<typeof updatePostValidate> & IDPayload;
+
 export type IDPayload = {
   userId: string;
   id: string;

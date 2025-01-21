@@ -2,16 +2,12 @@ import { CreatePostPayload, PostWithMedia, UpdatePostPayload, IDPayload } from "
 import { PostTransaction } from "./transaction";
 import { InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
-import { SearchedUser } from "../users/validator";
-import { PaginationParams } from "../../utilities/pagination";
 
 export interface PostService {
   createPost(payload: CreatePostPayload): Promise<PostWithMedia>;
   getPost(payload: IDPayload): Promise<PostWithMedia>;
   updatePost(payload: UpdatePostPayload): Promise<PostWithMedia>;
   deletePost(payload: IDPayload): Promise<void>;
-  toggleLike(payload: IDPayload): Promise<boolean>;
-  getLikeUsers(payload: IDPayload & PaginationParams): Promise<SearchedUser[]>;
 }
 
 export class PostServiceImpl implements PostService {
@@ -59,19 +55,5 @@ export class PostServiceImpl implements PostService {
       await this.postTransaction.deletePost(payload);
     };
     return await handleServiceError(deletePostImpl)();
-  }
-
-  async toggleLike(payload: IDPayload): Promise<boolean> {
-    const toggleLikeImpl = async () => {
-      return await this.postTransaction.toggleLike(payload);
-    };
-    return await handleServiceError(toggleLikeImpl)();
-  }
-
-  async getLikeUsers(payload: IDPayload & PaginationParams): Promise<SearchedUser[]> {
-    const getLikeUsersImpl = async () => {
-      return await this.postTransaction.getLikeUsers(payload);
-    };
-    return await handleServiceError(getLikeUsersImpl)();
   }
 }
