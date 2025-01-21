@@ -16,6 +16,8 @@ export interface PostController {
   getPost(ctx: Context): Promise<POST_API>;
   updatePost(ctx: Context): Promise<POST_API>;
   deletePost(ctx: Context): Promise<DEL_POST>;
+  toggleLike(ctx: Context): Promise<Response>;
+  getLikeUsers(ctx: Context): Promise<Response>;
 }
 
 export class PostControllerImpl implements PostController {
@@ -90,4 +92,25 @@ export class PostControllerImpl implements PostController {
     };
     return await handleAppError(deletePostImpl)(ctx);
   }
+
+  async toggleLike(ctx: Context): Promise<Response> {
+    const toggleLikeImpl = async () => {
+      const postId = parseUUID(ctx.req.param("id"));
+      const userId = ctx.get("userId");
+      await this.postService.toggleLike({id: postId, userId});
+      return ctx.json({ message: "Successfully toggle like" }, Status.OK);
+    }
+    return await handleAppError(toggleLikeImpl)(ctx);
+  }
+
+  async getLikeUsers(ctx: Context): Promise<Response> {
+    const getLikeUsersImpl = async () => {
+      const postId = parseUUID(ctx.req.param("id"));
+      const userId = ctx.get("userId");
+      const users = await this.postService.getLikeUsers({id: postId, userId});
+      return ctx.json(users, Status.OK);
+    }
+    return await handleAppError(getLikeUsersImpl)(ctx);
+  }
 }
+                                                                                              

@@ -3,12 +3,15 @@ import { CreatePostPayload, IDPayload, Media, PostWithMedia, UpdatePostPayload }
 import { groupsTable, mediaTable, membersTable, postsTable } from "../schema";
 import { eq, and, sql } from "drizzle-orm";
 import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
+import { SearchedUser } from "../users/validator";
 
 export interface PostTransaction {
   createPost(post: CreatePostPayload): Promise<PostWithMedia | null>;
   getPost(payload: IDPayload): Promise<PostWithMedia | null>;
   updatePost(payload: UpdatePostPayload): Promise<PostWithMedia | null>;
-  deletePost(postId: string, userId: string): Promise<void>;
+  deletePost(payload: IDPayload): Promise<void>;
+  toggleLike(payload: IDPayload): Promise<void>;
+  getLikeUsers(payload: IDPayload): Promise<SearchedUser[]>;
 }
 
 export class PostTransactionImpl implements PostTransaction {
@@ -149,11 +152,11 @@ export class PostTransactionImpl implements PostTransaction {
     return updatedPostWithMedia;
   }
 
-  async deletePost(postId: string, userId: string): Promise<void> {
-    await this.checkPostOwnership(postId, userId);
+  async deletePost({id, userId}: IDPayload): Promise<void> {
+    await this.checkPostOwnership(id, userId);
     await this.db
       .delete(postsTable)
-      .where(and(eq(postsTable.id, postId), eq(postsTable.userId, userId)));
+      .where(and(eq(postsTable.id, id), eq(postsTable.userId, userId)));
   }
 
   async checkPostOwnership(postId: string, userId: string): Promise<void> {
@@ -161,5 +164,13 @@ export class PostTransactionImpl implements PostTransaction {
     if (post && post.userId != userId) {
       throw new ForbiddenError();
     }
+  }
+
+  async toggleLike({ id, userId }: IDPayload): Promise<void> {
+    
+  }
+
+  async getLikeUsers({ id, userId }: IDPayload): Promise<SearchedUser[]> {
+    return [];
   }
 }

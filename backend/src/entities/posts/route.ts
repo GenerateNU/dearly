@@ -15,6 +15,8 @@ export const postRoutes = (db: PostgresJsDatabase): Hono => {
   post.get("/posts/:id", (ctx) => postController.getPost(ctx));
   post.patch("/posts/:id", (ctx) => postController.updatePost(ctx));
   post.delete("/posts/:id", (ctx) => postController.deletePost(ctx));
+  post.patch("/posts/:id/likes", (ctx) => postController.toggleLike(ctx));
+  post.get("/posts/:id/likes", (ctx) => postController.getLikeUsers(ctx));
 
   return post;
 };
