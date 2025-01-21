@@ -1,7 +1,8 @@
-import { CreatePostPayload, PostWithMedia, UpdatePostPayload, IDPayload } from "./validator";
+import { CreatePostPayload, PostWithMedia, UpdatePostPayload } from "./validator";
 import { PostTransaction } from "./transaction";
 import { InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
+import { IDPayload } from "../../types/id";
 
 export interface PostService {
   createPost(payload: CreatePostPayload): Promise<PostWithMedia>;

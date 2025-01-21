@@ -1,10 +1,10 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { IDPayload } from "./validator";
 import { groupsTable, likesTable, membersTable, postsTable, usersTable } from "../schema";
 import { eq, and, sql } from "drizzle-orm";
 import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
 import { SearchedUser } from "../users/validator";
 import { PaginationParams } from "../../utilities/pagination";
+import { IDPayload } from "../../types/id";
 
 export interface LikeTransaction {
   toggleLike(payload: IDPayload): Promise<boolean>;

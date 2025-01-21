@@ -2,7 +2,7 @@ import { LikeTransaction } from "./transaction";
 import { handleServiceError } from "../../utilities/errors/service-error";
 import { SearchedUser } from "../users/validator";
 import { PaginationParams } from "../../utilities/pagination";
-import { IDPayload } from "./validator";
+import { IDPayload } from "../../types/id";
 
 export interface LikeService {
   toggleLike(payload: IDPayload): Promise<boolean>;
