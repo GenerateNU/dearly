@@ -73,11 +73,11 @@ export default class S3Impl implements IS3Operations {
      * @returns A promise of the blob is the newly compressed audio recording
      */
     async compressAudio(file: Blob): Promise<Blob> {
-        var compressedAudio = [] // holds the final compressed audio
+        const compressedAudio = [] // holds the final compressed audio
         const mp3encoder = new lame.Mp3Encoder(1, 44100, 128);
         const audioBuffer: ArrayBuffer = await file.arrayBuffer()
         const audioBufferInt16 = new Int16Array(audioBuffer, 0, Math.floor(audioBuffer.byteLength / 2));
-        var mp3Tmp = mp3encoder.encodeBuffer(audioBufferInt16);
+        let mp3Tmp = mp3encoder.encodeBuffer(audioBufferInt16);
 
         compressedAudio.push(mp3Tmp);
         // flush the mp3encoder so that any remaining data is also pushed into the final 

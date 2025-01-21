@@ -16,6 +16,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.731.1",
     "@blgc/openapi-router": "^0.1.0",
     "@breezystack/lamejs": "^1.2.7",
     "@eslint/js": "^9.17.0",
