@@ -56,6 +56,11 @@ tasks:
     cmds:
       - cd backend && bun migrate
 
+  db:studio:
+    desc: "Run local Drizzle studio"
+    cmds:
+      - cd backend && bun db:studio
+
   db:generate:migrate:
     desc: "Apply SQL generation and migration"
     deps: [db:generate, db:migrate]
