@@ -1,4 +1,5 @@
 import { MIN_LIMIT, NAME_MAX_LIMIT, TEXT_MAX_LIMIT } from "../../constants/database";
+import { paginationSchema } from "../../utilities/pagination";
 import { groupsTable } from "../schema";
 import z from "zod";
 
@@ -18,3 +19,14 @@ export const createGroupValidate = z
       .optional(),
   })
   .passthrough();
+
+export const feedParamValidate = z
+  .object({
+    date: z.date().optional(),
+  })
+  .merge(paginationSchema);
+
+export type FeedParamPayload = z.infer<typeof feedParamValidate> & {
+  userId: string;
+  groupId: string;
+};
