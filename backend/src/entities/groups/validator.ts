@@ -1,4 +1,11 @@
 import { MIN_LIMIT, NAME_MAX_LIMIT, TEXT_MAX_LIMIT } from "../../constants/database";
+import {
+  convertToDate,
+  validateDateFormat,
+  validateFutureDate,
+  validateMonth,
+  validateYear,
+} from "../../utilities/date";
 import { paginationSchema } from "../../utilities/pagination";
 import { groupsTable } from "../schema";
 import z from "zod";
@@ -27,7 +34,8 @@ export const feedParamValidate = z
       .transform((val) => new Date(val))
       .refine((date) => !isNaN(date.getTime()), {
         message: "Invalid date format",
-      }),
+      })
+      .optional(),
   })
   .merge(paginationSchema);
 
@@ -46,44 +54,19 @@ export const calendarParamsValidate = z.object({
 
   date: z
     .string()
-    .refine(
-      (val) => {
-        if (!val) return true;
-        const dateRegex = /^\d{4}-(?:0[1-9]|1[0-2])$/;
-        return dateRegex.test(val);
-      },
-      {
-        message: "Date must be in YYYY-MM format (e.g., 2024-01)",
-      },
-    )
-    .refine(
-      (val) => {
-        if (!val) return true;
-        const [year] = val.split("-").map(Number);
-        return year !== undefined && !isNaN(year) && year.toString().length === 4;
-      },
-      {
-        message: "Year must be a valid 4-digit number",
-      },
-    )
-    .refine(
-      (val) => {
-        if (!val) return true;
-        const [, month] = val.split("-").map(Number);
-        return month !== undefined && !isNaN(month) && month >= 1 && month <= 12;
-      },
-      {
-        message: "Month must be between 1 and 12",
-      },
-    )
-    .transform((val) => {
-      if (!val) {
-        const now = new Date();
-        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-      }
-      const [year, month] = val.split("-").map(Number);
-      return `${year}-${String(month).padStart(2, "0")}`;
+    .refine(validateDateFormat, {
+      message: "Date must be in YYYY-MM format (e.g., 2024-01)",
     })
+    .refine(validateYear, {
+      message: "Year must be a valid 4-digit number",
+    })
+    .refine(validateMonth, {
+      message: "Month must be between 1 and 12",
+    })
+    .refine(validateFutureDate, {
+      message: "Date cannot be in the future",
+    })
+    .transform(convertToDate)
     .optional()
     .default(() => {
       const now = new Date();

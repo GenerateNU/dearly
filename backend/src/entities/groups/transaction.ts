@@ -1,5 +1,5 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { groupsTable, mediaTable, membersTable, postsTable } from "../schema";
+import { groupsTable, likesTable, mediaTable, membersTable, postsTable } from "../schema";
 import {
   CalendarParamPayload,
   CreateGroupPayload,
@@ -8,7 +8,7 @@ import {
   ThumbnailResponse,
 } from "./validator";
 import { Media, PostWithMedia } from "../posts/validator";
-import { sql, eq, and } from "drizzle-orm";
+import { sql, eq, and, gte, lte } from "drizzle-orm";
 import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
 
 export interface GroupTransaction {
@@ -119,6 +119,23 @@ export class GroupTransactionImpl implements GroupTransaction {
     groupId,
     range,
   }: CalendarParamPayload): Promise<ThumbnailResponse[]> {
-    return [];
+    await this.checkMembership(groupId, userId);
+    const result = await this.db
+      .select({
+        date: postsTable.createdAt,
+        url: mediaTable.url,
+      })
+      .from(postsTable)
+      .innerJoin(mediaTable, eq(mediaTable.postId, postsTable.id))
+      .leftJoin(likesTable, eq(likesTable.postId, postsTable.id))
+      // from the pivot month back to the past based on the range
+      .where(and(lte(postsTable.createdAt, sql`${date.toISOString()}`), gte(postsTable.createdAt, sql`${new Date(date.getTime() - (range * 24 * 60 * 60 * 1000)).toISOString()}`)))
+      .groupBy(postsTable.createdAt, mediaTable.url)
+      // rank posts based on like count
+      .orderBy(sql`COUNT(${likesTable.id}) DESC`)
+      // take first post with most like
+      .limit(1);
+
+    return result;
   }
 }
