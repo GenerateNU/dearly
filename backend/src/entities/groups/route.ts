@@ -12,16 +12,7 @@ export const groupRoutes = (db: PostgresJsDatabase): Hono => {
   const groupController: GroupController = new GroupControllerImpl(groupService);
 
   group.post("/", (ctx) => groupController.createGroup(ctx));
-
-  // query params:
-  // - date
-  // - limit
-  // - page
-  group.get("/:id/feed", (ctx) => groupController.getFeed(ctx));
-
-  // query params:
-  // - range
-  // - month-year
+  group.get("/:id/feed", (ctx) => groupController.getAllPosts(ctx));
   group.get("/:id/calendar", (ctx) => groupController.getCalendar(ctx));
 
   return group;

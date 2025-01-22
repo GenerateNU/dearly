@@ -1,13 +1,20 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { groupsTable, mediaTable, membersTable, postsTable } from "../schema";
-import { CreateGroupPayload, FeedParamPayload, Group } from "./validator";
+import {
+  CalendarParamPayload,
+  CreateGroupPayload,
+  FeedParamPayload,
+  Group,
+  ThumbnailResponse,
+} from "./validator";
 import { Media, PostWithMedia } from "../posts/validator";
 import { sql, eq, and } from "drizzle-orm";
 import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
 
 export interface GroupTransaction {
   insertGroup(payload: CreateGroupPayload): Promise<Group | null>;
-  getFeed(payload: FeedParamPayload): Promise<PostWithMedia[]>;
+  getAllPosts(payload: FeedParamPayload): Promise<PostWithMedia[]>;
+  getCalendar(payload: CalendarParamPayload): Promise<ThumbnailResponse[]>;
 }
 
 export class GroupTransactionImpl implements GroupTransaction {
@@ -37,7 +44,7 @@ export class GroupTransactionImpl implements GroupTransaction {
     return createdGroup ?? null;
   }
 
-  async getFeed({
+  async getAllPosts({
     userId,
     limit,
     page,
@@ -104,5 +111,14 @@ export class GroupTransactionImpl implements GroupTransaction {
     if (memberId === null) {
       throw new ForbiddenError();
     }
+  }
+
+  async getCalendar({
+    date,
+    userId,
+    groupId,
+    range,
+  }: CalendarParamPayload): Promise<ThumbnailResponse[]> {
+    return [];
   }
 }

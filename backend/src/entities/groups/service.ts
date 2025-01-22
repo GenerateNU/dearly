@@ -2,11 +2,18 @@ import { InternalServerError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
 import { PostWithMedia } from "../posts/validator";
 import { GroupTransaction } from "./transaction";
-import { CreateGroupPayload, FeedParamPayload, Group } from "./validator";
+import {
+  CalendarParamPayload,
+  CreateGroupPayload,
+  FeedParamPayload,
+  Group,
+  ThumbnailResponse,
+} from "./validator";
 
 export interface GroupService {
   createGroup(payload: CreateGroupPayload): Promise<Group>;
-  getFeed(payload: FeedParamPayload): Promise<PostWithMedia[]>;
+  getAllPosts(payload: FeedParamPayload): Promise<PostWithMedia[]>;
+  getCalendar(payload: CalendarParamPayload): Promise<ThumbnailResponse[]>;
 }
 
 export class GroupServiceImpl implements GroupService {
@@ -27,10 +34,17 @@ export class GroupServiceImpl implements GroupService {
     return handleServiceError(createGroupImpl)();
   }
 
-  async getFeed(payload: FeedParamPayload): Promise<PostWithMedia[]> {
-    const getFeedImpl = async () => {
-      return await this.groupTransaction.getFeed(payload);
+  async getAllPosts(payload: FeedParamPayload): Promise<PostWithMedia[]> {
+    const getAllPostsImpl = async () => {
+      return await this.groupTransaction.getAllPosts(payload);
     };
-    return handleServiceError(getFeedImpl)();
+    return handleServiceError(getAllPostsImpl)();
+  }
+
+  async getCalendar(payload: CalendarParamPayload): Promise<ThumbnailResponse[]> {
+    const getCalendarImpl = async () => {
+      return await this.groupTransaction.getCalendar(payload);
+    };
+    return handleServiceError(getCalendarImpl)();
   }
 }
