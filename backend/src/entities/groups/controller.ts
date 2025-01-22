@@ -1,9 +1,10 @@
 import { Context } from "hono";
 import { GROUP_API } from "../../types/api/schemas/groups";
 import { GroupService } from "./service";
-import { createGroupValidate } from "./validator";
+import { createGroupValidate, feedParamValidate } from "./validator";
 import { Status } from "../../constants/http";
 import { handleAppError } from "../../utilities/errors/app-error";
+import { parseUUID } from "../../utilities/uuid";
 
 export interface GroupController {
   createGroup(ctx: Context): Promise<GROUP_API>;
@@ -39,6 +40,17 @@ export class GroupControllerImpl implements GroupController {
   }
 
   async getFeed(ctx: Context): Promise<Response> {
-    return ctx.json({}, Status.Created);
+    const getFeedImpl = async () => {
+      const { date, limit, page } = ctx.req.query();
+      const groupId = parseUUID(ctx.req.param("groupId"));
+      const parsedParams = feedParamValidate.parse({ date, limit, page });
+      const feed = await this.groupService.getFeed({
+        ...parsedParams,
+        userId: ctx.get("userId"),
+        groupId,
+      });
+      return ctx.json(feed, 200);
+    };
+    return await handleAppError(getFeedImpl)(ctx);
   }
 }

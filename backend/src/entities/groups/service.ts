@@ -1,10 +1,12 @@
 import { InternalServerError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
+import { PostWithMedia } from "../posts/validator";
 import { GroupTransaction } from "./transaction";
-import { CreateGroupPayload, Group } from "./validator";
+import { CreateGroupPayload, FeedParamPayload, Group } from "./validator";
 
 export interface GroupService {
   createGroup(payload: CreateGroupPayload): Promise<Group>;
+  getFeed(payload: FeedParamPayload): Promise<PostWithMedia[]>;
 }
 
 export class GroupServiceImpl implements GroupService {
@@ -23,5 +25,12 @@ export class GroupServiceImpl implements GroupService {
       return group;
     };
     return handleServiceError(createGroupImpl)();
+  }
+
+  async getFeed(payload: FeedParamPayload): Promise<PostWithMedia[]> {
+    const getFeedImpl = async () => {
+      return await this.groupTransaction.getFeed(payload);
+    };
+    return handleServiceError(getFeedImpl)();
   }
 }
