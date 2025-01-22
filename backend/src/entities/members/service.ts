@@ -1,9 +1,10 @@
-// import { InternalServerError } from "../../utilities/errors/app-error";
-// import { handleServiceError } from "../../utilities/errors/service-error";
+import { InternalServerError } from "../../utilities/errors/app-error";
+import { handleServiceError } from "../../utilities/errors/service-error";
 import { MemberTransaction } from "./transaction";
-// import { CreateMemberPayload, Member } from "./validator";
+import { addMemberPayload, Member } from "./validator";
 
 export interface MemberService {
+  addMember(payload: addMemberPayload): Promise<Member>;
 }
 
 export class MemberServiceImpl implements MemberService {
@@ -11,6 +12,17 @@ export class MemberServiceImpl implements MemberService {
 
   constructor(memberTransaction: MemberTransaction) {
     this.memberTransaction = memberTransaction;
+  }
+
+  addMember(payload: addMemberPayload): Promise<Member> {
+    const addMemberImpl = async () => {
+      const member = await this.memberTransaction.insertMember({...payload,});
+      if (!member) {
+        throw new InternalServerError("Failed to add member");
+      }
+      return member;
+    };
+    return handleServiceError(addMemberImpl)();
   }
 
 }
