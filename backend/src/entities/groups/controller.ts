@@ -1,7 +1,7 @@
 import { Context } from "hono";
 import { GROUP_API } from "../../types/api/schemas/groups";
 import { GroupService } from "./service";
-import { createGroupValidate, feedParamValidate } from "./validator";
+import { calendarParamsValidate, createGroupValidate, feedParamValidate } from "./validator";
 import { Status } from "../../constants/http";
 import { handleAppError } from "../../utilities/errors/app-error";
 import { parseUUID } from "../../utilities/uuid";
@@ -9,7 +9,7 @@ import { parseUUID } from "../../utilities/uuid";
 export interface GroupController {
   createGroup(ctx: Context): Promise<GROUP_API>;
   getCalendar(ctx: Context): Promise<Response>;
-  getFeed(ctx: Context): Promise<Response>;
+  getAllPosts(ctx: Context): Promise<Response>;
 }
 
 export class GroupControllerImpl implements GroupController {
@@ -36,21 +36,32 @@ export class GroupControllerImpl implements GroupController {
   }
 
   async getCalendar(ctx: Context): Promise<Response> {
-    return ctx.json({}, Status.Created);
+    const getCalendarImpl = async () => {
+      const { date, range } = ctx.req.query();
+      const groupId = parseUUID(ctx.req.param("groupId"));
+      const parsedParams = calendarParamsValidate.parse({ date, range });
+      const calendar = await this.groupService.getCalendar({
+        ...parsedParams,
+        userId: ctx.get("userId"),
+        groupId,
+      });
+      return ctx.json(calendar, 200);
+    };
+    return await handleAppError(getCalendarImpl)(ctx);
   }
 
-  async getFeed(ctx: Context): Promise<Response> {
-    const getFeedImpl = async () => {
+  async getAllPosts(ctx: Context): Promise<Response> {
+    const getAllPostsImpl = async () => {
       const { date, limit, page } = ctx.req.query();
       const groupId = parseUUID(ctx.req.param("groupId"));
       const parsedParams = feedParamValidate.parse({ date, limit, page });
-      const feed = await this.groupService.getFeed({
+      const feed = await this.groupService.getAllPosts({
         ...parsedParams,
         userId: ctx.get("userId"),
         groupId,
       });
       return ctx.json(feed, 200);
     };
-    return await handleAppError(getFeedImpl)(ctx);
+    return await handleAppError(getAllPostsImpl)(ctx);
   }
 }
