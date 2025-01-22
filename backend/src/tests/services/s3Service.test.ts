@@ -1,12 +1,14 @@
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { mockClient } from "aws-sdk-client-mock";
+import { DeleteObjectCommand, PutObjectCommand, S3, S3Client } from "@aws-sdk/client-s3";
+import { AwsClientStub, mockClient } from "aws-sdk-client-mock";
 import S3Impl from "../../services/s3Service";
 import fs from "fs";
 import { resolve } from "node:path";
-
+import { NotFoundError } from "../../utilities/errors/app-error";
 const PROJECT_ROOT = resolve(__dirname, "../..");
 
-describe("Save an object to s3 testing", () => {
+
+
+describe("S3 Service Testing", () => {
   it("Should return the valid s3 link", async () => {
     const mockS3Client = mockClient(S3Client);
     const client = mockS3Client
@@ -20,4 +22,26 @@ describe("Save an object to s3 testing", () => {
     expect(expected).not.toBeNull();
     expect(expected).toContain(expectedString);
   });
+
+  it("test that delete throws error when url is not found", async () => {
+    const mockS3Client = mockClient(S3Client);
+    const client = mockS3Client
+      .on(DeleteObjectCommand)
+      .resolves({$metadata: {httpStatusCode: 400}}) as unknown as S3Client;
+    const s3Impl = new S3Impl(client);
+  try{
+    const expected = await s3Impl.deleteObject("")
+    expect(expected).toBe(NotFoundError)
+  } catch(Error){}
+  })
+
+  it("test that delete returns true when url does exist", async () => {
+    const mockS3Client = mockClient(S3Client);
+    const client = mockS3Client
+      .on(DeleteObjectCommand)
+      .resolves({$metadata: {httpStatusCode: 300}}) as unknown as S3Client;
+    const s3Impl = new S3Impl(client);
+    const res = await s3Impl.deleteObject("");
+    expect(res).toBe(true);
+  })
 });

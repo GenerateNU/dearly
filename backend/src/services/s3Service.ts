@@ -22,7 +22,7 @@ interface IS3Operations {
    * @param url The URL of the object that will be deleted
    * @throws NotFoundError: if the object was not able to be deleted
    */
-  deleteObject(url: string): void;
+  deleteObject(url: string): Promise<boolean|null>;
 }
 
 export default class S3Impl implements IS3Operations {
@@ -113,7 +113,7 @@ export default class S3Impl implements IS3Operations {
    * @param url The URL of the object that will be deleted
    * @throws NotFoundError: if the object was not able to be deleted
    */
-  async deleteObject(url: string) {
+  async deleteObject(url: string): Promise<boolean | null> {
     const indexOfDotCom = url.indexOf(".com/");
     const objectKey: string = url.substring(indexOfDotCom + 5);
     const res = await this.client!.send(
@@ -123,5 +123,6 @@ export default class S3Impl implements IS3Operations {
     if (res.$metadata.httpStatusCode! > 300) {
       throw new NotFoundError(url);
     }
+    return true;
   }
 }
