@@ -4,7 +4,7 @@ import {
   USER_ALICE_ID,
   INVALID_ID_ARRAY,
   POST_ID,
-} from "./../helpers/test-constants";
+} from "../helpers/test-constants";
 import { Hono } from "hono";
 import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
