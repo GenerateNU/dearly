@@ -22,7 +22,12 @@ export const createGroupValidate = z
 
 export const feedParamValidate = z
   .object({
-    date: z.date().optional(),
+    date: z
+      .string()
+      .transform((val) => new Date(val))
+      .refine((date) => !isNaN(date.getTime()), {
+        message: "Invalid date format",
+      }),
   })
   .merge(paginationSchema);
 
