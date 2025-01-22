@@ -1,4 +1,5 @@
-import { DeleteObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, PutObjectCommand, S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import { getConfigurations } from "../config/config";
 import { NotFoundError } from "../utilities/errors/app-error";
 import { randomUUIDv7 } from "bun";
@@ -6,6 +7,7 @@ import sharp from "sharp";
 import * as lame from "@breezystack/lamejs";
 import imagemin from 'imagemin';
 import imageminJpegtran from 'imagemin-jpegtran';
+
 
 interface IS3Operations {
   // group is the uuid of the group this photo is being sent to (used as tagging number) -> make public group id number
@@ -15,16 +17,22 @@ interface IS3Operations {
    * @param file the file that will be saved to S3
    * @param tag the tag that will be associated with the file
    * @param fileType The type of the blob sent to the endpoint
-   * @returns Will return the url of the object in S3
+   * @returns Will return the object key of the object in S3
    */
   saveObject(file: Blob, tag: string, fileType: "image" | "audio"): Promise<string | null>;
 
   /**
    * Will delete an object from S3 with the given S3 URL.
-   * @param url The URL of the object that will be deleted
+   * @param objectID The object key of the object that will be deleted
    * @throws NotFoundError: if the object was not able to be deleted
    */
-  deleteObject(url: string): Promise<boolean|null>;
+  deleteObject(objectID: string): Promise<boolean | null>;
+
+  /**
+   * Will retrive the presigned URL of the given object associated with the given object ID
+   * @param objectKey The key of the object in the S3 bucket
+   */
+  getObjectURL(objectKey: string): Promise<String>
 }
 
 export default class S3Impl implements IS3Operations {
@@ -96,7 +104,7 @@ export default class S3Impl implements IS3Operations {
    * @param file the file that will be saved to S3
    * @param tag the tag that will be associated with the file
    * @param fileType The type of the blob sent to the endpoint
-   * @returns Will return the url of the object in S3
+   * @returns Will return the S3 object key
    */
   async saveObject(file: Blob, tag: string, fileType: "image" | "audio"): Promise<string | null> {
     // to-do: compress blob, and deal with permission
@@ -116,7 +124,7 @@ export default class S3Impl implements IS3Operations {
   }
 
   /**
-   * Will delete an object from S3 with the given S3 URL.
+   * Will delete an object from S3 with the given S3 objectKey.
    * @param url The URL of the object that will be deleted
    * @throws NotFoundError: if the object was not able to be deleted
    */
@@ -131,5 +139,20 @@ export default class S3Impl implements IS3Operations {
       throw new NotFoundError(url);
     }
     return true;
+  }
+
+  /**
+   * Will retrive the presigned URL of the given object associated with the given object ID
+   * @param objectKey The key of the object in the S3 bucket
+   */
+  async getObjectURL(objectKey: string): Promise<String> {
+    const waitInSeconds = 60 * 60 * 24
+    const command = new GetObjectCommand({
+      Bucket: this.bucketName,
+      Key: objectKey,
+    })
+    let request = await getSignedUrl(this.client, command, { expiresIn: waitInSeconds });
+
+    return request;
   }
 }
