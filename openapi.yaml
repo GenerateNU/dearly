@@ -106,7 +106,6 @@ components:
     Member:
       type: object
       properties:
-      required:
     Post:
       type: object
       properties:
@@ -1095,6 +1094,32 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Members"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: User or group not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
     delete:
       tags:
         - Members Endpoints
@@ -1130,6 +1155,30 @@ paths:
                   message:
                     type: string
                     example: "Successfully removed a member from this group"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: Forbidden if the member being removed is not the group manager or the member themself.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /api/v1/groups/{id}/members:
     get:
       tags:

@@ -45,7 +45,17 @@ export class MemberControllerImpl implements MemberController {
   }
 
   async deleteMember(ctx: Context): Promise<DEL_MEMBER> {
-      throw new Error("Method not implemented.");
+    const deleteMemberImpl = async () => {
+      // get userId from decoded JWT
+      const clientId = parseUUID(ctx.get("userId"));
+      const userId = parseUUID(ctx.req.param("userId"));
+      const groupId = parseUUID(ctx.req.param("id"));
+
+      await this.memberService.deleteMember(clientId, userId, groupId);
+      return ctx.json({ message: "Successfully delete user" }, Status.OK);
+    }
+
+    return await handleAppError(deleteMemberImpl)(ctx)
   }
 
   async getMembers(ctx: Context): Promise<MEMBERS_API> {

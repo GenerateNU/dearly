@@ -5,6 +5,7 @@ import { addMemberPayload, Member } from "./validator";
 
 export interface MemberService {
   addMember(payload: addMemberPayload): Promise<Member>;
+  deleteMember(clientId: string, userId: string, groupId: string): Promise<void>
 }
 
 export class MemberServiceImpl implements MemberService {
@@ -14,7 +15,7 @@ export class MemberServiceImpl implements MemberService {
     this.memberTransaction = memberTransaction;
   }
 
-  addMember(payload: addMemberPayload): Promise<Member> {
+  async addMember(payload: addMemberPayload): Promise<Member> {
     const addMemberImpl = async () => {
       const member = await this.memberTransaction.insertMember({...payload,});
       if (!member) {
@@ -23,6 +24,13 @@ export class MemberServiceImpl implements MemberService {
       return member;
     };
     return handleServiceError(addMemberImpl)();
+  }
+
+  async deleteMember(clientId: string, userId: string, groupId: string): Promise<void> {
+    const deleteMemberImpl = async () => {
+      await this.memberTransaction.deleteMember(clientId, userId, groupId);
+    }
+    return handleServiceError(deleteMemberImpl)()
   }
 
 }
