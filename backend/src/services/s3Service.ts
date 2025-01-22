@@ -4,6 +4,8 @@ import { NotFoundError } from "../utilities/errors/app-error";
 import { randomUUIDv7 } from "bun";
 import sharp from "sharp";
 import * as lame from "@breezystack/lamejs";
+import imagemin from 'imagemin';
+import imageminJpegtran from 'imagemin-jpegtran';
 
 interface IS3Operations {
   // group is the uuid of the group this photo is being sent to (used as tagging number) -> make public group id number
@@ -57,11 +59,16 @@ export default class S3Impl implements IS3Operations {
    * @param imageQuality The quality of the image [0, 100]
    * @returns A promise of the blob is the newly compressed image
    */
-  async compressImage(file: Blob, imageQuality: number = 80): Promise<Blob> {
-    const imageBuffer: ArrayBuffer = await file.arrayBuffer();
-    const compressedImageArr = await sharp(imageBuffer).jpeg({ quality: imageQuality }).toArray();
-
-    return new Blob(compressedImageArr);
+  async compressImage(file: Blob): Promise<Blob> {
+    const imageBuffer = await file.arrayBuffer();
+    const jpegImage = await sharp(imageBuffer).jpeg().toArray();
+    const uint8Array = new Uint8Array(jpegImage)
+    const compressedImageArr = await imagemin.buffer(uint8Array, {
+      plugins: [
+        imageminJpegtran()
+      ]
+    });
+    return new Blob([compressedImageArr])
   }
 
   /**
