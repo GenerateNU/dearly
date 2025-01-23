@@ -76,9 +76,9 @@ tasks:
     deps: [frontend:install, backend:install]
 
   test:
-    desc: "Run tests in backend"
+    desc: "Run tests in backend, if run with -- <test_file_path> you can run a single test file"
     cmds:
-      - cd backend && bun run test
+      - source backend/scripts/test.sh {{.CLI_ARGS}}
 
   generate:
     desc: "Generate Schema from OpenAPI Specification"
