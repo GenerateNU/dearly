@@ -41,7 +41,10 @@ const convertToDate = (val: string) => {
     return new Date();
   }
   const [year, month] = val.split("-").map(Number);
-  return new Date(year!, month! - 1);
+  // `0` day gives the last day of the current month
+  const date = new Date(year!, month!, 0);
+  date.setHours(23, 59, 59, 999);
+  return date;
 };
 
 const validateYearMonth = (val: string) => {

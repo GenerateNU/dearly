@@ -13,12 +13,24 @@ import { HTTPRequest, Status } from "../../constants/http";
 describe("GET /groups/:id/calendar", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
+  const expected = [
+    {
+      data: [
+        {
+          day: 31,
+          url: "https://google.com",
+        },
+      ],
+      month: 12,
+      year: 1969,
+    },
+  ];
 
   beforeAll(async () => {
     app = await startTestApp();
   });
 
-  it("should return 200 if correct date value", async () => {
+  it("should return 200 if valid date value and default range", async () => {
     (
       await testBuilder.request({
         app,
@@ -34,18 +46,28 @@ describe("GET /groups/:id/calendar", () => {
       })
     )
       .assertStatusCode(Status.OK)
-      .assertBody([
-        {
-          data: [
-            {
-              day: 31,
-              url: "https://google.com",
-            },
-          ],
-          month: 12,
-          year: 1969,
+      .assertBody(expected);
+  });
+
+  it("should return 200 if correct date value", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.GET,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/calendar`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
         },
-      ]);
+        queryParams: {
+          // should return thumbnail if 3 months back into the past
+          date: "1970-02",
+          range: "3",
+        },
+      })
+    )
+      .assertStatusCode(Status.OK)
+      .assertBody(expected);
   });
 
   it.each(["bad", "-1", "0", "???"])("should return 400 if bad range %s", async (badRange) => {

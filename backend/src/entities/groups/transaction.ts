@@ -130,6 +130,8 @@ export class GroupTransactionImpl implements GroupTransaction {
     range,
   }: CalendarParamPayload): Promise<ThumbnailResponse[]> {
     await this.checkMembership(groupId, userId);
+    const rangeStartDate = new Date(date);
+    rangeStartDate.setMonth(rangeStartDate.getMonth() - range);
 
     // subquery to get all groups of posts that are grouped into date and sorted by likes
     const rankedPosts = this.db
@@ -148,8 +150,8 @@ export class GroupTransactionImpl implements GroupTransaction {
       .where(
         between(
           postsTable.createdAt,
-          sql`${new Date(date.getTime() - range * 24 * 60 * 60 * 1000).toISOString()}`,
-          sql`${new Date().toISOString()}`,
+          sql`${rangeStartDate.toISOString()}`,
+          sql`${new Date(date).toISOString()}`,
         ),
       )
       .groupBy(sql`DATE(${postsTable.createdAt})`, postsTable.id, mediaTable.url)
