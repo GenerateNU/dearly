@@ -1,5 +1,4 @@
 import {
-  ANOTHER_GROUP_ID,
   DEARLY_GROUP_ID,
   INVALID_ID_ARRAY,
   USER_ALICE_ID,
@@ -17,6 +16,25 @@ describe("GET /groups/:id/calendar", () => {
 
   beforeAll(async () => {
     app = await startTestApp();
+  });
+
+  it("should return 200 if correct date value", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.GET,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/calendar`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
+        },
+        queryParams: {
+          date: "1969-12",
+        },
+      })
+    )
+      .assertStatusCode(Status.OK)
+      .assertBody([]);
   });
 
   it.each(["bad", "-1", "0", "???"])("should return 400 if bad range %s", async (badRange) => {

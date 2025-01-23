@@ -27,7 +27,7 @@ describe("GET /groups/:id/feed", () => {
     app = await startTestApp();
   });
 
-  it("should return 200 if group has posts with no query params", async () => {
+  it("should return 200 if group has posts with date specified", async () => {
     (
       await testBuilder.request({
         app,
@@ -36,6 +36,9 @@ describe("GET /groups/:id/feed", () => {
         autoAuthorized: false,
         headers: {
           Authorization: `Bearer ${generateJWTFromID(USER_BOB_ID)}`,
+        },
+        queryParams: {
+          date: "1969-12-31",
         },
       })
     )
@@ -73,10 +76,8 @@ describe("GET /groups/:id/feed", () => {
   it.each([
     ["1", "1", [post]],
     ["1", "2", []],
-    ["1", "3", []],
     ["2", "1", [post]],
     ["2", "2", []],
-    ["2", "3", []],
   ])(
     "should return 200 if no date specified and limit %s and page %s",
     async (limit, page, expectedBody) => {

@@ -6,6 +6,7 @@ export const handleServiceError = <T>(fn: () => T) => {
     try {
       return await fn();
     } catch (error) {
+      console.error(error);
       if (isAppError(error)) {
         throw error;
       } else if (isDatabaseError(error)) {

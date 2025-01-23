@@ -132,11 +132,11 @@ export class GroupTransactionImpl implements GroupTransaction {
     await this.checkMembership(groupId, userId);
 
     // subquery to get all groups of posts that are grouped into date and sorted by likes
-    const mostLikedPostsSubquery = this.db
+    const rankedPosts = this.db
       .select({
         createdAt: postsTable.createdAt,
         url: mediaTable.url,
-        // assign a number for each row, partition posts into their date and sort by likes in descending order
+        likes: sql<number>`COUNT(${likesTable.id}) AS likeCount`,
         rowNum:
           sql<number>`ROW_NUMBER() OVER (PARTITION BY DATE(${postsTable.createdAt}) ORDER BY COUNT(${likesTable.id}) DESC)`.as(
             "rowNum",
@@ -154,34 +154,33 @@ export class GroupTransactionImpl implements GroupTransaction {
           ),
         ),
       )
-      .groupBy(postsTable.createdAt, postsTable.id, mediaTable.url)
-      .as("postsWithLikes");
+      .groupBy(sql`DATE(${postsTable.createdAt})`, postsTable.id, mediaTable.url)
+      .as("rankedPosts");
 
     const result = await this.db
       .select({
-        year: sql<number>`EXTRACT(YEAR FROM ${mostLikedPostsSubquery}.createdAt)`.as("year"),
-        month: sql<number>`EXTRACT(MONTH FROM ${mostLikedPostsSubquery}.createdAt)`.as("month"),
+        year: sql<number>`EXTRACT(YEAR FROM ${rankedPosts.createdAt})`.as("year"),
+        month: sql<number>`EXTRACT(MONTH FROM ${rankedPosts.createdAt})`.as("month"),
         data: sql<Thumbnail[]>`ARRAY_AGG(
           JSON_BUILD_OBJECT(
-            'date', ${mostLikedPostsSubquery}.createdAt,
-            'url', ${mostLikedPostsSubquery}.url
+            'day', EXTRACT(DAY FROM ${rankedPosts.createdAt}),
+            'url', ${rankedPosts.url}
           )
         )`.as("data"),
       })
-      .from(mostLikedPostsSubquery)
+      .from(rankedPosts)
       // get the most liked post from each day
-      .where(sql`${mostLikedPostsSubquery}.rowNum = 1`)
+      .where(sql`${rankedPosts.rowNum} = 1`)
       // group these posts by month and year
       .groupBy(
-        sql`EXTRACT(YEAR FROM ${mostLikedPostsSubquery}.createdAt)`,
-        sql`EXTRACT(MONTH FROM ${mostLikedPostsSubquery}.createdAt)`,
+        sql`EXTRACT(YEAR FROM ${rankedPosts.createdAt})`,
+        sql`EXTRACT(MONTH FROM ${rankedPosts.createdAt})`,
       )
       // order these groups by most recent month to less recent months
       .orderBy(
-        sql`EXTRACT(YEAR FROM ${mostLikedPostsSubquery}.createdAt) DESC`,
-        sql`EXTRACT(MONTH FROM ${mostLikedPostsSubquery}.createdAt) DESC`,
-      )
-      .execute();
+        sql`EXTRACT(YEAR FROM ${rankedPosts.createdAt}) DESC`,
+        sql`EXTRACT(MONTH FROM ${rankedPosts.createdAt}) DESC`,
+      );
 
     return result;
   }
