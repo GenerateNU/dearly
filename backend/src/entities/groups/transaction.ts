@@ -9,7 +9,7 @@ import {
   ThumbnailResponse,
 } from "./validator";
 import { Media, PostWithMedia } from "../posts/validator";
-import { sql, eq, and, gte, lte, desc } from "drizzle-orm";
+import { sql, eq, and, between, desc } from "drizzle-orm";
 import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
 
 export interface GroupTransaction {
@@ -146,12 +146,10 @@ export class GroupTransactionImpl implements GroupTransaction {
       .leftJoin(likesTable, eq(likesTable.postId, postsTable.id))
       .innerJoin(mediaTable, eq(mediaTable.postId, postsTable.id))
       .where(
-        and(
-          lte(postsTable.createdAt, sql`${date.toISOString()}`),
-          gte(
-            postsTable.createdAt,
-            sql`${new Date(date.getTime() - range * 24 * 60 * 60 * 1000).toISOString()}`,
-          ),
+        between(
+          postsTable.createdAt,
+          sql`${new Date(date.getTime() - range * 24 * 60 * 60 * 1000).toISOString()}`,
+          sql`${new Date().toISOString()}`,
         ),
       )
       .groupBy(sql`DATE(${postsTable.createdAt})`, postsTable.id, mediaTable.url)
@@ -159,8 +157,8 @@ export class GroupTransactionImpl implements GroupTransaction {
 
     const result = await this.db
       .select({
-        year: sql<number>`EXTRACT(YEAR FROM ${rankedPosts.createdAt})`.as("year"),
-        month: sql<number>`EXTRACT(MONTH FROM ${rankedPosts.createdAt})`.as("month"),
+        year: sql<number>`cast(EXTRACT(YEAR FROM ${rankedPosts.createdAt}) as int)`.as("year"),
+        month: sql<number>`cast(EXTRACT(MONTH FROM ${rankedPosts.createdAt}) as int)`.as("month"),
         data: sql<Thumbnail[]>`ARRAY_AGG(
           JSON_BUILD_OBJECT(
             'day', EXTRACT(DAY FROM ${rankedPosts.createdAt}),

@@ -34,7 +34,18 @@ describe("GET /groups/:id/calendar", () => {
       })
     )
       .assertStatusCode(Status.OK)
-      .assertBody([]);
+      .assertBody([
+        {
+          data: [
+            {
+              day: 31,
+              url: "https://google.com",
+            },
+          ],
+          month: 12,
+          year: 1969,
+        },
+      ]);
   });
 
   it.each(["bad", "-1", "0", "???"])("should return 400 if bad range %s", async (badRange) => {
