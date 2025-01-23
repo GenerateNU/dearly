@@ -1,12 +1,15 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { groupsTable, membersTable, postsTable } from "../schema";
-import { CreateGroupPayload, Group } from "./validator";
+import { groupsTable, membersTable, usersTable } from "../schema";
+import { CreateGroupPayload, Group, IDPayload, UpdateGroupPayload } from "./validator";
 import { ForbiddenError } from "../../utilities/errors/app-error";
-import { and, eq } from "drizzle-orm";
+import { and, eq, or } from "drizzle-orm";
+import { PostWithMedia, UpdatePostPayload } from "../posts/validator";
 
 export interface GroupTransaction {
   insertGroup(payload: CreateGroupPayload): Promise<Group | null>;
   deleteGroup(groupId: string, userId: string): Promise<void>;
+  getGroup(payload: IDPayload): Promise<Group | null>;
+  updateGroup(payload: UpdateGroupPayload): Promise<Group | null>;
 }
 
 export class GroupTransactionImpl implements GroupTransaction {
@@ -34,6 +37,61 @@ export class GroupTransactionImpl implements GroupTransaction {
       return null;
     });
     return createdGroup ?? null;
+  }
+
+  async updateGroup({ id, userId, description, name }: UpdateGroupPayload): Promise<Group | null> {
+    await this.checkGroupOwnership(id, userId);
+
+    // update group
+    const updatedGroup = await this.db.transaction(async (tx) => {
+      const [updatedGroup] = await tx
+        .update(groupsTable)
+        .set({ description: description, name: name })
+        .where(and(eq(groupsTable.id, id), eq(groupsTable.managerId, userId)))
+        .returning();
+
+      if (!updatedGroup) return null;
+
+      return {
+        id: updatedGroup.id,
+        managerId: updatedGroup.managerId,
+        description: updatedGroup.description,
+        name: updatedGroup.name,
+      };
+    });
+
+    return updatedGroup;
+  }
+
+  async getGroup({ id, userId }: IDPayload): Promise<Group | null> {
+    const [result] = await this.db
+      .select({
+        id: groupsTable.id,
+        managerId: groupsTable.managerId,
+        description: groupsTable.description,
+        name: groupsTable.name,
+      })
+      .from(groupsTable)
+      .innerJoin(usersTable, eq(usersTable.id, groupsTable.managerId))
+      .innerJoin(
+        membersTable,
+        and(eq(groupsTable.id, membersTable.groupId), eq(membersTable.userId, userId)),
+      )
+      .groupBy(groupsTable.id, groupsTable.managerId, groupsTable.description, groupsTable.name)
+      .where(
+        and(
+          eq(groupsTable.id, id),
+          or(
+            // check group
+            eq(groupsTable.managerId, userId),
+          ), // check if user is manager
+          eq(membersTable.userId, userId),
+        ),
+      ); // check if user is member
+
+    if (!result) return null;
+
+    return result;
   }
 
   async deleteGroup(groupId: string, userId: string): Promise<void> {

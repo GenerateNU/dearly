@@ -1,12 +1,14 @@
-import { InternalServerError } from "../../utilities/errors/app-error";
+import { InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
 import { IDPayload } from "../posts/validator";
 import { GroupTransaction } from "./transaction";
-import { CreateGroupPayload, Group } from "./validator";
+import { CreateGroupPayload, Group, UpdateGroupPayload } from "./validator";
 
 export interface GroupService {
   createGroup(payload: CreateGroupPayload): Promise<Group>;
   deleteGroup(payload: IDPayload): Promise<void>;
+  getGroup(payload: IDPayload): Promise<Group>;
+  updateGroup(payload: UpdateGroupPayload): Promise<Group>;
 }
 
 export class GroupServiceImpl implements GroupService {
@@ -27,10 +29,32 @@ export class GroupServiceImpl implements GroupService {
     return handleServiceError(createGroupImpl)();
   }
 
+  async updateGroup(payload: UpdateGroupPayload): Promise<Group> {
+    const updateGroupImpl = async () => {
+      const updatedGroup = await this.groupTransaction.updateGroup(payload);
+      if (!updatedGroup) {
+        throw new NotFoundError("Group");
+      }
+      return updatedGroup;
+    };
+    return await handleServiceError(updateGroupImpl)();
+  }
+
+  async getGroup(payload: IDPayload): Promise<Group> {
+    const getGroupImpl = async () => {
+      const group = await this.groupTransaction.getGroup(payload);
+      if (!group) {
+        throw new NotFoundError("Group");
+      }
+      return group;
+    };
+    return await handleServiceError(getGroupImpl)();
+  }
+
   async deleteGroup({ id, userId }: IDPayload): Promise<void> {
-    const deletePostImpl = async () => {
+    const deleteGroupimpl = async () => {
       await this.groupTransaction.deleteGroup(id, userId);
     };
-    return await handleServiceError(deletePostImpl)();
+    return await handleServiceError(deleteGroupimpl)();
   }
 }
