@@ -84,6 +84,12 @@ export type GroupUserIDPayload = {
 export type CalendarParamPayload = z.infer<typeof calendarParamsValidate> & GroupUserIDPayload;
 
 export type ThumbnailResponse = {
+  month: number;
+  year: number;
+  data: Thumbnail[];
+};
+
+export type Thumbnail = {
   date: Date;
   url: string;
 };

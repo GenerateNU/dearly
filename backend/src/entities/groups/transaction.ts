@@ -5,6 +5,7 @@ import {
   CreateGroupPayload,
   FeedParamPayload,
   Group,
+  Thumbnail,
   ThumbnailResponse,
 } from "./validator";
 import { Media, PostWithMedia } from "../posts/validator";
@@ -120,21 +121,57 @@ export class GroupTransactionImpl implements GroupTransaction {
     range,
   }: CalendarParamPayload): Promise<ThumbnailResponse[]> {
     await this.checkMembership(groupId, userId);
-    const result = await this.db
+    const mostLikedPostsSubquery = this.db
       .select({
-        date: postsTable.createdAt,
+        createdAt: postsTable.createdAt,
         url: mediaTable.url,
+        // assign a number for each row
+        // partition posts into their date and sort by likes in descending order
+        rowNum:
+          sql<number>`ROW_NUMBER() OVER (PARTITION BY DATE(${postsTable.createdAt}) ORDER BY COUNT(${likesTable.id}) DESC)`.as(
+            "rowNum",
+        ),
       })
       .from(postsTable)
-      .innerJoin(mediaTable, eq(mediaTable.postId, postsTable.id))
       .leftJoin(likesTable, eq(likesTable.postId, postsTable.id))
-      // from the pivot month back to the past based on the range
-      .where(and(lte(postsTable.createdAt, sql`${date.toISOString()}`), gte(postsTable.createdAt, sql`${new Date(date.getTime() - (range * 24 * 60 * 60 * 1000)).toISOString()}`)))
-      .groupBy(postsTable.createdAt, mediaTable.url)
-      // rank posts based on like count
-      .orderBy(sql`COUNT(${likesTable.id}) DESC`)
-      // take first post with most like
-      .limit(1);
+      .innerJoin(mediaTable, eq(mediaTable.postId, postsTable.id))
+      .where(
+        and(
+          lte(postsTable.createdAt, sql`${date.toISOString()}`),
+          gte(
+            postsTable.createdAt,
+            sql`${new Date(date.getTime() - range * 24 * 60 * 60 * 1000).toISOString()}`,
+          ),
+        ),
+      )
+      .groupBy(postsTable.createdAt, postsTable.id, mediaTable.url)
+      .as("postsWithLikes");
+
+    const result = await this.db
+      .select({
+        year: sql<number>`EXTRACT(YEAR FROM ${mostLikedPostsSubquery}.createdAt)`.as("year"),
+        month: sql<number>`EXTRACT(MONTH FROM ${mostLikedPostsSubquery}.createdAt)`.as("month"),
+        data: sql<Thumbnail[]>`ARRAY_AGG(
+          JSON_BUILD_OBJECT(
+            'date', ${mostLikedPostsSubquery}.createdAt,
+            'url', ${mostLikedPostsSubquery}.url
+          )
+        )`.as("data"),
+      })
+      .from(mostLikedPostsSubquery)
+      // get the most liked post from each day
+      .where(sql`${mostLikedPostsSubquery}.rowNum = 1`)
+      // group these posts by month and year
+      .groupBy(
+        sql`EXTRACT(YEAR FROM ${mostLikedPostsSubquery}.createdAt)`,
+        sql`EXTRACT(MONTH FROM ${mostLikedPostsSubquery}.createdAt)`,
+      )
+      // order these groups by most recent month to less recent months
+      .orderBy(
+        sql`EXTRACT(YEAR FROM ${mostLikedPostsSubquery}.createdAt) DESC`,
+        sql`EXTRACT(MONTH FROM ${mostLikedPostsSubquery}.createdAt) DESC`,
+      )
+      .execute();
 
     return result;
   }
