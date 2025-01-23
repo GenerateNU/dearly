@@ -9,7 +9,7 @@ import {
   ThumbnailResponse,
 } from "./validator";
 import { Media, PostWithMedia } from "../posts/validator";
-import { sql, eq, and, gte, lte } from "drizzle-orm";
+import { sql, eq, and, gte, lte, desc } from "drizzle-orm";
 import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
 
 export interface GroupTransaction {
@@ -53,22 +53,25 @@ export class GroupTransactionImpl implements GroupTransaction {
     groupId,
   }: FeedParamPayload): Promise<PostWithMedia[]> {
     await this.checkMembership(groupId, userId);
+
+    const selectedFields = {
+      id: postsTable.id,
+      userId: postsTable.userId,
+      groupId: postsTable.groupId,
+      createdAt: postsTable.createdAt,
+      caption: postsTable.caption,
+      media: sql<Media[]>`array_agg(
+            json_build_object(
+              'id', ${mediaTable.id},
+              'type', ${mediaTable.type},
+              'postId', ${mediaTable.postId},
+              'url', ${mediaTable.url}
+            )
+          )`,
+    };
+
     return await this.db
-      .select({
-        id: postsTable.id,
-        userId: postsTable.userId,
-        groupId: postsTable.groupId,
-        createdAt: postsTable.createdAt,
-        caption: postsTable.caption,
-        media: sql<Media[]>`array_agg(
-              json_build_object(
-                'id', ${mediaTable.id},
-                'type', ${mediaTable.type},
-                'postId', ${mediaTable.postId},
-                'url', ${mediaTable.url}
-              )
-            )`,
-      })
+      .select(selectedFields)
       .from(postsTable)
       .innerJoin(mediaTable, eq(mediaTable.postId, postsTable.id))
       // extra check to return nothing if user is not a member of group
@@ -86,7 +89,8 @@ export class GroupTransactionImpl implements GroupTransaction {
         postsTable.createdAt,
         postsTable.caption,
       )
-      .orderBy(postsTable.createdAt)
+      // most recent to less recent
+      .orderBy(desc(postsTable.createdAt))
       .limit(limit)
       .offset((page - 1) * limit);
   }
@@ -121,16 +125,17 @@ export class GroupTransactionImpl implements GroupTransaction {
     range,
   }: CalendarParamPayload): Promise<ThumbnailResponse[]> {
     await this.checkMembership(groupId, userId);
+
+    // subquery to get all groups of posts that are grouped into date and sorted by likes
     const mostLikedPostsSubquery = this.db
       .select({
         createdAt: postsTable.createdAt,
         url: mediaTable.url,
-        // assign a number for each row
-        // partition posts into their date and sort by likes in descending order
+        // assign a number for each row, partition posts into their date and sort by likes in descending order
         rowNum:
           sql<number>`ROW_NUMBER() OVER (PARTITION BY DATE(${postsTable.createdAt}) ORDER BY COUNT(${likesTable.id}) DESC)`.as(
             "rowNum",
-        ),
+          ),
       })
       .from(postsTable)
       .leftJoin(likesTable, eq(likesTable.postId, postsTable.id))
