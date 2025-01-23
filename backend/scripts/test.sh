@@ -17,18 +17,6 @@ ready() {
   done
 }
 
-run_all() {
-  bun test
-}
-
-run_one_file() {
-  bun test $1
-}
-
-run_one_file_with_method() {
-  bun test $1 $2
-}
-
 teardown() {
   # Stop and remove the Docker container after tests finish
   docker-compose -f ./backend/docker-compose.yml down --volumes
