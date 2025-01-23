@@ -63,7 +63,7 @@ describe("GET /groups/:id/calendar", () => {
         .assertStatusCode(Status.BadRequest)
         .assertError([
           {
-            message: "Date must be in YYYY-MM format (e.g., 2024-01)",
+            message: "Date must be in YYYY-MM format and cannot be in future",
             path: "date",
           },
         ]);
@@ -91,7 +91,7 @@ describe("GET /groups/:id/calendar", () => {
       .assertStatusCode(Status.BadRequest)
       .assertError([
         {
-          message: "Date cannot be in the future",
+          message: "Date must be in YYYY-MM format and cannot be in future",
           path: "date",
         },
       ]);

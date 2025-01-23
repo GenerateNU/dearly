@@ -1,5 +1,7 @@
 const validateCalendarParam = (val: string) => {
-  return validateDateFormat(val) && validateYear(val) && validateMonth(val);
+  return (
+    validateDateFormat(val) && validateYear(val) && validateMonth(val) && validateFutureDate(val)
+  );
 };
 
 const validateDateFormat = (val: string) => {

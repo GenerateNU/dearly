@@ -52,28 +52,11 @@ export const calendarParamsValidate = z.object({
     .default("1"),
 
   date: z
-    .preprocess(
-      (input) => {
-        if (typeof input !== "string") return input;
-
-        if (!validateCalendarParam(input)) {
-          throw new z.ZodError([
-            {
-              message: "Date must be in YYYY-MM format (e.g., 2024-01)",
-              path: ["date"],
-              code: "invalid_date",
-            },
-          ]);
-        }
-        return input;
-      },
-      z
-        .string()
-        .refine(validateFutureDate, {
-          message: "Date cannot be in the future",
-        })
-        .transform(convertToDate),
-    )
+    .string()
+    .refine((input) => validateCalendarParam(input), {
+      message: "Date must be in YYYY-MM format and cannot be in future",
+    })
+    .transform(convertToDate)
     .optional()
     .default(() => {
       const now = new Date();
