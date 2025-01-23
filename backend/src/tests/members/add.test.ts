@@ -12,13 +12,10 @@ describe("POST /members", () => {
 
   beforeAll(async () => {
     app = await startTestApp();
-
-    // generate an id
   });
 
-  it("should return 201 if valid payload", async () => {
+  it("should return 201 if a valid user is added to the group and was not already present in the group", async () => {
     const testId = generateUUID();
-    // const responseId = (
     (
       await testBuilder.request({
         app,
@@ -34,6 +31,28 @@ describe("POST /members", () => {
       .assertFieldExists("joinedAt")
       .assertFields({
         userId: USER_ANA_ID,
+        groupId: DEARLY_GROUP_ID,
+        role: MemberRole.MEMBER,
+      });
+  });
+
+  it.skip("should return 201 if a valid user is added to the group and was already added in the group", async () => {
+    const testId = generateUUID();
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.POST,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/members/${USER_ALICE_ID}`,
+        requestBody: {
+          id: testId, // should be ignored
+          hello: "world", // should be ignored
+        },
+      })
+    )
+      .assertStatusCode(Status.Created)
+      .assertFieldExists("joinedAt")
+      .assertFields({
+        userId: USER_ALICE_ID,
         groupId: DEARLY_GROUP_ID,
         role: MemberRole.MEMBER,
       });

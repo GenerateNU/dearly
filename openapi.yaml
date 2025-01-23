@@ -106,6 +106,30 @@ components:
     Member:
       type: object
       properties:
+        id:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: A unique identifier for the member of this group.
+        groupId:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: A unique identifier for the group.
+        userId:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: A unique identifier for the user in this group.
+        joinedAt:
+          type: string
+          format: date-time
+          example: "2025-01-17T00:00:00Z"
+          description: The date and time when the member was added.
+        role:
+          type: string
+          enum: ["MEMBER", "MANAGER", null]
+          description: Defines the role and level of permissions this user in the group has.
     Post:
       type: object
       properties:
