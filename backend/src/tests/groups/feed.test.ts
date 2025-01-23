@@ -1,6 +1,7 @@
 import {
   ANOTHER_GROUP_ID,
   DEARLY_GROUP_ID,
+  INVALID_ID_ARRAY,
   USER_ALICE_ID,
   USER_ANA_ID,
 } from "./../helpers/test-constants";
@@ -62,6 +63,20 @@ describe("GET /groups/:id/feed", () => {
     ).assertStatusCode(Status.Forbidden);
   });
 
+  it.each(
+    INVALID_ID_ARRAY.map((id) => [id === null ? "null" : id === undefined ? "undefined" : id, id]),
+  )("should return 400 if invalid ID %s", async (id) => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.GET,
+        route: `/api/v1/groups/${id}/feed`,
+      })
+    )
+      .assertStatusCode(Status.BadRequest)
+      .assertError("Invalid ID format");
+  });
+
   it("should return 400 if limit and page not number", async () => {
     (
       await testBuilder.request({
@@ -91,7 +106,7 @@ describe("GET /groups/:id/feed", () => {
       ]);
   });
 
-  it.each(["bad", "2024-12-35", "12:30:00Z", "0", "1", "-1"])(
+  it.each(["bad", "2024-12-35", "2024-13-12", "12:30:00Z", "0", "1", "-1"])(
     "should return 400 if bad value %s for date",
     async (badValue) => {
       (
