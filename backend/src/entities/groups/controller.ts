@@ -38,7 +38,7 @@ export class GroupControllerImpl implements GroupController {
   async getCalendar(ctx: Context): Promise<Response> {
     const getCalendarImpl = async () => {
       const { date, range } = ctx.req.query();
-      const groupId = parseUUID(ctx.req.param("groupId"));
+      const groupId = parseUUID(ctx.req.param("id"));
       const parsedParams = calendarParamsValidate.parse({ date, range });
       const calendar = await this.groupService.getCalendar({
         ...parsedParams,
@@ -53,7 +53,7 @@ export class GroupControllerImpl implements GroupController {
   async getAllPosts(ctx: Context): Promise<Response> {
     const getAllPostsImpl = async () => {
       const { date, limit, page } = ctx.req.query();
-      const groupId = parseUUID(ctx.req.param("groupId"));
+      const groupId = parseUUID(ctx.req.param("id"));
       const parsedParams = feedParamValidate.parse({ date, limit, page });
       const feed = await this.groupService.getAllPosts({
         ...parsedParams,

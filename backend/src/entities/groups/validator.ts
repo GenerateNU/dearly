@@ -31,10 +31,24 @@ export const feedParamValidate = z
   .object({
     date: z
       .string()
+      .refine(
+        (val) => {
+          if (/^-?\d+$/.test(val)) {
+            return false;
+          }
+
+          const date = new Date(val);
+          return (
+            date instanceof Date &&
+            !isNaN(date.getTime()) &&
+            date.toISOString().slice(0, 10) === val.slice(0, 10)
+          );
+        },
+        {
+          message: "Invalid date. Please follow the format YYYY-MM-DD.",
+        },
+      )
       .transform((val) => new Date(val))
-      .refine((date) => !isNaN(date.getTime()), {
-        message: "Invalid date format",
-      })
       .optional(),
   })
   .merge(paginationSchema);
