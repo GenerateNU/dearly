@@ -67,6 +67,7 @@ export const mediaTable = pgTable("media", {
 });
 
 export const membersTable = pgTable("members", {
+  id: uuid().primaryKey().defaultRandom(),
   userId: uuid()
     .notNull()
     .references(() => usersTable.id, { onDelete: "cascade" }),
