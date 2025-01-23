@@ -5,8 +5,6 @@ import { NotFoundError } from "../utilities/errors/app-error";
 import { randomUUIDv7 } from "bun";
 import sharp from "sharp";
 import * as lame from "@breezystack/lamejs";
-import imagemin from 'imagemin';
-import imageminMozjpeg from 'imagemin-mozjpeg';
 
 
 interface IS3Operations {
@@ -70,13 +68,8 @@ export default class S3Impl implements IS3Operations {
    */
   async compressImage(file: Blob): Promise<Blob> {
     const imageBuffer = await file.arrayBuffer();
-    const jpegImage = await sharp(imageBuffer).jpeg().toBuffer();
-    const compressedImageArr = await imagemin.buffer(jpegImage, {
-      plugins: [
-        imageminMozjpeg({quality: 70}) // able to reduce image size only if quality is 35 LOL we are so cooked
-      ]
-    });
-    return new Blob([compressedImageArr])
+    const compressedImage = await sharp(imageBuffer).jpeg({quality: 80}).toBuffer();
+    return new Blob([compressedImage])
   }
 
   /**
