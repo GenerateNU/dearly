@@ -6,7 +6,7 @@ import { randomUUIDv7 } from "bun";
 import sharp from "sharp";
 import * as lame from "@breezystack/lamejs";
 import imagemin from 'imagemin';
-import imageminJpegtran from 'imagemin-jpegtran';
+import imageminMozjpeg from 'imagemin-mozjpeg';
 
 
 interface IS3Operations {
@@ -25,6 +25,7 @@ interface IS3Operations {
    * Will delete an object from S3 with the given S3 URL.
    * @param objectID The object key of the object that will be deleted
    * @throws NotFoundError: if the object was not able to be deleted
+   * @returns returns true is the object was able to be deleted, and false otherwise
    */
   deleteObject(objectID: string): Promise<boolean | null>;
 
@@ -65,15 +66,14 @@ export default class S3Impl implements IS3Operations {
    * In general small images can lower qualities but less than 40 is not recomended
    * @param file The blob that will be compressed
    * @param imageQuality The quality of the image [0, 100]
-   * @returns A promise of the blob is the newly compressed image
+   * @returns A promise of the blob of the newly compressed image
    */
   async compressImage(file: Blob): Promise<Blob> {
     const imageBuffer = await file.arrayBuffer();
-    const jpegImage = await sharp(imageBuffer).jpeg().toArray();
-    const uint8Array = new Uint8Array(jpegImage)
-    const compressedImageArr = await imagemin.buffer(uint8Array, {
+    const jpegImage = await sharp(imageBuffer).jpeg().toBuffer();
+    const compressedImageArr = await imagemin.buffer(jpegImage, {
       plugins: [
-        imageminJpegtran()
+        imageminMozjpeg({quality: 70}) // able to reduce image size only if quality is 35 LOL we are so cooked
       ]
     });
     return new Blob([compressedImageArr])
@@ -82,7 +82,7 @@ export default class S3Impl implements IS3Operations {
   /**
    * Will compress a given blob so that it takes up less storage and reduces load times
    * @param file The audio blob that will be compressed
-   * @returns A promise of the blob is the newly compressed audio recording
+   * @returns A promise of a blob of the newly compressed audio recording
    */
   async compressAudio(file: Blob): Promise<Blob> {
     const compressedAudio = []; // holds the final compressed audio
@@ -111,7 +111,7 @@ export default class S3Impl implements IS3Operations {
     const objectKey: string = randomUUIDv7();
     const compressedFile =
       fileType == "image" ? await this.compressImage(file) : await this.compressAudio(file);
-    await this.client!.send(
+    const res = await this.client!.send(
       new PutObjectCommand({
         Bucket: this.bucketName,
         Key: objectKey,
