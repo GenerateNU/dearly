@@ -2,8 +2,11 @@ import {
   ANOTHER_GROUP_ID,
   DEARLY_GROUP_ID,
   INVALID_ID_ARRAY,
+  MEDIA_MOCK,
+  POST_MOCK,
   USER_ALICE_ID,
   USER_ANA_ID,
+  USER_BOB_ID,
 } from "./../helpers/test-constants";
 import { Hono } from "hono";
 import { startTestApp } from "../helpers/test-app";
@@ -14,10 +17,88 @@ import { HTTPRequest, Status } from "../../constants/http";
 describe("GET /groups/:id/feed", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
+  const post = {
+    ...POST_MOCK[0],
+    createdAt: POST_MOCK[0]!.createdAt?.toISOString(),
+    media: MEDIA_MOCK,
+  };
 
   beforeAll(async () => {
     app = await startTestApp();
   });
+
+  it("should return 200 if group has posts", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.GET,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/feed`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${generateJWTFromID(USER_BOB_ID)}`,
+        },
+      })
+    )
+      .assertStatusCode(Status.OK)
+      .assertBody([
+        {
+          ...POST_MOCK[0],
+          createdAt: POST_MOCK[0]!.createdAt?.toISOString(),
+          media: MEDIA_MOCK,
+        },
+      ]);
+  });
+
+  it("should return 200 if group has posts", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.GET,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/feed`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
+        },
+        queryParams: {
+          date: "1969-12-31",
+          limit: "1",
+          page: "1",
+        },
+      })
+    )
+      .assertStatusCode(Status.OK)
+      .assertBody([post]);
+  });
+
+  it.each([
+    ["1", "1", [post]],
+    ["1", "2", [post]],
+    ["1", "3", [post]],
+    ["2", "1", [post]],
+    ["2", "2", []],
+    ["2", "3", []],
+  ])(
+    "should return 200 if is manager with limit %s and page %s",
+    async (limit, page, expectedBody) => {
+      (
+        await testBuilder.request({
+          app,
+          type: HTTPRequest.GET,
+          route: `/api/v1/groups/${DEARLY_GROUP_ID}/feed`,
+          queryParams: {
+            limit,
+            page,
+          },
+          autoAuthorized: false,
+          headers: {
+            Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
+          },
+        })
+      )
+        .assertStatusCode(Status.OK)
+        .assertBody(expectedBody);
+    },
+  );
 
   it("should return 200 if group has no posts", async () => {
     (
