@@ -95,6 +95,27 @@ To start the development server:
 
 -----
 
+### Running Drizzle Studio
+1. **Start the local Docker database**:  
+
+   ```bash
+   task db:up
+   ```
+
+2. **Migrate the database schema**:
+
+   ```bash
+   task db:migrate
+   ```
+
+3. **Start the local drizzle studio**:
+
+   ```bash
+   task db:studio
+   ```
+
+-----
+
 ### Running Backend Tests
 
 To run the backend tests, simply use the following command:
