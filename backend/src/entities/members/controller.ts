@@ -45,6 +45,9 @@ export class MemberControllerImpl implements MemberController {
       const userId = parseUUID(ctx.req.param("userId"));
       const groupId = parseUUID(ctx.req.param("id"));
 
+      console.log(`Client is same as member deleted: ${clientId == userId}`)
+
+
       await this.memberService.deleteMember(clientId, userId, groupId);
       return ctx.json({ message: "Successfully delete user" }, Status.OK);
     };

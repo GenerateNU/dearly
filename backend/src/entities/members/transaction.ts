@@ -2,7 +2,7 @@ import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { membersTable, groupsTable, usersTable } from "../schema";
 import { eq, and } from "drizzle-orm";
 import { addMemberPayload, Member } from "./validator";
-import { ForbiddenError } from "../../utilities/errors/app-error";
+import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
 import { User } from "../users/validator";
 
 export interface MemberTransaction {
@@ -24,6 +24,7 @@ export class MemberTransactionImpl implements MemberTransaction {
   }
 
   async insertMember(payload: addMemberPayload): Promise<Member | null> {
+    // TODO: on conflict do nothing
     const [memberAdded] = await this.db.insert(membersTable).values(payload).returning();
     return memberAdded ?? null;
   }
@@ -37,8 +38,22 @@ export class MemberTransactionImpl implements MemberTransaction {
       .where(eq(groupsTable.id, groupId))
       .limit(1);
 
-    if ((group && group.managerId != clientId) || clientId != userId) {
-      throw new ForbiddenError("You do not have the rights to remove this member.");
+    if (!group) {
+      throw new NotFoundError("Group");
+    }
+
+    // console.log(`Group: ${group}`)
+    // console.log(`ClientId: ${clientId}`)
+    // console.log(`userId: ${userId}`)
+    // console.log(`managerId: ${group.managerId}`)
+
+
+    if (clientId != userId) {
+
+      console.log("user is not member")
+      if (group.managerId != clientId) {
+        throw new ForbiddenError("You do not have the rights to remove this member.");
+      }
     }
 
     const [memberAdded] = await this.db

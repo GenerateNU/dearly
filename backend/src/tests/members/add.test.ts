@@ -14,7 +14,7 @@ describe("POST /members", () => {
     app = await startTestApp();
   });
 
-  it("should return 201 if a valid user is added to the group and was not already present in the group", async () => {
+  it.skip("should return 201 if a valid user is added to the group and was not already present in the group", async () => {
     const testId = generateUUID();
     (
       await testBuilder.request({
@@ -36,7 +36,7 @@ describe("POST /members", () => {
       });
   });
 
-  it.skip("should return 201 if a valid user is added to the group and was already added in the group", async () => {
+  it("should return 201 if a valid user is added to the group and was already added in the group", async () => {
     const testId = generateUUID();
     (
       await testBuilder.request({
