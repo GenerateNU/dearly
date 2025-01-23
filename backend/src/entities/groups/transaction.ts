@@ -79,9 +79,13 @@ export class GroupTransactionImpl implements GroupTransaction {
         membersTable,
         and(eq(membersTable.groupId, groupId), eq(membersTable.userId, userId)),
       )
-      // TODO: make sure only comparing day, month and year not time
       .where(
-        and(date ? eq(postsTable.createdAt, date) : undefined, eq(postsTable.groupId, groupId)),
+        and(
+          date
+            ? eq(sql`DATE(${postsTable.createdAt})`, sql`DATE(${date.toISOString()})`)
+            : undefined,
+          eq(postsTable.groupId, groupId),
+        ),
       )
       .groupBy(
         postsTable.id,

@@ -27,7 +27,7 @@ describe("GET /groups/:id/feed", () => {
     app = await startTestApp();
   });
 
-  it("should return 200 if group has posts", async () => {
+  it("should return 200 if group has posts with no query params", async () => {
     (
       await testBuilder.request({
         app,
@@ -49,7 +49,7 @@ describe("GET /groups/:id/feed", () => {
       ]);
   });
 
-  it("should return 200 if group has posts", async () => {
+  it("should return 200 if group has posts but different date specified", async () => {
     (
       await testBuilder.request({
         app,
@@ -60,25 +60,25 @@ describe("GET /groups/:id/feed", () => {
           Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
         },
         queryParams: {
-          date: "1969-12-31",
+          date: "2025-01-23",
           limit: "1",
           page: "1",
         },
       })
     )
       .assertStatusCode(Status.OK)
-      .assertBody([post]);
+      .assertBody([]);
   });
 
   it.each([
     ["1", "1", [post]],
-    ["1", "2", [post]],
-    ["1", "3", [post]],
+    ["1", "2", []],
+    ["1", "3", []],
     ["2", "1", [post]],
     ["2", "2", []],
     ["2", "3", []],
   ])(
-    "should return 200 if is manager with limit %s and page %s",
+    "should return 200 if no date specified and limit %s and page %s",
     async (limit, page, expectedBody) => {
       (
         await testBuilder.request({

@@ -58,7 +58,7 @@ export const POST_MOCK: (typeof postsTable.$inferInsert)[] = [
     userId: USER_ALICE_ID,
     groupId: DEARLY_GROUP_ID,
     id: POST_ID,
-    createdAt: new Date(),
+    createdAt: new Date(-1),
     caption: "my first post",
   },
   {
