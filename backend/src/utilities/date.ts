@@ -1,3 +1,7 @@
+const validateCalendarParam = (val: string) => {
+  return validateDateFormat(val) && validateYear(val) && validateMonth(val);
+};
+
 const validateDateFormat = (val: string) => {
   if (!val) return true;
   const dateRegex = /^\d{4}-(?:0[1-9]|1[0-2])$/;
@@ -38,4 +42,16 @@ const convertToDate = (val: string) => {
   return new Date(year!, month! - 1);
 };
 
-export { validateDateFormat, validateYear, validateMonth, validateFutureDate, convertToDate };
+const validateYearMonth = (val: string) => {
+  if (/^-?\d+$/.test(val)) {
+    return false;
+  }
+  const date = new Date(val);
+  return (
+    date instanceof Date &&
+    !isNaN(date.getTime()) &&
+    date.toISOString().slice(0, 10) === val.slice(0, 10)
+  );
+};
+
+export { validateYearMonth, validateFutureDate, convertToDate, validateCalendarParam };

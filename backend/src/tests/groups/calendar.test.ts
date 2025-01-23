@@ -19,6 +19,84 @@ describe("GET /groups/:id/calendar", () => {
     app = await startTestApp();
   });
 
+  it.each(["bad", "-1", "0", "???"])("should return 400 if bad range %s", async (badRange) => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.GET,
+        route: `/api/v1/groups/${generateUUID()}/calendar`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${generateJWTFromID()}`,
+        },
+        queryParams: {
+          range: badRange,
+        },
+      })
+    )
+      .assertStatusCode(Status.BadRequest)
+      .assertError([
+        {
+          message: "Range must be a positive number",
+          path: "range",
+        },
+      ]);
+  });
+
+  it.each(["bad", "-1", "0", "???", "2025-01-23", "2019-11-14T00:55:31.820Z"])(
+    "should return 400 if bad date format %s",
+    async (badDate) => {
+      (
+        await testBuilder.request({
+          app,
+          type: HTTPRequest.GET,
+          route: `/api/v1/groups/${generateUUID()}/calendar`,
+          autoAuthorized: false,
+          headers: {
+            Authorization: `Bearer ${generateJWTFromID()}`,
+          },
+          queryParams: {
+            date: badDate,
+          },
+        })
+      )
+        .assertStatusCode(Status.BadRequest)
+        .assertError([
+          {
+            message: "Date must be in YYYY-MM format (e.g., 2024-01)",
+            path: "date",
+          },
+        ]);
+    },
+  );
+
+  it.each([
+    ["month", `${new Date().getFullYear()}-0${new Date().getMonth() + 2}`],
+    ["year", `${new Date().getFullYear() + 1}-0${new Date().getMonth() + 1}`],
+  ])("should return 400 if future value of %s with %s", async (_, value) => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.GET,
+        route: `/api/v1/groups/${generateUUID()}/calendar`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${generateJWTFromID()}`,
+        },
+        queryParams: {
+          date: value,
+        },
+      })
+    )
+      .assertStatusCode(Status.BadRequest)
+      .assertError([
+        {
+          message: "Date cannot be in the future",
+          path: "date",
+        },
+      ]);
+  });
+
   it("should return 404 if group not found", async () => {
     (
       await testBuilder.request({

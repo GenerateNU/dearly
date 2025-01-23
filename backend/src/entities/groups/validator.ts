@@ -1,10 +1,9 @@
 import { MIN_LIMIT, NAME_MAX_LIMIT, TEXT_MAX_LIMIT } from "../../constants/database";
 import {
   convertToDate,
-  validateDateFormat,
+  validateCalendarParam,
   validateFutureDate,
-  validateMonth,
-  validateYear,
+  validateYearMonth,
 } from "../../utilities/date";
 import { paginationSchema } from "../../utilities/pagination";
 import { groupsTable } from "../schema";
@@ -31,23 +30,9 @@ export const feedParamValidate = z
   .object({
     date: z
       .string()
-      .refine(
-        (val) => {
-          if (/^-?\d+$/.test(val)) {
-            return false;
-          }
-
-          const date = new Date(val);
-          return (
-            date instanceof Date &&
-            !isNaN(date.getTime()) &&
-            date.toISOString().slice(0, 10) === val.slice(0, 10)
-          );
-        },
-        {
-          message: "Invalid date. Please follow the format YYYY-MM-DD.",
-        },
-      )
+      .refine(validateYearMonth, {
+        message: "Invalid date. Please follow the format YYYY-MM-DD.",
+      })
       .transform((val) => new Date(val))
       .optional(),
   })
@@ -67,20 +52,28 @@ export const calendarParamsValidate = z.object({
     .default("1"),
 
   date: z
-    .string()
-    .refine(validateDateFormat, {
-      message: "Date must be in YYYY-MM format (e.g., 2024-01)",
-    })
-    .refine(validateYear, {
-      message: "Year must be a valid 4-digit number",
-    })
-    .refine(validateMonth, {
-      message: "Month must be between 1 and 12",
-    })
-    .refine(validateFutureDate, {
-      message: "Date cannot be in the future",
-    })
-    .transform(convertToDate)
+    .preprocess(
+      (input) => {
+        if (typeof input !== "string") return input;
+
+        if (!validateCalendarParam(input)) {
+          throw new z.ZodError([
+            {
+              message: "Date must be in YYYY-MM format (e.g., 2024-01)",
+              path: ["date"],
+              code: "invalid_date",
+            },
+          ]);
+        }
+        return input;
+      },
+      z
+        .string()
+        .refine(validateFutureDate, {
+          message: "Date cannot be in the future",
+        })
+        .transform(convertToDate),
+    )
     .optional()
     .default(() => {
       const now = new Date();
