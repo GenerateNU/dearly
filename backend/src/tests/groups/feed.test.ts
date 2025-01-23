@@ -1,16 +1,37 @@
-import { DEARLY_GROUP_ID, USER_ALICE_ID, USER_ANA_ID } from "./../helpers/test-constants";
+import {
+  ANOTHER_GROUP_ID,
+  DEARLY_GROUP_ID,
+  USER_ALICE_ID,
+  USER_ANA_ID,
+} from "./../helpers/test-constants";
 import { Hono } from "hono";
 import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
 
-describe("GET /groups/:id/posts", () => {
+describe("GET /groups/:id/feed", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
 
   beforeAll(async () => {
     app = await startTestApp();
+  });
+
+  it("should return 200 if group has no posts", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.GET,
+        route: `/api/v1/groups/${ANOTHER_GROUP_ID}/feed`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
+        },
+      })
+    )
+      .assertStatusCode(Status.OK)
+      .assertBody([]);
   });
 
   it("should return 404 if group not found", async () => {
@@ -27,7 +48,7 @@ describe("GET /groups/:id/posts", () => {
     ).assertStatusCode(Status.NotFound);
   });
 
-  it("should return 403 if user not member", async () => {
+  it("should return 403 if user not member of group", async () => {
     (
       await testBuilder.request({
         app,
