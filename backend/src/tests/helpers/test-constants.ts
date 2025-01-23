@@ -61,13 +61,6 @@ export const POST_MOCK: (typeof postsTable.$inferInsert)[] = [
     createdAt: new Date(-1),
     caption: "my first post",
   },
-  {
-    userId: USER_ANA_ID,
-    groupId: DEARLY_GROUP_ID,
-    id: NEW_POST_ID,
-    createdAt: new Date(),
-    caption: "a chill weekend",
-  },
 ];
 
 export const USER_ALICE: CreateUserPayload = {
