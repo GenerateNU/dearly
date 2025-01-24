@@ -821,7 +821,7 @@ paths:
   /api/v1/groups/{id}/feed:
     get:
       tags:
-        - Post Endpoints
+        - Group Endpoints
       summary: Retrieve post feed of a group
       description: Get all the posts from a group, can be filtered by date.
       parameters:
@@ -901,7 +901,7 @@ paths:
   /api/v1/groups/{id}/calendar:
     get:
       tags:
-        - Post Endpoints
+        - Group Endpoints
       summary: Retrieve calendar view data
       description: Retrieve the thumbnail of media from posts that received likes on specific days, organizing them by month.
       parameters:
