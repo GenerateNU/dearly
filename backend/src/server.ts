@@ -6,7 +6,6 @@ import { setUpRoutes } from "./routes/init";
 import { automigrateDB } from "./database/migrate";
 import { generateJWTFromID } from "./tests/helpers/test-token";
 import S3Impl from "./services/s3Service";
-import { s3 } from "bun";
 
 const app = new Hono();
 

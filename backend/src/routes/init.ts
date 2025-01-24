@@ -40,8 +40,6 @@ const apiRoutes = (db: PostgresJsDatabase): Hono => {
   api.route("/groups", groupRoutes(db));
   api.route("/", postRoutes(db));
   api.route("/posts/:id/likes", likeRoutes(db));
-  api.route("/", postRoutes(db));
-  api.route("/posts/:id/likes", likeRoutes(db));
 
   return api;
 };

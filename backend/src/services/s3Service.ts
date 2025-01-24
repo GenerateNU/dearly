@@ -109,7 +109,7 @@ export default class S3Impl implements IS3Operations {
     const objectKey: string = randomUUIDv7();
     const compressedFile =
       fileType == MediaType.PHOTO ? await this.compressImage(file) : await this.compressAudio(file);
-    const res = await this.client!.send(
+    await this.client!.send(
       new PutObjectCommand({
         Bucket: this.bucketName,
         Key: objectKey,

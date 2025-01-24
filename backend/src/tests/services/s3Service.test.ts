@@ -1,5 +1,5 @@
-import { DeleteObjectCommand, PutObjectCommand, S3, S3Client } from "@aws-sdk/client-s3";
-import { AwsClientStub, mockClient } from "aws-sdk-client-mock";
+import { DeleteObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { mockClient } from "aws-sdk-client-mock";
 import S3Impl from "../../services/s3Service";
 import fs from "fs";
 import { resolve } from "node:path";
@@ -27,10 +27,13 @@ describe("S3 Service Testing", () => {
       .on(DeleteObjectCommand)
       .resolves({ $metadata: { httpStatusCode: 400 } }) as unknown as S3Client;
     const s3Impl = new S3Impl(client);
+    let expected;
     try {
-      const expected = await s3Impl.deleteObject("");
+      expected = await s3Impl.deleteObject("");
       expect(expected).toBe(NotFoundError);
-    } catch (Error) {}
+    } catch (Error: unknown) {
+      expect(Error);
+    }
   });
 
   it("test that delete returns true when url does exist", async () => {
