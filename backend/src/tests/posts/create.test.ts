@@ -19,11 +19,11 @@ describe("POST /groups/:id/posts", () => {
     caption: "dearly",
     media: [
       {
-        url: "https://www.google.com",
+        objectKey: "photo1.jpg",
         type: "VIDEO",
       },
       {
-        url: "https://www.google.com",
+        objectKey: "photo2.jpg",
         type: "PHOTO",
       },
     ],
@@ -32,7 +32,7 @@ describe("POST /groups/:id/posts", () => {
     caption: "",
     media: [
       {
-        url: "link",
+        objectKey: "",
         type: "AUDIO",
       },
     ],
@@ -165,8 +165,8 @@ describe("POST /groups/:id/posts", () => {
           path: "media.0.type",
         },
         {
-          message: "Invalid url",
-          path: "media.0.url",
+          message: "Object key cannot be empty",
+          path: "media.0.objectKey",
         },
       ]);
   });
@@ -274,19 +274,19 @@ describe("POST /groups/:id/posts", () => {
           media: [
             {
               type: "VIDEO",
-              url: "https://www.google.com",
+              objectKey: "https://www.google.com",
             },
             {
               type: "VIDEO",
-              url: "https://www.google.com",
+              objectKey: "https://www.google.com",
             },
             {
               type: "VIDEO",
-              url: "https://www.google.com",
+              objectKey: "https://www.google.com",
             },
             {
               type: "VIDEO",
-              url: "https://www.google.com",
+              objectKey: "https://www.google.com",
             },
           ],
         },

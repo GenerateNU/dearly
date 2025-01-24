@@ -19,7 +19,9 @@ export const createPostValidate = z
       .array(
         z.object({
           type: z.enum(["VIDEO", "PHOTO"]),
-          url: z.string().url(),
+          objectKey: z.string().min(1, {
+            message: "Object key cannot be empty",
+          }),
         }),
       )
       .min(MIN_MEDIA_COUNT, {

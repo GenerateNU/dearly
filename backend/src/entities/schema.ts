@@ -62,7 +62,7 @@ export const mediaTable = pgTable("media", {
   postId: uuid()
     .notNull()
     .references(() => postsTable.id, { onDelete: "cascade" }),
-  url: varchar().notNull(),
+  objectKey: varchar().notNull(),
   type: postMediaEnum().notNull(),
 });
 

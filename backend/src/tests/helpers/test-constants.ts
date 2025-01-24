@@ -41,13 +41,13 @@ export const GROUP_EMPTY_FIELDS_ERRORS = [
 export const MEDIA_MOCK: (typeof mediaTable.$inferInsert)[] = [
   {
     postId: POST_ID,
-    url: "https://google.com",
+    objectKey: "photo1",
     type: "VIDEO",
     id: MEDIA_ONE_ID,
   },
   {
     postId: POST_ID,
-    url: "https://google.com",
+    objectKey: "photo2",
     type: "PHOTO",
     id: MEDIA_TWO_ID,
   },

@@ -78,7 +78,7 @@ export class PostTransactionImpl implements PostTransaction {
           'id', ${mediaTable.id},
           'type', ${mediaTable.type},
           'postId', ${mediaTable.postId},
-          'url', ${mediaTable.url}
+          'objectKey', ${mediaTable.objectKey}
         )
       )`,
       })

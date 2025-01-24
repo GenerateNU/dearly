@@ -21,11 +21,11 @@ describe("PATCH /posts/:id", () => {
     caption: "updated",
     media: [
       {
-        url: "https://www.netflix.com",
+        objectKey: "photo1.jpg",
         type: "VIDEO",
       },
       {
-        url: "https://www.netflix.com",
+        objectKey: "photo1.jpg",
         type: "PHOTO",
       },
     ],
@@ -142,19 +142,19 @@ describe("PATCH /posts/:id", () => {
           media: [
             {
               type: "VIDEO",
-              url: "https://www.google.com",
+              objectKey: "photo1",
             },
             {
               type: "VIDEO",
-              url: "https://www.google.com",
+              objectKey: "photo2",
             },
             {
               type: "VIDEO",
-              url: "https://www.google.com",
+              objectKey: "photo3",
             },
             {
               type: "VIDEO",
-              url: "https://www.google.com",
+              objectKey: "photo4",
             },
           ],
         },
@@ -173,7 +173,7 @@ describe("PATCH /posts/:id", () => {
       ]);
   });
 
-  it("should return 400 if owner and bad media url and type", async () => {
+  it("should return 400 if owner and bad media objectKey and type", async () => {
     (
       await testBuilder.request({
         app,
@@ -182,7 +182,7 @@ describe("PATCH /posts/:id", () => {
         requestBody: {
           media: [
             {
-              url: "link",
+              objectKey: "",
               type: "AUDIO",
             },
           ],
@@ -200,8 +200,8 @@ describe("PATCH /posts/:id", () => {
           path: "media.0.type",
         },
         {
-          message: "Invalid url",
-          path: "media.0.url",
+          message: "Object key cannot be empty",
+          path: "media.0.objectKey",
         },
       ]);
   });

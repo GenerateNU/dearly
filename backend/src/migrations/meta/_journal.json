@@ -29,6 +29,13 @@
       "when": 1737337614864,
       "tag": "20250120014654_lumpy_triton",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1737690408275,
+      "tag": "20250124034648_striped_mandroid",
+      "breakpoints": true
     }
   ]
 }
