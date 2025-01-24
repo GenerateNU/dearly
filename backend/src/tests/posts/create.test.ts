@@ -273,20 +273,20 @@ describe("POST /groups/:id/posts", () => {
         requestBody: {
           media: [
             {
-              type: "VIDEO",
-              objectKey: "https://www.google.com",
+              type: "PHOTO",
+              objectKey: "photo1",
             },
             {
-              type: "VIDEO",
-              objectKey: "https://www.google.com",
+              type: "PHOTO",
+              objectKey: "photo2",
             },
             {
-              type: "VIDEO",
-              objectKey: "https://www.google.com",
+              type: "PHOTO",
+              objectKey: "photo3",
             },
             {
-              type: "VIDEO",
-              objectKey: "https://www.google.com",
+              type: "PHOTO",
+              objectKey: "photo4",
             },
           ],
         },

@@ -149,10 +149,10 @@ components:
           format: uuid
           example: 5e91507e-5630-4efd-9fd4-799178870b10
           description: The ID of the post to which the media belongs.
-        url:
+        objectKey:
           type: string
-          example: "https://example.com/media/image.jpg"
-          description: The URL of the media item.
+          example: "image.jpg"
+          description: The object key of the media item.
         type:
           type: string
           example: "PHOTO"
@@ -816,13 +816,13 @@ paths:
                           - VIDEO
                           - PHOTO
                         description: The type of media (either VIDEO or PHOTO).
-                      url:
+                      objectKey:
                         type: string
-                        description: The URL of the media item.
+                        description: The object key of the media item to retrieve signed URL from S3.
                     required:
                       - type
-                      - url
-                  description: A list of media items, each with a type and URL.
+                      - objectKey
+                  description: A list of media items, each with a type and object key.
               required:
                 - media
               additionalProperties: true
@@ -949,13 +949,13 @@ paths:
                           - VIDEO
                           - PHOTO
                         description: The type of media (either VIDEO or PHOTO).
-                      url:
+                      objectKey:
                         type: string
-                        description: The URL of the media item.
+                        description: The object key of the media item.
                     required:
                       - type
-                      - url
-                  description: A list of media items, each with a type and URL.
+                      - objectKey
+                  description: A list of media items, each with a type and object key to retrieve signed url from S3.
               additionalProperties: true
       responses:
         200:
