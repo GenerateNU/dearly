@@ -6,7 +6,6 @@ import { getOpenAPISpecification } from "../utilities/docs";
 import { HEALTHCHECK } from "../types/api/routes/healthcheck";
 import { groupRoutes } from "../entities/groups/route";
 import { postRoutes } from "../entities/posts/route";
-import S3Impl from "../services/s3Service";
 import { likeRoutes } from "../entities/likes/route";
 import S3Impl from "../services/s3Service";
 
