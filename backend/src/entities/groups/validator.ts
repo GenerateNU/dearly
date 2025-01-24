@@ -18,3 +18,12 @@ export const createGroupValidate = z
       .optional(),
   })
   .passthrough();
+
+export const updateGroupValidate = createGroupValidate.partial();
+
+export type UpdateGroupPayload = z.infer<typeof updateGroupValidate> & GroupIdPayload;
+
+export type GroupIdPayload = {
+  userId: string;
+  groupId: string;
+};
