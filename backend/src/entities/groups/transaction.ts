@@ -170,7 +170,6 @@ export class GroupTransactionImpl implements GroupTransaction {
       .groupBy(groupsTable.id, groupsTable.managerId, groupsTable.description, groupsTable.name)
       .where(eq(groupsTable.id, groupId));
     if (!result) return null;
-    console.log(result);
     return result;
   }
 
