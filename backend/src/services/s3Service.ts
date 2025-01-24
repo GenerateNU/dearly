@@ -17,7 +17,7 @@ interface IS3Operations {
    * @param fileType The type of the blob sent to the endpoint
    * @returns Will return the object key of the object in S3
    */
-  saveObject(file: Blob, tag: string, fileType: "image" | "audio"): Promise<string | null>;
+  saveObject(file: Blob, tag: string, fileType: "image" | "audio"): Promise<string>;
 
   /**
    * Will delete an object from S3 with the given S3 URL.
@@ -25,7 +25,7 @@ interface IS3Operations {
    * @throws NotFoundError: if the object was not able to be deleted
    * @returns returns true is the object was able to be deleted, and false otherwise
    */
-  deleteObject(objectID: string): Promise<boolean | null>;
+  deleteObject(objectID: string): Promise<boolean>;
 
   /**
    * Will retrive the presigned URL of the given object associated with the given object ID
@@ -99,7 +99,7 @@ export default class S3Impl implements IS3Operations {
    * @param fileType The type of the blob sent to the endpoint
    * @returns Will return the S3 object key
    */
-  async saveObject(file: Blob, tag: string, fileType: "image" | "audio"): Promise<string | null> {
+  async saveObject(file: Blob, tag: string, fileType: "image" | "audio"): Promise<string> {
     // to-do: compress blob, and deal with permission
     const objectKey: string = randomUUIDv7();
     const compressedFile =
@@ -112,8 +112,7 @@ export default class S3Impl implements IS3Operations {
         Tagging: `GroupID=${tag}`,
       }),
     );
-    const url: string = "https://" + this.bucketName + ".s3.amazonaws.com/" + objectKey;
-    return url;
+    return objectKey;
   }
 
   /**
@@ -121,7 +120,7 @@ export default class S3Impl implements IS3Operations {
    * @param url The URL of the object that will be deleted
    * @throws NotFoundError: if the object was not able to be deleted
    */
-  async deleteObject(url: string): Promise<boolean | null> {
+  async deleteObject(url: string): Promise<boolean> {
     const indexOfDotCom = url.indexOf(".com/");
     const objectKey: string = url.substring(indexOfDotCom + 5);
     const res = await this.client!.send(
