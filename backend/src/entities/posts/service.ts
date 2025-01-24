@@ -14,7 +14,7 @@ export interface PostService {
 
 export class PostServiceImpl implements PostService {
   private postTransaction: PostTransaction;
-  private s3ServiceProvider: IS3Operations ;
+  private s3ServiceProvider: IS3Operations;
 
   constructor(postTransaction: PostTransaction, s3ServiceProvider: IS3Operations) {
     this.postTransaction = postTransaction;
