@@ -10,6 +10,9 @@ import { likeRoutes } from "../entities/likes/route";
 import S3Impl from "../services/s3Service";
 
 export const setUpRoutes = (app: Hono, db: PostgresJsDatabase, s3ServiceProvider: S3Impl) => {
+  //pass s3ServiceProvier to any routes that need to use the s3Services (remove this here when it is used in an endpoint
+  //currently here so lint doesnt get mad)
+  s3ServiceProvider;
   // api documentation
   app.get(
     "/",
