@@ -10,9 +10,6 @@ import { likeRoutes } from "../entities/likes/route";
 import S3Impl from "../services/s3Service";
 
 export const setUpRoutes = (app: Hono, db: PostgresJsDatabase, s3ServiceProvider: S3Impl) => {
-  //pass s3ServiceProvier to any routes that need to use the s3Services (remove this here when it is used in an endpoint
-  //currently here so lint doesnt get mad)
-  s3ServiceProvider;
   // api documentation
   app.get(
     "/",
@@ -28,7 +25,7 @@ export const setUpRoutes = (app: Hono, db: PostgresJsDatabase, s3ServiceProvider
     return ctx.json({ message: "OK" }, 200);
   });
 
-  app.route("/api/v1", apiRoutes(db));
+  app.route("/api/v1", apiRoutes(db, s3ServiceProvider));
 
   // unsupported route
   app.notFound((ctx: Context) => {
@@ -36,12 +33,12 @@ export const setUpRoutes = (app: Hono, db: PostgresJsDatabase, s3ServiceProvider
   });
 };
 
-const apiRoutes = (db: PostgresJsDatabase): Hono => {
+const apiRoutes = (db: PostgresJsDatabase, s3ServiceProvider: S3Impl): Hono => {
   const api = new Hono();
 
   api.route("/users", userRoutes(db));
   api.route("/groups", groupRoutes(db));
-  api.route("/", postRoutes(db));
+  api.route("/", postRoutes(db, s3ServiceProvider));
   api.route("/posts/:id/likes", likeRoutes(db));
 
   return api;

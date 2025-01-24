@@ -10,6 +10,7 @@ import {
 } from "./validator";
 import { Status } from "../../constants/http";
 import { DEL_POST, POST_API } from "../../types/api/routes/posts";
+import S3Impl from "../../services/s3Service";
 
 export interface PostController {
   createPost(ctx: Context): Promise<POST_API>;
