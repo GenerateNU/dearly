@@ -1,6 +1,5 @@
 import { InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
-import { IDPayload } from "../posts/validator";
 import { GroupTransaction } from "./transaction";
 import { CreateGroupPayload, Group, GroupIdPayload, UpdateGroupPayload } from "./validator";
 

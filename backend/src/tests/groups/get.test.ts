@@ -1,6 +1,5 @@
 import {
   USER_ANA_ID,
-  USER_BOB_ID,
   DEARLY_GROUP_ID,
   USER_ALICE_ID,
   INVALID_ID_ARRAY,
@@ -21,7 +20,6 @@ describe("GET /groups/:id", () => {
   };
 
   const ALICE_JWT = generateJWTFromID(USER_ALICE_ID);
-  const BOB_JWT = generateJWTFromID(USER_BOB_ID);
   const ANA_JWT = generateJWTFromID(USER_ANA_ID);
 
   beforeAll(async () => {

@@ -1,5 +1,5 @@
 import { CreateGroupPayload } from "../../entities/groups/validator";
-import { groupsTable, mediaTable, membersTable, postsTable } from "../../entities/schema";
+import { groupsTable, mediaTable, postsTable } from "../../entities/schema";
 import { CreateUserPayload } from "../../entities/users/validator";
 
 export const INVALID_ID_ARRAY = ["1", "%2", "123abc", "!!$$", "123 456", "@ID", null, undefined];

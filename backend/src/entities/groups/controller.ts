@@ -1,12 +1,7 @@
 import { Context } from "hono";
 import { GROUP_API } from "../../types/api/schemas/groups";
 import { GroupService } from "./service";
-import {
-  createGroupValidate,
-  UpdateGroupPayload,
-  updateGroupValidate,
-  GroupIdPayload,
-} from "./validator";
+import { createGroupValidate, UpdateGroupPayload, updateGroupValidate } from "./validator";
 import { Status } from "../../constants/http";
 import { handleAppError } from "../../utilities/errors/app-error";
 import { DELETE_GROUP, GET_GROUP, PATCH_GROUP } from "../../types/api/routes/groups";

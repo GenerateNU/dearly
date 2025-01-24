@@ -3,7 +3,6 @@ import { groupsTable, membersTable, usersTable } from "../schema";
 import { CreateGroupPayload, Group, GroupIdPayload, UpdateGroupPayload } from "./validator";
 import { ForbiddenError } from "../../utilities/errors/app-error";
 import { and, eq, or } from "drizzle-orm";
-import { PostWithMedia, UpdatePostPayload } from "../posts/validator";
 
 export interface GroupTransaction {
   insertGroup(payload: CreateGroupPayload): Promise<Group | null>;
