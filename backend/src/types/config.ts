@@ -21,6 +21,13 @@ export interface CorsConfig {
   allowHeaders: string[];
 }
 
+export interface S3Config {
+  secretKey: string;
+  publicKey: string;
+  region: string;
+  name: string;
+}
+
 export interface Configuration {
   server: ServerConfig;
   database: DatabaseConfig;
@@ -29,5 +36,6 @@ export interface Configuration {
   automigrate: {
     migrationsFolder: string;
   };
+  s3Config: S3Config;
   environment: string;
 }
