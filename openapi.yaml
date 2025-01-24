@@ -149,7 +149,7 @@ components:
           format: uuid
           example: 5e91507e-5630-4efd-9fd4-799178870b10
           description: The ID of the post to which the media belongs.
-        objectID:
+        objectKey:
           type: string
           format: uuid
           example: 5e91507e-5630-4efd-9fd4-799178870b10
