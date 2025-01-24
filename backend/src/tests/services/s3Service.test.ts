@@ -4,6 +4,7 @@ import S3Impl from "../../services/s3Service";
 import fs from "fs";
 import { resolve } from "node:path";
 import { NotFoundError } from "../../utilities/errors/app-error";
+import { MediaType } from "../../constants/database";
 const PROJECT_ROOT = resolve(__dirname, "../..");
 
 
@@ -16,7 +17,7 @@ describe("S3 Service Testing", () => {
     let buffer = fs.readFileSync(PROJECT_ROOT + "/tests/test-assets/test_image.tiff");
     let blob = new Blob([buffer]);
     const s3Impl = new S3Impl(client);
-    const expected = await s3Impl.saveObject(blob, "test", "image");
+    const expected = await s3Impl.saveObject(blob, "test", MediaType.PHOTO);
     expect(expected).not.toBeNull();
     expect(expected.length).toBeGreaterThan(3);
   });

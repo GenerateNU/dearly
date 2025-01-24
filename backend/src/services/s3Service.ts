@@ -5,6 +5,7 @@ import { NotFoundError } from "../utilities/errors/app-error";
 import { randomUUIDv7 } from "bun";
 import sharp from "sharp";
 import * as lame from "@breezystack/lamejs";
+import { MediaType } from "../constants/database";
 
 
 interface IS3Operations {
@@ -17,7 +18,7 @@ interface IS3Operations {
    * @param fileType The type of the blob sent to the endpoint
    * @returns Will return the object key of the object in S3
    */
-  saveObject(file: Blob, tag: string, fileType: "image" | "audio"): Promise<string>;
+  saveObject(file: Blob, tag: string, fileType: MediaType): Promise<string>;
 
   /**
    * Will delete an object from S3 with the given S3 URL.
@@ -99,11 +100,11 @@ export default class S3Impl implements IS3Operations {
    * @param fileType The type of the blob sent to the endpoint
    * @returns Will return the S3 object key
    */
-  async saveObject(file: Blob, tag: string, fileType: "image" | "audio"): Promise<string> {
+  async saveObject(file: Blob, tag: string, fileType: MediaType): Promise<string> {
     // to-do: compress blob, and deal with permission
     const objectKey: string = randomUUIDv7();
     const compressedFile =
-      fileType == "image" ? await this.compressImage(file) : await this.compressAudio(file);
+      fileType == MediaType.PHOTO ? await this.compressImage(file) : await this.compressAudio(file);
     const res = await this.client!.send(
       new PutObjectCommand({
         Bucket: this.bucketName,
