@@ -14,7 +14,8 @@ describe("POST /members", () => {
     app = await startTestApp();
   });
 
-  it.skip("should return 201 if a valid user is added to the group and was not already present in the group", async () => {
+  // TODO: delete member after added
+  it("should return 201 if a valid user is added to the group and was not already present in the group", async () => {
     const testId = generateUUID();
     (
       await testBuilder.request({
@@ -54,7 +55,7 @@ describe("POST /members", () => {
       .assertFields({
         userId: USER_ALICE_ID,
         groupId: DEARLY_GROUP_ID,
-        role: MemberRole.MEMBER,
+        role: MemberRole.MANAGER,
       });
   });
 

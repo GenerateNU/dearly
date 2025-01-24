@@ -25,13 +25,15 @@ export class MemberTransactionImpl implements MemberTransaction {
 
   async insertMember(payload: addMemberPayload): Promise<Member | null> {
     // TODO: on conflict do nothing
-    const [memberAdded] = await this.db.insert(membersTable).values(payload).returning();
+    await this.db.insert(membersTable).values(payload).onConflictDoNothing();
+
+    const [memberAdded] = await this.db.select().from(membersTable).where(and(eq(membersTable.userId, payload.userId), eq(membersTable.groupId, payload.groupId))).limit(1);
+
     return memberAdded ?? null;
   }
 
   async deleteMember(clientId: string, userId: string, groupId: string): Promise<Member | null> {
     // check current user is the userId/member being removed or is the manager of the group
-    // Select the group
     const [group] = await this.db
       .select()
       .from(groupsTable)
@@ -42,18 +44,8 @@ export class MemberTransactionImpl implements MemberTransaction {
       throw new NotFoundError("Group");
     }
 
-    // console.log(`Group: ${group}`)
-    // console.log(`ClientId: ${clientId}`)
-    // console.log(`userId: ${userId}`)
-    // console.log(`managerId: ${group.managerId}`)
-
-
-    if (clientId != userId) {
-
-      console.log("user is not member")
-      if (group.managerId != clientId) {
-        throw new ForbiddenError("You do not have the rights to remove this member.");
-      }
+    if (group.managerId != clientId && clientId != userId) {
+      throw new ForbiddenError("You do not have the rights to remove this member.");
     }
 
     const [memberAdded] = await this.db
@@ -69,6 +61,7 @@ export class MemberTransactionImpl implements MemberTransaction {
     limit: number,
     offset: number,
   ): Promise<User[] | null> {
+    // TODO: deal with invalid offset
     const members = await this.db
       .select({
         name: usersTable.name,
@@ -86,7 +79,7 @@ export class MemberTransactionImpl implements MemberTransaction {
 
     if (!members) return null;
 
-    if (!members.reduce((acc, member) => acc || member.id == clientId)) {
+    if (!members.reduce((acc, member) => acc || member.id == clientId, false)) {
       throw new ForbiddenError("You do not have the rights to the member list of this group.");
     }
 

@@ -45,9 +45,6 @@ export class MemberControllerImpl implements MemberController {
       const userId = parseUUID(ctx.req.param("userId"));
       const groupId = parseUUID(ctx.req.param("id"));
 
-      console.log(`Client is same as member deleted: ${clientId == userId}`)
-
-
       await this.memberService.deleteMember(clientId, userId, groupId);
       return ctx.json({ message: "Successfully delete user" }, Status.OK);
     };
@@ -61,9 +58,12 @@ export class MemberControllerImpl implements MemberController {
       const clientId = parseUUID(ctx.get("userId"));
       const groupId = parseUUID(ctx.req.param("id"));
       const limit = parseInt(ctx.req.query("limit") || "10", 10);
-      const offset = parseInt(ctx.req.query("offset") || "0", 10);
+      const offset = parseInt(ctx.req.query("offset") || "0", 0);
+
+      console.log(clientId, groupId)
 
       const members = await this.memberService.getMembers(clientId, groupId, limit, offset);
+      console.log(`Members: ${members}`)
 
       return ctx.json(members, Status.OK);
     };

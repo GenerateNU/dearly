@@ -13,7 +13,7 @@ export const memberRoutes = (db: PostgresJsDatabase): Hono => {
 
   member.post("/:userId", (ctx) => memberController.addMember(ctx));
   member.delete("/:userId", (ctx) => memberController.deleteMember(ctx));
-  member.delete("/", (ctx) => memberController.getMembers(ctx));
+  member.get("/", (ctx) => memberController.getMembers(ctx));
 
   return member;
 };

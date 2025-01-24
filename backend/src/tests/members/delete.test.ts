@@ -38,11 +38,6 @@ describe("DELETE groups/{id}/members/{userId}", () => {
     app = await startTestApp();
   });
 
-  // Initialize every test with a userid
-  // beforeEach(async () => {
-  //   console.log(addMember(USER_ANA_ID))
-  // });
-
   afterEach(async () => {
     (
       await testBuilder.request({
@@ -57,8 +52,7 @@ describe("DELETE groups/{id}/members/{userId}", () => {
   });
 
   it("should return 200 if user is successfully deleted when deleted by manager", async () => {
-    addMember(USER_ANA_ID)
-    console.log(authPayload(manager_jwt));
+    await addMember(USER_ANA_ID);
     (
       await testBuilder.request({
         app,
@@ -99,13 +93,13 @@ describe("DELETE groups/{id}/members/{userId}", () => {
   });
 
 
-  it.skip("should return 200 if user not in group", async () => {
-    // TODO
+  it("should return 200 if user not in group", async () => {
     (
       await testBuilder.request({
         app,
         type: HTTPRequest.DELETE,
-        route: `/api/v1/groups/${DEARLY_GROUP_ID}/members/${USER_BILL_ID}`,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/members/${USER_BOB_ID}`,
+        ...authPayload(bob_jwt)
       })
     )
       .assertStatusCode(Status.OK)
@@ -114,7 +108,7 @@ describe("DELETE groups/{id}/members/{userId}", () => {
 
   it("should return 403 if client is not the manager nor the member to be removed", async () => {
     await addMember(USER_ANA_ID);
-    
+
     (
       await testBuilder.request({
         app,
@@ -124,6 +118,21 @@ describe("DELETE groups/{id}/members/{userId}", () => {
       })
     )
       .assertStatusCode(Status.Forbidden)
-      .assertMessage(forbiddenMessage);
+      .assertError(forbiddenMessage);
+  });
+
+  it("should return 403 if client is not in the group", async () => {
+    await addMember(USER_ANA_ID);
+
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.DELETE,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/members/${USER_ALICE_ID}`,
+        ...authPayload(bob_jwt)
+      })
+    )
+      .assertStatusCode(Status.Forbidden)
+      .assertError(forbiddenMessage);
   });
 });

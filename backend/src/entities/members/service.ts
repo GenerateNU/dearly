@@ -44,7 +44,7 @@ export class MemberServiceImpl implements MemberService {
     const getMembersImpl = async () => {
       const members = await this.memberTransaction.getMembers(clientId, groupId, limit, offset);
       if (!members) {
-        throw new NotFoundError("Group not found.");
+        throw new NotFoundError("Group");
       }
       return members;
     };
