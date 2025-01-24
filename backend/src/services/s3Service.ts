@@ -5,12 +5,12 @@ import {
   GetObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { getConfigurations } from "../config/config";
 import { NotFoundError } from "../utilities/errors/app-error";
 import { randomUUIDv7 } from "bun";
 import sharp from "sharp";
 import * as lame from "@breezystack/lamejs";
 import { MediaType } from "../constants/database";
+import { Configuration } from "../types/config";
 
 interface IS3Operations {
   // group is the uuid of the group this photo is being sent to (used as tagging number) -> make public group id number
@@ -43,12 +43,11 @@ export default class S3Impl implements IS3Operations {
   private client;
   private bucketName;
 
-  public constructor(client?: S3Client) {
-    const config = getConfigurations();
-    const region = config.s3Config.region;
-    const secretKey = config.s3Config.secretKey;
-    const publicKey = config.s3Config.publicKey;
-    this.bucketName = config.s3Config.name;
+  public constructor(config: Configuration["s3Config"], client?: S3Client) {
+    const region = config.region;
+    const secretKey = config.secretKey;
+    const publicKey = config.publicKey;
+    this.bucketName = config.name;
 
     if (!client) {
       this.client = new S3Client({

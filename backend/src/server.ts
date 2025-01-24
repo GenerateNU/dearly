@@ -12,7 +12,7 @@ const app = new Hono();
 const config = getConfigurations();
 
 (async function setUpServer() {
-  const s3ServiceProvider = new S3Impl();
+  const s3ServiceProvider = new S3Impl(config.s3Config);
   try {
     const db = connectDB(config);
 
