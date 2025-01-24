@@ -8,8 +8,9 @@ import { groupRoutes } from "../entities/groups/route";
 import { postRoutes } from "../entities/posts/route";
 import { memberRoutes } from "../entities/members/route";
 import { likeRoutes } from "../entities/likes/route";
+import S3Impl from "../services/s3Service";
 
-export const setUpRoutes = (app: Hono, db: PostgresJsDatabase) => {
+export const setUpRoutes = (app: Hono, db: PostgresJsDatabase, s3ServiceProvider: S3Impl) => {
   // api documentation
   app.get(
     "/",
@@ -25,7 +26,7 @@ export const setUpRoutes = (app: Hono, db: PostgresJsDatabase) => {
     return ctx.json({ message: "OK" }, 200);
   });
 
-  app.route("/api/v1", apiRoutes(db));
+  app.route("/api/v1", apiRoutes(db, s3ServiceProvider));
 
   // unsupported route
   app.notFound((ctx: Context) => {
@@ -33,13 +34,13 @@ export const setUpRoutes = (app: Hono, db: PostgresJsDatabase) => {
   });
 };
 
-const apiRoutes = (db: PostgresJsDatabase): Hono => {
+const apiRoutes = (db: PostgresJsDatabase, s3ServiceProvider: S3Impl): Hono => {
   const api = new Hono();
 
   api.route("/users", userRoutes(db));
   api.route("/groups", groupRoutes(db));
+  api.route("/", postRoutes(db, s3ServiceProvider));
   api.route("/groups/:id/members", memberRoutes(db));
-  api.route("/", postRoutes(db));
   api.route("/posts/:id/likes", likeRoutes(db));
 
   return api;
