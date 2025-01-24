@@ -1,7 +1,12 @@
 import { Context } from "hono";
 import { GROUP_API } from "../../types/api/schemas/groups";
 import { GroupService } from "./service";
-import { createGroupValidate, UpdateGroupPayload, updateGroupValidate } from "./validator";
+import {
+  createGroupValidate,
+  UpdateGroupPayload,
+  updateGroupValidate,
+  GroupIdPayload,
+} from "./validator";
 import { Status } from "../../constants/http";
 import { handleAppError } from "../../utilities/errors/app-error";
 import { DELETE_GROUP, GET_GROUP, PATCH_GROUP } from "../../types/api/routes/groups";
@@ -49,7 +54,7 @@ export class GroupControllerImpl implements GroupController {
       // format input to send to service layer
       const updateGroupPayload: UpdateGroupPayload = {
         userId,
-        id: groupId,
+        groupId: groupId,
         ...groupInfoPayload,
       };
       const group = await this.groupService.updateGroup(updateGroupPayload);
@@ -61,10 +66,10 @@ export class GroupControllerImpl implements GroupController {
   async getGroup(ctx: Context): Promise<GET_GROUP> {
     const getGroupImpl = async () => {
       // pull out essential IDs
-      const id = parseUUID(ctx.req.param("id"));
+      const groupId = parseUUID(ctx.req.param("id"));
       const userId = parseUUID(ctx.get("userId"));
 
-      const group = await this.groupService.getGroup({ userId, id });
+      const group = await this.groupService.getGroup({ userId, groupId });
       return ctx.json(group, Status.OK);
     };
     return await handleAppError(getGroupImpl)(ctx);
@@ -73,10 +78,10 @@ export class GroupControllerImpl implements GroupController {
   async deleteGroup(ctx: Context): Promise<DELETE_GROUP> {
     const deleteGroupImpl = async () => {
       // pull out essential IDs
-      const id = parseUUID(ctx.req.param("id"));
+      const groupId = parseUUID(ctx.req.param("id"));
       const userId = parseUUID(ctx.get("userId"));
 
-      await this.groupService.deleteGroup({ userId, id });
+      await this.groupService.deleteGroup({ groupId, userId });
       return ctx.json({ message: "Successfully delete group" }, Status.OK);
     };
     return await handleAppError(deleteGroupImpl)(ctx);

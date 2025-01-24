@@ -21,9 +21,9 @@ export const createGroupValidate = z
 
 export const updateGroupValidate = createGroupValidate.partial();
 
-export type UpdateGroupPayload = z.infer<typeof updateGroupValidate> & IDPayload;
+export type UpdateGroupPayload = z.infer<typeof updateGroupValidate> & GroupIdPayload;
 
-export type IDPayload = {
+export type GroupIdPayload = {
   userId: string;
-  id: string;
+  groupId: string;
 };

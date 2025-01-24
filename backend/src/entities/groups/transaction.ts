@@ -1,6 +1,6 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { groupsTable, membersTable, usersTable } from "../schema";
-import { CreateGroupPayload, Group, IDPayload, UpdateGroupPayload } from "./validator";
+import { CreateGroupPayload, Group, GroupIdPayload, UpdateGroupPayload } from "./validator";
 import { ForbiddenError } from "../../utilities/errors/app-error";
 import { and, eq, or } from "drizzle-orm";
 import { PostWithMedia, UpdatePostPayload } from "../posts/validator";
@@ -8,7 +8,7 @@ import { PostWithMedia, UpdatePostPayload } from "../posts/validator";
 export interface GroupTransaction {
   insertGroup(payload: CreateGroupPayload): Promise<Group | null>;
   deleteGroup(groupId: string, userId: string): Promise<void>;
-  getGroup(payload: IDPayload): Promise<Group | null>;
+  getGroup(payload: GroupIdPayload): Promise<Group | null>;
   updateGroup(payload: UpdateGroupPayload): Promise<Group | null>;
 }
 
@@ -39,15 +39,20 @@ export class GroupTransactionImpl implements GroupTransaction {
     return createdGroup ?? null;
   }
 
-  async updateGroup({ id, userId, description, name }: UpdateGroupPayload): Promise<Group | null> {
-    await this.checkGroupOwnership(id, userId);
+  async updateGroup({
+    groupId,
+    userId,
+    description,
+    name,
+  }: UpdateGroupPayload): Promise<Group | null> {
+    await this.checkGroupOwnership(groupId, userId);
 
     // update group
     const updatedGroup = await this.db.transaction(async (tx) => {
       const [updatedGroup] = await tx
         .update(groupsTable)
         .set({ description: description, name: name })
-        .where(and(eq(groupsTable.id, id), eq(groupsTable.managerId, userId)))
+        .where(and(eq(groupsTable.id, groupId), eq(groupsTable.managerId, userId)))
         .returning();
 
       if (!updatedGroup) return null;
@@ -63,7 +68,8 @@ export class GroupTransactionImpl implements GroupTransaction {
     return updatedGroup;
   }
 
-  async getGroup({ id, userId }: IDPayload): Promise<Group | null> {
+  async getGroup({ groupId, userId }: GroupIdPayload): Promise<Group | null> {
+    await this.checkGroupMemberManagerOwnership(groupId, userId);
     const [result] = await this.db
       .select({
         id: groupsTable.id,
@@ -72,25 +78,10 @@ export class GroupTransactionImpl implements GroupTransaction {
         name: groupsTable.name,
       })
       .from(groupsTable)
-      .innerJoin(usersTable, eq(usersTable.id, groupsTable.managerId))
-      .innerJoin(
-        membersTable,
-        and(eq(groupsTable.id, membersTable.groupId), eq(membersTable.userId, userId)),
-      )
       .groupBy(groupsTable.id, groupsTable.managerId, groupsTable.description, groupsTable.name)
-      .where(
-        and(
-          eq(groupsTable.id, id),
-          or(
-            // check group
-            eq(groupsTable.managerId, userId),
-          ), // check if user is manager
-          eq(membersTable.userId, userId),
-        ),
-      ); // check if user is member
-
+      .where(eq(groupsTable.id, groupId));
     if (!result) return null;
-
+    console.log(result);
     return result;
   }
 
@@ -104,6 +95,17 @@ export class GroupTransactionImpl implements GroupTransaction {
   async checkGroupOwnership(groupId: string, userId: string): Promise<void> {
     const [group] = await this.db.select().from(groupsTable).where(eq(groupsTable.id, groupId));
     if (group && group.managerId != userId) {
+      throw new ForbiddenError();
+    }
+  }
+
+  async checkGroupMemberManagerOwnership(groupId: string, userId: string): Promise<void> {
+    const [group] = await this.db.select().from(groupsTable).where(eq(groupsTable.id, groupId));
+    const [member] = await this.db
+      .select()
+      .from(membersTable)
+      .where(and(eq(membersTable.groupId, groupId), eq(membersTable.userId, userId)));
+    if ((group && group.managerId != userId) || (member && member.userId != userId)) {
       throw new ForbiddenError();
     }
   }
