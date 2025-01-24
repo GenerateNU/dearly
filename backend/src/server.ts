@@ -5,12 +5,15 @@ import { configureMiddlewares } from "./middlewares/init";
 import { setUpRoutes } from "./routes/init";
 import { automigrateDB } from "./database/migrate";
 import { generateJWTFromID } from "./tests/helpers/test-token";
+import S3Impl from "./services/s3Service";
+import { s3 } from "bun";
 
 const app = new Hono();
 
 const config = getConfigurations();
 
 (async function setUpServer() {
+  const s3ServiceProvider = new S3Impl();
   try {
     const db = connectDB(config);
 
@@ -20,7 +23,7 @@ const config = getConfigurations();
 
     configureMiddlewares(app, config);
 
-    setUpRoutes(app, db);
+    setUpRoutes(app, db, s3ServiceProvider);
 
     console.log("Successfully initialize app");
   } catch (error) {
