@@ -3,7 +3,7 @@ timeout=5
 elapsed=0
 
 setup() {
-  docker-compose -f ./backend/docker-compose.yml up -d # Use the correct relative path to docker-compose.yml
+  docker-compose -f ./docker-compose.yml up -d # Use the correct relative path to docker-compose.yml
 }
 
 ready() {
@@ -19,21 +19,20 @@ ready() {
 
 teardown() {
   # Stop and remove the Docker container after tests finish
-  docker-compose -f ./backend/docker-compose.yml down --volumes
+  docker-compose -f ./docker-compose.yml down --volumes
 }
 
 run() {
   setup
   ready
   NODE_ENV=test
-  echo $#
   if [ $# -eq 0 ]; then
-    bun test --cwd ./backend
+    bun test
   elif [ $# -eq 1 ]; then
-    bun test --cwd ./backend $1
+    bun test $1
   elif [ $# -ge 2 ]; then
     local test_name_pattern="${@:3}"
-    bun test --cwd ./backend --test-name-pattern "$test_name_pattern" $1
+    bun test --test-name-pattern "$test_name_pattern" $1
   fi
   teardown
 }
