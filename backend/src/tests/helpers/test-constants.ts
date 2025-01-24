@@ -1,5 +1,5 @@
 import { CreateGroupPayload } from "../../entities/groups/validator";
-import { mediaTable, postsTable } from "../../entities/schema";
+import { groupsTable, mediaTable, postsTable } from "../../entities/schema";
 import { CreateUserPayload } from "../../entities/users/validator";
 
 export const INVALID_ID_ARRAY = ["1", "%2", "123abc", "!!$$", "123 456", "@ID", null, undefined];
@@ -60,6 +60,21 @@ export const POST_MOCK: (typeof postsTable.$inferInsert)[] = [
     id: POST_ID,
     createdAt: new Date(-1),
     caption: "my first post",
+  },
+];
+
+export const GROUP_MOCK: (typeof groupsTable.$inferInsert)[] = [
+  {
+    id: DEARLY_GROUP_ID,
+    name: "dearly",
+    description: "dearly",
+    managerId: USER_ALICE_ID,
+  },
+  {
+    id: ANOTHER_GROUP_ID,
+    name: "family",
+    description: "family",
+    managerId: USER_ANA_ID,
   },
 ];
 
