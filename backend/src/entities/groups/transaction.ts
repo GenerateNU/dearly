@@ -1,8 +1,8 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { groupsTable, membersTable, usersTable } from "../schema";
+import { groupsTable, membersTable } from "../schema";
 import { CreateGroupPayload, Group, GroupIdPayload, UpdateGroupPayload } from "./validator";
 import { ForbiddenError } from "../../utilities/errors/app-error";
-import { and, eq, or } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 export interface GroupTransaction {
   insertGroup(payload: CreateGroupPayload): Promise<Group | null>;
