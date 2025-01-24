@@ -1,12 +1,16 @@
-import { DeleteObjectCommand, PutObjectCommand, S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
+import {
+  DeleteObjectCommand,
+  PutObjectCommand,
+  S3Client,
+  GetObjectCommand,
+} from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { getConfigurations } from "../config/config";
 import { NotFoundError } from "../utilities/errors/app-error";
 import { randomUUIDv7 } from "bun";
 import sharp from "sharp";
 import * as lame from "@breezystack/lamejs";
 import { MediaType } from "../constants/database";
-
 
 interface IS3Operations {
   // group is the uuid of the group this photo is being sent to (used as tagging number) -> make public group id number
@@ -32,7 +36,7 @@ interface IS3Operations {
    * Will retrive the presigned URL of the given object associated with the given object ID
    * @param objectKey The key of the object in the S3 bucket
    */
-  getObjectURL(objectKey: string): Promise<String>
+  getObjectURL(objectKey: string): Promise<String>;
 }
 
 export default class S3Impl implements IS3Operations {
@@ -69,8 +73,8 @@ export default class S3Impl implements IS3Operations {
    */
   async compressImage(file: Blob): Promise<Blob> {
     const imageBuffer = await file.arrayBuffer();
-    const compressedImage = await sharp(imageBuffer).jpeg({quality: 80}).toBuffer();
-    return new Blob([compressedImage])
+    const compressedImage = await sharp(imageBuffer).jpeg({ quality: 80 }).toBuffer();
+    return new Blob([compressedImage]);
   }
 
   /**
@@ -139,11 +143,11 @@ export default class S3Impl implements IS3Operations {
    * @param objectKey The key of the object in the S3 bucket
    */
   async getObjectURL(objectKey: string): Promise<String> {
-    const waitInSeconds = 60 * 60 * 24
+    const waitInSeconds = 60 * 60 * 24;
     const command = new GetObjectCommand({
       Bucket: this.bucketName,
       Key: objectKey,
-    })
+    });
     let request = await getSignedUrl(this.client, command, { expiresIn: waitInSeconds });
 
     return request;
