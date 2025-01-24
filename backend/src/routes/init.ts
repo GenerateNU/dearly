@@ -9,6 +9,7 @@ import { postRoutes } from "../entities/posts/route";
 import { likeRoutes } from "../entities/likes/route";
 import S3Impl from "../services/s3Service";
 import { likeRoutes } from "../entities/likes/route";
+import S3Impl from "../services/s3Service";
 
 export const setUpRoutes = (app: Hono, db: PostgresJsDatabase, s3ServiceProvider: S3Impl) => {
   // api documentation
