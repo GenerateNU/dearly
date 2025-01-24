@@ -30,7 +30,7 @@ describe("GET /groups/:id/calendar", () => {
     app = await startTestApp();
   });
 
-  it("should return 200 if valid date value and default range", async () => {
+  it("should return 200 if valid pivot value and default range", async () => {
     (
       await testBuilder.request({
         app,
@@ -41,7 +41,7 @@ describe("GET /groups/:id/calendar", () => {
           Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
         },
         queryParams: {
-          date: "1969-12",
+          pivot: "1969-12",
         },
       })
     )
@@ -49,7 +49,7 @@ describe("GET /groups/:id/calendar", () => {
       .assertBody(expected);
   });
 
-  it("should return 200 if correct date value", async () => {
+  it("should return 200 if correct pivot value", async () => {
     (
       await testBuilder.request({
         app,
@@ -61,7 +61,7 @@ describe("GET /groups/:id/calendar", () => {
         },
         queryParams: {
           // should return thumbnail if 3 months back into the past
-          date: "1970-02",
+          pivot: "1970-02",
           range: "3",
         },
       })
@@ -107,7 +107,7 @@ describe("GET /groups/:id/calendar", () => {
             Authorization: `Bearer ${generateJWTFromID()}`,
           },
           queryParams: {
-            date: badDate,
+            pivot: badDate,
           },
         })
       )
@@ -115,7 +115,7 @@ describe("GET /groups/:id/calendar", () => {
         .assertError([
           {
             message: "Date must be in YYYY-MM format and cannot be in future",
-            path: "date",
+            path: "pivot",
           },
         ]);
     },
@@ -135,7 +135,7 @@ describe("GET /groups/:id/calendar", () => {
           Authorization: `Bearer ${generateJWTFromID()}`,
         },
         queryParams: {
-          date: value,
+          pivot: value,
         },
       })
     )
@@ -143,7 +143,7 @@ describe("GET /groups/:id/calendar", () => {
       .assertError([
         {
           message: "Date must be in YYYY-MM format and cannot be in future",
-          path: "date",
+          path: "pivot",
         },
       ]);
   });

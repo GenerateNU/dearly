@@ -46,7 +46,7 @@ export const calendarParamsValidate = z.object({
     .optional()
     .default("1"),
 
-  date: z
+  pivot: z
     .string()
     .refine((input) => validateCalendarParam(input), {
       message: "Date must be in YYYY-MM format and cannot be in future",

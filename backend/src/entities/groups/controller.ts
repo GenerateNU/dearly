@@ -5,11 +5,12 @@ import { calendarParamsValidate, createGroupValidate, feedParamValidate } from "
 import { Status } from "../../constants/http";
 import { handleAppError } from "../../utilities/errors/app-error";
 import { parseUUID } from "../../utilities/uuid";
+import { CALENDAR_API, FEED_API } from "../../types/api/routes/groups";
 
 export interface GroupController {
   createGroup(ctx: Context): Promise<GROUP_API>;
-  getCalendar(ctx: Context): Promise<Response>;
-  getAllPosts(ctx: Context): Promise<Response>;
+  getCalendar(ctx: Context): Promise<CALENDAR_API>;
+  getAllPosts(ctx: Context): Promise<FEED_API>;
 }
 
 export class GroupControllerImpl implements GroupController {
@@ -35,11 +36,11 @@ export class GroupControllerImpl implements GroupController {
     return await handleAppError(createGroupImpl)(ctx);
   }
 
-  async getCalendar(ctx: Context): Promise<Response> {
+  async getCalendar(ctx: Context): Promise<CALENDAR_API> {
     const getCalendarImpl = async () => {
-      const { date, range } = ctx.req.query();
+      const { pivot, range } = ctx.req.query();
       const groupId = parseUUID(ctx.req.param("id"));
-      const parsedParams = calendarParamsValidate.parse({ date, range });
+      const parsedParams = calendarParamsValidate.parse({ pivot, range });
       const calendar = await this.groupService.getCalendar({
         ...parsedParams,
         userId: ctx.get("userId"),
@@ -50,7 +51,7 @@ export class GroupControllerImpl implements GroupController {
     return await handleAppError(getCalendarImpl)(ctx);
   }
 
-  async getAllPosts(ctx: Context): Promise<Response> {
+  async getAllPosts(ctx: Context): Promise<FEED_API> {
     const getAllPostsImpl = async () => {
       const { date, limit, page } = ctx.req.query();
       const groupId = parseUUID(ctx.req.param("id"));
