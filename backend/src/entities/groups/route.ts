@@ -12,6 +12,9 @@ export const groupRoutes = (db: PostgresJsDatabase): Hono => {
   const groupController: GroupController = new GroupControllerImpl(groupService);
 
   group.post("/", (ctx) => groupController.createGroup(ctx));
+  group.delete("/:id", (ctx) => groupController.deleteGroup(ctx));
+  group.get("/:id", (ctx) => groupController.getGroup(ctx));
+  group.patch("/:id", (ctx) => groupController.updateGroup(ctx));
 
   return group;
 };
