@@ -66,9 +66,6 @@ describe("DELETE /groups/:id", () => {
       .assertStatusCode(Status.Forbidden)
       .assertError("Forbidden");
 
-    // TODO: should we be returning status 200 or 404 if group doesn't exist
-    // posts return 404 and users return 200?
-
     // not member of the group
     (
       await testBuilder.request({

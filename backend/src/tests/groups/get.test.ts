@@ -53,9 +53,6 @@ describe("GET /groups/:id", () => {
       })
       .getResponseId();
 
-    // TODO: How to write a test for succesfully getting a group as a member
-    // when no member table yet?
-
     // manager of group
     (
       await testBuilder.request({
