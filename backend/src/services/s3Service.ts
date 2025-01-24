@@ -105,7 +105,6 @@ export default class S3Impl implements IS3Operations {
    * @returns Will return the S3 object key
    */
   async saveObject(file: Blob, tag: string, fileType: MediaType): Promise<string> {
-    // to-do: compress blob, and deal with permission
     const objectKey: string = randomUUIDv7();
     const compressedFile =
       fileType == MediaType.PHOTO ? await this.compressImage(file) : await this.compressAudio(file);
@@ -148,8 +147,7 @@ export default class S3Impl implements IS3Operations {
       Bucket: this.bucketName,
       Key: objectKey,
     });
-    let request = await getSignedUrl(this.client, command, { expiresIn: waitInSeconds });
-
+    const request = await getSignedUrl(this.client, command, { expiresIn: waitInSeconds }); 
     return request;
   }
 }

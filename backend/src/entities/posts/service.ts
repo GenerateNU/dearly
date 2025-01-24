@@ -3,7 +3,7 @@ import { PostTransaction } from "./transaction";
 import { InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
 import { IDPayload } from "../../types/id";
-import S3Impl from "../../services/s3Service";
+import IS3Operations from "../../services/s3Service";
 
 export interface PostService {
   createPost(payload: CreatePostPayload): Promise<PostWithMedia>;
@@ -14,9 +14,9 @@ export interface PostService {
 
 export class PostServiceImpl implements PostService {
   private postTransaction: PostTransaction;
-  private s3ServiceProvider: S3Impl;
+  private s3ServiceProvider: IS3Operations ;
 
-  constructor(postTransaction: PostTransaction, s3ServiceProvider: S3Impl) {
+  constructor(postTransaction: PostTransaction, s3ServiceProvider: IS3Operations) {
     this.postTransaction = postTransaction;
     this.s3ServiceProvider = s3ServiceProvider;
   }
