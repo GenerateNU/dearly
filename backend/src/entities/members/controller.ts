@@ -5,7 +5,7 @@ import { handleAppError } from "../../utilities/errors/app-error";
 import { Status } from "../../constants/http";
 import { ADD_MEMBER, DEL_MEMBER, MEMBERS_API } from "../../types/api/routes/members";
 import { MemberRole } from "../../constants/database";
-// import { paginationSchema } from "../../utilities/pagination";
+import { paginationSchema } from "../../utilities/pagination";
 
 export interface MemberController {
   addMember(ctx: Context): Promise<ADD_MEMBER>;
@@ -55,16 +55,12 @@ export class MemberControllerImpl implements MemberController {
   async getMembers(ctx: Context): Promise<MEMBERS_API> {
     const getMembers = async () => {
       // get userId from decoded JWT
-      const clientId = parseUUID(ctx.get("userId"));
+      const { limit, page } = ctx.req.query();
+      const queryParams = paginationSchema.parse({ limit, page });
+      const id = parseUUID(ctx.get("userId"));
       const groupId = parseUUID(ctx.req.param("id"));
-      const limit = parseInt(ctx.req.query("limit") || "10", 10);
-      const offset = parseInt(ctx.req.query("offset") || "0", 10);
 
-      console.log(clientId, groupId);
-
-      const members = await this.memberService.getMembers(clientId, groupId, limit, offset);
-      console.log(`Members: ${members}`);
-
+      const members = await this.memberService.getMembers(groupId, { id, ...queryParams });
       return ctx.json(members, Status.OK);
     };
 

@@ -1,13 +1,13 @@
 import { InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
-import { User } from "../users/validator";
+import { Pagination, SearchedUser, User } from "../users/validator";
 import { MemberTransaction } from "./transaction";
 import { addMemberPayload, Member } from "./validator";
 
 export interface MemberService {
   addMember(payload: addMemberPayload): Promise<Member>;
   deleteMember(clientId: string, userId: string, groupId: string): Promise<void>;
-  getMembers(clientId: string, groupId: string, limit: number, offset: number): Promise<User[]>;
+  getMembers(groupId: string, payload: Pagination): Promise<SearchedUser[]>;
 }
 
 export class MemberServiceImpl implements MemberService {
@@ -35,14 +35,9 @@ export class MemberServiceImpl implements MemberService {
     return handleServiceError(deleteMemberImpl)();
   }
 
-  async getMembers(
-    clientId: string,
-    groupId: string,
-    limit: number,
-    offset: number,
-  ): Promise<User[]> {
+  async getMembers(groupId: string, payload: Pagination): Promise<SearchedUser[]> {
     const getMembersImpl = async () => {
-      const members = await this.memberTransaction.getMembers(clientId, groupId, limit, offset);
+      const members = await this.memberTransaction.getMembers(groupId, payload);
       if (!members) {
         throw new NotFoundError("Group");
       }

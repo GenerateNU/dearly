@@ -1,19 +1,14 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { membersTable, groupsTable, usersTable } from "../schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 import { addMemberPayload, Member } from "./validator";
-import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
-import { User } from "../users/validator";
+import { BadRequestError, ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
+import { Pagination, SearchedUser, User } from "../users/validator";
 
 export interface MemberTransaction {
   insertMember(payload: addMemberPayload): Promise<Member | null>;
   deleteMember(clientId: string, userId: string, groupId: string): Promise<Member | null>;
-  getMembers(
-    clientId: string,
-    groupId: string,
-    limit: number,
-    offset: number,
-  ): Promise<User[] | null>;
+  getMembers(groupId: string, payload: Pagination): Promise<SearchedUser[] | null>;
 }
 
 export class MemberTransactionImpl implements MemberTransaction {
@@ -62,33 +57,41 @@ export class MemberTransactionImpl implements MemberTransaction {
   }
 
   async getMembers(
-    clientId: string,
     groupId: string,
-    limit: number,
-    offset: number,
-  ): Promise<User[] | null> {
-    // TODO: deal with invalid offset
-    const members = await this.db
+    { id, limit, page }: Pagination,
+  ): Promise<SearchedUser[] | null> {
+    if (!id || !groupId) {
+      throw new BadRequestError("Invalid request parameters.");
+    }
+
+    const requesterIdIsMember = await this.db
+      .select()
+      .from(membersTable)
+      .where(and(eq(membersTable.groupId, groupId), eq(membersTable.userId, id)))
+      .limit(1);
+
+    if (requesterIdIsMember.length === 0) {
+      throw new ForbiddenError("You do not have the rights to the member list of this group.");
+    }
+
+    const paginatedMembers = await this.db
       .select({
-        name: usersTable.name,
         id: usersTable.id,
+        name: usersTable.name,
         username: usersTable.username,
-        mode: usersTable.mode,
         profilePhoto: usersTable.profilePhoto,
-        notificationsEnabled: usersTable.notificationsEnabled,
+        isMember:
+          sql<boolean>`CASE WHEN ${membersTable.groupId} = ${groupId} THEN true ELSE false END`.as(
+            "isMember", // assuming that member includes manager
+          ),
       })
       .from(usersTable)
       .innerJoin(membersTable, eq(usersTable.id, membersTable.userId))
       .where(eq(membersTable.groupId, groupId))
+      .orderBy(usersTable.name)
       .limit(limit)
-      .offset(offset);
+      .offset((page - 1) * limit);
 
-    if (!members) return null;
-
-    if (!members.reduce((acc, member) => acc || member.id == clientId, false)) {
-      throw new ForbiddenError("You do not have the rights to the member list of this group.");
-    }
-
-    return members;
+    return paginatedMembers;
   }
 }

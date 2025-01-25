@@ -157,11 +157,6 @@ components:
     Member:
       type: object
       properties:
-        id:
-          type: string
-          format: uuid
-          example: 5e91507e-5630-4efd-9fd4-799178870b10
-          description: A unique identifier for the member of this group.
         groupId:
           type: string
           format: uuid
@@ -1344,7 +1339,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /api/v1/groups/{id}/members/{userId}:
+  /api/v1/groups/{groupId}/members/{userId}:
     post:
       tags:
         - Members Endpoints
@@ -1470,7 +1465,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /api/v1/groups/{id}/members:
+  /api/v1/groups/{groupId}/members:
     get:
       tags:
         - Members Endpoints

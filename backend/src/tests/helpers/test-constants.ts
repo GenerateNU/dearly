@@ -1,6 +1,6 @@
 import { CreateGroupPayload } from "../../entities/groups/validator";
-import { groupsTable, mediaTable, postsTable } from "../../entities/schema";
-import { CreateUserPayload } from "../../entities/users/validator";
+import { groupsTable, mediaTable, postsTable, membersTable } from "../../entities/schema";
+import { CreateUserPayload, SearchedUser } from "../../entities/users/validator";
 
 export const INVALID_ID_ARRAY = ["1", "%2", "123abc", "!!$$", "123 456", "@ID", null, undefined];
 export const USER_ALICE_ID = "00000000-0000-0000-0000-000000000000";
@@ -78,11 +78,52 @@ export const GROUP_MOCK: (typeof groupsTable.$inferInsert)[] = [
   },
 ];
 
+// export const MEMBER_MOCK: (typeof membersTable.$inferInsert)[] = [
+//   {
+//     userId: USER_ALICE_ID,
+//     groupId: DEARLY_GROUP_ID,
+//     role: "MANAGER",
+//   },
+//   {
+//     userId: USER_BOB_ID,
+//     groupId: DEARLY_GROUP_ID,
+//     role: "MEMBER",
+//   },
+//   {
+//     userId: USER_ANA_ID,
+//     groupId: ANOTHER_GROUP_ID,
+//     role: "MANAGER",
+//   },
+//   {
+//     userId: USER_BILL_ID,
+//     groupId: ANOTHER_GROUP_ID,
+//     role: "MEMBER",
+//   },
+//   {
+//     userId: USER_ALICE_ID,
+//     groupId: ANOTHER_GROUP_ID,
+//     role: "MEMBER",
+//   },
+//   {
+//     userId: USER_BILL_ID,
+//     groupId: DEARLY_GROUP_ID,
+//     role: "MEMBER",
+//   },
+// ];
+
 export const USER_ALICE: CreateUserPayload = {
   name: "Alice",
   username: "alice123",
   mode: "BASIC",
   id: USER_ALICE_ID,
+};
+
+export const SEARCHED_ALICE: SearchedUser = {
+  id: USER_ALICE_ID,
+  name: USER_ALICE["name"],
+  username: USER_ALICE["username"],
+  profilePhoto: null,
+  isMember: true,
 };
 
 export const USER_BOB: CreateUserPayload = {
@@ -92,11 +133,27 @@ export const USER_BOB: CreateUserPayload = {
   id: USER_BOB_ID,
 };
 
+export const SEARCHED_BOB: SearchedUser = {
+  id: USER_BOB_ID,
+  name: USER_BOB["name"],
+  username: USER_BOB["username"],
+  profilePhoto: null,
+  isMember: true,
+};
+
 export const USER_ANA: CreateUserPayload = {
   name: "Ana",
   username: "ana",
   mode: "BASIC",
   id: USER_ANA_ID,
+};
+
+export const SEARCHED_ANA: SearchedUser = {
+  id: USER_ANA_ID,
+  name: USER_ANA["name"],
+  username: USER_ANA["username"],
+  profilePhoto: null,
+  isMember: true,
 };
 
 export const USER_BILL: CreateUserPayload = {
