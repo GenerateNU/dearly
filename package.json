@@ -4,5 +4,9 @@
   },
   "devDependencies": {
     "lint-staged": "^15.2.11"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.731.0",
+    "sharp": "^0.33.5"
   }
 }

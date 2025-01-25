@@ -87,9 +87,7 @@ export const membersTable = pgTable(
     role: memberRoleEnum().notNull().default("MEMBER"),
   },
   (table) => {
-    return [
-      primaryKey({ columns: [table.userId, table.groupId] }),
-    ];
+    return [primaryKey({ columns: [table.userId, table.groupId] })];
   },
 );
 

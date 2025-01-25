@@ -60,10 +60,10 @@ export class MemberControllerImpl implements MemberController {
       const limit = parseInt(ctx.req.query("limit") || "10", 10);
       const offset = parseInt(ctx.req.query("offset") || "0", 10);
 
-      console.log(clientId, groupId)
+      console.log(clientId, groupId);
 
       const members = await this.memberService.getMembers(clientId, groupId, limit, offset);
-      console.log(`Members: ${members}`)
+      console.log(`Members: ${members}`);
 
       return ctx.json(members, Status.OK);
     };

@@ -27,7 +27,13 @@ export class MemberTransactionImpl implements MemberTransaction {
     // TODO: on conflict do nothing
     await this.db.insert(membersTable).values(payload).onConflictDoNothing();
 
-    const [memberAdded] = await this.db.select().from(membersTable).where(and(eq(membersTable.userId, payload.userId), eq(membersTable.groupId, payload.groupId))).limit(1);
+    const [memberAdded] = await this.db
+      .select()
+      .from(membersTable)
+      .where(
+        and(eq(membersTable.userId, payload.userId), eq(membersTable.groupId, payload.groupId)),
+      )
+      .limit(1);
 
     return memberAdded ?? null;
   }
