@@ -1,14 +1,26 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { groupsTable, membersTable } from "../schema";
-import { CreateGroupPayload, Group, GroupIdPayload, UpdateGroupPayload } from "./validator";
-import { ForbiddenError } from "../../utilities/errors/app-error";
-import { and, eq } from "drizzle-orm";
+import { groupsTable, likesTable, mediaTable, membersTable, postsTable } from "../schema";
+import {
+  CalendarParamPayload,
+  CreateGroupPayload,
+  FeedParamPayload,
+  Group,
+  GroupIdPayload,
+  Thumbnail,
+  ThumbnailResponse,
+  UpdateGroupPayload,
+} from "./validator";
+import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
+import { and, eq, sql, desc, between } from "drizzle-orm";
+import { Media, PostWithMedia } from "../posts/validator";
 
 export interface GroupTransaction {
   insertGroup(payload: CreateGroupPayload): Promise<Group | null>;
   deleteGroup(groupId: string, userId: string): Promise<void>;
   getGroup(payload: GroupIdPayload): Promise<Group | null>;
   updateGroup(payload: UpdateGroupPayload): Promise<Group | null>;
+  getAllPosts(payload: FeedParamPayload): Promise<PostWithMedia[]>;
+  getCalendar(payload: CalendarParamPayload): Promise<ThumbnailResponse[]>;
 }
 
 export class GroupTransactionImpl implements GroupTransaction {
@@ -36,6 +48,84 @@ export class GroupTransactionImpl implements GroupTransaction {
       return null;
     });
     return createdGroup ?? null;
+  }
+
+  async getAllPosts({
+    userId,
+    limit,
+    page,
+    date,
+    groupId,
+  }: FeedParamPayload): Promise<PostWithMedia[]> {
+    await this.checkMembership(groupId, userId);
+
+    const selectedFields = {
+      id: postsTable.id,
+      userId: postsTable.userId,
+      groupId: postsTable.groupId,
+      createdAt: postsTable.createdAt,
+      caption: postsTable.caption,
+      media: sql<Media[]>`array_agg(
+            json_build_object(
+              'id', ${mediaTable.id},
+              'type', ${mediaTable.type},
+              'postId', ${mediaTable.postId},
+              'url', ${mediaTable.url}
+            )
+          )`,
+    };
+
+    return await this.db
+      .select(selectedFields)
+      .from(postsTable)
+      .innerJoin(mediaTable, eq(mediaTable.postId, postsTable.id))
+      // extra check to return nothing if user is not a member of group
+      .innerJoin(
+        membersTable,
+        and(eq(membersTable.groupId, groupId), eq(membersTable.userId, userId)),
+      )
+      .where(
+        and(
+          date
+            ? eq(sql`DATE(${postsTable.createdAt})`, sql`DATE(${date.toISOString()})`)
+            : undefined,
+          eq(postsTable.groupId, groupId),
+        ),
+      )
+      .groupBy(
+        postsTable.id,
+        postsTable.userId,
+        postsTable.groupId,
+        postsTable.createdAt,
+        postsTable.caption,
+      )
+      // most recent to less recent
+      .orderBy(desc(postsTable.createdAt))
+      .limit(limit)
+      .offset((page - 1) * limit);
+  }
+
+  async checkMembership(groupId: string, userId: string): Promise<void> {
+    const [group] = await this.db
+      .select({
+        memberId: membersTable.userId,
+      })
+      .from(groupsTable)
+      .leftJoin(
+        membersTable,
+        and(eq(membersTable.groupId, groupsTable.id), eq(membersTable.userId, userId)),
+      )
+      .where(eq(groupsTable.id, groupId));
+
+    if (!group) {
+      throw new NotFoundError("Group");
+    }
+
+    const { memberId } = group;
+
+    if (memberId === null) {
+      throw new ForbiddenError();
+    }
   }
 
   async updateGroup({
@@ -95,6 +185,68 @@ export class GroupTransactionImpl implements GroupTransaction {
     if (group && group.managerId != userId) {
       throw new ForbiddenError();
     }
+  }
+
+  async getCalendar({
+    pivot,
+    userId,
+    groupId,
+    range,
+  }: CalendarParamPayload): Promise<ThumbnailResponse[]> {
+    await this.checkMembership(groupId, userId);
+    const rangeStartDate = new Date(pivot);
+    rangeStartDate.setMonth(rangeStartDate.getMonth() - range);
+
+    // subquery to get all groups of posts that are grouped into date and sorted by likes
+    const rankedPosts = this.db
+      .select({
+        createdAt: postsTable.createdAt,
+        url: mediaTable.url,
+        likes: sql<number>`COUNT(${likesTable.id}) AS likeCount`,
+        rowNum:
+          sql<number>`ROW_NUMBER() OVER (PARTITION BY DATE(${postsTable.createdAt}) ORDER BY COUNT(${likesTable.id}) DESC)`.as(
+            "rowNum",
+          ),
+      })
+      .from(postsTable)
+      .leftJoin(likesTable, eq(likesTable.postId, postsTable.id))
+      .innerJoin(mediaTable, eq(mediaTable.postId, postsTable.id))
+      .where(
+        between(
+          postsTable.createdAt,
+          sql`${rangeStartDate.toISOString()}`,
+          sql`${new Date(pivot).toISOString()}`,
+        ),
+      )
+      .groupBy(sql`DATE(${postsTable.createdAt})`, postsTable.id, mediaTable.url)
+      .as("rankedPosts");
+
+    const result = await this.db
+      .select({
+        year: sql<number>`cast(EXTRACT(YEAR FROM ${rankedPosts.createdAt}) as int)`.as("year"),
+        month: sql<number>`cast(EXTRACT(MONTH FROM ${rankedPosts.createdAt}) as int)`.as("month"),
+        data: sql<Thumbnail[]>`ARRAY_AGG(
+          JSON_BUILD_OBJECT(
+            'day', EXTRACT(DAY FROM ${rankedPosts.createdAt}),
+            'url', ${rankedPosts.url}
+          )
+        )`.as("data"),
+      })
+      .from(rankedPosts)
+      // get the most liked post from each day
+      .where(sql`${rankedPosts.rowNum} = 1`)
+      // group these posts by month and year
+      .groupBy(
+        sql`EXTRACT(YEAR FROM ${rankedPosts.createdAt})`,
+        sql`EXTRACT(MONTH FROM ${rankedPosts.createdAt})`,
+      )
+      // order these groups by most recent month to less recent months
+      .orderBy(
+        sql`EXTRACT(YEAR FROM ${rankedPosts.createdAt}) DESC`,
+        sql`EXTRACT(MONTH FROM ${rankedPosts.createdAt}) DESC`,
+      );
+
+    return result;
   }
 
   async checkGroupMemberManagerOwnership(groupId: string, userId: string): Promise<void> {
