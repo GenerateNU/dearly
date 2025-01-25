@@ -70,7 +70,7 @@ export class GroupTransactionImpl implements GroupTransaction {
               'id', ${mediaTable.id},
               'type', ${mediaTable.type},
               'postId', ${mediaTable.postId},
-              'url', ${mediaTable.url}
+              'objectKey', ${mediaTable.objectKey}
             )
           )`,
     };
@@ -201,7 +201,7 @@ export class GroupTransactionImpl implements GroupTransaction {
     const rankedPosts = this.db
       .select({
         createdAt: postsTable.createdAt,
-        url: mediaTable.url,
+        objectKey: mediaTable.objectKey,
         likes: sql<number>`COUNT(${likesTable.id}) AS likeCount`,
         rowNum:
           sql<number>`ROW_NUMBER() OVER (PARTITION BY DATE(${postsTable.createdAt}) ORDER BY COUNT(${likesTable.id}) DESC)`.as(
@@ -218,7 +218,7 @@ export class GroupTransactionImpl implements GroupTransaction {
           sql`${new Date(pivot).toISOString()}`,
         ),
       )
-      .groupBy(sql`DATE(${postsTable.createdAt})`, postsTable.id, mediaTable.url)
+      .groupBy(sql`DATE(${postsTable.createdAt})`, postsTable.id, mediaTable.objectKey)
       .as("rankedPosts");
 
     const result = await this.db
@@ -228,7 +228,7 @@ export class GroupTransactionImpl implements GroupTransaction {
         data: sql<Thumbnail[]>`ARRAY_AGG(
           JSON_BUILD_OBJECT(
             'day', EXTRACT(DAY FROM ${rankedPosts.createdAt}),
-            'url', ${rankedPosts.url}
+            'objectKey', ${rankedPosts.objectKey}
           )
         )`.as("data"),
       })
