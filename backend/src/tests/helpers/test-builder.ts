@@ -98,25 +98,6 @@ export class TestBuilder {
   }
 
   /**
-   * Format headers based on autoAuthorized.
-   */
-  private formatHeaders(
-    autoAuthorized?: boolean,
-    headers?: Record<string, string>,
-  ): Record<string, string> {
-    if (!autoAuthorized) {
-      return {
-        ...headers,
-      };
-    } else {
-      return {
-        Authorization: `Bearer ${generateJWTFromID(generateUUID())}`,
-        ...headers,
-      };
-    }
-  }
-
-  /**
    * Get the response ID (for non-DELETE requests)
    */
   getResponseId(): string {

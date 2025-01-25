@@ -29,12 +29,12 @@ describe.only("GET /members", () => {
     app = await startTestApp();
   });
 
-  async function addMember(memberId:string) {
+  async function addMember(memberId: string) {
     (
       await testBuilder.request({
         app,
         type: HTTPRequest.POST,
-        route: `/api/v1/groups/${DEARLY_GROUP_ID}/members/${memberId}`
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/members/${memberId}`,
       })
     ).assertStatusCode(Status.Created);
   }
@@ -91,6 +91,5 @@ describe.only("GET /members", () => {
         },
       })
     ).assertStatusCode(Status.Forbidden);
-  })
-
+  });
 });
