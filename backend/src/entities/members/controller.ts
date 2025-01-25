@@ -58,7 +58,7 @@ export class MemberControllerImpl implements MemberController {
       const clientId = parseUUID(ctx.get("userId"));
       const groupId = parseUUID(ctx.req.param("id"));
       const limit = parseInt(ctx.req.query("limit") || "10", 10);
-      const offset = parseInt(ctx.req.query("offset") || "0", 0);
+      const offset = parseInt(ctx.req.query("offset") || "0", 10);
 
       console.log(clientId, groupId)
 
