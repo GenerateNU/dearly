@@ -14,7 +14,6 @@ import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error"
 import { and, eq, sql, desc, between } from "drizzle-orm";
 import { Media, PostWithMedia } from "../posts/validator";
 
-
 export interface GroupTransaction {
   insertGroup(payload: CreateGroupPayload): Promise<Group | null>;
   deleteGroup(groupId: string, userId: string): Promise<void>;

@@ -97,7 +97,6 @@ export class TestBuilder {
     return resultHeaders;
   }
 
-
   getResponseBodyKey(key: string): unknown {
     if (this.type === HTTPRequest.DELETE) {
       throw new Error("Cannot retrieve id from DELETE request");
