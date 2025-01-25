@@ -3,17 +3,8 @@ import {
   USER_BOB_ID,
   DEARLY_GROUP_ID,
   USER_ALICE_ID,
-  DEARLY_GROUP,
-  ANOTHER_GROUP,
-  POST_ID,
-  POST_MOCK,
-  MEDIA_MOCK,
   INVALID_ID_ARRAY,
-  USER_BOB,
   USER_BILL_ID,
-  USER_ANA,
-  USER_ALICE,
-  USER_BILL,
   ANOTHER_GROUP_ID,
   SEARCHED_ALICE,
   SEARCHED_BOB,
@@ -37,16 +28,6 @@ describe.only("GET /members", () => {
   beforeAll(async () => {
     app = await startTestApp();
   });
-
-  // async function addMember(memberId: string) {
-  //   (
-  //     await testBuilder.request({
-  //       app,
-  //       type: HTTPRequest.POST,
-  //       route: `/api/v1/groups/${DEARLY_GROUP_ID}/members/${memberId}`,
-  //     })
-  //   ).assertStatusCode(Status.Created);
-  // }
 
   it("should return 200 and a list of all members when requested by member or manager", async () => {
     // member of group

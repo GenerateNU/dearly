@@ -8,8 +8,6 @@ import {
   DEARLY_GROUP_ID,
   USER_ALICE_ID,
   USER_ANA_ID,
-  USER_BILL_ID,
-  USER_BOB,
   USER_BOB_ID,
 } from "./../helpers/test-constants";
 
@@ -120,6 +118,17 @@ describe("DELETE groups/{id}/members/{userId}", () => {
         type: HTTPRequest.DELETE,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/members/${USER_ALICE_ID}`,
         ...authPayload(ana_jwt),
+      })
+    )
+      .assertStatusCode(Status.Forbidden)
+      .assertError(forbiddenMessage);
+
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.DELETE,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/members/${USER_ALICE_ID}`,
+        ...authPayload(random_jwt),
       })
     )
       .assertStatusCode(Status.Forbidden)

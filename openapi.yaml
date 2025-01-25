@@ -1472,7 +1472,7 @@ paths:
       summary: Gets members of this group.
       description: Gets all the members in this group.
       parameters:
-        - name: id
+        - name: groupId
           in: path
           description: ID of the group
           required: true
@@ -1502,7 +1502,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Member"
+                $ref: "#/components/schemas/SearchedUser"
         400:
           description: Malformed request
           content:

@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
-import { generateJWTFromID, generateUUID } from "../helpers/test-token";
+import { generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
 import { MemberRole } from "../../constants/database";
 import { DEARLY_GROUP_ID, USER_ALICE_ID, USER_ANA_ID } from "./../helpers/test-constants";
@@ -61,7 +61,6 @@ describe("POST /members", () => {
 
   it("should return 404 if user does not exist", async () => {
     const testId = generateUUID();
-    // const responseId = (
     (
       await testBuilder.request({
         app,

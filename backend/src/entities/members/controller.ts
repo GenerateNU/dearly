@@ -59,7 +59,6 @@ export class MemberControllerImpl implements MemberController {
       const queryParams = paginationSchema.parse({ limit, page });
       const id = parseUUID(ctx.get("userId"));
       const groupId = parseUUID(ctx.req.param("id"));
-
       const members = await this.memberService.getMembers(groupId, { id, ...queryParams });
       return ctx.json(members, Status.OK);
     };
