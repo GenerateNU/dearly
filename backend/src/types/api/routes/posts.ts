@@ -1,11 +1,10 @@
 import { TypedResponse } from "hono";
-import { components, paths } from "../../../gen/openapi";
+import { paths } from "../../../gen/openapi";
 import { API_ERROR } from "../schemas/error";
 
 export type POST_API = TypedResponse<
   | paths["/api/v1/groups/{id}/posts"]["post"]["responses"]["201"]["content"]["application/json"]
-  | components["schemas"]["Error"]
-  | components["schemas"]["ValidationError"]
+  | API_ERROR
 >;
 
 export type DEL_POST = TypedResponse<
