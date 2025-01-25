@@ -6,11 +6,14 @@ import { setUpRoutes } from "../../routes/init";
 import { automigrateDB } from "../../database/migrate";
 import { resetDB } from "../../database/reset";
 import { seedDatabase } from "./seed-db";
+import S3Impl from "../../services/s3Service";
 
 export const startTestApp = async (): Promise<Hono> => {
   const app = new Hono();
 
   const config = getConfigurations();
+
+  const s3 = new S3Impl(config.s3Config);
 
   const db = connectDB(config);
 
@@ -22,7 +25,7 @@ export const startTestApp = async (): Promise<Hono> => {
 
   configureMiddlewares(app, config);
 
-  setUpRoutes(app, db);
+  setUpRoutes(app, db, s3);
 
   return app;
 };
