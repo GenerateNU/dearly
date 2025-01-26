@@ -1,6 +1,6 @@
-import { CreateGroupPayload } from "../../entities/groups/validator";
 import { groupsTable, mediaTable, postsTable } from "../../entities/schema";
-import { CreateUserPayload } from "../../entities/users/validator";
+import { CreateGroupPayload } from "../../types/api/internal/groups";
+import { CreateUserPayload } from "../../types/api/internal/users";
 
 export const INVALID_ID_ARRAY = ["1", "%2", "123abc", "!!$$", "123 456", "@ID", null, undefined];
 export const USER_ALICE_ID = "00000000-0000-0000-0000-000000000000";
