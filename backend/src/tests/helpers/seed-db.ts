@@ -6,7 +6,6 @@ import {
   postsTable,
   usersTable,
 } from "../../entities/schema";
-import { CreateUserPayload } from "../../entities/users/validator";
 import {
   ANOTHER_GROUP,
   ANOTHER_GROUP_ID,
@@ -22,7 +21,8 @@ import {
   USER_BOB,
   USER_BOB_ID,
 } from "./test-constants";
-import { CreateGroupPayload } from "../../entities/groups/validator";
+import { CreateGroupPayload } from "../../types/api/internal/groups";
+import { CreateUserPayload } from "../../types/api/internal/users";
 
 export const seedDatabase = async (db: PostgresJsDatabase) => {
   try {
