@@ -23,7 +23,6 @@ export class InvitationServiceImpl implements InvitationService {
   async verifyInviteToken(token: string, userId: string): Promise<void> {
     const verifyInviteTokenImpl = async () => {
       const groupId = await this.InvitationTransaction.getGroupIdFromToken(token);
-
       if (await this.InvitationTransaction.isManager(userId, groupId)) {
         throw new NotFoundError("Group");
       }
