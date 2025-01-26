@@ -4,7 +4,6 @@ import {
   DEARLY_GROUP_ID,
   USER_ALICE_ID,
   INVALID_ID_ARRAY,
-  USER_BILL_ID,
   ANOTHER_GROUP_ID,
   SEARCHED_ALICE,
   SEARCHED_BOB,
@@ -23,7 +22,6 @@ describe.only("GET /members", () => {
   const ALICE_JWT = generateJWTFromID(USER_ALICE_ID);
   const BOB_JWT = generateJWTFromID(USER_BOB_ID);
   const ANA_JWT = generateJWTFromID(USER_ANA_ID);
-  const BILL_JWT = generateJWTFromID(USER_BILL_ID);
 
   beforeAll(async () => {
     app = await startTestApp();

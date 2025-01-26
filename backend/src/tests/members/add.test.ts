@@ -14,7 +14,6 @@ describe("POST /members", () => {
     app = await startTestApp();
   });
 
-  // TODO: delete member after added
   it("should return 201 if a valid user is added to the group and was not already present in the group", async () => {
     const testId = generateUUID();
     (

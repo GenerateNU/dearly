@@ -1,7 +1,6 @@
 import { membersTable } from "../schema";
-// import z from "zod";
 
-export type addMemberPayload = {
+export type AddMemberPayload = {
   userId: string;
   groupId: string;
   role: "MEMBER" | "MANAGER";

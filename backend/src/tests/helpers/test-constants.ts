@@ -1,5 +1,5 @@
 import { CreateGroupPayload } from "../../entities/groups/validator";
-import { groupsTable, mediaTable, postsTable, membersTable } from "../../entities/schema";
+import { groupsTable, mediaTable, postsTable } from "../../entities/schema";
 import { CreateUserPayload, SearchedUser } from "../../entities/users/validator";
 
 export const INVALID_ID_ARRAY = ["1", "%2", "123abc", "!!$$", "123 456", "@ID", null, undefined];
@@ -77,39 +77,6 @@ export const GROUP_MOCK: (typeof groupsTable.$inferInsert)[] = [
     managerId: USER_ANA_ID,
   },
 ];
-
-// export const MEMBER_MOCK: (typeof membersTable.$inferInsert)[] = [
-//   {
-//     userId: USER_ALICE_ID,
-//     groupId: DEARLY_GROUP_ID,
-//     role: "MANAGER",
-//   },
-//   {
-//     userId: USER_BOB_ID,
-//     groupId: DEARLY_GROUP_ID,
-//     role: "MEMBER",
-//   },
-//   {
-//     userId: USER_ANA_ID,
-//     groupId: ANOTHER_GROUP_ID,
-//     role: "MANAGER",
-//   },
-//   {
-//     userId: USER_BILL_ID,
-//     groupId: ANOTHER_GROUP_ID,
-//     role: "MEMBER",
-//   },
-//   {
-//     userId: USER_ALICE_ID,
-//     groupId: ANOTHER_GROUP_ID,
-//     role: "MEMBER",
-//   },
-//   {
-//     userId: USER_BILL_ID,
-//     groupId: DEARLY_GROUP_ID,
-//     role: "MEMBER",
-//   },
-// ];
 
 export const USER_ALICE: CreateUserPayload = {
   name: "Alice",

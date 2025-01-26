@@ -1,12 +1,12 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { membersTable, groupsTable, usersTable } from "../schema";
 import { eq, and, sql } from "drizzle-orm";
-import { addMemberPayload, Member } from "./validator";
-import { BadRequestError, ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
-import { Pagination, SearchedUser, User } from "../users/validator";
+import { AddMemberPayload, Member } from "./validator";
+import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
+import { Pagination, SearchedUser } from "../users/validator";
 
 export interface MemberTransaction {
-  insertMember(payload: addMemberPayload): Promise<Member | null>;
+  insertMember(payload: AddMemberPayload): Promise<Member | null>;
   deleteMember(clientId: string, userId: string, groupId: string): Promise<Member | null>;
   getMembers(groupId: string, payload: Pagination): Promise<SearchedUser[] | null>;
 }
@@ -18,8 +18,7 @@ export class MemberTransactionImpl implements MemberTransaction {
     this.db = db;
   }
 
-  async insertMember(payload: addMemberPayload): Promise<Member | null> {
-    // TODO: on conflict do nothing
+  async insertMember(payload: AddMemberPayload): Promise<Member | null> {
     await this.db.insert(membersTable).values(payload).onConflictDoNothing();
 
     const [memberAdded] = await this.db
@@ -60,10 +59,6 @@ export class MemberTransactionImpl implements MemberTransaction {
     groupId: string,
     { id, limit, page }: Pagination,
   ): Promise<SearchedUser[] | null> {
-    if (!id || !groupId) {
-      throw new BadRequestError("Invalid request parameters.");
-    }
-
     const requesterIdIsMember = await this.db
       .select()
       .from(membersTable)
