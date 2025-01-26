@@ -1,8 +1,8 @@
+import { AddMemberPayload, Member } from "../../types/api/internal/members";
+import { Pagination, SearchedUser } from "../../types/api/internal/users";
 import { InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
-import { Pagination, SearchedUser } from "../users/validator";
 import { MemberTransaction } from "./transaction";
-import { AddMemberPayload, Member } from "./validator";
 
 export interface MemberService {
   addMember(payload: AddMemberPayload): Promise<Member>;

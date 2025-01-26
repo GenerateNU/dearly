@@ -86,7 +86,7 @@ components:
           items:
             type: object
             properties:
-              date:
+              day:
                 type: integer
                 description: The day of the month when the post received likes.
                 example: 23
@@ -1502,7 +1502,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SearchedUser"
+                type: array
+                items:
+                  $ref: "#/components/schemas/SearchedUser"
         400:
           description: Malformed request
           content:

@@ -4,9 +4,6 @@ import { paginationSchema } from "../../utilities/pagination";
 import { groupsTable } from "../schema";
 import z from "zod";
 
-export type CreateGroupPayload = typeof groupsTable.$inferInsert;
-export type Group = typeof groupsTable.$inferSelect;
-
 export const createGroupValidate = z
   .object({
     name: z
@@ -59,30 +56,4 @@ export const calendarParamsValidate = z.object({
     }),
 });
 
-export type FeedParamPayload = z.infer<typeof feedParamValidate> & GroupUserIDPayload;
-
-export type GroupUserIDPayload = {
-  userId: string;
-  groupId: string;
-};
-
-export type CalendarParamPayload = z.infer<typeof calendarParamsValidate> & GroupUserIDPayload;
-
-export type ThumbnailResponse = {
-  month: number;
-  year: number;
-  data: Thumbnail[];
-};
-
-export type Thumbnail = {
-  date: number;
-  url: string;
-};
 export const updateGroupValidate = createGroupValidate.partial();
-
-export type UpdateGroupPayload = z.infer<typeof updateGroupValidate> & GroupIdPayload;
-
-export type GroupIdPayload = {
-  userId: string;
-  groupId: string;
-};
