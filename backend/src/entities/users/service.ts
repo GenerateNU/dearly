@@ -1,17 +1,17 @@
 import { InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
+import { UserTransaction } from "./transaction";
 import {
   CreateUserPayload,
+  Pagination,
   SearchedInfo,
   SearchedUser,
   UpdateUserPayload,
   User,
-  Pagination,
-} from "./validator";
-import { UserTransaction } from "./transaction";
-import { PostWithMedia } from "../posts/validator";
-import { Group } from "../groups/validator";
-import { IS3Operations } from "../../services/s3Service";
+} from "../../types/api/internal/users";
+import { PostWithMediaURL } from "../../types/api/internal/posts";
+import { MediaService } from "../media/service";
+import { Group } from "../../types/api/internal/groups";
 
 export interface UserService {
   createUser(payload: CreateUserPayload): Promise<User>;
@@ -20,18 +20,18 @@ export interface UserService {
   deleteUser(id: string): Promise<void>;
   registerDevice(id: string, expoToken: string): Promise<string[]>;
   removeDevice(id: string, expoToken: string): Promise<string[]>;
-  getPosts(payload: Pagination): Promise<PostWithMedia[]>;
+  getPosts(payload: Pagination): Promise<PostWithMediaURL[]>;
   getGroups(payload: Pagination): Promise<Group[]>;
   searchByUsername(payload: SearchedInfo): Promise<SearchedUser[]>;
 }
 
 export class UserServiceImpl implements UserService {
   private userTransaction: UserTransaction;
-  private s3Service: IS3Operations;
+  private mediaService: MediaService;
 
-  constructor(UserTransaction: UserTransaction, s3ServiceProvider: IS3Operations) {
+  constructor(UserTransaction: UserTransaction, mediaService: MediaService) {
     this.userTransaction = UserTransaction;
-    this.s3Service = s3ServiceProvider;
+    this.mediaService = mediaService;
   }
 
   async createUser(payload: CreateUserPayload): Promise<User> {
@@ -53,6 +53,7 @@ export class UserServiceImpl implements UserService {
       if (!user) {
         throw new NotFoundError("User");
       }
+
       return user;
     };
     return handleServiceError(getUserImpl)();
@@ -92,9 +93,13 @@ export class UserServiceImpl implements UserService {
     return handleServiceError(removeDeviceImpl)();
   }
 
-  async getPosts(payload: Pagination): Promise<PostWithMedia[]> {
+  async getPosts(payload: Pagination): Promise<PostWithMediaURL[]> {
     const getPostsImpl = async () => {
-      return await this.userTransaction.getPosts(payload);
+      const posts = await this.userTransaction.getPosts(payload);
+      const postsWithUrls = await Promise.all(
+        posts.map(this.mediaService.getPostWithMediaUrls.bind(this.mediaService)),
+      );
+      return postsWithUrls;
     };
     return handleServiceError(getPostsImpl)();
   }
@@ -108,7 +113,9 @@ export class UserServiceImpl implements UserService {
 
   async searchByUsername(payload: SearchedInfo): Promise<SearchedUser[]> {
     const search = async () => {
-      return await this.userTransaction.getUsersByUsername(payload);
+      const users = await this.userTransaction.getUsersByUsername(payload);
+      const usersWithProfileURLs = await this.mediaService.getUsersWithSignedURL(users);
+      return usersWithProfileURLs;
     };
     return handleServiceError(search)();
   }

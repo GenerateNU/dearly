@@ -1,24 +1,29 @@
-import { CreatePostPayload, PostWithMedia, UpdatePostPayload } from "./validator";
 import { PostTransaction } from "./transaction";
 import { InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
 import { IDPayload } from "../../types/id";
-import { IS3Operations } from "../../services/s3Service";
+import {
+  CreatePostPayload,
+  PostWithMedia,
+  PostWithMediaURL,
+  UpdatePostPayload,
+} from "../../types/api/internal/posts";
+import { MediaService } from "../media/service";
 
 export interface PostService {
   createPost(payload: CreatePostPayload): Promise<PostWithMedia>;
-  getPost(payload: IDPayload): Promise<PostWithMedia>;
+  getPost(payload: IDPayload): Promise<PostWithMediaURL>;
   updatePost(payload: UpdatePostPayload): Promise<PostWithMedia>;
   deletePost(payload: IDPayload): Promise<void>;
 }
 
 export class PostServiceImpl implements PostService {
   private postTransaction: PostTransaction;
-  private s3Service: IS3Operations;
+  private mediaService: MediaService;
 
-  constructor(postTransaction: PostTransaction, s3ServiceProvider: IS3Operations) {
+  constructor(postTransaction: PostTransaction, mediaService: MediaService) {
     this.postTransaction = postTransaction;
-    this.s3Service = s3ServiceProvider;
+    this.mediaService = mediaService;
   }
 
   async createPost(payload: CreatePostPayload): Promise<PostWithMedia> {
@@ -32,13 +37,14 @@ export class PostServiceImpl implements PostService {
     return await handleServiceError(createPostImpl)();
   }
 
-  async getPost(payload: IDPayload): Promise<PostWithMedia> {
+  async getPost(payload: IDPayload): Promise<PostWithMediaURL> {
     const getPostImpl = async () => {
       const post = await this.postTransaction.getPost(payload);
       if (!post) {
         throw new NotFoundError("Post");
       }
-      return post;
+      const postWithMediaUrls = await this.mediaService.getPostWithMediaUrls(post);
+      return postWithMediaUrls;
     };
     return await handleServiceError(getPostImpl)();
   }

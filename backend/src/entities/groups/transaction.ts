@@ -1,18 +1,18 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { groupsTable, likesTable, mediaTable, membersTable, postsTable } from "../schema";
+import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
+import { and, eq, sql, desc, between } from "drizzle-orm";
+import { Media, PostWithMedia } from "../../types/api/internal/posts";
 import {
   CalendarParamPayload,
   CreateGroupPayload,
   FeedParamPayload,
   Group,
   GroupIdPayload,
-  Thumbnail,
+  DayWithObjectKey,
   ThumbnailResponse,
   UpdateGroupPayload,
-} from "./validator";
-import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
-import { and, eq, sql, desc, between } from "drizzle-orm";
-import { Media, PostWithMedia } from "../posts/validator";
+} from "../../types/api/internal/groups";
 
 export interface GroupTransaction {
   insertGroup(payload: CreateGroupPayload): Promise<Group | null>;
@@ -225,7 +225,7 @@ export class GroupTransactionImpl implements GroupTransaction {
       .select({
         year: sql<number>`cast(EXTRACT(YEAR FROM ${rankedPosts.createdAt}) as int)`.as("year"),
         month: sql<number>`cast(EXTRACT(MONTH FROM ${rankedPosts.createdAt}) as int)`.as("month"),
-        data: sql<Thumbnail[]>`ARRAY_AGG(
+        data: sql<DayWithObjectKey[]>`ARRAY_AGG(
           JSON_BUILD_OBJECT(
             'day', EXTRACT(DAY FROM ${rankedPosts.createdAt}),
             'objectKey', ${rankedPosts.objectKey}

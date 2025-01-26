@@ -1,34 +1,34 @@
-import { IS3Operations } from "../../services/s3Service";
-import { InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
-import { handleServiceError } from "../../utilities/errors/service-error";
-import { PostWithMedia } from "../posts/validator";
-import { GroupTransaction } from "./transaction";
 import {
+  CalendarParamPayload,
   CreateGroupPayload,
+  FeedParamPayload,
   Group,
   GroupIdPayload,
+  ThumbnailResponseWithURL,
   UpdateGroupPayload,
-  CalendarParamPayload,
-  FeedParamPayload,
-  ThumbnailResponse,
-} from "./validator";
+} from "../../types/api/internal/groups";
+import { PostWithMediaURL } from "../../types/api/internal/posts";
+import { InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
+import { handleServiceError } from "../../utilities/errors/service-error";
+import { MediaService } from "../media/service";
+import { GroupTransaction } from "./transaction";
 
 export interface GroupService {
   createGroup(payload: CreateGroupPayload): Promise<Group>;
   deleteGroup(payload: GroupIdPayload): Promise<void>;
   getGroup(payload: GroupIdPayload): Promise<Group>;
   updateGroup(payload: UpdateGroupPayload): Promise<Group>;
-  getAllPosts(payload: FeedParamPayload): Promise<PostWithMedia[]>;
-  getCalendar(payload: CalendarParamPayload): Promise<ThumbnailResponse[]>;
+  getAllPosts(payload: FeedParamPayload): Promise<PostWithMediaURL[]>;
+  getCalendar(payload: CalendarParamPayload): Promise<ThumbnailResponseWithURL[]>;
 }
 
 export class GroupServiceImpl implements GroupService {
   private groupTransaction: GroupTransaction;
-  private s3Service: IS3Operations;
+  private mediaService: MediaService;
 
-  constructor(groupTransaction: GroupTransaction, s3ServiceProvider: IS3Operations) {
+  constructor(groupTransaction: GroupTransaction, mediaService: MediaService) {
     this.groupTransaction = groupTransaction;
-    this.s3Service = s3ServiceProvider;
+    this.mediaService = mediaService;
   }
 
   async createGroup(payload: CreateGroupPayload): Promise<Group> {
@@ -42,16 +42,22 @@ export class GroupServiceImpl implements GroupService {
     return handleServiceError(createGroupImpl)();
   }
 
-  async getAllPosts(payload: FeedParamPayload): Promise<PostWithMedia[]> {
+  async getAllPosts(payload: FeedParamPayload): Promise<PostWithMediaURL[]> {
     const getAllPostsImpl = async () => {
-      return await this.groupTransaction.getAllPosts(payload);
+      const posts = await this.groupTransaction.getAllPosts(payload);
+      const postsWithUrls = await Promise.all(
+        posts.map(this.mediaService.getPostWithMediaUrls.bind(this.mediaService)),
+      );
+      return postsWithUrls;
     };
     return handleServiceError(getAllPostsImpl)();
   }
 
-  async getCalendar(payload: CalendarParamPayload): Promise<ThumbnailResponse[]> {
+  async getCalendar(payload: CalendarParamPayload): Promise<ThumbnailResponseWithURL[]> {
     const getCalendarImpl = async () => {
-      return await this.groupTransaction.getCalendar(payload);
+      const thumbnails = await this.groupTransaction.getCalendar(payload);
+      const thumbnailWithUrls = await this.mediaService.getThumbnailsWithSignedUrls(thumbnails);
+      return thumbnailWithUrls;
     };
     return handleServiceError(getCalendarImpl)();
   }

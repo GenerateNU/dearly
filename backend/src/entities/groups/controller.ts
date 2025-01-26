@@ -5,7 +5,6 @@ import {
   calendarParamsValidate,
   createGroupValidate,
   feedParamValidate,
-  UpdateGroupPayload,
   updateGroupValidate,
 } from "./validator";
 import { Status } from "../../constants/http";
@@ -18,6 +17,7 @@ import {
   PATCH_GROUP,
 } from "../../types/api/routes/groups";
 import { parseUUID } from "../../utilities/uuid";
+import { UpdateGroupPayload } from "../../types/api/internal/groups";
 
 export interface GroupController {
   createGroup(ctx: Context): Promise<GROUP_API>;

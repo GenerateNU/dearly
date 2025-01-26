@@ -3,13 +3,13 @@ import { Hono } from "hono";
 import { GroupController, GroupControllerImpl } from "./controller";
 import { GroupTransaction, GroupTransactionImpl } from "./transaction";
 import { GroupService, GroupServiceImpl } from "./service";
-import { IS3Operations } from "../../services/s3Service";
+import { MediaService } from "../media/service";
 
-export const groupRoutes = (db: PostgresJsDatabase, s3ServiceProvider: IS3Operations): Hono => {
+export const groupRoutes = (db: PostgresJsDatabase, mediaService: MediaService): Hono => {
   const group = new Hono();
 
   const groupTransaction: GroupTransaction = new GroupTransactionImpl(db);
-  const groupService: GroupService = new GroupServiceImpl(groupTransaction, s3ServiceProvider);
+  const groupService: GroupService = new GroupServiceImpl(groupTransaction, mediaService);
   const groupController: GroupController = new GroupControllerImpl(groupService);
 
   group.post("/", (ctx) => groupController.createGroup(ctx));
