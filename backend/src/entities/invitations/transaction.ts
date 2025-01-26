@@ -42,10 +42,7 @@ export class InvitationTransactionImpl implements InvitationTransaction {
     return await this.db.transaction(async (tx) => {
       const match = and(eq(linksTable.token, token), eq(linksTable.groupId, groupId));
       const [query] = await tx.select().from(linksTable).where(match);
-      if (!query) {
-        return false;
-      }
-      if (query.expiresAt < new Date()) {
+      if (!query || query.expiresAt < new Date()) {
         return false;
       }
       return true;
