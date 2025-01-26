@@ -1,7 +1,6 @@
 import { MIN_LIMIT, NAME_MAX_LIMIT, TEXT_MAX_LIMIT } from "../../constants/database";
 import { convertToDate, validateCalendarParam, validateYearMonth } from "../../utilities/date";
 import { paginationSchema } from "../../utilities/pagination";
-import { groupsTable } from "../schema";
 import z from "zod";
 
 export const createGroupValidate = z

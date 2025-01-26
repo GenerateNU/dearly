@@ -9,7 +9,6 @@ import {
   FeedParamPayload,
   Group,
   GroupIdPayload,
-  ThumbnailResponse,
   ThumbnailResponseWithURL,
   UpdateGroupPayload,
 } from "../../types/api/internal/groups";
