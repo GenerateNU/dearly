@@ -1,3 +1,4 @@
+import { ThumbnailResponse } from "./../../types/api/internal/groups";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { groupsTable, likesTable, mediaTable, membersTable, postsTable } from "../schema";
 import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
@@ -10,7 +11,6 @@ import {
   Group,
   GroupIdPayload,
   DayWithObjectKey,
-  ThumbnailResponse,
   UpdateGroupPayload,
 } from "../../types/api/internal/groups";
 

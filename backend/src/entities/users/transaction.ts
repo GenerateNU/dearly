@@ -8,6 +8,7 @@ import {
   usersTable,
 } from "../schema";
 import { and, eq, sql, not, exists } from "drizzle-orm";
+import { Media, PostWithMedia } from "../../types/api/internal/posts";
 import {
   CreateUserPayload,
   Pagination,
@@ -16,7 +17,6 @@ import {
   UpdateUserPayload,
   User,
 } from "../../types/api/internal/users";
-import { Media, PostWithMedia } from "../../types/api/internal/posts";
 import { Group } from "../../types/api/internal/groups";
 
 export interface UserTransaction {

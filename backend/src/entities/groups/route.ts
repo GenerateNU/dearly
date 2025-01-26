@@ -4,6 +4,7 @@ import { GroupController, GroupControllerImpl } from "./controller";
 import { GroupTransaction, GroupTransactionImpl } from "./transaction";
 import { GroupService, GroupServiceImpl } from "./service";
 import { MediaService } from "../media/service";
+import { invitationRoutes } from "../invitations/route";
 
 export const groupRoutes = (db: PostgresJsDatabase, mediaService: MediaService): Hono => {
   const group = new Hono();
@@ -18,6 +19,7 @@ export const groupRoutes = (db: PostgresJsDatabase, mediaService: MediaService):
   group.delete("/:id", (ctx) => groupController.deleteGroup(ctx));
   group.get("/:id", (ctx) => groupController.getGroup(ctx));
   group.patch("/:id", (ctx) => groupController.updateGroup(ctx));
+  group.route("/", invitationRoutes(db));
 
   return group;
 };

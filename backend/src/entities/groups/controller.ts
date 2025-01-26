@@ -1,5 +1,4 @@
 import { Context } from "hono";
-import { GROUP_API } from "../../types/api/schemas/groups";
 import { GroupService } from "./service";
 import {
   calendarParamsValidate,
@@ -14,6 +13,7 @@ import {
   DELETE_GROUP,
   FEED_API,
   GET_GROUP,
+  GROUP_API,
   PATCH_GROUP,
 } from "../../types/api/routes/groups";
 import { parseUUID } from "../../utilities/uuid";
@@ -34,7 +34,6 @@ export class GroupControllerImpl implements GroupController {
   constructor(groupService: GroupService) {
     this.groupService = groupService;
   }
-
   async createGroup(ctx: Context): Promise<GROUP_API> {
     const createGroupImpl = async () => {
       const body = await ctx.req.json();

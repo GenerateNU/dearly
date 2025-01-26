@@ -7,6 +7,8 @@ import {
 import { groupsTable } from "../../../entities/schema";
 
 export type CreateGroupPayload = typeof groupsTable.$inferInsert;
+export type UpdateGroupPayload = z.infer<typeof updateGroupValidate> & GroupIdPayload;
+
 export type Group = typeof groupsTable.$inferSelect;
 export type FeedParamPayload = z.infer<typeof feedParamValidate> & GroupUserIDPayload;
 
@@ -35,8 +37,6 @@ export type ResponseWithDate<T> = {
 
 export type ThumbnailResponse = ResponseWithDate<DayWithObjectKey>;
 export type ThumbnailResponseWithURL = ResponseWithDate<DayWithURL>;
-
-export type UpdateGroupPayload = z.infer<typeof updateGroupValidate> & GroupIdPayload;
 
 export type GroupIdPayload = {
   userId: string;

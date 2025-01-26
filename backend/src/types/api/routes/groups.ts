@@ -2,6 +2,12 @@ import { TypedResponse } from "hono";
 import { components, paths } from "../../../gen/openapi";
 import { API_ERROR } from "../schemas/error";
 
+export type GROUP_API = TypedResponse<
+  | paths["/api/v1/groups"]["post"]["responses"]["201"]["content"]["application/json"]
+  | components["schemas"]["Error"]
+  | components["schemas"]["ValidationError"]
+>;
+
 export type FEED_API = TypedResponse<
   | paths["/api/v1/groups/{id}/feed"]["get"]["responses"]["200"]["content"]["application/json"]
   | API_ERROR
