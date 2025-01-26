@@ -11,6 +11,7 @@ import {
 import { UserTransaction } from "./transaction";
 import { PostWithMedia } from "../posts/validator";
 import { Group } from "../groups/validator";
+import { IS3Operations } from "../../services/s3Service";
 
 export interface UserService {
   createUser(payload: CreateUserPayload): Promise<User>;
@@ -26,9 +27,11 @@ export interface UserService {
 
 export class UserServiceImpl implements UserService {
   private userTransaction: UserTransaction;
+  private s3Service: IS3Operations;
 
-  constructor(UserTransaction: UserTransaction) {
+  constructor(UserTransaction: UserTransaction, s3ServiceProvider: IS3Operations) {
     this.userTransaction = UserTransaction;
+    this.s3Service = s3ServiceProvider;
   }
 
   async createUser(payload: CreateUserPayload): Promise<User> {

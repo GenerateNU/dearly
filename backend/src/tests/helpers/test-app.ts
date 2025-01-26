@@ -6,14 +6,18 @@ import { setUpRoutes } from "../../routes/init";
 import { automigrateDB } from "../../database/migrate";
 import { resetDB } from "../../database/reset";
 import { seedDatabase } from "./seed-db";
-import S3Impl from "../../services/s3Service";
+import { S3Client } from "@aws-sdk/client-s3";
+import { mockClient } from "aws-sdk-client-mock";
+import { S3Impl } from "../../services/s3Service";
 
 export const startTestApp = async (): Promise<Hono> => {
   const app = new Hono();
 
   const config = getConfigurations();
 
-  const s3 = new S3Impl(config.s3Config);
+  const mockS3Client = mockClient(S3Client) as unknown as S3Client;
+
+  const s3 = new S3Impl(config.s3Config, mockS3Client);
 
   const db = connectDB(config);
 

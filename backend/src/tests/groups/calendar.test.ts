@@ -18,7 +18,7 @@ describe("GET /groups/:id/calendar", () => {
       data: [
         {
           day: 31,
-          objectKey: "photo1",
+          objectKey: "photo",
         },
       ],
       month: 12,

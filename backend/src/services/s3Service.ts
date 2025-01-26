@@ -12,7 +12,7 @@ import * as lame from "@breezystack/lamejs";
 import { MediaType } from "../constants/database";
 import { Configuration } from "../types/config";
 
-interface IS3Operations {
+export interface IS3Operations {
   // group is the uuid of the group this photo is being sent to (used as tagging number) -> make public group id number
 
   /**
@@ -36,10 +36,10 @@ interface IS3Operations {
    * Will retrive the presigned URL of the given object associated with the given object ID
    * @param objectKey The key of the object in the S3 bucket
    */
-  getObjectURL(objectKey: string): Promise<String>;
+  getObjectURL(objectKey: string): Promise<string>;
 }
 
-export default class S3Impl implements IS3Operations {
+export class S3Impl implements IS3Operations {
   private client;
   private bucketName;
 
@@ -140,7 +140,7 @@ export default class S3Impl implements IS3Operations {
    * Will retrive the presigned URL of the given object associated with the given object ID
    * @param objectKey The key of the object in the S3 bucket
    */
-  async getObjectURL(objectKey: string): Promise<String> {
+  async getObjectURL(objectKey: string): Promise<string> {
     const waitInSeconds = 60 * 60 * 24;
     const command = new GetObjectCommand({
       Bucket: this.bucketName,

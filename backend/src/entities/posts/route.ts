@@ -3,7 +3,7 @@ import { Hono } from "hono";
 import { PostTransaction, PostTransactionImpl } from "./transaction";
 import { PostService, PostServiceImpl } from "./service";
 import { PostController, PostControllerImpl } from "./controller";
-import IS3Operations from "../../services/s3Service";
+import { IS3Operations } from "../../services/s3Service";
 
 export const postRoutes = (db: PostgresJsDatabase, s3ServiceProvider: IS3Operations): Hono => {
   const post = new Hono();

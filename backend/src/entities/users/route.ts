@@ -3,12 +3,13 @@ import { Hono } from "hono";
 import { UserTransaction, UserTransactionImpl } from "./transaction";
 import { UserService, UserServiceImpl } from "./service";
 import { UserController, UserControllerImpl } from "./controller";
+import { IS3Operations } from "../../services/s3Service";
 
-export const userRoutes = (db: PostgresJsDatabase): Hono => {
+export const userRoutes = (db: PostgresJsDatabase, s3ServiceProvider: IS3Operations): Hono => {
   const user = new Hono();
 
   const userTransaction: UserTransaction = new UserTransactionImpl(db);
-  const userService: UserService = new UserServiceImpl(userTransaction);
+  const userService: UserService = new UserServiceImpl(userTransaction, s3ServiceProvider);
   const userController: UserController = new UserControllerImpl(userService);
 
   user.get("/posts", (ctx) => userController.getPosts(ctx));

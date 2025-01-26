@@ -1,3 +1,4 @@
+import { IS3Operations } from "../../services/s3Service";
 import { InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
 import { PostWithMedia } from "../posts/validator";
@@ -23,9 +24,11 @@ export interface GroupService {
 
 export class GroupServiceImpl implements GroupService {
   private groupTransaction: GroupTransaction;
+  private s3Service: IS3Operations;
 
-  constructor(groupTransaction: GroupTransaction) {
+  constructor(groupTransaction: GroupTransaction, s3ServiceProvider: IS3Operations) {
     this.groupTransaction = groupTransaction;
+    this.s3Service = s3ServiceProvider;
   }
 
   async createGroup(payload: CreateGroupPayload): Promise<Group> {

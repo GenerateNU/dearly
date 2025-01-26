@@ -7,9 +7,13 @@ import { HEALTHCHECK } from "../types/api/routes/healthcheck";
 import { groupRoutes } from "../entities/groups/route";
 import { postRoutes } from "../entities/posts/route";
 import { likeRoutes } from "../entities/likes/route";
-import S3Impl from "../services/s3Service";
+import { IS3Operations } from "../services/s3Service";
 
-export const setUpRoutes = (app: Hono, db: PostgresJsDatabase, s3ServiceProvider: S3Impl) => {
+export const setUpRoutes = (
+  app: Hono,
+  db: PostgresJsDatabase,
+  s3ServiceProvider: IS3Operations,
+) => {
   // api documentation
   app.get(
     "/",
@@ -33,13 +37,13 @@ export const setUpRoutes = (app: Hono, db: PostgresJsDatabase, s3ServiceProvider
   });
 };
 
-const apiRoutes = (db: PostgresJsDatabase, s3ServiceProvider: S3Impl): Hono => {
+const apiRoutes = (db: PostgresJsDatabase, s3ServiceProvider: IS3Operations): Hono => {
   const api = new Hono();
 
-  api.route("/users", userRoutes(db));
-  api.route("/groups", groupRoutes(db));
+  api.route("/users", userRoutes(db, s3ServiceProvider));
+  api.route("/groups", groupRoutes(db, s3ServiceProvider));
   api.route("/", postRoutes(db, s3ServiceProvider));
-  api.route("/posts/:id/likes", likeRoutes(db));
+  api.route("/posts/:id/likes", likeRoutes(db, s3ServiceProvider));
 
   return api;
 };

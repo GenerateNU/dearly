@@ -3,6 +3,7 @@ import { handleServiceError } from "../../utilities/errors/service-error";
 import { SearchedUser } from "../users/validator";
 import { PaginationParams } from "../../utilities/pagination";
 import { IDPayload } from "../../types/id";
+import { IS3Operations } from "../../services/s3Service";
 
 export interface LikeService {
   toggleLike(payload: IDPayload): Promise<boolean>;
@@ -11,9 +12,11 @@ export interface LikeService {
 
 export class LikeServiceImpl implements LikeService {
   private likeTransaction: LikeTransaction;
+  private s3Service: IS3Operations;
 
-  constructor(likeTransaction: LikeTransaction) {
+  constructor(likeTransaction: LikeTransaction, s3ServiceProvider: IS3Operations) {
     this.likeTransaction = likeTransaction;
+    this.s3Service = s3ServiceProvider;
   }
 
   async toggleLike(payload: IDPayload): Promise<boolean> {
