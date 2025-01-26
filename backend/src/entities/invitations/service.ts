@@ -14,19 +14,19 @@ export interface InvitationService {
 }
 
 export class InvitationServiceImpl implements InvitationService {
-  private InvitationTransaction: InvitationTransaction;
+  private invitationTransaction: InvitationTransaction;
 
   constructor(InvitationTransaction: InvitationTransaction) {
-    this.InvitationTransaction = InvitationTransaction;
+    this.invitationTransaction = InvitationTransaction;
   }
 
   async verifyInviteToken(token: string, userId: string): Promise<void> {
     const verifyInviteTokenImpl = async () => {
-      const groupId = await this.InvitationTransaction.getGroupIdFromToken(token);
-      if (await this.InvitationTransaction.isManager(userId, groupId)) {
+      const groupId = await this.invitationTransaction.getGroupIdFromToken(token);
+      if (await this.invitationTransaction.isManager(userId, groupId)) {
         throw new NotFoundError("Group");
       }
-      if (!(await this.InvitationTransaction.verifyToken(token, groupId))) {
+      if (!(await this.invitationTransaction.verifyToken(token, groupId))) {
         throw new ForbiddenError("Token is invalid");
       }
       const payload: addMemberPayload = {
@@ -35,7 +35,7 @@ export class InvitationServiceImpl implements InvitationService {
         joinedAt: new Date(),
         role: "MEMBER",
       };
-      await this.InvitationTransaction.insertUserByInvitation(payload);
+      await this.invitationTransaction.insertUserByInvitation(payload);
     };
     return handleServiceError(verifyInviteTokenImpl)();
   }
@@ -45,10 +45,10 @@ export class InvitationServiceImpl implements InvitationService {
       const token = nanoid();
       const sevenDaysFromToday = new Date();
       sevenDaysFromToday.setDate(sevenDaysFromToday.getDate() + 7);
-      if (!(await this.InvitationTransaction.isManager(userId, groupId))) {
+      if (!(await this.invitationTransaction.isManager(userId, groupId))) {
         throw new NotFoundError("Group");
       }
-      const uploadedEncoding = await this.InvitationTransaction.insertInvitation(
+      const uploadedEncoding = await this.invitationTransaction.insertInvitation(
         {
           groupId: groupId,
           token: token,

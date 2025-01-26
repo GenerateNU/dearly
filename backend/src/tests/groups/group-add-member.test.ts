@@ -13,9 +13,21 @@ import { generateJWTFromID } from "../helpers/test-token";
 const addMemberToGroupInviteTest = () => {
   let app: Hono;
   let testBuilder = new TestBuilder();
+  let token: string;
 
   beforeAll(async () => {
     app = await startTestApp();
+    testBuilder = await testBuilder.request({
+      app,
+      type: HTTPRequest.GET,
+      route: `/api/v1/groups/${DEARLY_GROUP_ID}/invites`,
+      autoAuthorized: false,
+      headers: {
+        Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
+      },
+    });
+
+    token = testBuilder.getResponseBodyKey("token") as string;
   });
 
   it("Should return 403 for a unknown or invalid token", async () => {
@@ -28,17 +40,6 @@ const addMemberToGroupInviteTest = () => {
   });
 
   it("Should return 200 for a good token", async () => {
-    testBuilder = await testBuilder.request({
-      app,
-      type: HTTPRequest.GET,
-      route: `/api/v1/groups/${DEARLY_GROUP_ID}/invites`,
-      autoAuthorized: false,
-      headers: {
-        Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
-      },
-    });
-
-    const token = testBuilder.getResponseBodyKey("token") as string;
     const builder = await testBuilder.request({
       app,
       type: HTTPRequest.PUT,
@@ -52,17 +53,6 @@ const addMemberToGroupInviteTest = () => {
   });
 
   it("Should return 409 if the person being invited is already in the group", async () => {
-    testBuilder = await testBuilder.request({
-      app,
-      type: HTTPRequest.GET,
-      route: `/api/v1/groups/${DEARLY_GROUP_ID}/invites`,
-      autoAuthorized: false,
-      headers: {
-        Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
-      },
-    });
-
-    const token = testBuilder.getResponseBodyKey("token") as string;
     const builder = await testBuilder.request({
       app,
       type: HTTPRequest.PUT,
@@ -80,7 +70,7 @@ const addMemberToGroupInviteTest = () => {
     const builder = await testBuilder.request({
       app,
       type: HTTPRequest.PUT,
-      route: `api/v1/groups/verify`,
+      route: `api/v1/groups/${token}/verify`,
       autoAuthorized: false,
       headers: {
         Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
