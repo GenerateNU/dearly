@@ -27,10 +27,6 @@ export class MediaServiceImpl {
     this.s3Service = s3Service;
   }
 
-  private async getSignedUrl(key: string): Promise<string> {
-    return this.s3Service.getObjectURL(key);
-  }
-
   async getThumbnailWithSignedUrl({ day, objectKey }: DayWithObjectKey): Promise<DayWithURL> {
     const signedUrl = await this.getSignedUrl(objectKey);
     return {
@@ -67,31 +63,6 @@ export class MediaServiceImpl {
     return usersWithSignedUrls;
   }
 
-  async getThumbnailsWithSignedUrls(
-    thumbnails: ThumbnailResponse[],
-  ): Promise<ThumbnailResponseWithURL[]> {
-    const thumbnailsWithUrls = await Promise.all(
-      thumbnails.map(async (thumbnailResponse) => {
-        const dayWithUrls = await Promise.all(
-          thumbnailResponse.data.map(async (dayWithObjectKey) => {
-            const signedUrl = await this.s3Service.getObjectURL(dayWithObjectKey.objectKey);
-            return {
-              day: dayWithObjectKey.day,
-              url: signedUrl,
-            };
-          }),
-        );
-
-        return {
-          month: thumbnailResponse.month,
-          year: thumbnailResponse.year,
-          data: dayWithUrls,
-        };
-      }),
-    );
-    return thumbnailsWithUrls;
-  }
-
   async getPostWithMediaUrls({
     id,
     groupId,
@@ -126,7 +97,35 @@ export class MediaServiceImpl {
     };
   }
 
+  private async getSignedUrl(key: string): Promise<string> {
+    return this.s3Service.getObjectURL(key);
+  }
+
+  async getThumbnailsWithSignedUrls(
+    thumbnails: ThumbnailResponse[],
+  ): Promise<ThumbnailResponseWithURL[]> {
+    const thumbnailsWithUrls = await Promise.all(
+      thumbnails.map(async (thumbnailResponse) => {
+        const dataWithUrls = await this.getThumbnailWithSignedUrls(thumbnailResponse.data);
+        return {
+          month: thumbnailResponse.month,
+          year: thumbnailResponse.year,
+          data: dataWithUrls,
+        };
+      }),
+    );
+    return thumbnailsWithUrls;
+  }
+
   private async getThumbnailWithSignedUrls(thumbnails: DayWithObjectKey[]): Promise<DayWithURL[]> {
-    return Promise.all(thumbnails.map(this.getThumbnailWithSignedUrl.bind(this)));
+    return Promise.all(
+      thumbnails.map(async (dayWithObjectKey) => {
+        const signedUrl = await this.s3Service.getObjectURL(dayWithObjectKey.objectKey);
+        return {
+          day: dayWithObjectKey.day,
+          url: signedUrl,
+        };
+      }),
+    );
   }
 }

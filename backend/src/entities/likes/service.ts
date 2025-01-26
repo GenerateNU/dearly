@@ -28,7 +28,9 @@ export class LikeServiceImpl implements LikeService {
 
   async getLikeUsers(payload: IDPayload & PaginationParams): Promise<SearchedUser[]> {
     const getLikeUsersImpl = async () => {
-      return await this.likeTransaction.getLikeUsers(payload);
+      const users = await this.likeTransaction.getLikeUsers(payload);
+      const usersWithProfilePresignedURL = await this.mediaService.getUsersWithSignedURL(users);
+      return usersWithProfilePresignedURL;
     };
     return await handleServiceError(getLikeUsersImpl)();
   }
