@@ -1,6 +1,6 @@
 import { groupsTable, mediaTable, postsTable } from "../../entities/schema";
 import { CreateGroupPayload } from "../../types/api/internal/groups";
-import { CreateUserPayload } from "../../types/api/internal/users";
+import { CreateUserPayload, SearchedUser } from "../../types/api/internal/users";
 
 export const INVALID_ID_ARRAY = ["1", "%2", "123abc", "!!$$", "123 456", "@ID", null, undefined];
 export const USER_ALICE_ID = "00000000-0000-0000-0000-000000000000";
@@ -85,6 +85,14 @@ export const USER_ALICE: CreateUserPayload = {
   id: USER_ALICE_ID,
 };
 
+export const SEARCHED_ALICE: SearchedUser = {
+  id: USER_ALICE_ID,
+  name: USER_ALICE["name"],
+  username: USER_ALICE["username"],
+  profilePhoto: null,
+  isMember: true,
+};
+
 export const USER_BOB: CreateUserPayload = {
   name: "Bob",
   username: "bobthebuilder",
@@ -92,11 +100,27 @@ export const USER_BOB: CreateUserPayload = {
   id: USER_BOB_ID,
 };
 
+export const SEARCHED_BOB: SearchedUser = {
+  id: USER_BOB_ID,
+  name: USER_BOB["name"],
+  username: USER_BOB["username"],
+  profilePhoto: null,
+  isMember: true,
+};
+
 export const USER_ANA: CreateUserPayload = {
   name: "Ana",
   username: "ana",
   mode: "BASIC",
   id: USER_ANA_ID,
+};
+
+export const SEARCHED_ANA: SearchedUser = {
+  id: USER_ANA_ID,
+  name: USER_ANA["name"],
+  username: USER_ANA["username"],
+  profilePhoto: null,
+  isMember: true,
 };
 
 export const USER_BILL: CreateUserPayload = {

@@ -69,7 +69,6 @@ const seedMember = async (db: PostgresJsDatabase) => {
       role: "MEMBER",
     },
   ];
-
   await db.insert(membersTable).values(seedData);
 };
 

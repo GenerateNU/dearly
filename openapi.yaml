@@ -154,8 +154,28 @@ components:
           description: A unique identifier of the group manager.
       required:
         - name
-        - id
-        - managerId
+    Member:
+      type: object
+      properties:
+        groupId:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: A unique identifier for the group.
+        userId:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: A unique identifier for the user in this group.
+        joinedAt:
+          type: string
+          format: date-time
+          example: "2025-01-17T00:00:00Z"
+          description: The date and time when the member was added.
+        role:
+          type: string
+          enum: ["MEMBER", "MANAGER", null]
+          description: Defines the role and level of permissions this user in the group has.
     Post:
       type: object
       properties:
@@ -760,8 +780,8 @@ paths:
     get:
       tags:
         - User Endpoints
-      summary: Get all groups for user
-      description: Get all groups user is member of.
+      summary: Gets all groups for user
+      description: Gets all groups user is member of.
       security:
         - BearerAuth: []
       parameters:
@@ -829,8 +849,8 @@ paths:
     get:
       tags:
         - User Endpoints
-      summary: Get all posts for user
-      description: Get all posts that a user posted.
+      summary: Gets all posts for user
+      description: Gets all posts that a user posted.
       security:
         - BearerAuth: []
       parameters:
@@ -882,8 +902,8 @@ paths:
     get:
       tags:
         - User Endpoints
-      summary: Search users by username
-      description: Search in-app users so they can be invited directly to a group.
+      summary: Searches users by username
+      description: Searches in-app users so they can be invited directly to a group.
       security:
         - BearerAuth: []
       parameters:
@@ -1279,14 +1299,6 @@ paths:
             type: string
             format: uuid
             example: 5e91507e-5630-4efd-9fd4-799178870b10
-        - name: postId
-          in: path
-          description: ID of the post
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: 5e91507e-5630-4efd-9fd4-799178870b10
       security:
         - BearerAuth: []
       responses:
@@ -1327,137 +1339,335 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /api/v1/groups/{id}/members/{userId}:
+    post:
+      tags:
+        - Members Endpoints
+      summary: Adds a member to a group.
+      description: Adds the member to a group.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the group.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+        - name: userId
+          in: path
+          description: ID of the member to be added.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+              required:
+              additionalProperties: true
+      responses:
+        201:
+          description: Successfully added member to group.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Member"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: User or group not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      tags:
+        - Members Endpoints
+      summary: Deletes member from group.
+      description: Deletes member from group.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the group.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+        - name: userId
+          in: path
+          description: ID of the member to be removed.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Successfully removed a member from a group
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Successfully removed a member from this group"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: Forbidden if the member being removed is not the group manager or the member themself.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/groups/{id}/members:
+    get:
+      tags:
+        - Members Endpoints
+      summary: Gets members of this group.
+      description: Gets all the members in this group.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the group
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+        - name: limit
+          in: query
+          description: The maximum number of members to return per request.
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: offset
+          in: query
+          description: The number of members to skip before starting to collect the result set.
+          required: false
+          schema:
+            type: integer
+            default: 0
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Successfully retrieved a members
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchedUser"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: Forbidden since user is not member of the group
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Group not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
   /api/v1/posts/{id}/likes:
-      get:
-        tags:
-          - Like Endpoints
-        summary: Gets all users who like the post
-        description: Retrieves list of users who like the post
-        parameters:
-          - name: id
-            in: path
-            description: ID of the post
-            required: true
-            schema:
-              type: string
-              format: uuid
-              example: 5e91507e-5630-4efd-9fd4-799178870b10
-          - name: limit
-            in: query
-            description: The maximum number of groups to return.
-            required: false
-            schema:
-              type: integer
-              default: 10
-          - name: page
-            in: query
-            description: The page number for pagination.
-            required: false
-            schema:
-              type: integer
-              default: 1
-        security:
-          - BearerAuth: []
-        responses:
-          200:
-            description: Successfully retrieve users who like the post
-            content:
-              application/json:
-                schema:
-                  type: array
-                  items:
-                    $ref: "#/components/schemas/SearchedUser"
-          400:
-            description: Malformed ID and query params
-            content:
-              application/json:
-                schema:
-                  oneOf:
-                    - $ref: "#/components/schemas/Error"
-                    - $ref: "#/components/schemas/ValidationError"
-          401:
-            description: Unauthorized due to invalid JWT
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/Error"
-          403:
-            description: Forbidden since user is not member of the group
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/Error"
-          404:
-            description: Post not found
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/Error"
-          500:
-            description: Internal server error
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/Error"
-      patch:
-        tags:
-          - Like Endpoints
-        summary: Toggles like on a post
-        description: Likes if user has not liked the post, unlikes otherwise
-        parameters:
-          - name: id
-            in: path
-            description: ID of the post
-            required: true
-            schema:
-              type: string
-              format: uuid
-              example: 5e91507e-5630-4efd-9fd4-799178870b10
-        security:
-          - BearerAuth: []
-        responses:
-          200:
-            description: Successfully toggle like of the post
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    message:
-                      type: string
-                      example: "Successfully like post"
-          400:
-            description: Malformed request
-            content:
-              application/json:
-                schema:
-                  oneOf:
-                    - $ref: "#/components/schemas/Error"
-                    - $ref: "#/components/schemas/ValidationError"
-          401:
-            description: Unauthorized due to invalid JWT
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/Error"
-          403:
-            description: Forbidden since user is not a member of a group
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/Error"
-          404:
-            description: Post not found
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/Error"
-          500:
-            description: Internal server error
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/Error"
+    get:
+      tags:
+        - Post Endpoints
+      summary: Gets all users who like the post
+      description: Retrieves list of users who like the post
+      parameters:
+        - name: id
+          in: path
+          description: ID of the post
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+        - name: limit
+          in: query
+          description: The maximum number of groups to return.
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: page
+          in: query
+          description: The page number for pagination.
+          required: false
+          schema:
+            type: integer
+            default: 1
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Successfully retrieve users who like the post
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SearchedUser"
+        400:
+          description: Malformed ID and query params
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: Forbidden since user is not member of the group
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    patch:
+      tags:
+        - Post Endpoints
+      summary: Toggles like on a post
+      description: Likes if user has not liked the post, unlikes otherwise
+      parameters:
+        - name: id
+          in: path
+          description: ID of the post
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Successfully toggle like of the post
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Successfully like post"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: Forbidden since user is not a member of a group
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
   /api/v1/groups/{id}/feed:
     get:
       tags:
