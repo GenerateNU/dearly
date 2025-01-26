@@ -9,10 +9,10 @@ export const likeRoutes = (db: PostgresJsDatabase): Hono => {
 
   const likeTransaction: LikeTransaction = new LikeTransactionImpl(db);
   const likeService: LikeService = new LikeServiceImpl(likeTransaction);
-  const postController: LikeController = new LikeControllerImpl(likeService);
+  const likeController: LikeController = new LikeControllerImpl(likeService);
 
-  like.patch("/", (ctx) => postController.toggleLike(ctx));
-  like.get("/", (ctx) => postController.getLikeUsers(ctx));
+  like.patch("/", (ctx) => likeController.toggleLike(ctx));
+  like.get("/", (ctx) => likeController.getLikeUsers(ctx));
 
   return like;
 };
