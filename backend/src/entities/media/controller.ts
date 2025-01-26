@@ -25,24 +25,29 @@ export class MediaControllerImpl implements MediaController {
         throw new BadRequestError("No media found");
       }
 
-      let blobs: Blob[] = [];
-
-      if (Array.isArray(media)) {
-        blobs = media.map((item) => {
-          if (item instanceof File) {
-            return item;
-          }
-          throw new BadRequestError("Invalid file type in array");
-        });
-      } else if (media instanceof File) {
-        blobs = [media];
-      } else {
-        throw new BadRequestError("Invalid media type");
-      }
+      const blobs = this.checkMediaType(media);
 
       const objectKeys = await this.mediaService.uploadMedia(blobs, groupId, userId);
       return ctx.json(objectKeys, 201);
     };
     return await handleAppError(uploadMediaImpl)(ctx);
+  }
+
+  private checkMediaType(media: unknown): Blob[] {
+    let blobs: Blob[] = [];
+
+    if (Array.isArray(media)) {
+      blobs = media.map((item) => {
+        if (item instanceof File) {
+          return item;
+        }
+        throw new BadRequestError("Invalid file type in array");
+      });
+    } else if (media instanceof File) {
+      blobs = [media];
+    } else {
+      throw new BadRequestError("Invalid media type");
+    }
+    return blobs;
   }
 }

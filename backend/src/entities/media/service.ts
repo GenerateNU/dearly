@@ -9,9 +9,9 @@ import { PostWithMedia, PostWithMediaURL } from "../../types/api/internal/posts"
 import { SearchedUser, User } from "../../types/api/internal/users";
 import { MediaType } from "../../constants/database";
 import { Media, MediaResponse, MediaWithURL } from "../../types/api/internal/media";
-import { BadRequestError, ForbiddenError } from "../../utilities/errors/app-error";
+import { BadRequestError, ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { membersTable } from "../schema";
+import { groupsTable, membersTable } from "../schema";
 import { eq, and } from "drizzle-orm";
 
 export interface MediaService {
@@ -26,7 +26,7 @@ export class MediaServiceImpl {
   private s3Service: IS3Operations;
   private db: PostgresJsDatabase;
 
-  constructor(s3Service: IS3Operations, db: PostgresJsDatabase) {
+  constructor(db: PostgresJsDatabase, s3Service: IS3Operations) {
     this.s3Service = s3Service;
     this.db = db;
   }
@@ -122,12 +122,25 @@ export class MediaServiceImpl {
   }
 
   async checkPermissions(groupId: string, userId: string): Promise<void> {
-    const [isMember] = await this.db
-      .select()
-      .from(membersTable)
-      .where(and(eq(membersTable.groupId, groupId), eq(membersTable.userId, userId)));
-    if (!isMember) {
-      throw new ForbiddenError();
+    const [result] = await this.db
+      .select({
+        groupExists: groupsTable.id,
+        isMember: membersTable.userId,
+      })
+      .from(groupsTable)
+      .leftJoin(
+        membersTable,
+        and(eq(groupsTable.id, membersTable.groupId), eq(membersTable.userId, userId)),
+      )
+      .where(eq(groupsTable.id, groupId))
+      .limit(1);
+
+    if (!result) {
+      throw new NotFoundError("Group");
+    }
+
+    if (!result.isMember) {
+      throw new ForbiddenError("User not a member of this group");
     }
   }
 

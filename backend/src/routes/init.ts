@@ -42,7 +42,7 @@ export const setUpRoutes = (
 
 const apiRoutes = (db: PostgresJsDatabase, s3Service: IS3Operations): Hono => {
   const api = new Hono();
-  const mediaService = new MediaServiceImpl(s3Service);
+  const mediaService = new MediaServiceImpl(db, s3Service);
 
   api.route("/users", userRoutes(db, mediaService));
   api.route("/groups", groupRoutes(db, mediaService));
