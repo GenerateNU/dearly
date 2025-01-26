@@ -36,7 +36,7 @@ interface IS3Operations {
    * Will retrive the presigned URL of the given object associated with the given object ID
    * @param objectKey The key of the object in the S3 bucket
    */
-  getObjectURL(objectKey: string): Promise<String>;
+  getObjectURL(objectKey: string): Promise<string>;
 }
 
 export default class S3Impl implements IS3Operations {
@@ -140,7 +140,7 @@ export default class S3Impl implements IS3Operations {
    * Will retrive the presigned URL of the given object associated with the given object ID
    * @param objectKey The key of the object in the S3 bucket
    */
-  async getObjectURL(objectKey: string): Promise<String> {
+  async getObjectURL(objectKey: string): Promise<string> {
     const waitInSeconds = 60 * 60 * 24;
     const command = new GetObjectCommand({
       Bucket: this.bucketName,

@@ -13,8 +13,8 @@ describe("S3 Service Testing", () => {
     const client = mockS3Client
       .on(PutObjectCommand)
       .resolves({ Size: 42069 }) as unknown as S3Client;
-    let buffer = fs.readFileSync(PROJECT_ROOT + "/tests/test-assets/test_image.tiff");
-    let blob = new Blob([buffer]);
+    const buffer = fs.readFileSync(PROJECT_ROOT + "/tests/test-assets/test_image.tiff");
+    const blob = new Blob([buffer]);
     const s3Impl = new S3Impl(client);
     const expected = await s3Impl.saveObject(blob, "test", MediaType.PHOTO);
     expect(expected).not.toBeNull();
@@ -49,8 +49,8 @@ describe("S3 Service Testing", () => {
   it("test image compression", async () => {
     const mockS3Client = mockClient(S3Client);
     const s3Impl = new S3Impl(mockS3Client as unknown as S3Client);
-    let buffer = fs.readFileSync(PROJECT_ROOT + "/tests/test-assets/test_image.tiff");
-    let blob = new Blob([buffer]);
+    const buffer = fs.readFileSync(PROJECT_ROOT + "/tests/test-assets/test_image.tiff");
+    const blob = new Blob([buffer]);
     const compressed_image = await s3Impl.compressImage(blob);
     expect(blob.size).toBeGreaterThan(compressed_image.size);
   });
@@ -58,8 +58,8 @@ describe("S3 Service Testing", () => {
   it("test audio compression", async () => {
     const mockS3Client = mockClient(S3Client);
     const s3Impl = new S3Impl(mockS3Client as unknown as S3Client);
-    let buffer = fs.readFileSync(PROJECT_ROOT + "/tests/test-assets/test_audio.m4a");
-    let blob = new Blob([buffer]);
+    const buffer = fs.readFileSync(PROJECT_ROOT + "/tests/test-assets/test_audio.m4a");
+    const blob = new Blob([buffer]);
     const compressed_audio = await s3Impl.compressAudio(blob);
     expect(blob.size).toBeGreaterThan(compressed_audio.size);
   });
