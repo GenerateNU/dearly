@@ -3,7 +3,15 @@ import {
   DEVICE_TOKEN_MAX_LIMIT,
   NOTIFICATION_BODY_MAX_LIMIT,
 } from "./../constants/database";
-import { timestamp, uuid, pgEnum, pgTable, varchar, boolean } from "drizzle-orm/pg-core";
+import {
+  timestamp,
+  uuid,
+  pgEnum,
+  pgTable,
+  varchar,
+  boolean,
+  primaryKey,
+} from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { NAME_MAX_LIMIT } from "../constants/database";
 
@@ -66,16 +74,22 @@ export const mediaTable = pgTable("media", {
   type: postMediaEnum().notNull(),
 });
 
-export const membersTable = pgTable("members", {
-  userId: uuid()
-    .notNull()
-    .references(() => usersTable.id, { onDelete: "cascade" }),
-  groupId: uuid()
-    .notNull()
-    .references(() => groupsTable.id, { onDelete: "cascade" }),
-  joinedAt: timestamp().notNull().defaultNow(),
-  role: memberRoleEnum().notNull().default("MEMBER"),
-});
+export const membersTable = pgTable(
+  "members",
+  {
+    userId: uuid()
+      .notNull()
+      .references(() => usersTable.id, { onDelete: "cascade" }),
+    groupId: uuid()
+      .notNull()
+      .references(() => groupsTable.id, { onDelete: "cascade" }),
+    joinedAt: timestamp().notNull().defaultNow(),
+    role: memberRoleEnum().notNull().default("MEMBER"),
+  },
+  (table) => {
+    return [primaryKey({ columns: [table.userId, table.groupId] })];
+  },
+);
 
 export const likesTable = pgTable("likes", {
   id: uuid().primaryKey().defaultRandom(),
