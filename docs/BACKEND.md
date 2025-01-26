@@ -4,6 +4,7 @@
 - [Working on Controllers and Routes](#working-on-controllers-and-routes)
 - [Error Handling](#error-handling)
 - [Write Integration Tests with Test Builder](#write-integration-tests-with-test-builder)
+- [Deep-Linking](#deep-linking)
 
 ## **Working on Controllers and Routes**
 
@@ -366,4 +367,16 @@ Since we are calling `debug`, it will show in the console:
 
 ```
 Response Body:  {"message":"Validation failed","errors":[{"path":"lastName","message":"Required"}]}
+```
+
+
+## **Deep linking**
+
+### IOS 
+Currently the dearly's focus is on IOS development, and therefore will support universal linking. 
+
+simulate an app deep-link in development from the command line:
+
+```bash 
+bunx uri-scheme open exp://127.0.0.1:8081/ --ios
 ```
