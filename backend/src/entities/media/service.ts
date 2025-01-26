@@ -12,12 +12,14 @@ import {
   PostWithMediaURL,
 } from "../../types/api/internal/posts";
 import { SearchedUser, User } from "../../types/api/internal/users";
+import { MediaType } from "../../constants/database";
 
 export interface MediaService {
   getPostWithMediaUrls(post: PostWithMedia): Promise<PostWithMediaURL>;
   getThumbnailsWithSignedUrls(thumbnails: ThumbnailResponse[]): Promise<ThumbnailResponseWithURL[]>;
   getUsersWithSignedURL(users: SearchedUser[]): Promise<SearchedUser[]>;
   getUserWithSignedURL(user: User): Promise<User>;
+  uploadMedia(media: Blob[]): Promise<string[]>;
 }
 
 export class MediaServiceImpl {
@@ -115,6 +117,10 @@ export class MediaServiceImpl {
       }),
     );
     return thumbnailsWithUrls;
+  }
+
+  async uploadMedia(blobs: Blob[]): Promise<string[]> {
+    return [];
   }
 
   private async getThumbnailWithSignedUrls(thumbnails: DayWithObjectKey[]): Promise<DayWithURL[]> {
