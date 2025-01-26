@@ -1339,7 +1339,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /api/v1/groups/{groupId}/members/{userId}:
+  /api/v1/groups/{id}/members/{userId}:
     post:
       tags:
         - Members Endpoints
@@ -1465,14 +1465,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /api/v1/groups/{groupId}/members:
+  /api/v1/groups/{id}/members:
     get:
       tags:
         - Members Endpoints
       summary: Gets members of this group.
       description: Gets all the members in this group.
       parameters:
-        - name: groupId
+        - name: id
           in: path
           description: ID of the group
           required: true

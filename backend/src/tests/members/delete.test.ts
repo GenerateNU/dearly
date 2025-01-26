@@ -14,10 +14,10 @@ import {
 describe("DELETE groups/{id}/members/{userId}", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
-  const jwt = generateJWTFromID(generateUUID());
-  const manager_jwt = generateJWTFromID(USER_ALICE_ID);
-  const ana_jwt = generateJWTFromID(USER_ANA_ID);
-  const bob_jwt = generateJWTFromID(USER_BOB_ID);
+  const RANDOM_JWT = generateJWTFromID(generateUUID());
+  const ALICE_JWT = generateJWTFromID(USER_ALICE_ID);
+  const ANA_JWT = generateJWTFromID(USER_ANA_ID);
+  const BOB_JWT = generateJWTFromID(USER_BOB_ID);
   const forbiddenMessage = "You do not have the rights to remove this member.";
 
   const authPayload = (jwt: string) => {
@@ -49,7 +49,7 @@ describe("DELETE groups/{id}/members/{userId}", () => {
         app,
         type: HTTPRequest.DELETE,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/members/${USER_ANA_ID}`,
-        ...authPayload(ana_jwt),
+        ...authPayload(ANA_JWT),
       })
     )
       .assertStatusCode(Status.OK)
@@ -63,7 +63,7 @@ describe("DELETE groups/{id}/members/{userId}", () => {
         app,
         type: HTTPRequest.DELETE,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/members/${USER_ANA_ID}`,
-        ...authPayload(manager_jwt),
+        ...authPayload(ALICE_JWT),
       })
     )
       .assertStatusCode(Status.OK)
@@ -75,7 +75,7 @@ describe("DELETE groups/{id}/members/{userId}", () => {
         app,
         type: HTTPRequest.DELETE,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/members/${USER_ANA_ID}`,
-        ...authPayload(manager_jwt),
+        ...authPayload(ALICE_JWT),
       })
     )
       .assertStatusCode(Status.OK)
@@ -89,7 +89,7 @@ describe("DELETE groups/{id}/members/{userId}", () => {
         app,
         type: HTTPRequest.DELETE,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/members/${USER_ANA_ID}`,
-        ...authPayload(ana_jwt),
+        ...authPayload(ANA_JWT),
       })
     )
       .assertStatusCode(Status.OK)
@@ -102,7 +102,7 @@ describe("DELETE groups/{id}/members/{userId}", () => {
         app,
         type: HTTPRequest.DELETE,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/members/${USER_BOB_ID}`,
-        ...authPayload(bob_jwt),
+        ...authPayload(BOB_JWT),
       })
     )
       .assertStatusCode(Status.OK)
@@ -117,7 +117,7 @@ describe("DELETE groups/{id}/members/{userId}", () => {
         app,
         type: HTTPRequest.DELETE,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/members/${USER_ALICE_ID}`,
-        ...authPayload(ana_jwt),
+        ...authPayload(ANA_JWT),
       })
     )
       .assertStatusCode(Status.Forbidden)
@@ -128,7 +128,7 @@ describe("DELETE groups/{id}/members/{userId}", () => {
         app,
         type: HTTPRequest.DELETE,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/members/${USER_ALICE_ID}`,
-        ...authPayload(random_jwt),
+        ...authPayload(RANDOM_JWT),
       })
     )
       .assertStatusCode(Status.Forbidden)
@@ -143,7 +143,7 @@ describe("DELETE groups/{id}/members/{userId}", () => {
         app,
         type: HTTPRequest.DELETE,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/members/${USER_ALICE_ID}`,
-        ...authPayload(bob_jwt),
+        ...authPayload(BOB_JWT),
       })
     )
       .assertStatusCode(Status.Forbidden)
