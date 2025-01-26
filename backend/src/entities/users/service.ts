@@ -1,16 +1,16 @@
 import { InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
+import { UserTransaction } from "./transaction";
 import {
   CreateUserPayload,
+  Pagination,
   SearchedInfo,
   SearchedUser,
   UpdateUserPayload,
   User,
-  Pagination,
-} from "./validator";
-import { UserTransaction } from "./transaction";
-import { PostWithMedia } from "../posts/validator";
-import { Group } from "../groups/validator";
+} from "../../types/api/internal/users";
+import { PostWithMedia } from "../../types/api/internal/posts";
+import { Group } from "../../types/api/internal/groups";
 
 export interface UserService {
   createUser(payload: CreateUserPayload): Promise<User>;

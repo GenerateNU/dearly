@@ -7,8 +7,8 @@ import {
   postsTable,
   usersTable,
 } from "../schema";
-import { Media, PostWithMedia } from "../posts/validator";
-import { Group } from "../groups/validator";
+import { and, eq, sql, not, exists } from "drizzle-orm";
+import { Media, PostWithMedia } from "../../types/api/internal/posts";
 import {
   CreateUserPayload,
   Pagination,
@@ -16,8 +16,8 @@ import {
   SearchedUser,
   UpdateUserPayload,
   User,
-} from "./validator";
-import { and, eq, sql, not, exists } from "drizzle-orm";
+} from "../../types/api/internal/users";
+import { Group } from "../../types/api/internal/groups";
 
 export interface UserTransaction {
   insertUser(payload: CreateUserPayload): Promise<User | null>;

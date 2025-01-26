@@ -1,18 +1,18 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { groupsTable, likesTable, mediaTable, membersTable, postsTable } from "../schema";
+import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
+import { and, eq, sql, desc, between } from "drizzle-orm";
 import {
   CalendarParamPayload,
   CreateGroupPayload,
+  DayWithURL,
   FeedParamPayload,
   Group,
   GroupIdPayload,
-  Thumbnail,
-  ThumbnailResponse,
+  ThumbnailResponseWithURL,
   UpdateGroupPayload,
-} from "./validator";
-import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
-import { and, eq, sql, desc, between } from "drizzle-orm";
-import { Media, PostWithMedia } from "../posts/validator";
+} from "../../types/api/internal/groups";
+import { Media, PostWithMedia } from "../../types/api/internal/posts";
 
 export interface GroupTransaction {
   insertGroup(payload: CreateGroupPayload): Promise<Group | null>;
@@ -20,7 +20,7 @@ export interface GroupTransaction {
   getGroup(payload: GroupIdPayload): Promise<Group | null>;
   updateGroup(payload: UpdateGroupPayload): Promise<Group | null>;
   getAllPosts(payload: FeedParamPayload): Promise<PostWithMedia[]>;
-  getCalendar(payload: CalendarParamPayload): Promise<ThumbnailResponse[]>;
+  getCalendar(payload: CalendarParamPayload): Promise<ThumbnailResponseWithURL[]>;
 }
 
 export class GroupTransactionImpl implements GroupTransaction {
@@ -192,7 +192,7 @@ export class GroupTransactionImpl implements GroupTransaction {
     userId,
     groupId,
     range,
-  }: CalendarParamPayload): Promise<ThumbnailResponse[]> {
+  }: CalendarParamPayload): Promise<ThumbnailResponseWithURL[]> {
     await this.checkMembership(groupId, userId);
     const rangeStartDate = new Date(pivot);
     rangeStartDate.setMonth(rangeStartDate.getMonth() - range);
@@ -225,7 +225,7 @@ export class GroupTransactionImpl implements GroupTransaction {
       .select({
         year: sql<number>`cast(EXTRACT(YEAR FROM ${rankedPosts.createdAt}) as int)`.as("year"),
         month: sql<number>`cast(EXTRACT(MONTH FROM ${rankedPosts.createdAt}) as int)`.as("month"),
-        data: sql<Thumbnail[]>`ARRAY_AGG(
+        data: sql<DayWithURL[]>`ARRAY_AGG(
           JSON_BUILD_OBJECT(
             'day', EXTRACT(DAY FROM ${rankedPosts.createdAt}),
             'url', ${rankedPosts.url}

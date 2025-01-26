@@ -1,17 +1,7 @@
 import { MIN_LIMIT, NAME_MAX_LIMIT, TEXT_MAX_LIMIT } from "../../constants/database";
 import { convertToDate, validateCalendarParam, validateYearMonth } from "../../utilities/date";
 import { paginationSchema } from "../../utilities/pagination";
-import { groupsTable, invitationsTable, linksTable, membersTable } from "../schema";
 import z from "zod";
-
-export type CreateGroupPayload = typeof groupsTable.$inferInsert;
-export type Group = typeof groupsTable.$inferSelect;
-export type CreateLinkPayload = typeof linksTable.$inferInsert;
-export type CreateInvitePayload = typeof invitationsTable.$inferInsert;
-export type addMemberPayload = typeof membersTable.$inferInsert;
-export type GroupInvitation = {
-  token: string;
-};
 
 export const createGroupValidate = z
   .object({
@@ -65,30 +55,4 @@ export const calendarParamsValidate = z.object({
     }),
 });
 
-export type FeedParamPayload = z.infer<typeof feedParamValidate> & GroupUserIDPayload;
-
-export type GroupUserIDPayload = {
-  userId: string;
-  groupId: string;
-};
-
-export type CalendarParamPayload = z.infer<typeof calendarParamsValidate> & GroupUserIDPayload;
-
-export type ThumbnailResponse = {
-  month: number;
-  year: number;
-  data: Thumbnail[];
-};
-
-export type Thumbnail = {
-  date: number;
-  url: string;
-};
 export const updateGroupValidate = createGroupValidate.partial();
-
-export type UpdateGroupPayload = z.infer<typeof updateGroupValidate> & GroupIdPayload;
-
-export type GroupIdPayload = {
-  userId: string;
-  groupId: string;
-};

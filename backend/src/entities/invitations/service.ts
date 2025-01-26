@@ -5,8 +5,9 @@ import {
   NotFoundError,
 } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
-import { addMemberPayload, GroupInvitation } from "../groups/validator";
 import { InvitationTransaction } from "./transaction";
+import { GroupInvitation } from "../../types/api/internal/invite";
+import { AddMemberPayload } from "../../types/api/internal/members";
 
 export interface InvitationService {
   createInviteToken(groupId: string, userId: string): Promise<GroupInvitation>;
@@ -29,7 +30,7 @@ export class InvitationServiceImpl implements InvitationService {
       if (!(await this.invitationTransaction.verifyToken(token, groupId))) {
         throw new ForbiddenError("Token is invalid");
       }
-      const payload: addMemberPayload = {
+      const payload: AddMemberPayload = {
         groupId: groupId,
         userId: userId,
         joinedAt: new Date(),
