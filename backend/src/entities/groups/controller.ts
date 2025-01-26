@@ -34,7 +34,6 @@ export class GroupControllerImpl implements GroupController {
   constructor(groupService: GroupService) {
     this.groupService = groupService;
   }
-
   async createGroup(ctx: Context): Promise<GROUP_API> {
     const createGroupImpl = async () => {
       const body = await ctx.req.json();
