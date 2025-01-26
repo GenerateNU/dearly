@@ -84,3 +84,10 @@ tasks:
     desc: "Generate Schema from OpenAPI Specification"
     cmds:
       - cd backend && bun run gen
+
+  clean:
+    desc: "Clean up temporary files"
+    cmds:
+      - rm -rf node_modules bun.lockb package-lock.json
+      - cd backend && rm -rf node_modules bun.lockb package-lock.json gen
+      - cd frontend && rm -rf node_modules bun.lockb package-lock.json .expo gen

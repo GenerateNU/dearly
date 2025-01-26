@@ -97,6 +97,19 @@ export class TestBuilder {
     return resultHeaders;
   }
 
+  getResponseBodyKey(key: string): unknown {
+    if (this.type === HTTPRequest.DELETE) {
+      throw new Error("Cannot retrieve id from DELETE request");
+    }
+    if (!this.body) {
+      throw new Error("Response is not defined.");
+    }
+    if (!this.body[key]) {
+      throw new Error(`${key} does not exist in the response body.`);
+    }
+    return this.body[key];
+  }
+
   /**
    * Get the response ID (for non-DELETE requests)
    */
