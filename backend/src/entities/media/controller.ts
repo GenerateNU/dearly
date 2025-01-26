@@ -17,6 +17,7 @@ export class MediaControllerImpl implements MediaController {
   async uploadMedia(ctx: Context): Promise<Response> {
     const uploadMediaImpl = async () => {
       const groupId = parseUUID(ctx.req.param("id"));
+      const userId = ctx.get("userId");
       const body = await ctx.req.parseBody({ all: true });
       const media = body["media"];
 
@@ -39,7 +40,7 @@ export class MediaControllerImpl implements MediaController {
         throw new BadRequestError("Invalid media type");
       }
 
-      const objectKeys = await this.mediaService.uploadMedia(blobs, groupId);
+      const objectKeys = await this.mediaService.uploadMedia(blobs, groupId, userId);
       return ctx.json(objectKeys, 201);
     };
     return await handleAppError(uploadMediaImpl)(ctx);

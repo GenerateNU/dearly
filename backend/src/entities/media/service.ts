@@ -9,21 +9,26 @@ import { PostWithMedia, PostWithMediaURL } from "../../types/api/internal/posts"
 import { SearchedUser, User } from "../../types/api/internal/users";
 import { MediaType } from "../../constants/database";
 import { Media, MediaResponse, MediaWithURL } from "../../types/api/internal/media";
-import { BadRequestError } from "../../utilities/errors/app-error";
+import { BadRequestError, ForbiddenError } from "../../utilities/errors/app-error";
+import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import { membersTable } from "../schema";
+import { eq, and } from "drizzle-orm";
 
 export interface MediaService {
   getPostWithMediaUrls(post: PostWithMedia): Promise<PostWithMediaURL>;
   getThumbnailsWithSignedUrls(thumbnails: ThumbnailResponse[]): Promise<ThumbnailResponseWithURL[]>;
   getUsersWithSignedURL(users: SearchedUser[]): Promise<SearchedUser[]>;
   getUserWithSignedURL(user: User): Promise<User>;
-  uploadMedia(blobs: Blob[], groupId: string): Promise<MediaResponse[]>;
+  uploadMedia(blobs: Blob[], groupId: string, userId: string): Promise<MediaResponse[]>;
 }
 
 export class MediaServiceImpl {
   private s3Service: IS3Operations;
+  private db: PostgresJsDatabase;
 
-  constructor(s3Service: IS3Operations) {
+  constructor(s3Service: IS3Operations, db: PostgresJsDatabase) {
     this.s3Service = s3Service;
+    this.db = db;
   }
 
   async getThumbnailWithSignedUrl({ day, objectKey }: DayWithObjectKey): Promise<DayWithURL> {
@@ -116,7 +121,18 @@ export class MediaServiceImpl {
     return thumbnailsWithUrls;
   }
 
-  async uploadMedia(blobs: Blob[], groupId: string): Promise<MediaResponse[]> {
+  async checkPermissions(groupId: string, userId: string): Promise<void> {
+    const [isMember] = await this.db
+      .select()
+      .from(membersTable)
+      .where(and(eq(membersTable.groupId, groupId), eq(membersTable.userId, userId)));
+    if (!isMember) {
+      throw new ForbiddenError();
+    }
+  }
+
+  async uploadMedia(blobs: Blob[], groupId: string, userId: string): Promise<MediaResponse[]> {
+    await this.checkPermissions(groupId, userId);
     const objectKeys: MediaResponse[] = await Promise.all(
       blobs.map(async (blob) => {
         const objectKey = await this.s3Service.saveObject(
