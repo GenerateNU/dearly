@@ -2,14 +2,10 @@ import { Context } from "hono";
 import { PostService } from "./service";
 import { handleAppError } from "../../utilities/errors/app-error";
 import { parseUUID } from "../../utilities/uuid";
-import {
-  CreatePostPayload,
-  createPostValidate,
-  UpdatePostPayload,
-  updatePostValidate,
-} from "./validator";
+import { createPostValidate, updatePostValidate } from "./validator";
 import { Status } from "../../constants/http";
 import { DEL_POST, POST_API } from "../../types/api/routes/posts";
+import { CreatePostPayload, UpdatePostPayload } from "../../types/api/internal/posts";
 
 export interface PostController {
   createPost(ctx: Context): Promise<POST_API>;

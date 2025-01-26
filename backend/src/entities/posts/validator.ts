@@ -5,8 +5,6 @@ import {
   MIN_MEDIA_COUNT,
   TEXT_MAX_LIMIT,
 } from "../../constants/database";
-import { mediaTable, postsTable } from "../schema";
-import { IDPayload } from "../../types/id";
 
 export const createPostValidate = z
   .object({
@@ -30,17 +28,3 @@ export const createPostValidate = z
   .passthrough();
 
 export const updatePostValidate = createPostValidate.partial();
-
-export type CreatePostPayload = z.infer<typeof createPostValidate> & {
-  groupId: string;
-  userId: string;
-};
-
-export type UpdatePostPayload = z.infer<typeof updatePostValidate> & IDPayload;
-
-export type Media = typeof mediaTable.$inferSelect;
-type Post = typeof postsTable.$inferSelect;
-
-export type PostWithMedia = Post & {
-  media: Media[];
-};

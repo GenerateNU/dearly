@@ -1,13 +1,13 @@
 import { and, eq } from "drizzle-orm";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
+import { linksTable, membersTable, invitationsTable } from "../schema";
+import { AddMemberPayload } from "../../types/api/internal/members";
 import {
-  addMemberPayload,
   CreateInvitePayload,
   CreateLinkPayload,
   GroupInvitation,
-} from "../groups/validator";
-import { linksTable, membersTable, invitationsTable } from "../schema";
+} from "../../types/api/internal/invite";
 
 export interface InvitationTransaction {
   /**
@@ -16,7 +16,7 @@ export interface InvitationTransaction {
    */
   isManager(userId: string, groupId: string): Promise<boolean>;
   verifyToken(token: string, groupId: string): Promise<boolean>;
-  insertUserByInvitation(payload: addMemberPayload): Promise<void>;
+  insertUserByInvitation(payload: AddMemberPayload): Promise<void>;
   insertInvitation(payload: CreateLinkPayload, userId: string): Promise<GroupInvitation | null>;
   getGroupIdFromToken(token: string): Promise<string>;
 }
@@ -49,7 +49,7 @@ export class InvitationTransactionImpl implements InvitationTransaction {
     });
   }
 
-  async insertUserByInvitation(payload: addMemberPayload): Promise<void> {
+  async insertUserByInvitation(payload: AddMemberPayload): Promise<void> {
     await this.db.transaction(async (tx) => {
       const [insert] = await tx.insert(membersTable).values(payload).returning();
       if (!insert) {
