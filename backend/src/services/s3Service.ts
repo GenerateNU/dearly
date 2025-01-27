@@ -6,11 +6,11 @@ import {
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { NotFoundError } from "../utilities/errors/app-error";
-import { randomUUIDv7 } from "bun";
 import sharp from "sharp";
 import * as lame from "@breezystack/lamejs";
 import { MediaType } from "../constants/database";
 import { Configuration } from "../types/config";
+import { v4 as uuidv4 } from "uuid";
 
 export interface IS3Operations {
   // group is the uuid of the group this photo is being sent to (used as tagging number) -> make public group id number
@@ -104,7 +104,7 @@ export class S3Impl implements IS3Operations {
    * @returns Will return the S3 object key
    */
   async saveObject(file: Blob, tag: string, fileType: MediaType): Promise<string> {
-    const objectKey: string = randomUUIDv7();
+    const objectKey: string = uuidv4();
     const compressedFile =
       fileType == MediaType.PHOTO ? await this.compressImage(file) : await this.compressAudio(file);
     await this.client!.send(

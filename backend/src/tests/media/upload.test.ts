@@ -19,12 +19,16 @@ describe("POST /groups/:id/media", () => {
 
   const ALICE_JWT = generateJWTFromID(USER_ALICE_ID);
   const ANA_JWT = generateJWTFromID(USER_ANA_ID);
+  const formData = new FormData();
+  const image = fs.readFileSync(PROJECT_ROOT + "/tests/test-assets/test_image.tiff");
+  const imageFile = new File([image], "test_image.tiff");
+  formData.append("media", imageFile);
 
   beforeAll(async () => {
     app = await startTestApp();
   });
 
-  it("should return 201 if upload more than one media", async () => {
+  it("should return 201 if upload one image", async () => {
     const formData = new FormData();
     const buffer = fs.readFileSync(PROJECT_ROOT + "/tests/test-assets/test_image.tiff");
     const blob = new Blob([buffer]);
@@ -37,18 +41,21 @@ describe("POST /groups/:id/media", () => {
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/media`,
         autoAuthorized: false,
         headers: {
-          Authorization: `Bearer ${ANA_JWT}`,
+          Authorization: `Bearer ${ALICE_JWT}`,
         },
         requestBody: formData,
       })
-    ).assertStatusCode(Status.Created);
+    )
+      .assertStatusCode(Status.Created)
+      .assertArraySize(1)
+      .assertArrayFieldExists("objectKey")
+      .assertArrayFieldExists("type");
   });
 
-  it("should return 201 if upload one media", async () => {
-    const formData = new FormData();
-    const buffer = fs.readFileSync(PROJECT_ROOT + "/tests/test-assets/test_image.tiff");
-    const blob = new Blob([buffer]);
-    formData.append("media", blob);
+  it("should return 201 if upload more than one media (image and audio)", async () => {
+    const audio = fs.readFileSync(PROJECT_ROOT + "/tests/test-assets/test_audio.m4a");
+    const audioFile = new File([audio], "test_audio.m4a");
+    formData.append("media", audioFile);
 
     (
       await testBuilder.request({
@@ -57,14 +64,23 @@ describe("POST /groups/:id/media", () => {
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/media`,
         autoAuthorized: false,
         headers: {
-          Authorization: `Bearer ${ANA_JWT}`,
+          Authorization: `Bearer ${ALICE_JWT}`,
         },
         requestBody: formData,
       })
-    ).assertStatusCode(Status.Created);
+    )
+      .assertStatusCode(Status.Created)
+      .assertArraySize(2)
+      .assertArrayFieldExists("objectKey")
+      .assertArrayFieldExists("type");
   });
 
   it("should return 400 if media type is not PHOTO or AUDIO", async () => {
+    const formData = new FormData();
+    const text = fs.readFileSync(PROJECT_ROOT + "/tests/test-assets/test_invalid_filetype.txt");
+    const file = new File([text], "test_invalid_filetype.txt");
+    formData.append("media", file);
+
     (
       await testBuilder.request({
         app,
@@ -72,15 +88,21 @@ describe("POST /groups/:id/media", () => {
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/media`,
         autoAuthorized: false,
         headers: {
-          Authorization: `Bearer ${ANA_JWT}`,
+          Authorization: `Bearer ${ALICE_JWT}`,
         },
+        requestBody: formData,
       })
     )
       .assertStatusCode(Status.BadRequest)
-      .assertError("Invalid file type in array");
+      .assertError("Invalid media type");
   });
 
   it("should return 403 if user not member of group", async () => {
+    const formData = new FormData();
+    const buffer = fs.readFileSync(PROJECT_ROOT + "/tests/test-assets/test_image.tiff");
+    const blob = new Blob([buffer]);
+    formData.append("media", blob);
+
     (
       await testBuilder.request({
         app,
@@ -90,6 +112,7 @@ describe("POST /groups/:id/media", () => {
         headers: {
           Authorization: `Bearer ${ANA_JWT}`,
         },
+        requestBody: formData,
       })
     ).assertStatusCode(Status.Forbidden);
   });

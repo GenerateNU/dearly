@@ -98,8 +98,6 @@ export class TestBuilder {
       const token = generateJWTFromID(generateUUID());
       resultHeaders.set("Authorization", `Bearer ${token}`);
     }
-
-    resultHeaders.set("Content-Type", "application/json");
     return resultHeaders;
   }
 
@@ -114,6 +112,21 @@ export class TestBuilder {
       throw new Error(`${key} does not exist in the response body.`);
     }
     return this.body[key];
+  }
+
+  assertArrayFieldExists(fieldName: string): TestBuilder {
+    if (this.type === HTTPRequest.DELETE) {
+      throw new Error("Cannot retrieve from DELETE request");
+    }
+    if (!this.body) {
+      throw new Error("Response is not defined.");
+    }
+    if (Array.isArray(this.body)) {
+      this.body.forEach((item) => {
+        expect(item).toHaveProperty(fieldName);
+      });
+    }
+    return this;
   }
 
   /**

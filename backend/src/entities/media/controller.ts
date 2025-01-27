@@ -20,7 +20,6 @@ export class MediaControllerImpl implements MediaController {
       const userId = ctx.get("userId");
       const body = await ctx.req.parseBody({ all: true });
       const media = body["media"];
-      console.log(body.media);
 
       if (!media) {
         throw new BadRequestError("No media found");
