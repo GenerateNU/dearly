@@ -8,7 +8,7 @@ interface Request {
   app: Hono;
   route: string;
   type?: HTTPRequest;
-  requestBody?: Record<string, unknown>;
+  requestBody?: Record<string, unknown> | FormData;
   queryParams?: Record<string, string>;
   headers?: Record<string, string>;
   autoAuthorized?: boolean;

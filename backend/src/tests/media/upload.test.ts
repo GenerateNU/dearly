@@ -21,39 +21,81 @@ describe("POST /groups/:id/media", () => {
     app = await startTestApp();
   });
 
+  it("should return 201 if upload more than one media", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.POST,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/media`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${ANA_JWT}`,
+        },
+      })
+    ).assertStatusCode(Status.Forbidden);
+  });
+
+  it("should return 201 if upload one media", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.POST,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/media`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${ANA_JWT}`,
+        },
+      })
+    ).assertStatusCode(Status.Forbidden);
+  });
+
+  it("should return 400 if media type is not PHOTO or AUDIO", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.POST,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/media`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${ANA_JWT}`,
+        },
+      })
+    )
+      .assertStatusCode(Status.BadRequest)
+      .assertError("Invalid file type in array");
+  });
+
+  it("should return 403 if user not member of group", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.POST,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/media`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${ANA_JWT}`,
+        },
+      })
+    ).assertStatusCode(Status.Forbidden);
+  });
+
   it("should return 404 if group does not exist", async () => {
     (
       await testBuilder.request({
         app,
         type: HTTPRequest.POST,
-        route: `/api/v1/groups/${DEARLY_GROUP_ID}/media`,
+        route: `/api/v1/groups/${generateUUID()}/media`,
         autoAuthorized: false,
         headers: {
-          Authorization: `Bearer ${ANA_JWT}`,
+          Authorization: `Bearer ${ALICE_JWT}`,
         },
       })
     )
-      .assertStatusCode(Status.BadRequest)
-      .assertError("No media found");
+      .assertStatusCode(Status.NotFound)
+      .assertError("Group does not exist.");
   });
 
-  it("should return 403 if user is not member of group", async () => {
-    (
-      await testBuilder.request({
-        app,
-        type: HTTPRequest.POST,
-        route: `/api/v1/groups/${DEARLY_GROUP_ID}/media`,
-        autoAuthorized: false,
-        headers: {
-          Authorization: `Bearer ${ANA_JWT}`,
-        },
-      })
-    )
-      .assertStatusCode(Status.BadRequest)
-      .assertError("No media found");
-  });
-
-  it("should return 400 if no media", async () => {
+  it("should return 400 if no media field", async () => {
     (
       await testBuilder.request({
         app,
