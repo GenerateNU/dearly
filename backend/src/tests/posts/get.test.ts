@@ -5,8 +5,8 @@ import {
   USER_ALICE_ID,
   POST_ID,
   POST_MOCK,
-  MEDIA_MOCK,
   INVALID_ID_ARRAY,
+  MOCK_MEDIA_WITH_URL,
 } from "./../helpers/test-constants";
 import { Hono } from "hono";
 import { startTestApp } from "../helpers/test-app";
@@ -108,7 +108,7 @@ describe("GET /posts/:id", () => {
       .assertBody({
         ...POST_MOCK[0],
         createdAt: POST_MOCK[0]!.createdAt?.toISOString(),
-        media: MEDIA_MOCK,
+        media: MOCK_MEDIA_WITH_URL,
       });
   });
 

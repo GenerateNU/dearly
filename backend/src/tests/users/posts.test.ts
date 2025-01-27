@@ -4,7 +4,7 @@ import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
 import {
-  MEDIA_MOCK,
+  MOCK_MEDIA_WITH_URL,
   POST_MOCK,
   USER_ALICE_ID,
   USER_BILL_ID,
@@ -43,7 +43,7 @@ describe("GET /users/posts", () => {
       [
         {
           ...POST_MOCK[0],
-          media: MEDIA_MOCK,
+          media: MOCK_MEDIA_WITH_URL,
           createdAt: POST_MOCK[0]!.createdAt?.toISOString(),
         },
       ],
@@ -71,7 +71,7 @@ describe("GET /users/posts", () => {
       [
         {
           ...POST_MOCK[0],
-          media: MEDIA_MOCK,
+          media: MOCK_MEDIA_WITH_URL,
           createdAt: POST_MOCK[0]!.createdAt?.toISOString(),
         },
       ],
@@ -84,7 +84,7 @@ describe("GET /users/posts", () => {
       [
         {
           ...POST_MOCK[0],
-          media: MEDIA_MOCK,
+          media: MOCK_MEDIA_WITH_URL,
           createdAt: POST_MOCK[0]!.createdAt?.toISOString(),
         },
       ],

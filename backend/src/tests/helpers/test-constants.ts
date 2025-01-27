@@ -14,6 +14,7 @@ export const MEDIA_TWO_ID = "43bd915c-122c-448f-8d2b-bdc983934e86";
 export const MEDIA_THREE_ID = "a9c2d3f7-5b84-42e1-91f0-3d6a8b4c7e12";
 export const ANOTHER_GROUP_ID = "678d8ff3-c24c-8002-ad06-052ae4f44075";
 export const NEW_POST_ID = "e3f4b2c1-8d67-4f9b-90a4-6b1f3d2e5c78";
+export const MOCK_SIGNED_URL = "https://mocked-url.com";
 
 export const GROUP_EMPTY_FIELDS_ERRORS = [
   {
@@ -41,13 +42,13 @@ export const GROUP_EMPTY_FIELDS_ERRORS = [
 export const MEDIA_MOCK: (typeof mediaTable.$inferInsert)[] = [
   {
     postId: POST_ID,
-    objectKey: "photo",
+    objectKey: "photo1",
     type: "VIDEO",
     id: MEDIA_ONE_ID,
   },
   {
     postId: POST_ID,
-    objectKey: "photo",
+    objectKey: "photo2",
     type: "PHOTO",
     id: MEDIA_TWO_ID,
   },
@@ -143,3 +144,10 @@ export const ANOTHER_GROUP: CreateGroupPayload = {
   managerId: USER_ANA_ID,
   id: ANOTHER_GROUP_ID,
 };
+
+export const MOCK_MEDIA_WITH_URL = MEDIA_MOCK.map((media) => ({
+  id: media.id,
+  postId: media.postId,
+  type: media.type,
+  url: MOCK_SIGNED_URL,
+}));

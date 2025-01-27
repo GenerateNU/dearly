@@ -1,6 +1,7 @@
 import {
   DEARLY_GROUP_ID,
   INVALID_ID_ARRAY,
+  MOCK_SIGNED_URL,
   USER_ALICE_ID,
   USER_ANA_ID,
 } from "./../helpers/test-constants";
@@ -18,7 +19,7 @@ describe("GET /groups/:id/calendar", () => {
       data: [
         {
           day: 31,
-          objectKey: "photo",
+          url: MOCK_SIGNED_URL,
         },
       ],
       month: 12,
