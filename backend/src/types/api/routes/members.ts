@@ -1,5 +1,5 @@
 import { TypedResponse } from "hono";
-import { components, paths } from "../../../gen/openapi";
+import { paths } from "../../../gen/openapi";
 import { API_ERROR } from "../schemas/error";
 
 export type ADD_MEMBER = TypedResponse<
@@ -14,6 +14,5 @@ export type DEL_MEMBER = TypedResponse<
 
 export type MEMBERS_API = TypedResponse<
   | paths["/api/v1/groups/{id}/members"]["get"]["responses"]["200"]["content"]["application/json"]
-  | components["schemas"]["Error"]
-  | components["schemas"]["ValidationError"]
+  | API_ERROR
 >;

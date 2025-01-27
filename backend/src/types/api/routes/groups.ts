@@ -1,11 +1,9 @@
 import { TypedResponse } from "hono";
-import { components, paths } from "../../../gen/openapi";
+import { paths } from "../../../gen/openapi";
 import { API_ERROR } from "../schemas/error";
 
 export type GROUP_API = TypedResponse<
-  | paths["/api/v1/groups"]["post"]["responses"]["201"]["content"]["application/json"]
-  | components["schemas"]["Error"]
-  | components["schemas"]["ValidationError"]
+  paths["/api/v1/groups"]["post"]["responses"]["201"]["content"]["application/json"] | API_ERROR
 >;
 
 export type FEED_API = TypedResponse<
@@ -25,12 +23,9 @@ export type DELETE_GROUP = TypedResponse<
 
 export type PATCH_GROUP = TypedResponse<
   | paths["/api/v1/groups/{id}"]["patch"]["responses"]["201"]["content"]["application/json"]
-  | components["schemas"]["Error"]
-  | components["schemas"]["ValidationError"]
+  | API_ERROR
 >;
 
 export type GET_GROUP = TypedResponse<
-  | paths["/api/v1/groups/{id}"]["get"]["responses"]["201"]["content"]["application/json"]
-  | components["schemas"]["Error"]
-  | components["schemas"]["ValidationError"]
+  paths["/api/v1/groups/{id}"]["get"]["responses"]["201"]["content"]["application/json"] | API_ERROR
 >;
