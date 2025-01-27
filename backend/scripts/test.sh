@@ -27,7 +27,7 @@ run() {
   ready
   NODE_ENV=test
   if [ $# -eq 0 ]; then
-    bun test
+    bun test 
   elif [ $# -eq 1 ]; then
     bun test $1
   elif [ $# -ge 2 ]; then
