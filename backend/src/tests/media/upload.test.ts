@@ -9,6 +9,9 @@ import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
+import { resolve } from "node:path";
+const PROJECT_ROOT = resolve(__dirname, "../..");
+import fs from "fs";
 
 describe("POST /groups/:id/media", () => {
   let app: Hono;
@@ -23,8 +26,9 @@ describe("POST /groups/:id/media", () => {
 
   it("should return 201 if upload more than one media", async () => {
     const formData = new FormData();
-    formData.append("media", "value1");
-    formData.append("media", "value2");
+    const buffer = fs.readFileSync(PROJECT_ROOT + "/tests/test-assets/test_image.tiff");
+    const blob = new Blob([buffer]);
+    formData.append("media", blob);
 
     (
       await testBuilder.request({
@@ -37,12 +41,15 @@ describe("POST /groups/:id/media", () => {
         },
         requestBody: formData,
       })
-    )
-      .assertError("")
-      .assertStatusCode(Status.Created);
+    ).assertStatusCode(Status.Created);
   });
 
   it("should return 201 if upload one media", async () => {
+    const formData = new FormData();
+    const buffer = fs.readFileSync(PROJECT_ROOT + "/tests/test-assets/test_image.tiff");
+    const blob = new Blob([buffer]);
+    formData.append("media", blob);
+
     (
       await testBuilder.request({
         app,
@@ -52,6 +59,7 @@ describe("POST /groups/:id/media", () => {
         headers: {
           Authorization: `Bearer ${ANA_JWT}`,
         },
+        requestBody: formData,
       })
     ).assertStatusCode(Status.Created);
   });
@@ -87,6 +95,11 @@ describe("POST /groups/:id/media", () => {
   });
 
   it("should return 404 if group does not exist", async () => {
+    const formData = new FormData();
+    const buffer = fs.readFileSync(PROJECT_ROOT + "/tests/test-assets/test_image.tiff");
+    const blob = new Blob([buffer]);
+    formData.append("media", blob);
+
     (
       await testBuilder.request({
         app,
@@ -96,6 +109,7 @@ describe("POST /groups/:id/media", () => {
         headers: {
           Authorization: `Bearer ${ALICE_JWT}`,
         },
+        requestBody: formData,
       })
     )
       .assertStatusCode(Status.NotFound)
