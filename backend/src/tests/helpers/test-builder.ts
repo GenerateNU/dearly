@@ -48,6 +48,12 @@ export class TestBuilder {
       body: requestBody ? JSON.stringify(requestBody) : undefined,
     };
 
+    if (requestBody instanceof FormData) {
+      options.body = requestBody;
+    } else if (requestBody) {
+      options.body = JSON.stringify(requestBody);
+    }
+
     this.response = await app.request(requestedRoute, options);
     await this.parseResponse();
 

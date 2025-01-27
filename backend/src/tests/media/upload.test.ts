@@ -21,6 +21,38 @@ describe("POST /groups/:id/media", () => {
     app = await startTestApp();
   });
 
+  it("should return 404 if group does not exist", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.POST,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/media`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${ANA_JWT}`,
+        },
+      })
+    )
+      .assertStatusCode(Status.BadRequest)
+      .assertError("No media found");
+  });
+
+  it("should return 403 if user is not member of group", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.POST,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/media`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${ANA_JWT}`,
+        },
+      })
+    )
+      .assertStatusCode(Status.BadRequest)
+      .assertError("No media found");
+  });
+
   it("should return 400 if no media", async () => {
     (
       await testBuilder.request({
