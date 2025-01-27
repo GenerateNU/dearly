@@ -14,11 +14,51 @@ import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { groupsTable, membersTable } from "../schema";
 import { eq, and } from "drizzle-orm";
 
+/**
+ * Interface for the Media Service, which provides methods for interacting with media-related operations.
+ * This includes retrieving media with signed URLs, uploading media, and checking user permissions.
+ */
 export interface MediaService {
+  /**
+   * Retrieves a post with its associated media URLs.
+   *
+   * @param post - The post object containing media object key.
+   * @returns A promise that resolves to a `PostWithMediaURL` object, which contains the post data and media URLs.
+   */
   getPostWithMediaUrls(post: PostWithMedia): Promise<PostWithMediaURL>;
+
+  /**
+   * Retrieves a list of thumbnails with signed URLs for each thumbnail.
+   *
+   * @param thumbnails - A list of `ThumbnailResponse` objects with object keys to retrieve signed URLs for.
+   * @returns A promise that resolves to a list of `ThumbnailResponseWithURL` objects, each containing the thumbnail data and URL.
+   */
   getThumbnailsWithSignedUrls(thumbnails: ThumbnailResponse[]): Promise<ThumbnailResponseWithURL[]>;
+
+  /**
+   * Retrieves a list of users, each with a signed URL for their profile photo (if available).
+   *
+   * @param users - A list of `SearchedUser` objects to retrieve profile photo URLs for.
+   * @returns A promise that resolves to a list of `SearchedUser` objects with signed profile photo URLs.
+   */
   getUsersWithSignedURL(users: SearchedUser[]): Promise<SearchedUser[]>;
+
+  /**
+   * Retrieves a single user with their signed profile photo URL (if available).
+   *
+   * @param user - The `User` object to retrieve the profile photo URL for.
+   * @returns A promise that resolves to a `User` object with a signed profile photo URL.
+   */
   getUserWithSignedURL(user: User): Promise<User>;
+
+  /**
+   * Uploads media (such as images, videos, or audio) to the S3 service and associates them with a group.
+   *
+   * @param blobs - A list of `Blob` objects representing the media to upload.
+   * @param groupId - The ID of the group the media is being uploaded to.
+   * @param userId - The ID of the user uploading the media.
+   * @returns A promise that resolves to a list of `MediaResponse` objects, each containing the media object key and type.
+   */
   uploadMedia(blobs: Blob[], groupId: string, userId: string): Promise<MediaResponse[]>;
 }
 

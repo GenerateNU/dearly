@@ -5,12 +5,13 @@ import {
   GetObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { NotFoundError } from "../utilities/errors/app-error";
+import { InternalServerError, NotFoundError } from "../utilities/errors/app-error";
 import sharp from "sharp";
 import * as lame from "@breezystack/lamejs";
 import { MediaType } from "../constants/database";
 import { Configuration } from "../types/config";
 import { v4 as uuidv4 } from "uuid";
+import logger from "../utilities/logger";
 
 export interface IS3Operations {
   // group is the uuid of the group this photo is being sent to (used as tagging number) -> make public group id number
@@ -141,12 +142,17 @@ export class S3Impl implements IS3Operations {
    * @param objectKey The key of the object in the S3 bucket
    */
   async getObjectURL(objectKey: string): Promise<string> {
-    const waitInSeconds = 60 * 60 * 24;
-    const command = new GetObjectCommand({
-      Bucket: this.bucketName,
-      Key: objectKey,
-    });
-    const request = await getSignedUrl(this.client, command, { expiresIn: waitInSeconds });
-    return request;
+    try {
+      const waitInSeconds = 60 * 60 * 24;
+      const command = new GetObjectCommand({
+        Bucket: this.bucketName,
+        Key: objectKey,
+      });
+      const request = await getSignedUrl(this.client, command, { expiresIn: waitInSeconds });
+      return request;
+    } catch (error) {
+      logger.error(error);
+      throw new InternalServerError("Failed to retrieve signed url");
+    }
   }
 }
