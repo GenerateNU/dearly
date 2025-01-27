@@ -22,6 +22,10 @@ describe("POST /groups/:id/media", () => {
   });
 
   it("should return 201 if upload more than one media", async () => {
+    const formData = new FormData();
+    formData.append("media", "value1");
+    formData.append("media", "value2");
+
     (
       await testBuilder.request({
         app,
@@ -31,8 +35,11 @@ describe("POST /groups/:id/media", () => {
         headers: {
           Authorization: `Bearer ${ANA_JWT}`,
         },
+        requestBody: formData,
       })
-    ).assertStatusCode(Status.Forbidden);
+    )
+      .assertError("")
+      .assertStatusCode(Status.Created);
   });
 
   it("should return 201 if upload one media", async () => {
@@ -46,7 +53,7 @@ describe("POST /groups/:id/media", () => {
           Authorization: `Bearer ${ANA_JWT}`,
         },
       })
-    ).assertStatusCode(Status.Forbidden);
+    ).assertStatusCode(Status.Created);
   });
 
   it("should return 400 if media type is not PHOTO or AUDIO", async () => {
