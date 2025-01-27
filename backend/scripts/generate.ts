@@ -2,12 +2,7 @@
  */
 import fs from "node:fs";
 import { resolve } from "node:path";
-import openapiTS, {
-  astToString,
-  SchemaObject,
-  TransformNodeOptions,
-  TransformObject,
-} from "openapi-typescript";
+import openapiTS, { astToString, SchemaObject, TransformObject } from "openapi-typescript";
 import ts from "typescript";
 
 const PROJECT_ROOT = resolve(__dirname, "../..");
@@ -22,10 +17,7 @@ const frontendOutput = `${FRONTEND_DIR}/openapi.d.ts`;
 //Create custom type generation
 const BLOB = ts.factory.createTypeReferenceNode(ts.factory.createIdentifier("Blob"));
 
-const transform = (
-  schemaObject: SchemaObject,
-  options: TransformNodeOptions,
-): ts.TypeNode | TransformObject | undefined => {
+const transform = (schemaObject: SchemaObject): ts.TypeNode | TransformObject | undefined => {
   if (schemaObject.format === "Your custom type") {
     return BLOB;
   }
