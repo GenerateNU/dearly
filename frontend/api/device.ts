@@ -1,39 +1,23 @@
-import { getAuthToken } from "@/utilities/device-token";
+import { authWrapper, getHeaders } from "@/utilities/auth-token";
 import fetchClient from "./client";
 
-const registerWrapper = <T>() => {
-  return async (registerFn: (expoToken: string) => Promise<T>) => {
-    const token = await getAuthToken();
-    if (!token) {
-      return null;
-    }
-    return await registerFn(token);
-  };
-};
-
-export const registerDeviceToken = async (expoToken: string): Promise<string | null> => {
+export const registerDeviceToken = async (expoToken: string): Promise<string> => {
   const req = async (token: string) => {
     await fetchClient.POST("/api/v1/users/devices", {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: getHeaders(token),
       body: { expoToken: expoToken },
     });
     return expoToken;
   };
-  return registerWrapper<string | null>()(req);
+  return authWrapper<string>()(req);
 };
 
-export const unregisterDeviceToken = async (expoToken: string): Promise<void | null> => {
+export const unregisterDeviceToken = async (expoToken: string): Promise<void> => {
   const req = async (token: string) => {
     await fetchClient.DELETE("/api/v1/users/devices", {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: getHeaders(token),
       body: { expoToken: expoToken },
     });
   };
-  return registerWrapper<void>()(req);
+  return authWrapper<void>()(req);
 };

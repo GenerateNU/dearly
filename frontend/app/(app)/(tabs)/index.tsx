@@ -5,13 +5,7 @@ import Button from "@/design-system/components/button";
 const Home = () => {
   const { logout } = useAuth();
   return (
-    <Box
-      gap="xl"
-      alignItems="center"
-      justifyContent="center"
-      backgroundColor="cardPrimaryBackground"
-      flex={1}
-    >
+    <Box gap="xl" alignItems="center" justifyContent="center" backgroundColor="primary" flex={1}>
       <Button label="Logout" onPress={logout} />
     </Box>
   );

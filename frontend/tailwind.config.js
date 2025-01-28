@@ -2,7 +2,11 @@
 module.exports = {
   content: ["./components/**/*.{js,jsx,ts,tsx}", "./app/**/*.{js,jsx,ts,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        proxima: ["ProximaNova-Regular", "ProximaNova-Bold"], // Add our font aliases here
+      },
+    },
   },
   plugins: [],
 };
