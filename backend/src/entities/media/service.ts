@@ -60,6 +60,13 @@ export interface MediaService {
    * @returns A promise that resolves to a list of `MediaResponse` objects, each containing the media object key and type.
    */
   uploadMedia(blobs: Blob[], groupId: string, userId: string): Promise<MediaResponse[]>;
+
+  /**
+   * Get pre-signed url of a medium given its object key
+   *
+   * @param key unique object key associated with media
+   */
+  getSignedUrl(key: string): Promise<string>;
 }
 
 export class MediaServiceImpl {
@@ -141,7 +148,7 @@ export class MediaServiceImpl {
     };
   }
 
-  private async getSignedUrl(key: string): Promise<string> {
+  async getSignedUrl(key: string): Promise<string> {
     return this.s3Service.getObjectURL(key);
   }
 

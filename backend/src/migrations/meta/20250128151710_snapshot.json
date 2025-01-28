@@ -1,6 +1,6 @@
 {
-  "id": "759dc5ce-5bf0-447e-bc16-d1312b34437f",
-  "prevId": "9730d958-4f68-4a60-be19-7a015ddf8865",
+  "id": "42f44e98-0d9b-40c7-8594-0771ba971b31",
+  "prevId": "759dc5ce-5bf0-447e-bc16-d1312b34437f",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -423,6 +423,13 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'MEMBER'"
+        },
+        "notificationsEnabled": {
+          "name": "notificationsEnabled",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
         }
       },
       "indexes": {},
@@ -446,7 +453,12 @@
           "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {},
+      "compositePrimaryKeys": {
+        "members_userId_groupId_pk": {
+          "name": "members_userId_groupId_pk",
+          "columns": ["userId", "groupId"]
+        }
+      },
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
@@ -705,12 +717,11 @@
           "primaryKey": false,
           "notNull": false
         },
-        "notificationsEnabled": {
-          "name": "notificationsEnabled",
-          "type": "boolean",
+        "timezone": {
+          "name": "timezone",
+          "type": "varchar",
           "primaryKey": false,
-          "notNull": true,
-          "default": true
+          "notNull": false
         }
       },
       "indexes": {},
@@ -747,7 +758,7 @@
     "public.referenceType": {
       "name": "referenceType",
       "schema": "public",
-      "values": ["POST", "COMMENT", "LIKE", "INVITE", "NUDGE"]
+      "values": ["POST", "COMMENT", "LIKE", "NUDGE"]
     },
     "public.mode": {
       "name": "mode",

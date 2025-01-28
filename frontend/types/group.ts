@@ -1,0 +1,21 @@
+import { components, paths } from "@/gen/openapi";
+
+export type Group = components["schemas"]["Group"];
+
+export type CreateGroupPayload =
+  paths["/api/v1/groups"]["post"]["requestBody"]["content"]["application/json"];
+
+export type UpdateGroupPayload =
+  paths["/api/v1/groups/{id}"]["patch"]["requestBody"]["content"]["application/json"];
+
+export type GroupCalendar =
+  paths["/api/v1/groups/{id}/calendar"]["get"]["responses"]["200"]["content"]["application/json"];
+
+export type GroupPostFeed =
+  paths["/api/v1/groups/{id}/feed"]["get"]["responses"]["200"]["content"]["application/json"];
+
+export type GroupMembers =
+  paths["/api/v1/groups/{id}/members"]["get"]["responses"]["200"]["content"]["application/json"];
+
+export type InvitationToken =
+  paths["/api/v1/groups/{groupId}/invites"]["get"]["responses"]["200"]["content"]["application/json"];

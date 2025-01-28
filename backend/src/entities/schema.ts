@@ -18,13 +18,7 @@ import { NAME_MAX_LIMIT } from "../constants/database";
 export const userModeEnum = pgEnum("mode", ["BASIC", "ADVANCED"]);
 export const postMediaEnum = pgEnum("mediaType", ["VIDEO", "PHOTO"]);
 export const memberRoleEnum = pgEnum("role", ["MEMBER", "MANAGER"]);
-export const referenceTypeEnum = pgEnum("referenceType", [
-  "POST",
-  "COMMENT",
-  "LIKE",
-  "INVITE",
-  "NUDGE",
-]);
+export const referenceTypeEnum = pgEnum("referenceType", ["POST", "COMMENT", "LIKE", "NUDGE"]);
 export const invitationStatusEnum = pgEnum("status", ["PENDING", "ACCEPTED"]);
 
 export const usersTable = pgTable("users", {
@@ -33,7 +27,7 @@ export const usersTable = pgTable("users", {
   username: varchar({ length: NAME_MAX_LIMIT }).notNull().unique(),
   mode: userModeEnum().notNull().default("BASIC"),
   profilePhoto: varchar(),
-  notificationsEnabled: boolean().notNull().default(true),
+  timezone: varchar(),
 });
 
 export const devicesTable = pgTable("devices", {
@@ -85,6 +79,7 @@ export const membersTable = pgTable(
       .references(() => groupsTable.id, { onDelete: "cascade" }),
     joinedAt: timestamp().notNull().defaultNow(),
     role: memberRoleEnum().notNull().default("MEMBER"),
+    notificationsEnabled: boolean().notNull().default(true),
   },
   (table) => {
     return [primaryKey({ columns: [table.userId, table.groupId] })];

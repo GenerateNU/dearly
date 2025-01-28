@@ -63,9 +63,9 @@ components:
           type: string
           nullable: true
           description: A URL to the user's profile photo.
-        notificationsEnabled:
-          type: boolean
-          description: True when user enables notification.
+        timezone:
+          type: string
+          description: Timezone that user is in for sending nudges.
       required:
         - name
         - username
@@ -434,6 +434,7 @@ paths:
       security:
         - BearerAuth: []
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -827,6 +828,7 @@ paths:
       security:
         - BearerAuth: []
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -990,6 +992,7 @@ paths:
             format: uuid
             example: 5e91507e-5630-4efd-9fd4-799178870b10
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -1987,7 +1990,7 @@ paths:
 
 
   /api/v1/groups/{id}/media:
-    get:
+    post:
       tags:
         - Media Endpoint
       summary: Upload media to S3 bucket

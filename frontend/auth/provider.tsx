@@ -12,16 +12,38 @@ interface AuthContextType {
   userId: string | null;
   mode: Mode;
   setMode: (mode: Mode) => void;
+  setInviteToken: (inviteToken: string) => void;
+  inviteToken: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const { isAuthenticated, login, register, logout, userId, mode, setMode } = useAuthStore();
+  const {
+    isAuthenticated,
+    login,
+    register,
+    logout,
+    userId,
+    mode,
+    setMode,
+    setInviteToken,
+    inviteToken,
+  } = useAuthStore();
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, login, register, logout, userId, mode, setMode }}
+      value={{
+        isAuthenticated,
+        login,
+        register,
+        logout,
+        userId,
+        mode,
+        setMode,
+        setInviteToken,
+        inviteToken,
+      }}
     >
       {children}
     </AuthContext.Provider>
