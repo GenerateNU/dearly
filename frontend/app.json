@@ -5,7 +5,8 @@
     "icon": "./assets/icon.png",
     "version": "1.0.0",
     "orientation": "portrait",
-    "scheme": "myapp",
+    "scheme": "dearly",
+    "platforms": ["ios", "android"],
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
