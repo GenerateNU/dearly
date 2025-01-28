@@ -17,6 +17,7 @@ interface AuthState {
   userId: string | null;
   error: string | null;
   isPending: boolean;
+  inviteToken: string | null;
   mode: Mode;
 
   login: ({ email, password }: { email: string; password: string }) => Promise<void>;
@@ -25,6 +26,7 @@ interface AuthState {
   forgotPassword: ({ email }: { email: string }) => Promise<void>;
   resetPassword: ({ password }: { password: string }) => Promise<void>;
   setMode: (mode: Mode) => void;
+  setInviteToken: (inviteToken: string) => void;
 }
 
 const authService: AuthService = new SupabaseAuth();
@@ -37,10 +39,17 @@ export const useAuthStore = create<AuthState>()(
       error: null,
       isPending: false,
       mode: Mode.ADVANCED,
+      inviteToken: null,
 
       setMode: (mode: Mode) => {
         set({
           mode: mode,
+        });
+      },
+
+      setInviteToken: (inviteToken: string) => {
+        set({
+          inviteToken,
         });
       },
 
