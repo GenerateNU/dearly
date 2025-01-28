@@ -18,11 +18,11 @@ describe("DELETE /posts/:id", () => {
     caption: "dearly",
     media: [
       {
-        url: "https://www.google.com",
+        objectKey: "photo1.jpg",
         type: "VIDEO",
       },
       {
-        url: "https://www.google.com",
+        objectKey: "photo1.jpg",
         type: "PHOTO",
       },
     ],

@@ -80,4 +80,4 @@ const addMemberToGroupInviteTest = () => {
   });
 };
 
-describe("PUT /groups/{token}/verify", addMemberToGroupInviteTest);
+describe("PUT /groups/:token/verify", addMemberToGroupInviteTest);

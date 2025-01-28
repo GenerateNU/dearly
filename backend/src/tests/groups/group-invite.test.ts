@@ -78,4 +78,4 @@ const getGroupInviteTest = () => {
   });
 };
 
-describe("GET /groups/{id}/invites", getGroupInviteTest);
+describe("GET /groups/:id/invites", getGroupInviteTest);

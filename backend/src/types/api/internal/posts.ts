@@ -1,7 +1,8 @@
 import { z } from "zod";
 import { createPostValidate, updatePostValidate } from "../../../entities/posts/validator";
-import { mediaTable, postsTable } from "../../../entities/schema";
+import { postsTable } from "../../../entities/schema";
 import { IDPayload } from "../../id";
+import { Media, MediaWithURL } from "./media";
 
 export type CreatePostPayload = z.infer<typeof createPostValidate> & {
   groupId: string;
@@ -10,18 +11,10 @@ export type CreatePostPayload = z.infer<typeof createPostValidate> & {
 
 export type UpdatePostPayload = z.infer<typeof updatePostValidate> & IDPayload;
 
-export type Media = typeof mediaTable.$inferSelect;
 type Post = typeof postsTable.$inferSelect;
 
 export type PostWithMedia = Post & {
   media: Media[];
-};
-
-export type MediaWithURL = {
-  id: string;
-  url: string;
-  postId: string;
-  type: "VIDEO" | "PHOTO";
 };
 
 export type PostWithMediaURL = Post & {

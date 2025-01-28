@@ -103,7 +103,7 @@ export class UserTransactionImpl implements UserTransaction {
             'id', ${mediaTable.id},
             'type', ${mediaTable.type},
             'postId', ${mediaTable.postId},
-            'url', ${mediaTable.url}
+            'objectKey', ${mediaTable.objectKey}
           )
         )`,
       })

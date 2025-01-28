@@ -1,11 +1,11 @@
+import { getConfigurations } from "./../../config/config";
 import { DeleteObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { mockClient } from "aws-sdk-client-mock";
-import S3Impl from "../../services/s3Service";
 import fs from "fs";
 import { resolve } from "node:path";
 import { NotFoundError } from "../../utilities/errors/app-error";
 import { MediaType } from "../../constants/database";
-import { getConfigurations } from "../../config/config";
+import { S3Impl } from "../../services/s3Service";
 const PROJECT_ROOT = resolve(__dirname, "../..");
 
 describe("S3 Service Testing", () => {

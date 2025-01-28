@@ -11,7 +11,7 @@ import {
   USER_BOB_ID,
 } from "./../helpers/test-constants";
 
-describe("DELETE groups/{id}/members/{userId}", () => {
+describe("DELETE groups/:id/members/:userId", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
   const RANDOM_JWT = generateJWTFromID(generateUUID());

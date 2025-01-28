@@ -7,9 +7,10 @@ import {
   ThumbnailResponseWithURL,
   UpdateGroupPayload,
 } from "../../types/api/internal/groups";
-import { PostWithMedia } from "../../types/api/internal/posts";
+import { PostWithMediaURL } from "../../types/api/internal/posts";
 import { InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
+import { MediaService } from "../media/service";
 import { GroupTransaction } from "./transaction";
 
 export interface GroupService {
@@ -17,15 +18,17 @@ export interface GroupService {
   deleteGroup(payload: GroupIdPayload): Promise<void>;
   getGroup(payload: GroupIdPayload): Promise<Group>;
   updateGroup(payload: UpdateGroupPayload): Promise<Group>;
-  getAllPosts(payload: FeedParamPayload): Promise<PostWithMedia[]>;
+  getAllPosts(payload: FeedParamPayload): Promise<PostWithMediaURL[]>;
   getCalendar(payload: CalendarParamPayload): Promise<ThumbnailResponseWithURL[]>;
 }
 
 export class GroupServiceImpl implements GroupService {
   private groupTransaction: GroupTransaction;
+  private mediaService: MediaService;
 
-  constructor(groupTransaction: GroupTransaction) {
+  constructor(groupTransaction: GroupTransaction, mediaService: MediaService) {
     this.groupTransaction = groupTransaction;
+    this.mediaService = mediaService;
   }
 
   async createGroup(payload: CreateGroupPayload): Promise<Group> {
@@ -39,16 +42,22 @@ export class GroupServiceImpl implements GroupService {
     return handleServiceError(createGroupImpl)();
   }
 
-  async getAllPosts(payload: FeedParamPayload): Promise<PostWithMedia[]> {
+  async getAllPosts(payload: FeedParamPayload): Promise<PostWithMediaURL[]> {
     const getAllPostsImpl = async () => {
-      return await this.groupTransaction.getAllPosts(payload);
+      const posts = await this.groupTransaction.getAllPosts(payload);
+      const postsWithUrls = await Promise.all(
+        posts.map(this.mediaService.getPostWithMediaUrls.bind(this.mediaService)),
+      );
+      return postsWithUrls;
     };
     return handleServiceError(getAllPostsImpl)();
   }
 
   async getCalendar(payload: CalendarParamPayload): Promise<ThumbnailResponseWithURL[]> {
     const getCalendarImpl = async () => {
-      return await this.groupTransaction.getCalendar(payload);
+      const thumbnails = await this.groupTransaction.getCalendar(payload);
+      const thumbnailWithUrls = await this.mediaService.getThumbnailsWithSignedUrls(thumbnails);
+      return thumbnailWithUrls;
     };
     return handleServiceError(getCalendarImpl)();
   }

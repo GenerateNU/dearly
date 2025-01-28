@@ -3,13 +3,13 @@ import { Hono } from "hono";
 import { PostTransaction, PostTransactionImpl } from "./transaction";
 import { PostService, PostServiceImpl } from "./service";
 import { PostController, PostControllerImpl } from "./controller";
-import IS3Operations from "../../services/s3Service";
+import { MediaService } from "../media/service";
 
-export const postRoutes = (db: PostgresJsDatabase, s3ServiceProvider: IS3Operations): Hono => {
+export const postRoutes = (db: PostgresJsDatabase, mediaService: MediaService): Hono => {
   const post = new Hono();
 
   const postTransaction: PostTransaction = new PostTransactionImpl(db);
-  const postService: PostService = new PostServiceImpl(postTransaction, s3ServiceProvider);
+  const postService: PostService = new PostServiceImpl(postTransaction, mediaService);
   const postController: PostController = new PostControllerImpl(postService);
 
   post.post("/groups/:id/posts", (ctx) => postController.createPost(ctx));

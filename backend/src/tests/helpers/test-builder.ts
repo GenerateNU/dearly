@@ -8,7 +8,7 @@ interface Request {
   app: Hono;
   route: string;
   type?: HTTPRequest;
-  requestBody?: Record<string, unknown>;
+  requestBody?: Record<string, unknown> | FormData;
   queryParams?: Record<string, string>;
   headers?: Record<string, string>;
   autoAuthorized?: boolean;
@@ -47,6 +47,12 @@ export class TestBuilder {
       headers: extraHeaders,
       body: requestBody ? JSON.stringify(requestBody) : undefined,
     };
+
+    if (requestBody instanceof FormData) {
+      options.body = requestBody;
+    } else if (requestBody) {
+      options.body = JSON.stringify(requestBody);
+    }
 
     this.response = await app.request(requestedRoute, options);
     await this.parseResponse();
@@ -92,8 +98,6 @@ export class TestBuilder {
       const token = generateJWTFromID(generateUUID());
       resultHeaders.set("Authorization", `Bearer ${token}`);
     }
-
-    resultHeaders.set("Content-Type", "application/json");
     return resultHeaders;
   }
 
@@ -108,6 +112,21 @@ export class TestBuilder {
       throw new Error(`${key} does not exist in the response body.`);
     }
     return this.body[key];
+  }
+
+  assertArrayFieldExists(fieldName: string): TestBuilder {
+    if (this.type === HTTPRequest.DELETE) {
+      throw new Error("Cannot retrieve from DELETE request");
+    }
+    if (!this.body) {
+      throw new Error("Response is not defined.");
+    }
+    if (Array.isArray(this.body)) {
+      this.body.forEach((item) => {
+        expect(item).toHaveProperty(fieldName);
+      });
+    }
+    return this;
   }
 
   /**
