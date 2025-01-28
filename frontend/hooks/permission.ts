@@ -8,7 +8,6 @@ export const useRequestPermission = () => {
       try {
         await Camera.requestCameraPermissionsAsync();
         await Audio.requestPermissionsAsync();
-        // await Location.requestBackgroundPermissionsAsync();
       } catch (error) {
         console.error("Error requesting permissions:", error);
       }
