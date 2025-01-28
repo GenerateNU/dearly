@@ -63,9 +63,9 @@ components:
           type: string
           nullable: true
           description: A URL to the user's profile photo.
-        notificationsEnabled:
-          type: boolean
-          description: True when user enables notification.
+        timezone:
+          type: string
+          description: Timezone that user is in for sending nudges.
       required:
         - name
         - username
