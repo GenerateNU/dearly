@@ -1,12 +1,10 @@
 import { createTheme } from "@shopify/restyle";
 
 const COLOR_PALETTE = {
-  primary: "#FFC107",
-  primaryLight: "#FFCA2C",
-  primaryDark: "#FF8F00",
+  primary: "#FFF5E1",
   secondary: "#4CAF50",
-  secondaryLight: "#81C784",
-  secondaryDark: "#388E3C",
+  secondaryLight: "#FFD496",
+  secondaryDark: "#FFB347",
   error: "#FF0033",
   success: "#2ECC71",
   warning: "#F39C12",
@@ -44,32 +42,40 @@ const BORDER_RADIUS = {
 };
 
 const ADVANCED_TEXT = {
-  header: {
-    fontWeight: "bold",
-    fontSize: 34,
+  primary: {
+    fontSize: 43,
+    fontFamily: "ProximaNova-Bold",
+  },
+  secondary: {
+    fontSize: 32,
+    fontFamily: "ProximaNova-Medium",
   },
   body: {
     fontSize: 16,
-    lineHeight: 24,
+    fontFamily: "ProximaNova-Bold",
   },
   defaults: {
     fontSize: 16,
-    lineHeight: 24,
+    fontFamily: "ProximaNova-Regular",
   },
 };
 
 const BASIC_TEXT = {
-  header: {
-    fontWeight: "bold",
-    fontSize: 34,
+  primary: {
+    fontSize: 60,
+    fontFamily: "ProximaNova-Bold",
+  },
+  secondary: {
+    fontSize: 40,
+    fontFamily: "ProximaNova-Medium",
   },
   body: {
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: 24,
+    fontFamily: "ProximaNova-Bold",
   },
   defaults: {
-    fontSize: 20,
-    lineHeight: 40,
+    fontSize: 24,
+    fontFamily: "ProximaNova-Regular",
   },
 };
 

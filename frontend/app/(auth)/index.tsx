@@ -12,7 +12,7 @@ const Index = () => {
   };
 
   return (
-    <Box gap="m" flex={1} justifyContent="center" alignItems="center">
+    <Box backgroundColor="primary" gap="m" flex={1} justifyContent="center" alignItems="center">
       <Button label="Toggle Mode" onPress={toggleTheme} />
       <Button label="Login" onPress={() => router.push("/(auth)/login")} />
       <Button label="Register" onPress={() => router.push("/(auth)/register")} />

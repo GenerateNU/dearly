@@ -10,6 +10,8 @@ import { NotificationProvider } from "@/contexts/notification";
 import { useNotificationPermission } from "@/hooks/notification";
 import { Mode } from "@/types/mode";
 import { useRequestPermission } from "@/hooks/permission";
+import { useFonts } from "expo-font";
+import AppLoading from "expo-app-loading";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +43,16 @@ const InitialLayout = () => {
 };
 
 const RootLayout = () => {
+  const [fontsLoaded] = useFonts({
+    "ProximaNova-Bold": require("../assets/fonts/proximanova-medium.otf"),
+    "ProximaNova-Medium": require("../assets/fonts/proximanova-medium.otf"),
+    "ProximaNova-Regular": require("../assets/fonts/proximanova-regular.otf"),
+  });
+
+  if (!fontsLoaded) {
+    return <AppLoading />;
+  }
+
   return (
     <GestureHandlerRootView>
       <NotificationProvider>

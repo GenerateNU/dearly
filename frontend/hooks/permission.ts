@@ -1,6 +1,5 @@
 import { Camera } from "expo-camera";
 import { Audio } from "expo-av";
-import * as Location from "expo-location";
 import { useEffect } from "react";
 
 export const useRequestPermission = () => {
@@ -9,7 +8,7 @@ export const useRequestPermission = () => {
       try {
         await Camera.requestCameraPermissionsAsync();
         await Audio.requestPermissionsAsync();
-        await Location.requestBackgroundPermissionsAsync();
+        // await Location.requestBackgroundPermissionsAsync();
       } catch (error) {
         console.error("Error requesting permissions:", error);
       }

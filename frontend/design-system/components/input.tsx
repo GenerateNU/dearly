@@ -52,11 +52,11 @@ const Input: React.FC<TextboxProps> = ({
         borderWidth={1}
         borderRadius="s"
         padding="s"
-        borderColor={error ? "error" : "primaryDark"}
+        borderColor={error ? "error" : "secondaryDark"}
       />
       {error && (
         <Box gap="xxs" flexDirection="row" alignItems="center">
-          <Text color="error" variant="body">
+          <Text color="error" variant="secondary">
             {error}
           </Text>
         </Box>
