@@ -39,7 +39,7 @@ describe("GET /users/:id", () => {
         id,
         ...requestBody,
         mode: "BASIC",
-        notificationsEnabled: true,
+        timezone: null,
         profilePhoto: null,
       })
       .assertStatusCode(Status.OK);

@@ -47,7 +47,7 @@ describe("End-to-end User CRUD", () => {
         ...originalBody,
         mode: "BASIC",
         profilePhoto: null,
-        notificationsEnabled: true,
+        timezone: null,
       });
   });
 
@@ -65,7 +65,7 @@ describe("End-to-end User CRUD", () => {
         ...originalBody,
         mode: "BASIC",
         profilePhoto: null,
-        notificationsEnabled: true,
+        timezone: null,
       });
   });
 

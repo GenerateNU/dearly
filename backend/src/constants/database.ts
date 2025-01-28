@@ -18,7 +18,6 @@ export enum NotificationType {
   POST = "POST",
   COMMENT = "COMMENT",
   LIKE = "LIKE",
-  INVITE = "INVITE",
   NUDGE = "NUDGE",
 }
 
