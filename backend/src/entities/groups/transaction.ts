@@ -1,18 +1,18 @@
+import { ThumbnailResponse } from "./../../types/api/internal/groups";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { groupsTable, likesTable, mediaTable, membersTable, postsTable } from "../schema";
 import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
 import { and, eq, sql, desc, between } from "drizzle-orm";
+import { Media, PostWithMedia } from "../../types/api/internal/posts";
 import {
   CalendarParamPayload,
   CreateGroupPayload,
-  DayWithURL,
   FeedParamPayload,
   Group,
   GroupIdPayload,
-  ThumbnailResponseWithURL,
+  DayWithObjectKey,
   UpdateGroupPayload,
 } from "../../types/api/internal/groups";
-import { Media, PostWithMedia } from "../../types/api/internal/posts";
 
 export interface GroupTransaction {
   insertGroup(payload: CreateGroupPayload): Promise<Group | null>;
@@ -20,7 +20,7 @@ export interface GroupTransaction {
   getGroup(payload: GroupIdPayload): Promise<Group | null>;
   updateGroup(payload: UpdateGroupPayload): Promise<Group | null>;
   getAllPosts(payload: FeedParamPayload): Promise<PostWithMedia[]>;
-  getCalendar(payload: CalendarParamPayload): Promise<ThumbnailResponseWithURL[]>;
+  getCalendar(payload: CalendarParamPayload): Promise<ThumbnailResponse[]>;
 }
 
 export class GroupTransactionImpl implements GroupTransaction {
@@ -70,7 +70,7 @@ export class GroupTransactionImpl implements GroupTransaction {
               'id', ${mediaTable.id},
               'type', ${mediaTable.type},
               'postId', ${mediaTable.postId},
-              'url', ${mediaTable.url}
+              'objectKey', ${mediaTable.objectKey}
             )
           )`,
     };
@@ -192,7 +192,7 @@ export class GroupTransactionImpl implements GroupTransaction {
     userId,
     groupId,
     range,
-  }: CalendarParamPayload): Promise<ThumbnailResponseWithURL[]> {
+  }: CalendarParamPayload): Promise<ThumbnailResponse[]> {
     await this.checkMembership(groupId, userId);
     const rangeStartDate = new Date(pivot);
     rangeStartDate.setMonth(rangeStartDate.getMonth() - range);
@@ -201,7 +201,7 @@ export class GroupTransactionImpl implements GroupTransaction {
     const rankedPosts = this.db
       .select({
         createdAt: postsTable.createdAt,
-        url: mediaTable.url,
+        objectKey: mediaTable.objectKey,
         likes: sql<number>`COUNT(${likesTable.id}) AS likeCount`,
         rowNum:
           sql<number>`ROW_NUMBER() OVER (PARTITION BY DATE(${postsTable.createdAt}) ORDER BY COUNT(${likesTable.id}) DESC)`.as(
@@ -218,17 +218,17 @@ export class GroupTransactionImpl implements GroupTransaction {
           sql`${new Date(pivot).toISOString()}`,
         ),
       )
-      .groupBy(sql`DATE(${postsTable.createdAt})`, postsTable.id, mediaTable.url)
+      .groupBy(sql`DATE(${postsTable.createdAt})`, postsTable.id, mediaTable.objectKey)
       .as("rankedPosts");
 
     const result = await this.db
       .select({
         year: sql<number>`cast(EXTRACT(YEAR FROM ${rankedPosts.createdAt}) as int)`.as("year"),
         month: sql<number>`cast(EXTRACT(MONTH FROM ${rankedPosts.createdAt}) as int)`.as("month"),
-        data: sql<DayWithURL[]>`ARRAY_AGG(
+        data: sql<DayWithObjectKey[]>`ARRAY_AGG(
           JSON_BUILD_OBJECT(
             'day', EXTRACT(DAY FROM ${rankedPosts.createdAt}),
-            'url', ${rankedPosts.url}
+            'objectKey', ${rankedPosts.objectKey}
           )
         )`.as("data"),
       })

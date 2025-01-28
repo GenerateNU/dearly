@@ -5,14 +5,15 @@ import {
   GetObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { NotFoundError } from "../utilities/errors/app-error";
-import { randomUUIDv7 } from "bun";
+import { InternalServerError, NotFoundError } from "../utilities/errors/app-error";
 import sharp from "sharp";
 import * as lame from "@breezystack/lamejs";
 import { MediaType } from "../constants/database";
 import { Configuration } from "../types/config";
+import { v4 as uuidv4 } from "uuid";
+import logger from "../utilities/logger";
 
-interface IS3Operations {
+export interface IS3Operations {
   // group is the uuid of the group this photo is being sent to (used as tagging number) -> make public group id number
 
   /**
@@ -39,7 +40,7 @@ interface IS3Operations {
   getObjectURL(objectKey: string): Promise<string>;
 }
 
-export default class S3Impl implements IS3Operations {
+export class S3Impl implements IS3Operations {
   private client;
   private bucketName;
 
@@ -104,7 +105,7 @@ export default class S3Impl implements IS3Operations {
    * @returns Will return the S3 object key
    */
   async saveObject(file: Blob, tag: string, fileType: MediaType): Promise<string> {
-    const objectKey: string = randomUUIDv7();
+    const objectKey: string = uuidv4();
     const compressedFile =
       fileType == MediaType.PHOTO ? await this.compressImage(file) : await this.compressAudio(file);
     await this.client!.send(
@@ -141,12 +142,17 @@ export default class S3Impl implements IS3Operations {
    * @param objectKey The key of the object in the S3 bucket
    */
   async getObjectURL(objectKey: string): Promise<string> {
-    const waitInSeconds = 60 * 60 * 24;
-    const command = new GetObjectCommand({
-      Bucket: this.bucketName,
-      Key: objectKey,
-    });
-    const request = await getSignedUrl(this.client, command, { expiresIn: waitInSeconds });
-    return request;
+    try {
+      const waitInSeconds = 60 * 60 * 24;
+      const command = new GetObjectCommand({
+        Bucket: this.bucketName,
+        Key: objectKey,
+      });
+      const request = await getSignedUrl(this.client, command, { expiresIn: waitInSeconds });
+      return request;
+    } catch (error) {
+      logger.error(error);
+      throw new InternalServerError("Failed to retrieve signed url");
+    }
   }
 }

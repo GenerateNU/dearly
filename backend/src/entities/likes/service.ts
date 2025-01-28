@@ -1,8 +1,9 @@
 import { LikeTransaction } from "./transaction";
 import { handleServiceError } from "../../utilities/errors/service-error";
-import { SearchedUser } from "../users/validator";
 import { PaginationParams } from "../../utilities/pagination";
 import { IDPayload } from "../../types/id";
+import { SearchedUser } from "../../types/api/internal/users";
+import { MediaService } from "../media/service";
 
 export interface LikeService {
   toggleLike(payload: IDPayload): Promise<boolean>;
@@ -11,9 +12,11 @@ export interface LikeService {
 
 export class LikeServiceImpl implements LikeService {
   private likeTransaction: LikeTransaction;
+  private mediaService: MediaService;
 
-  constructor(likeTransaction: LikeTransaction) {
+  constructor(likeTransaction: LikeTransaction, mediaService: MediaService) {
     this.likeTransaction = likeTransaction;
+    this.mediaService = mediaService;
   }
 
   async toggleLike(payload: IDPayload): Promise<boolean> {
@@ -25,7 +28,9 @@ export class LikeServiceImpl implements LikeService {
 
   async getLikeUsers(payload: IDPayload & PaginationParams): Promise<SearchedUser[]> {
     const getLikeUsersImpl = async () => {
-      return await this.likeTransaction.getLikeUsers(payload);
+      const users = await this.likeTransaction.getLikeUsers(payload);
+      const usersWithProfilePresignedURL = await this.mediaService.getUsersWithSignedURL(users);
+      return usersWithProfilePresignedURL;
     };
     return await handleServiceError(getLikeUsersImpl)();
   }

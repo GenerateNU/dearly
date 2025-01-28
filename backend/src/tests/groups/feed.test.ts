@@ -2,7 +2,7 @@ import {
   ANOTHER_GROUP_ID,
   DEARLY_GROUP_ID,
   INVALID_ID_ARRAY,
-  MEDIA_MOCK,
+  MOCK_MEDIA_WITH_URL,
   POST_MOCK,
   USER_ALICE_ID,
   USER_ANA_ID,
@@ -20,7 +20,7 @@ describe("GET /groups/:id/feed", () => {
   const post = {
     ...POST_MOCK[0],
     createdAt: POST_MOCK[0]!.createdAt?.toISOString(),
-    media: MEDIA_MOCK,
+    media: MOCK_MEDIA_WITH_URL,
   };
 
   beforeAll(async () => {
@@ -43,13 +43,7 @@ describe("GET /groups/:id/feed", () => {
       })
     )
       .assertStatusCode(Status.OK)
-      .assertBody([
-        {
-          ...POST_MOCK[0],
-          createdAt: POST_MOCK[0]!.createdAt?.toISOString(),
-          media: MEDIA_MOCK,
-        },
-      ]);
+      .assertBody([post]);
   });
 
   it("should return 200 if group has posts but different date specified", async () => {
