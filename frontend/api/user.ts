@@ -1,6 +1,6 @@
 import { CreateUserPayload, User } from "@/types/user";
 import fetchClient from "./client";
-import { authWrapper } from "./auth-wrapper";
+import { authWrapper } from "@/utilities/auth-token";
 
 export const createUser = async (payload: CreateUserPayload): Promise<User> => {
   const req = async (token: string): Promise<User> => {

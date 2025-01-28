@@ -1,4 +1,4 @@
-import { authWrapper } from "./auth-wrapper";
+import { authWrapper } from "@/utilities/auth-token";
 import fetchClient from "./client";
 
 export const registerDeviceToken = async (expoToken: string): Promise<string> => {

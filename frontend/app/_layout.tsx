@@ -24,12 +24,15 @@ const InitialLayout = () => {
     }
   }, [isAuthenticated]);
 
+  // ask for notification permission
   useNotificationPermission();
+
+  // ask for camera and audio permission
   useRequestPermission();
 
   return (
     <ThemeProvider theme={mode === Mode.ADVANCED ? advancedTheme : basicTheme}>
-      <Stack>
+      <Stack screenOptions={{ gestureEnabled: false }}>
         <Stack.Screen name="(auth)" options={{ headerShown: false, gestureEnabled: false }} />
         <Stack.Screen name="(app)" options={{ headerShown: false, gestureEnabled: false }} />
       </Stack>
