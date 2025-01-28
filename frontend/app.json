@@ -32,6 +32,20 @@
           "backgroundColor": "#ffffff"
         }
       ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Dearly to access your camera",
+          "microphonePermission": "Allow Dearly to access your microphone",
+          "recordAudioAndroid": true
+        }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Allow Dearly to access your microphone"
+        }
+      ],
       "expo-secure-store"
     ],
     "experiments": {

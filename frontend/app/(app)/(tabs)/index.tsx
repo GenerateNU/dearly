@@ -9,7 +9,7 @@ const Home = () => {
       gap="xl"
       alignItems="center"
       justifyContent="center"
-      backgroundColor="cardPrimaryBackground"
+      backgroundColor="primaryDark"
       flex={1}
     >
       <Button label="Logout" onPress={logout} />

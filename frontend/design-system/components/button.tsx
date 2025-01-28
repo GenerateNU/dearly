@@ -36,13 +36,13 @@ const BaseButton = ({ onPress, label, disabled = false, ...rest }: Props) => {
       <Box
         opacity={disabled ? 0.5 : 1}
         borderRadius="s"
-        backgroundColor="cardPrimaryBackground"
+        backgroundColor="primaryDark"
         padding="s"
+        borderColor="primaryDark"
         borderWidth={1}
-        borderColor="cardPrimaryBackground"
         {...props}
       >
-        <Text color="mainBackground">{label}</Text>
+        <Text color="white">{label}</Text>
       </Box>
     </TouchableOpacity>
   );

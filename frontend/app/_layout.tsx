@@ -9,6 +9,7 @@ import { advancedTheme, basicTheme } from "@/design-system/base/theme";
 import { NotificationProvider } from "@/contexts/notification";
 import { useNotificationPermission } from "@/hooks/notification";
 import { Mode } from "@/types/mode";
+import { useRequestPermission } from "@/hooks/permission";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const InitialLayout = () => {
   }, [isAuthenticated]);
 
   useNotificationPermission();
+  useRequestPermission();
 
   return (
     <ThemeProvider theme={mode === Mode.ADVANCED ? advancedTheme : basicTheme}>
