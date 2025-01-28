@@ -1,5 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+export const getHeaders = (token: string, contentType: string = "application/json") => {
+  return {
+    "Content-Type": contentType,
+    Authorization: `Bearer ${token}`,
+  };
+};
+
 export const authWrapper =
   <T>() =>
   async (fn: (token: string) => Promise<T>) => {
