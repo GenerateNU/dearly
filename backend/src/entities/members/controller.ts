@@ -11,6 +11,7 @@ export interface MemberController {
   addMember(ctx: Context): Promise<ADD_MEMBER>;
   deleteMember(ctx: Context): Promise<DEL_MEMBER>;
   getMembers(ctx: Context): Promise<MEMBERS_API>;
+  toggleNotification(ctx: Context): Promise<Response>;
 }
 
 export class MemberControllerImpl implements MemberController {
@@ -63,5 +64,16 @@ export class MemberControllerImpl implements MemberController {
     };
 
     return await handleAppError(getMembers)(ctx);
+  }
+
+  async toggleNotification(ctx: Context): Promise<Response> {
+    const toggleNotificationImpl = async () => {
+      const userId = ctx.get("userId");
+      const groupId = parseUUID(ctx.req.param("id"));
+      const notificationOn = await this.memberService.toggleNotification({ userId, id: groupId });
+      const message = notificationOn ? "turn on" : "turn off";
+      return ctx.json({ message: `Successfully ${message} notification for group` }, Status.OK);
+    };
+    return await handleAppError(toggleNotificationImpl)(ctx);
   }
 }

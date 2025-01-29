@@ -1,5 +1,6 @@
 import { AddMemberPayload, Member } from "../../types/api/internal/members";
 import { Pagination, SearchedUser } from "../../types/api/internal/users";
+import { IDPayload } from "../../types/id";
 import { InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
 import { MemberTransaction } from "./transaction";
@@ -8,6 +9,7 @@ export interface MemberService {
   addMember(payload: AddMemberPayload): Promise<Member>;
   deleteMember(clientId: string, userId: string, groupId: string): Promise<void>;
   getMembers(groupId: string, payload: Pagination): Promise<SearchedUser[]>;
+  toggleNotification(payload: IDPayload): Promise<boolean>;
 }
 
 export class MemberServiceImpl implements MemberService {
@@ -45,5 +47,14 @@ export class MemberServiceImpl implements MemberService {
     };
 
     return handleServiceError(getMembersImpl)();
+  }
+
+  async toggleNotification(payload: IDPayload): Promise<boolean> {
+    const toggleNotificationImpl = async () => {
+      const notificationEnabled = await this.memberTransaction.toggleNotification(payload);
+      return notificationEnabled;
+    };
+
+    return handleServiceError(toggleNotificationImpl)();
   }
 }
