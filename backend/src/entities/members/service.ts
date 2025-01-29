@@ -51,10 +51,8 @@ export class MemberServiceImpl implements MemberService {
 
   async toggleNotification(payload: IDPayload): Promise<boolean> {
     const toggleNotificationImpl = async () => {
-      const notificationEnabled = await this.memberTransaction.toggleNotification(payload);
-      return notificationEnabled;
+      return await this.memberTransaction.toggleNotification(payload);
     };
-
     return handleServiceError(toggleNotificationImpl)();
   }
 }
