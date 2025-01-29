@@ -20,3 +20,5 @@ export type PostWithMedia = Post & {
 export type PostWithMediaURL = Post & {
   media: MediaWithURL[];
 };
+
+export { Media };
