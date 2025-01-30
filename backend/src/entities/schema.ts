@@ -11,6 +11,7 @@ import {
   varchar,
   boolean,
   primaryKey,
+  integer,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { NAME_MAX_LIMIT } from "../constants/database";
@@ -67,6 +68,7 @@ export const mediaTable = pgTable("media", {
     .references(() => postsTable.id, { onDelete: "cascade" }),
   objectKey: varchar().notNull(),
   type: postMediaEnum().notNull(),
+  order: integer("order").notNull().default(0),
 });
 
 export const membersTable = pgTable(

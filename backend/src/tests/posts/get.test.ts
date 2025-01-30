@@ -57,6 +57,10 @@ describe("GET /posts/:id", () => {
       .assertStatusCode(Status.Created)
       .assertFieldExists("id")
       .assertFieldExists("createdAt")
+      .assertField("comments", 0)
+      .assertField("likes", 0)
+      .assertField("location", null)
+      .assertField("profilePhoto", null)
       .assertFieldExists("media")
       .assertFields({
         caption: goodRequestBody.caption,
@@ -109,6 +113,11 @@ describe("GET /posts/:id", () => {
         ...POST_MOCK[0],
         createdAt: POST_MOCK[0]!.createdAt?.toISOString(),
         media: MOCK_MEDIA_WITH_URL,
+        comments: 0,
+        likes: 0,
+        isLiked: false,
+        location: null,
+        profilePhoto: null,
       });
   });
 

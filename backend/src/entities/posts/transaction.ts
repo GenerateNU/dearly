@@ -42,7 +42,6 @@ export class PostTransactionImpl implements PostTransaction {
     const mediaPayload = post.media;
 
     const postWithMedia = await this.db.transaction(async (tx) => {
-      // check if user is a member of the group
       const isMember = await tx
         .select()
         .from(membersTable)
@@ -57,11 +56,17 @@ export class PostTransactionImpl implements PostTransaction {
       const [newPost] = await tx.insert(postsTable).values(postPayload).returning();
       if (!newPost) return null;
 
-      // insert media if provided
+      // insert media with explicit order
       const insertedMedia = mediaPayload?.length
         ? await tx
             .insert(mediaTable)
-            .values(mediaPayload.map((media) => ({ postId: newPost.id, ...media })))
+            .values(
+              mediaPayload.map((media, index) => ({
+                postId: newPost.id,
+                ...media,
+                order: index,
+              })),
+            )
             .returning()
         : [];
 
@@ -77,7 +82,7 @@ export class PostTransactionImpl implements PostTransaction {
         groupId: newPost.groupId,
         caption: newPost.caption,
         createdAt: newPost.createdAt,
-        media: insertedMedia,
+        media: insertedMedia.sort((a, b) => a.order - b.order), // Ensure order is correct
         comments: 0,
         likes: 0,
         isLiked: false,
@@ -108,7 +113,7 @@ export class PostTransactionImpl implements PostTransaction {
             'type', ${mediaTable.type},
             'postId', ${mediaTable.postId},
             'objectKey', ${mediaTable.objectKey}
-          )
+          ) ORDER BY ${mediaTable.order} ASC
         )`,
       })
       .from(postsTable)
@@ -156,19 +161,28 @@ export class PostTransactionImpl implements PostTransaction {
 
       if (!updatedPost) return null;
 
-      // update associated media
       let updatedMedia = [];
       if (media?.length) {
-        await tx.delete(mediaTable).where(eq(mediaTable.postId, id)); // Clear old media
+        // delete old media
+        await tx.delete(mediaTable).where(eq(mediaTable.postId, id));
+
+        // insert new media with order
         updatedMedia = await tx
           .insert(mediaTable)
-          .values(media.map((m) => ({ postId: updatedPost.id, ...m })))
+          .values(
+            media.map((m, index) => ({
+              postId: updatedPost.id,
+              ...m,
+              order: index, // maintain order
+            })),
+          )
           .returning();
       } else {
         updatedMedia = await tx
           .select()
           .from(mediaTable)
-          .where(eq(mediaTable.postId, updatedPost.id));
+          .where(eq(mediaTable.postId, updatedPost.id))
+          .orderBy(mediaTable.order); // ensure order is maintained
       }
 
       // fetch updated likes, comments, and profile photo using JOIN
@@ -195,7 +209,7 @@ export class PostTransactionImpl implements PostTransaction {
         caption: updatedPost.caption,
         createdAt: updatedPost.createdAt,
         location: updatedPost.location,
-        media: updatedMedia,
+        media: updatedMedia.sort((a, b) => a.order - b.order), // Ensure media order
         comments: post.comments,
         likes: post.likes,
         isLiked: post.isLiked,

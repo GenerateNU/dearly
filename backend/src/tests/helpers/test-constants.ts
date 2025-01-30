@@ -46,12 +46,14 @@ export const MEDIA_MOCK: (typeof mediaTable.$inferInsert)[] = [
     objectKey: "photo1",
     type: "VIDEO",
     id: MEDIA_ONE_ID,
+    order: 0,
   },
   {
     postId: POST_ID,
     objectKey: "photo2",
     type: "PHOTO",
     id: MEDIA_TWO_ID,
+    order: 1,
   },
 ];
 

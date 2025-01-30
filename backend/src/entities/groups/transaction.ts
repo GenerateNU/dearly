@@ -1,9 +1,17 @@
 import { ThumbnailResponse } from "./../../types/api/internal/groups";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { groupsTable, likesTable, mediaTable, membersTable, postsTable } from "../schema";
+import {
+  commentsTable,
+  groupsTable,
+  likesTable,
+  mediaTable,
+  membersTable,
+  postsTable,
+  usersTable,
+} from "../schema";
 import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
-import { and, eq, sql, desc, between } from "drizzle-orm";
-import { Media, PostWithMedia } from "../../types/api/internal/posts";
+import { and, eq, sql, desc, between, count } from "drizzle-orm";
+import { PostWithMedia } from "../../types/api/internal/posts";
 import {
   CalendarParamPayload,
   CreateGroupPayload,
@@ -13,6 +21,7 @@ import {
   DayWithObjectKey,
   UpdateGroupPayload,
 } from "../../types/api/internal/groups";
+import { Media } from "../../types/api/internal/media";
 
 export interface GroupTransaction {
   insertGroup(payload: CreateGroupPayload): Promise<Group | null>;
@@ -65,14 +74,19 @@ export class GroupTransactionImpl implements GroupTransaction {
       groupId: postsTable.groupId,
       createdAt: postsTable.createdAt,
       caption: postsTable.caption,
-      media: sql<Media[]>`array_agg(
-            json_build_object(
-              'id', ${mediaTable.id},
-              'type', ${mediaTable.type},
-              'postId', ${mediaTable.postId},
-              'objectKey', ${mediaTable.objectKey}
-            )
-          )`,
+      location: postsTable.location,
+      profilePhoto: usersTable.profilePhoto,
+      comments: count(commentsTable.id),
+      likes: count(likesTable.id),
+      isLiked: sql<boolean>`BOOL_OR(CASE WHEN ${likesTable.userId} = ${userId} THEN true ELSE false END)`,
+      media: sql<Media[]>`ARRAY_AGG(
+        JSON_BUILD_OBJECT(
+          'id', ${mediaTable.id},
+          'type', ${mediaTable.type},
+          'postId', ${mediaTable.postId},
+          'objectKey', ${mediaTable.objectKey}
+        ) ORDER BY ${mediaTable.order} ASC
+      )`,
     };
 
     return await this.db
@@ -84,6 +98,9 @@ export class GroupTransactionImpl implements GroupTransaction {
         membersTable,
         and(eq(membersTable.groupId, groupId), eq(membersTable.userId, userId)),
       )
+      .innerJoin(usersTable, eq(postsTable.userId, usersTable.id))
+      .leftJoin(likesTable, eq(likesTable.postId, postsTable.id))
+      .leftJoin(commentsTable, eq(commentsTable.postId, postsTable.id))
       .where(
         and(
           date
@@ -98,6 +115,8 @@ export class GroupTransactionImpl implements GroupTransaction {
         postsTable.groupId,
         postsTable.createdAt,
         postsTable.caption,
+        postsTable.location,
+        usersTable.profilePhoto,
       )
       // most recent to less recent
       .orderBy(desc(postsTable.createdAt))

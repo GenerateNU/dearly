@@ -57,6 +57,13 @@
       "when": 1738256795169,
       "tag": "20250130170635_slim_solo",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1738269644622,
+      "tag": "20250130204044_wet_moondragon",
+      "breakpoints": true
     }
   ]
 }

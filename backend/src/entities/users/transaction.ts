@@ -111,7 +111,7 @@ export class UserTransactionImpl implements UserTransaction {
             'type', ${mediaTable.type},
             'postId', ${mediaTable.postId},
             'objectKey', ${mediaTable.objectKey}
-          )
+          ) ORDER BY ${mediaTable.order} ASC
         )`,
       })
       .from(postsTable)
