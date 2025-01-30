@@ -1,9 +1,7 @@
 import {
   USER_ANA_ID,
-  USER_BOB_ID,
   USER_ALICE_ID,
   INVALID_ID_ARRAY,
-  POST_ID,
   DEARLY_GROUP_ID,
 } from "../helpers/test-constants";
 import { Hono } from "hono";
