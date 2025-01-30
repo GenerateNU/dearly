@@ -1,14 +1,22 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { groupsTable, mediaTable, membersTable, postsTable } from "../schema";
+import {
+  commentsTable,
+  groupsTable,
+  likesTable,
+  mediaTable,
+  membersTable,
+  postsTable,
+  usersTable,
+} from "../schema";
 import { eq, and, sql } from "drizzle-orm";
 import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
 import { IDPayload } from "../../types/id";
 import {
   CreatePostPayload,
-  Media,
   PostWithMedia,
   UpdatePostPayload,
 } from "../../types/api/internal/posts";
+import { Media } from "../../types/api/internal/media";
 
 export interface PostTransaction {
   createPost(post: CreatePostPayload): Promise<PostWithMedia | null>;
@@ -33,7 +41,7 @@ export class PostTransactionImpl implements PostTransaction {
     const mediaPayload = post.media;
 
     const postWithMedia = await this.db.transaction(async (tx) => {
-      // check if a user is member of a group
+      // check if user is a member of the group
       const isMember = await tx
         .select()
         .from(membersTable)
@@ -49,22 +57,32 @@ export class PostTransactionImpl implements PostTransaction {
       if (!newPost) return null;
 
       // insert media if provided
-      if (mediaPayload && mediaPayload.length > 0) {
-        const insertedMedia = await tx
-          .insert(mediaTable)
-          .values(mediaPayload.map((media) => ({ postId: newPost.id, ...media })))
-          .returning();
+      const insertedMedia = mediaPayload?.length
+        ? await tx
+            .insert(mediaTable)
+            .values(mediaPayload.map((media) => ({ postId: newPost.id, ...media })))
+            .returning()
+        : [];
 
-        return {
-          id: newPost.id,
-          userId: newPost.userId,
-          groupId: newPost.groupId,
-          caption: newPost.caption,
-          createdAt: newPost.createdAt,
-          media: insertedMedia,
-        };
-      }
-      return null;
+      // fetch user profile photo using JOIN
+      const [user] = await tx
+        .select({ profilePhoto: usersTable.profilePhoto })
+        .from(usersTable)
+        .where(eq(usersTable.id, newPost.userId));
+
+      return {
+        id: newPost.id,
+        userId: newPost.userId,
+        groupId: newPost.groupId,
+        caption: newPost.caption,
+        createdAt: newPost.createdAt,
+        media: insertedMedia,
+        comments: 0,
+        likes: 0,
+        isLiked: false,
+        location: newPost.location,
+        profilePhoto: user?.profilePhoto || null,
+      };
     });
 
     return postWithMedia;
@@ -78,34 +96,43 @@ export class PostTransactionImpl implements PostTransaction {
         groupId: postsTable.groupId,
         createdAt: postsTable.createdAt,
         caption: postsTable.caption,
-        media: sql<Media[]>`array_agg(
-        json_build_object(
-          'id', ${mediaTable.id},
-          'type', ${mediaTable.type},
-          'postId', ${mediaTable.postId},
-          'objectKey', ${mediaTable.objectKey}
-        )
-      )`,
+        profilePhoto: usersTable.profilePhoto,
+        location: postsTable.location,
+        comments: sql<number>`COALESCE(COUNT(DISTINCT ${commentsTable.id}), 0)`,
+        likes: sql<number>`COALESCE(COUNT(DISTINCT ${likesTable.id}), 0)`,
+        isLiked: sql<boolean>`COALESCE(BOOL_OR(${likesTable.userId} = ${userId}), false)`,
+        media: sql<Media[]>`COALESCE(ARRAY_AGG(
+          JSON_BUILD_OBJECT(
+            'id', ${mediaTable.id},
+            'type', ${mediaTable.type},
+            'postId', ${mediaTable.postId},
+            'objectKey', ${mediaTable.objectKey}
+          )
+        )`,
       })
       .from(postsTable)
-      .innerJoin(mediaTable, eq(postsTable.id, mediaTable.postId))
+      .innerJoin(usersTable, eq(postsTable.userId, usersTable.id))
+      .leftJoin(mediaTable, eq(postsTable.id, mediaTable.postId))
       .innerJoin(groupsTable, eq(postsTable.groupId, groupsTable.id))
       .innerJoin(
         membersTable,
         and(eq(groupsTable.id, membersTable.groupId), eq(membersTable.userId, userId)),
       )
+      .leftJoin(commentsTable, eq(commentsTable.postId, postsTable.id))
+      .leftJoin(likesTable, eq(likesTable.postId, id))
       .groupBy(
         postsTable.id,
         postsTable.userId,
         postsTable.groupId,
         postsTable.createdAt,
         postsTable.caption,
+        postsTable.location,
+        usersTable.profilePhoto,
       )
       .where(eq(postsTable.id, id));
 
     if (!result) return null;
 
-    // TODO: return post with comments and likes later
     return result;
   }
 
@@ -117,20 +144,20 @@ export class PostTransactionImpl implements PostTransaction {
   }: UpdatePostPayload): Promise<PostWithMedia | null> {
     await this.checkPostOwnership(id, userId);
 
-    // update post
     const updatedPostWithMedia = await this.db.transaction(async (tx) => {
+      // update post caption
       const [updatedPost] = await tx
         .update(postsTable)
-        .set({ caption: caption })
+        .set({ caption })
         .where(and(eq(postsTable.id, id), eq(postsTable.userId, userId)))
         .returning();
 
       if (!updatedPost) return null;
 
       // update associated media
-      let updatedMedia;
-      if (media) {
-        await tx.delete(mediaTable).where(eq(mediaTable.postId, id));
+      let updatedMedia = [];
+      if (media?.length) {
+        await tx.delete(mediaTable).where(eq(mediaTable.postId, id)); // Clear old media
         updatedMedia = await tx
           .insert(mediaTable)
           .values(media.map((m) => ({ postId: updatedPost.id, ...m })))
@@ -142,13 +169,35 @@ export class PostTransactionImpl implements PostTransaction {
           .where(eq(mediaTable.postId, updatedPost.id));
       }
 
+      // fetch updated likes, comments, and profile photo using JOIN
+      const [post] = await tx
+        .select({
+          comments: sql<number>`COALESCE(COUNT(DISTINCT ${commentsTable.id}), 0)`,
+          likes: sql<number>`COALESCE(COUNT(DISTINCT ${likesTable.id}), 0)`,
+          isLiked: sql<boolean>`COALESCE(BOOL_OR(${likesTable.userId} = ${userId}), false)`,
+          profilePhoto: usersTable.profilePhoto,
+        })
+        .from(postsTable)
+        .innerJoin(usersTable, eq(postsTable.userId, usersTable.id))
+        .leftJoin(commentsTable, eq(commentsTable.postId, id))
+        .leftJoin(likesTable, eq(likesTable.postId, id))
+        .where(eq(postsTable.id, id))
+        .groupBy(postsTable.id, usersTable.profilePhoto);
+
+      if (!post) return null;
+
       return {
         id: updatedPost.id,
         userId: updatedPost.userId,
         groupId: updatedPost.groupId,
         caption: updatedPost.caption,
         createdAt: updatedPost.createdAt,
+        location: updatedPost.location,
         media: updatedMedia,
+        comments: post.comments,
+        likes: post.likes,
+        isLiked: post.isLiked,
+        profilePhoto: post.profilePhoto,
       };
     });
 

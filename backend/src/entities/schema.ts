@@ -57,6 +57,7 @@ export const postsTable = pgTable("posts", {
     .references(() => usersTable.id, { onDelete: "cascade" }),
   createdAt: timestamp().notNull().defaultNow(),
   caption: varchar({ length: TEXT_MAX_LIMIT }),
+  location: varchar({ length: NAME_MAX_LIMIT }),
 });
 
 export const mediaTable = pgTable("media", {

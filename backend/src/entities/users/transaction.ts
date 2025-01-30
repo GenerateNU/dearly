@@ -1,14 +1,16 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import {
+  commentsTable,
   devicesTable,
   groupsTable,
+  likesTable,
   mediaTable,
   membersTable,
   postsTable,
   usersTable,
 } from "../schema";
 import { and, eq, sql, not, exists } from "drizzle-orm";
-import { Media, PostWithMedia } from "../../types/api/internal/posts";
+import { PostWithMedia } from "../../types/api/internal/posts";
 import {
   CreateUserPayload,
   Pagination,
@@ -18,6 +20,7 @@ import {
   User,
 } from "../../types/api/internal/users";
 import { Group } from "../../types/api/internal/groups";
+import { Media } from "../../types/api/internal/media";
 
 export interface UserTransaction {
   insertUser(payload: CreateUserPayload): Promise<User | null>;
@@ -56,7 +59,6 @@ export class UserTransactionImpl implements UserTransaction {
         username: payload.username,
         mode: payload.mode,
         profilePhoto: payload.profilePhoto,
-        notificationsEnabled: payload.notificationsEnabled,
       })
       .where(eq(usersTable.id, id))
       .returning();
@@ -98,8 +100,13 @@ export class UserTransactionImpl implements UserTransaction {
         groupId: postsTable.groupId,
         createdAt: postsTable.createdAt,
         caption: postsTable.caption,
-        media: sql<Media[]>`array_agg(
-          json_build_object(
+        location: postsTable.location,
+        profilePhoto: usersTable.profilePhoto,
+        comments: sql<number>`COALESCE(COUNT(DISTINCT ${commentsTable.id}), 0)`,
+        likes: sql<number>`COALESCE(COUNT(DISTINCT ${likesTable.id}), 0)`,
+        isLiked: sql<boolean>`COALESCE(BOOL_OR(${likesTable.userId} = ${id}), false)`,
+        media: sql<Media[]>`ARRAY_AGG(
+          JSON_BUILD_OBJECT(
             'id', ${mediaTable.id},
             'type', ${mediaTable.type},
             'postId', ${mediaTable.postId},
@@ -108,6 +115,7 @@ export class UserTransactionImpl implements UserTransaction {
         )`,
       })
       .from(postsTable)
+      .innerJoin(usersTable, eq(postsTable.userId, usersTable.id))
       .innerJoin(mediaTable, eq(mediaTable.postId, postsTable.id))
       .where(eq(postsTable.userId, id))
       .groupBy(

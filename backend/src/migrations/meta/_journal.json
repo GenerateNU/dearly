@@ -50,6 +50,13 @@
       "when": 1738077430157,
       "tag": "20250128151710_melodic_mercury",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1738256795169,
+      "tag": "20250130170635_slim_solo",
+      "breakpoints": true
     }
   ]
 }

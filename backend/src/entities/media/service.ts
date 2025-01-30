@@ -121,14 +121,25 @@ export class MediaServiceImpl {
     createdAt,
     caption,
     media,
+    location,
+    comments,
+    likes,
+    isLiked,
+    profilePhoto,
   }: PostWithMedia): Promise<PostWithMediaURL> {
     const mediaWithUrls = await Promise.all(media.map(this.getMediaWithSignedUrl.bind(this)));
+    const profilePhotoUrl = profilePhoto ? await this.getSignedUrl(profilePhoto) : null;
     return {
       id,
       groupId,
+      location,
       userId,
+      comments,
+      likes,
+      isLiked,
       createdAt,
       caption,
+      profilePhoto: profilePhotoUrl,
       media: mediaWithUrls,
     };
   }
