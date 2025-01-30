@@ -204,6 +204,27 @@ components:
           example: "This is a sample caption for the post."
           description: A textual description or caption for the post.
           nullable: true
+        likes: 
+          type: number
+          example: 20
+          description: Number of likes in a post
+        comments: 
+          type: number
+          example: 20
+          description: Number of comments in a post
+        isLiked: 
+          type: boolean
+          example: true
+          description: Return true if user liked the post
+        profilePhoto:
+          type: string
+          nullable: true
+          description: Profile photo url of user who made the post
+        location: 
+          type: string
+          description: Location of where the post is made
+          example: "home"
+          nullable: true
         media:
           type: array
           items:
