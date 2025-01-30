@@ -114,6 +114,7 @@ export class UserControllerImpl implements UserController {
       const queryParams = paginationSchema.parse({ limit, page });
       const userId = ctx.get("userId");
       const posts = await this.userService.getPosts({ id: userId, ...queryParams });
+      console.log(posts);
       return ctx.json(posts, Status.OK);
     };
     return await handleAppError(getPostsImpl)(ctx);

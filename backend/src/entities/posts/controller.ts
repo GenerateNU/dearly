@@ -37,7 +37,6 @@ export class PostControllerImpl implements PostController {
         ...postInfoPayload,
       };
       const post = await this.postService.createPost(createPostPayload);
-      console.log("POST?", post);
       return ctx.json(post, Status.Created);
     };
     return await handleAppError(createPostImpl)(ctx);
@@ -50,7 +49,6 @@ export class PostControllerImpl implements PostController {
       const userId = parseUUID(ctx.get("userId"));
 
       const post = await this.postService.getPost({ userId, id });
-      console.log("GET?", post);
       return ctx.json(post, Status.OK);
     };
     return await handleAppError(getPostImpl)(ctx);

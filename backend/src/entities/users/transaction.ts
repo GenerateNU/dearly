@@ -115,6 +115,8 @@ export class UserTransactionImpl implements UserTransaction {
         )`,
       })
       .from(postsTable)
+      .leftJoin(likesTable, eq(likesTable.postId, postsTable.id))
+      .leftJoin(commentsTable, eq(commentsTable.postId, postsTable.id))
       .innerJoin(usersTable, eq(postsTable.userId, usersTable.id))
       .innerJoin(mediaTable, eq(mediaTable.postId, postsTable.id))
       .where(eq(postsTable.userId, id))
