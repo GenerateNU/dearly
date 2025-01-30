@@ -39,3 +39,17 @@ export const getAllMembers = async (
   };
   return authWrapper<GroupMembers>()(req);
 };
+
+export const toggleNotification = async (id: string): Promise<void> => {
+  const req = async (token: string): Promise<void> => {
+    await fetchClient.PATCH("/api/v1/groups/{id}/members/notifications", {
+      headers: getHeaders(token),
+      params: {
+        path: {
+          id,
+        },
+      },
+    });
+  };
+  return authWrapper<void>()(req);
+};
