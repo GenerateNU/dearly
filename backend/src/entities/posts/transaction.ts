@@ -8,7 +8,7 @@ import {
   postsTable,
   usersTable,
 } from "../schema";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and, sql, count } from "drizzle-orm";
 import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
 import { IDPayload } from "../../types/id";
 import {
@@ -37,6 +37,7 @@ export class PostTransactionImpl implements PostTransaction {
       userId: post.userId,
       groupId: post.groupId,
       caption: post.caption,
+      location: post.location,
     };
     const mediaPayload = post.media;
 
@@ -96,12 +97,12 @@ export class PostTransactionImpl implements PostTransaction {
         groupId: postsTable.groupId,
         createdAt: postsTable.createdAt,
         caption: postsTable.caption,
-        profilePhoto: usersTable.profilePhoto,
         location: postsTable.location,
-        comments: sql<number>`COALESCE(COUNT(DISTINCT ${commentsTable.id}), 0)`,
-        likes: sql<number>`COALESCE(COUNT(DISTINCT ${likesTable.id}), 0)`,
-        isLiked: sql<boolean>`COALESCE(BOOL_OR(${likesTable.userId} = ${userId}), false)`,
-        media: sql<Media[]>`COALESCE(ARRAY_AGG(
+        profilePhoto: usersTable.profilePhoto,
+        comments: count(commentsTable.id),
+        likes: count(likesTable.id),
+        isLiked: sql<boolean>`BOOL_OR(CASE WHEN ${likesTable.userId} = ${userId} THEN true ELSE false END)`,
+        media: sql<Media[]>`ARRAY_AGG(
           JSON_BUILD_OBJECT(
             'id', ${mediaTable.id},
             'type', ${mediaTable.type},
@@ -114,12 +115,12 @@ export class PostTransactionImpl implements PostTransaction {
       .innerJoin(usersTable, eq(postsTable.userId, usersTable.id))
       .leftJoin(mediaTable, eq(postsTable.id, mediaTable.postId))
       .innerJoin(groupsTable, eq(postsTable.groupId, groupsTable.id))
+      .leftJoin(commentsTable, eq(commentsTable.postId, postsTable.id))
+      .leftJoin(likesTable, eq(likesTable.postId, postsTable.id))
       .innerJoin(
         membersTable,
         and(eq(groupsTable.id, membersTable.groupId), eq(membersTable.userId, userId)),
       )
-      .leftJoin(commentsTable, eq(commentsTable.postId, postsTable.id))
-      .leftJoin(likesTable, eq(likesTable.postId, id))
       .groupBy(
         postsTable.id,
         postsTable.userId,
@@ -141,14 +142,15 @@ export class PostTransactionImpl implements PostTransaction {
     userId,
     caption,
     media,
+    location,
   }: UpdatePostPayload): Promise<PostWithMedia | null> {
     await this.checkPostOwnership(id, userId);
 
     const updatedPostWithMedia = await this.db.transaction(async (tx) => {
-      // update post caption
+      // update post caption and location
       const [updatedPost] = await tx
         .update(postsTable)
-        .set({ caption })
+        .set({ caption, location })
         .where(and(eq(postsTable.id, id), eq(postsTable.userId, userId)))
         .returning();
 
@@ -172,15 +174,15 @@ export class PostTransactionImpl implements PostTransaction {
       // fetch updated likes, comments, and profile photo using JOIN
       const [post] = await tx
         .select({
-          comments: sql<number>`COALESCE(COUNT(DISTINCT ${commentsTable.id}), 0)`,
-          likes: sql<number>`COALESCE(COUNT(DISTINCT ${likesTable.id}), 0)`,
-          isLiked: sql<boolean>`COALESCE(BOOL_OR(${likesTable.userId} = ${userId}), false)`,
+          comments: count(commentsTable.id),
+          likes: count(likesTable.id),
+          isLiked: sql<boolean>`BOOL_OR(CASE WHEN ${likesTable.userId} = ${userId} THEN true ELSE false END)`,
           profilePhoto: usersTable.profilePhoto,
         })
         .from(postsTable)
         .innerJoin(usersTable, eq(postsTable.userId, usersTable.id))
-        .leftJoin(commentsTable, eq(commentsTable.postId, id))
-        .leftJoin(likesTable, eq(likesTable.postId, id))
+        .leftJoin(commentsTable, eq(commentsTable.postId, postsTable.id))
+        .leftJoin(likesTable, eq(likesTable.postId, postsTable.id))
         .where(eq(postsTable.id, id))
         .groupBy(postsTable.id, usersTable.profilePhoto);
 

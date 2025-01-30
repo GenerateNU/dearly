@@ -7,6 +7,10 @@ export type POST_API = TypedResponse<
   | API_ERROR
 >;
 
+export type GET_POST = TypedResponse<
+  paths["/api/v1/posts/{id}"]["get"]["responses"]["200"]["content"]["application/json"] | API_ERROR
+>;
+
 export type DEL_POST = TypedResponse<
   | paths["/api/v1/posts/{id}"]["delete"]["responses"]["200"]["content"]["application/json"]
   | API_ERROR

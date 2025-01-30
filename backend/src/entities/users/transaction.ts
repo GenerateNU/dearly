@@ -9,7 +9,7 @@ import {
   postsTable,
   usersTable,
 } from "../schema";
-import { and, eq, sql, not, exists } from "drizzle-orm";
+import { and, eq, sql, not, exists, count } from "drizzle-orm";
 import { PostWithMedia } from "../../types/api/internal/posts";
 import {
   CreateUserPayload,
@@ -102,9 +102,9 @@ export class UserTransactionImpl implements UserTransaction {
         caption: postsTable.caption,
         location: postsTable.location,
         profilePhoto: usersTable.profilePhoto,
-        comments: sql<number>`COALESCE(COUNT(DISTINCT ${commentsTable.id}), 0)`,
-        likes: sql<number>`COALESCE(COUNT(DISTINCT ${likesTable.id}), 0)`,
-        isLiked: sql<boolean>`COALESCE(BOOL_OR(${likesTable.userId} = ${id}), false)`,
+        comments: count(commentsTable.id),
+        likes: count(likesTable.id),
+        isLiked: sql<boolean>`BOOL_OR(CASE WHEN ${likesTable.userId} = ${id} THEN true ELSE false END)`,
         media: sql<Media[]>`ARRAY_AGG(
           JSON_BUILD_OBJECT(
             'id', ${mediaTable.id},
@@ -124,6 +124,8 @@ export class UserTransactionImpl implements UserTransaction {
         postsTable.groupId,
         postsTable.createdAt,
         postsTable.caption,
+        postsTable.location,
+        usersTable.profilePhoto,
       )
       .orderBy(postsTable.createdAt)
       .limit(limit)

@@ -4,12 +4,12 @@ import { handleAppError } from "../../utilities/errors/app-error";
 import { parseUUID } from "../../utilities/uuid";
 import { createPostValidate, updatePostValidate } from "./validator";
 import { Status } from "../../constants/http";
-import { DEL_POST, POST_API } from "../../types/api/routes/posts";
+import { DEL_POST, GET_POST, POST_API } from "../../types/api/routes/posts";
 import { CreatePostPayload, UpdatePostPayload } from "../../types/api/internal/posts";
 
 export interface PostController {
   createPost(ctx: Context): Promise<POST_API>;
-  getPost(ctx: Context): Promise<POST_API>;
+  getPost(ctx: Context): Promise<GET_POST>;
   updatePost(ctx: Context): Promise<POST_API>;
   deletePost(ctx: Context): Promise<DEL_POST>;
 }
@@ -37,7 +37,7 @@ export class PostControllerImpl implements PostController {
         ...postInfoPayload,
       };
       const post = await this.postService.createPost(createPostPayload);
-      console.log(post);
+      console.log("POST?", post);
       return ctx.json(post, Status.Created);
     };
     return await handleAppError(createPostImpl)(ctx);
@@ -50,7 +50,7 @@ export class PostControllerImpl implements PostController {
       const userId = parseUUID(ctx.get("userId"));
 
       const post = await this.postService.getPost({ userId, id });
-      console.log(post);
+      console.log("GET?", post);
       return ctx.json(post, Status.OK);
     };
     return await handleAppError(getPostImpl)(ctx);
@@ -72,7 +72,6 @@ export class PostControllerImpl implements PostController {
         ...postInfoPayload,
       };
       const post = await this.postService.updatePost(updatePostPayload);
-      console.log(post);
       return ctx.json(post, Status.OK);
     };
     return await handleAppError(updatePostImpl)(ctx);

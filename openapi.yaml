@@ -65,6 +65,7 @@ components:
           description: A URL to the user's profile photo.
         timezone:
           type: string
+          nullable: true
           description: Timezone that user is in for sending nudges.
       required:
         - name
@@ -230,6 +231,61 @@ components:
           items:
             $ref: "#/components/schemas/Media"
           description: A list of media items attached to the post.
+    
+    PostWithURL:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: A unique identifier for the post.
+        groupId:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: A unique identifier for the group.
+        userId:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: A unique identifier for the user who makes the post.
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-01-17T00:00:00Z"
+          description: The date and time when the post was created.
+        caption:
+          type: string
+          example: "This is a sample caption for the post."
+          description: A textual description or caption for the post.
+          nullable: true
+        likes: 
+          type: number
+          example: 20
+          description: Number of likes in a post
+        comments: 
+          type: number
+          example: 20
+          description: Number of comments in a post
+        isLiked: 
+          type: boolean
+          example: true
+          description: Return true if user liked the post
+        profilePhoto:
+          type: string
+          nullable: true
+          description: Profile photo url of user who made the post
+        location: 
+          type: string
+          description: Location of where the post is made
+          example: "home"
+          nullable: true
+        media:
+          type: array
+          items:
+            $ref: "#/components/schemas/MediaWithURL"
+          description: A list of media items attached to the post.
 
     MediaUpload: 
       type: object
@@ -266,6 +322,32 @@ components:
           format: uuid
           example: 5e91507e-5630-4efd-9fd4-799178870b10
           description: The unique object key associated with the media in S3.
+        type:
+          type: string
+          example: "PHOTO"
+          enum:
+            - PHOTO
+            - VIDEO
+            - AUDIO
+          description: The type of the media (e.g., photo, audio, video).
+    
+    MediaWithURL:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b11
+          description: A unique identifier for the media item.
+        postId:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: The ID of the post to which the media belongs.
+        url:
+          type: string
+          format: uuid
+          description: The pre-signed URL from AWS S3
         type:
           type: string
           example: "PHOTO"
@@ -620,7 +702,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Post"
+                  $ref: "#/components/schemas/PostWithURL"
         400:
           description: Malformed query params
           content:
@@ -1524,7 +1606,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Post"
+                $ref: "#/components/schemas/PostWithURL"
         400:
           description: Malformed request
           content:
