@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { config } from 'dotenv'
 
 /**
  * POST: a new post is made in the group
@@ -17,7 +18,7 @@ class NotificationImpl{
     }
 
     subscribe() {
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+        const supabase = createClient(config.supabase, SUPABASE_ANON_KEY)
 
         // Create a function to handle inserts
         const handleInserts = (payload) => {
