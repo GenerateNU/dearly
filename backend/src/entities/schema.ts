@@ -12,6 +12,7 @@ import {
   boolean,
   primaryKey,
   integer,
+  unique,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { NAME_MAX_LIMIT } from "../constants/database";
@@ -114,6 +115,7 @@ export const commentsTable = pgTable("comments", {
 export const likeCommentsTable = pgTable(
   "likeComments",
   {
+    id: uuid("id").primaryKey().defaultRandom(),
     userId: uuid()
       .notNull()
       .references(() => usersTable.id, { onDelete: "cascade" }),
@@ -121,9 +123,11 @@ export const likeCommentsTable = pgTable(
       .notNull()
       .references(() => commentsTable.id, { onDelete: "cascade" }),
   },
-  (table) => {
-    return [primaryKey({ columns: [table.userId, table.commentId] })];
-  },
+  (table) => [
+    {
+      unique: unique().on(table.userId, table.commentId),
+    },
+  ],
 );
 
 export const notificationsTable = pgTable("notifications", {
@@ -140,7 +144,7 @@ export const notificationsTable = pgTable("notifications", {
   postId: uuid().references(() => postsTable.id, { onDelete: "cascade" }),
   commentId: uuid().references(() => commentsTable.id, { onDelete: "cascade" }),
   likeId: uuid().references(() => likesTable.id, { onDelete: "cascade" }),
-  invitationId: uuid().references(() => invitationsTable.id, { onDelete: "cascade" }),
+  likeCommentId: uuid().references(() => likeCommentsTable.id, { onDelete: "cascade" }),
   title: varchar({ length: NAME_MAX_LIMIT }).notNull(),
   description: varchar({ length: NOTIFICATION_BODY_MAX_LIMIT }).notNull(),
 });
@@ -292,9 +296,9 @@ export const notificationRelations = relations(notificationsTable, ({ one }) => 
     fields: [notificationsTable.likeId],
     references: [likesTable.id],
   }),
-  invitation: one(invitationsTable, {
-    fields: [notificationsTable.invitationId],
-    references: [invitationsTable.id],
+  likeComment: one(likeCommentsTable, {
+    fields: [notificationsTable.likeCommentId],
+    references: [likeCommentsTable.id],
   }),
 }));
 
