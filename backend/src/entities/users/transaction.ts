@@ -20,7 +20,7 @@ import {
   User,
 } from "../../types/api/internal/users";
 import { Group } from "../../types/api/internal/groups";
-import { Media } from "../../types/api/internal/media";
+import { getPostMetadata } from "../../utilities/query";
 
 export interface UserTransaction {
   insertUser(payload: CreateUserPayload): Promise<User | null>;
@@ -94,26 +94,7 @@ export class UserTransactionImpl implements UserTransaction {
 
   async getPosts({ id, limit, page }: Pagination): Promise<PostWithMedia[]> {
     return await this.db
-      .select({
-        id: postsTable.id,
-        userId: postsTable.userId,
-        groupId: postsTable.groupId,
-        createdAt: postsTable.createdAt,
-        caption: postsTable.caption,
-        location: postsTable.location,
-        profilePhoto: usersTable.profilePhoto,
-        comments: sql<number>`COUNT(DISTINCT ${commentsTable.id})`.mapWith(Number),
-        likes: sql<number>`COUNT(DISTINCT ${likesTable.id})`.mapWith(Number),
-        isLiked: sql<boolean>`BOOL_OR(CASE WHEN ${likesTable.userId} = ${id} THEN true ELSE false END)`,
-        media: sql<Media[]>`ARRAY_AGG(
-          JSON_BUILD_OBJECT(
-            'id', ${mediaTable.id},
-            'type', ${mediaTable.type},
-            'postId', ${mediaTable.postId},
-            'objectKey', ${mediaTable.objectKey}
-          ) ORDER BY ${mediaTable.order} ASC
-        )`,
-      })
+      .select(getPostMetadata(id))
       .from(postsTable)
       .leftJoin(likesTable, eq(likesTable.postId, postsTable.id))
       .leftJoin(commentsTable, eq(commentsTable.postId, postsTable.id))

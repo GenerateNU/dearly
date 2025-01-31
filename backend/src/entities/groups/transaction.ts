@@ -21,7 +21,7 @@ import {
   DayWithObjectKey,
   UpdateGroupPayload,
 } from "../../types/api/internal/groups";
-import { Media } from "../../types/api/internal/media";
+import { getPostMetadata } from "../../utilities/query";
 
 export interface GroupTransaction {
   insertGroup(payload: CreateGroupPayload): Promise<Group | null>;
@@ -68,29 +68,8 @@ export class GroupTransactionImpl implements GroupTransaction {
   }: FeedParamPayload): Promise<PostWithMedia[]> {
     await this.checkMembership(groupId, userId);
 
-    const selectedFields = {
-      id: postsTable.id,
-      userId: postsTable.userId,
-      groupId: postsTable.groupId,
-      createdAt: postsTable.createdAt,
-      caption: postsTable.caption,
-      location: postsTable.location,
-      profilePhoto: usersTable.profilePhoto,
-      comments: sql<number>`COUNT(DISTINCT ${commentsTable.id})`.mapWith(Number),
-      likes: sql<number>`COUNT(DISTINCT ${likesTable.id})`.mapWith(Number),
-      isLiked: sql<boolean>`BOOL_OR(CASE WHEN ${likesTable.userId} = ${userId} THEN true ELSE false END)`,
-      media: sql<Media[]>`ARRAY_AGG(
-        JSON_BUILD_OBJECT(
-          'id', ${mediaTable.id},
-          'type', ${mediaTable.type},
-          'postId', ${mediaTable.postId},
-          'objectKey', ${mediaTable.objectKey}
-        ) ORDER BY ${mediaTable.order} ASC
-      )`,
-    };
-
     return await this.db
-      .select(selectedFields)
+      .select(getPostMetadata(userId))
       .from(postsTable)
       .innerJoin(mediaTable, eq(mediaTable.postId, postsTable.id))
       // extra check to return nothing if user is not a member of group
