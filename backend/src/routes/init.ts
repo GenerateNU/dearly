@@ -50,7 +50,7 @@ const apiRoutes = (db: PostgresJsDatabase, s3Service: IS3Operations): Hono => {
   api.route("/", postRoutes(db, mediaService));
   api.route("/posts/:id/likes", likeRoutes(db, mediaService));
   api.route("/groups/:id/media", mediaRoutes(mediaService));
-  api.route("/groups/:id/members", memberRoutes(db));
+  api.route("/groups/:id/members", memberRoutes(db, mediaService));
   api.route("/", commentsRoutes(db, mediaService));
 
   return api;

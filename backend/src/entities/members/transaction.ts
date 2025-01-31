@@ -1,9 +1,9 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { membersTable, groupsTable, usersTable } from "../schema";
 import { eq, and, sql } from "drizzle-orm";
-import { AddMemberPayload, Member } from "./validator";
 import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
-import { Pagination, SearchedUser } from "../users/validator";
+import { Pagination, SearchedUser } from "../../types/api/internal/users";
+import { AddMemberPayload, Member } from "../../types/api/internal/members";
 
 export interface MemberTransaction {
   insertMember(payload: AddMemberPayload): Promise<Member | null>;
