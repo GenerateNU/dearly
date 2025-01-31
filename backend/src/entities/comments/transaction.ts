@@ -1,7 +1,7 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { IDPayload } from "../../types/id";
 import { commentsTable, likeCommentsTable, membersTable, postsTable } from "../schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
 
 export interface CommentTransaction {
@@ -17,39 +17,36 @@ export class CommentTransactionImpl implements CommentTransaction {
 
   async toggleLikeComment({ id: commentId, userId }: IDPayload): Promise<boolean> {
     return this.db.transaction(async (tx) => {
-      // check comments exist or not
-      const [comment] = await tx
-        .select({ groupId: postsTable.groupId })
+      const [result] = await tx
+        .select({
+          exists: sql<boolean>`true`,
+          isMember: sql<boolean>`${membersTable.userId} IS NOT NULL`,
+          existingLike: sql<boolean>`EXISTS (
+            SELECT 1 FROM ${likeCommentsTable}
+            WHERE ${eq(likeCommentsTable.userId, userId)} 
+            AND ${eq(likeCommentsTable.commentId, commentId)}
+          )`,
+        })
         .from(commentsTable)
         .innerJoin(postsTable, eq(commentsTable.postId, postsTable.id))
-        .where(eq(commentsTable.id, commentId))
-        .limit(1);
+        .leftJoin(
+          membersTable,
+          and(eq(membersTable.groupId, postsTable.groupId), eq(membersTable.userId, userId)),
+        )
+        .where(eq(commentsTable.id, commentId));
 
-      if (!comment) {
+      // no result returns -> comment does not exist
+      if (!result) {
         throw new NotFoundError("Comment");
       }
 
-      const groupId = comment.groupId;
-
-      // check if user is a member or not
-      const [member] = await tx
-        .select()
-        .from(membersTable)
-        .where(and(eq(membersTable.userId, userId), eq(membersTable.groupId, groupId)));
-
-      if (!member) {
+      // isMember is undefined -> not a member of group
+      if (!result.isMember) {
         throw new ForbiddenError();
       }
 
-      // toggle comment like if user is a member
-      const [existingLike] = await tx
-        .select()
-        .from(likeCommentsTable)
-        .where(
-          and(eq(likeCommentsTable.userId, userId), eq(likeCommentsTable.commentId, commentId)),
-        );
-
-      if (existingLike) {
+      // toggle like of comments
+      if (result.existingLike) {
         await tx
           .delete(likeCommentsTable)
           .where(

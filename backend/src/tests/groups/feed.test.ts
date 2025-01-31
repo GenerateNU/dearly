@@ -21,7 +21,7 @@ describe("GET /groups/:id/feed", () => {
     ...POST_MOCK[0],
     createdAt: POST_MOCK[0]!.createdAt?.toISOString(),
     media: MOCK_MEDIA_WITH_URL,
-    comments: 0,
+    comments: 1,
     isLiked: false,
     likes: 0,
     location: null,

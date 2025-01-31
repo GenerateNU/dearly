@@ -18,7 +18,7 @@ describe("GET /users/posts", () => {
     ...POST_MOCK[0],
     media: MOCK_MEDIA_WITH_URL,
     createdAt: POST_MOCK[0]!.createdAt?.toISOString(),
-    comments: 0,
+    comments: 1,
     isLiked: false,
     likes: 0,
     location: null,

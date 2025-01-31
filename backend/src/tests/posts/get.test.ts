@@ -113,7 +113,7 @@ describe("GET /posts/:id", () => {
         ...POST_MOCK[0],
         createdAt: POST_MOCK[0]!.createdAt?.toISOString(),
         media: MOCK_MEDIA_WITH_URL,
-        comments: 0,
+        comments: 1,
         likes: 0,
         isLiked: false,
         location: null,

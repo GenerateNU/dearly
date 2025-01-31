@@ -1,5 +1,6 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import {
+  commentsTable,
   groupsTable,
   mediaTable,
   membersTable,
@@ -9,6 +10,7 @@ import {
 import {
   ANOTHER_GROUP,
   ANOTHER_GROUP_ID,
+  COMMENTS,
   DEARLY_GROUP,
   DEARLY_GROUP_ID,
   MEDIA_MOCK,
@@ -30,6 +32,7 @@ export const seedDatabase = async (db: PostgresJsDatabase) => {
     await seedGroup(db);
     await seedMember(db);
     await seedPostAndMedia(db);
+    await seedComments(db);
   } catch (error) {
     console.error("Failed to seed database", error);
   }
@@ -75,4 +78,8 @@ const seedMember = async (db: PostgresJsDatabase) => {
 const seedPostAndMedia = async (db: PostgresJsDatabase) => {
   await db.insert(postsTable).values(POST_MOCK);
   await db.insert(mediaTable).values(MEDIA_MOCK);
+};
+
+const seedComments = async (db: PostgresJsDatabase) => {
+  await db.insert(commentsTable).values(COMMENTS);
 };
