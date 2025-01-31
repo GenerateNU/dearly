@@ -1,3 +1,4 @@
+ALTER TYPE "public"."referenceType" ADD VALUE 'LIKE-COMMENT';--> statement-breakpoint
 ALTER TABLE "notifications" RENAME COLUMN "invitationId" TO "likeCommentId";--> statement-breakpoint
 ALTER TABLE "notifications" DROP CONSTRAINT "notifications_invitationId_invitations_id_fk";
 --> statement-breakpoint

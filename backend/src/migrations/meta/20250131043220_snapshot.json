@@ -1,5 +1,5 @@
 {
-  "id": "f87273dc-d2f2-4f98-a999-d7a8eaa3b649",
+  "id": "636b329d-4b8f-4f72-b58f-7d6fc284107e",
   "prevId": "2a7c0f51-735b-4aca-85c4-103511654fa1",
   "version": "7",
   "dialect": "postgresql",
@@ -822,7 +822,7 @@
     "public.referenceType": {
       "name": "referenceType",
       "schema": "public",
-      "values": ["POST", "COMMENT", "LIKE", "NUDGE"]
+      "values": ["POST", "COMMENT", "LIKE", "NUDGE", "LIKE-COMMENT"]
     },
     "public.mode": {
       "name": "mode",
