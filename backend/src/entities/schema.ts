@@ -104,6 +104,7 @@ export const likesTable = pgTable("likes", {
   postId: uuid()
     .notNull()
     .references(() => postsTable.id, { onDelete: "cascade" }),
+  createdAt: timestamp().notNull().defaultNow(),
 });
 
 export const commentsTable = pgTable("comments", {
@@ -116,12 +117,14 @@ export const commentsTable = pgTable("comments", {
     .references(() => postsTable.id, { onDelete: "cascade" }),
   content: varchar({ length: TEXT_MAX_LIMIT }),
   voiceMemo: varchar(),
+  createdAt: timestamp().notNull().defaultNow(),
 });
 
 export const likeCommentsTable = pgTable(
   "likeComments",
   {
     id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp().notNull().defaultNow(),
     userId: uuid()
       .notNull()
       .references(() => usersTable.id, { onDelete: "cascade" }),

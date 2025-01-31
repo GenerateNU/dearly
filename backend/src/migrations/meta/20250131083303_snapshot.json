@@ -1,5 +1,5 @@
 {
-  "id": "636b329d-4b8f-4f72-b58f-7d6fc284107e",
+  "id": "039ca12b-2817-4fc7-9b00-cd9b72cdf49f",
   "prevId": "2a7c0f51-735b-4aca-85c4-103511654fa1",
   "version": "7",
   "dialect": "postgresql",
@@ -38,6 +38,13 @@
           "type": "varchar",
           "primaryKey": false,
           "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
@@ -249,6 +256,13 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
         "userId": {
           "name": "userId",
           "type": "uuid",
@@ -311,6 +325,13 @@
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
