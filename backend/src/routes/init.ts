@@ -11,6 +11,7 @@ import { likeRoutes } from "../entities/likes/route";
 import { IS3Operations } from "../services/s3Service";
 import { MediaServiceImpl } from "../entities/media/service";
 import { mediaRoutes } from "../entities/media/route";
+import { commentsRoutes } from "../entities/comments/route";
 
 export const setUpRoutes = (
   app: Hono,
@@ -50,6 +51,7 @@ const apiRoutes = (db: PostgresJsDatabase, s3Service: IS3Operations): Hono => {
   api.route("/posts/:id/likes", likeRoutes(db, mediaService));
   api.route("/groups/:id/media", mediaRoutes(mediaService));
   api.route("/groups/:id/members", memberRoutes(db));
+  api.route("/", commentsRoutes(db, mediaService));
 
   return api;
 };

@@ -1773,6 +1773,67 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /api/v1/comments/{id}/likes:
+    patch:
+      tags:
+        - Comment Endpoints
+      summary: Toggles like on a comment
+      description: Likes if user has not liked the comment, unlikes otherwise
+      parameters:
+        - name: id
+          in: path
+          description: ID of the comment
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Successfully toggle like of the comment
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Successfully like comment"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: Forbidden since user is not a member of a group
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
   /api/v1/posts/{id}/likes:
     patch:
       tags:

@@ -111,6 +111,21 @@ export const commentsTable = pgTable("comments", {
   voiceMemo: varchar(),
 });
 
+export const likeCommentsTable = pgTable(
+  "likeComments",
+  {
+    userId: uuid()
+      .notNull()
+      .references(() => usersTable.id, { onDelete: "cascade" }),
+    commentId: uuid()
+      .notNull()
+      .references(() => commentsTable.id, { onDelete: "cascade" }),
+  },
+  (table) => {
+    return [primaryKey({ columns: [table.userId, table.commentId] })];
+  },
+);
+
 export const notificationsTable = pgTable("notifications", {
   id: uuid().primaryKey().defaultRandom(),
   actorId: uuid()
@@ -152,6 +167,17 @@ export const invitationsTable = pgTable("invitations", {
   status: invitationStatusEnum().notNull().default("PENDING"),
   createdAt: timestamp().notNull().defaultNow(),
 });
+
+export const likeCommentRelations = relations(likeCommentsTable, ({ one }) => ({
+  user: one(usersTable, {
+    fields: [likeCommentsTable.userId],
+    references: [usersTable.id],
+  }),
+  comment: one(commentsTable, {
+    fields: [likeCommentsTable.commentId],
+    references: [commentsTable.id],
+  }),
+}));
 
 export const userRelations = relations(usersTable, ({ many }) => ({
   posts: many(postsTable),
