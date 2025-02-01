@@ -24,6 +24,7 @@ export enum NotificationType {
   COMMENT = "COMMENT",
   LIKE = "LIKE",
   NUDGE = "NUDGE",
+  LIKE_COMMENT = "LIKE-COMMENT",
 }
 
 export enum InvitationStatus {

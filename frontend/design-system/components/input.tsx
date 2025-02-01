@@ -56,9 +56,7 @@ const Input: React.FC<TextboxProps> = ({
       />
       {error && (
         <Box gap="xxs" flexDirection="row" alignItems="center">
-          <Text color="error" variant="secondary">
-            {error}
-          </Text>
+          <Text color="error">{error}</Text>
         </Box>
       )}
     </Box>

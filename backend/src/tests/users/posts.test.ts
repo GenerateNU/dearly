@@ -14,6 +14,16 @@ import {
 describe("GET /users/posts", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
+  const post = {
+    ...POST_MOCK[0],
+    media: MOCK_MEDIA_WITH_URL,
+    createdAt: POST_MOCK[0]!.createdAt?.toISOString(),
+    comments: 1,
+    isLiked: false,
+    likes: 0,
+    location: null,
+    profilePhoto: null,
+  };
 
   beforeAll(async () => {
     app = await startTestApp();
@@ -38,16 +48,7 @@ describe("GET /users/posts", () => {
   it.each([
     [USER_BOB_ID, []],
     [USER_BILL_ID, []],
-    [
-      USER_ALICE_ID,
-      [
-        {
-          ...POST_MOCK[0],
-          media: MOCK_MEDIA_WITH_URL,
-          createdAt: POST_MOCK[0]!.createdAt?.toISOString(),
-        },
-      ],
-    ],
+    [USER_ALICE_ID, [post]],
   ])("should return 200 if for user with ID %s", async (id, expectedPosts) => {
     (
       await testBuilder.request({
@@ -65,30 +66,10 @@ describe("GET /users/posts", () => {
   });
 
   it.each([
-    [
-      "1",
-      "1",
-      [
-        {
-          ...POST_MOCK[0],
-          media: MOCK_MEDIA_WITH_URL,
-          createdAt: POST_MOCK[0]!.createdAt?.toISOString(),
-        },
-      ],
-    ],
+    ["1", "1", [post]],
     ["1", "2", []],
     ["1", "3", []],
-    [
-      "2",
-      "1",
-      [
-        {
-          ...POST_MOCK[0],
-          media: MOCK_MEDIA_WITH_URL,
-          createdAt: POST_MOCK[0]!.createdAt?.toISOString(),
-        },
-      ],
-    ],
+    ["2", "1", [post]],
     ["2", "2", []],
   ])("should return 200 with limit %s and page %s", async (limit, page, expectedBody) => {
     (

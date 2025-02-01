@@ -1,14 +1,22 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { groupsTable, mediaTable, membersTable, postsTable } from "../schema";
-import { eq, and, sql } from "drizzle-orm";
+import {
+  commentsTable,
+  groupsTable,
+  likesTable,
+  mediaTable,
+  membersTable,
+  postsTable,
+  usersTable,
+} from "../schema";
+import { eq, and, sql, count } from "drizzle-orm";
 import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
 import { IDPayload } from "../../types/id";
 import {
   CreatePostPayload,
-  Media,
   PostWithMedia,
   UpdatePostPayload,
 } from "../../types/api/internal/posts";
+import { Media } from "../../types/api/internal/media";
 
 export interface PostTransaction {
   createPost(post: CreatePostPayload): Promise<PostWithMedia | null>;
@@ -29,11 +37,11 @@ export class PostTransactionImpl implements PostTransaction {
       userId: post.userId,
       groupId: post.groupId,
       caption: post.caption,
+      location: post.location,
     };
     const mediaPayload = post.media;
 
     const postWithMedia = await this.db.transaction(async (tx) => {
-      // check if a user is member of a group
       const isMember = await tx
         .select()
         .from(membersTable)
@@ -48,23 +56,39 @@ export class PostTransactionImpl implements PostTransaction {
       const [newPost] = await tx.insert(postsTable).values(postPayload).returning();
       if (!newPost) return null;
 
-      // insert media if provided
-      if (mediaPayload && mediaPayload.length > 0) {
-        const insertedMedia = await tx
-          .insert(mediaTable)
-          .values(mediaPayload.map((media) => ({ postId: newPost.id, ...media })))
-          .returning();
+      // insert media with explicit order
+      const insertedMedia = mediaPayload?.length
+        ? await tx
+            .insert(mediaTable)
+            .values(
+              mediaPayload.map((media, index) => ({
+                postId: newPost.id,
+                ...media,
+                order: index,
+              })),
+            )
+            .returning()
+        : [];
 
-        return {
-          id: newPost.id,
-          userId: newPost.userId,
-          groupId: newPost.groupId,
-          caption: newPost.caption,
-          createdAt: newPost.createdAt,
-          media: insertedMedia,
-        };
-      }
-      return null;
+      // fetch user profile photo using JOIN
+      const [user] = await tx
+        .select({ profilePhoto: usersTable.profilePhoto })
+        .from(usersTable)
+        .where(eq(usersTable.id, newPost.userId));
+
+      return {
+        id: newPost.id,
+        userId: newPost.userId,
+        groupId: newPost.groupId,
+        caption: newPost.caption,
+        createdAt: newPost.createdAt,
+        media: insertedMedia.sort((a, b) => a.order - b.order), // Ensure order is correct
+        comments: 0,
+        likes: 0,
+        isLiked: false,
+        location: newPost.location,
+        profilePhoto: user?.profilePhoto || null,
+      };
     });
 
     return postWithMedia;
@@ -78,18 +102,26 @@ export class PostTransactionImpl implements PostTransaction {
         groupId: postsTable.groupId,
         createdAt: postsTable.createdAt,
         caption: postsTable.caption,
-        media: sql<Media[]>`array_agg(
-        json_build_object(
-          'id', ${mediaTable.id},
-          'type', ${mediaTable.type},
-          'postId', ${mediaTable.postId},
-          'objectKey', ${mediaTable.objectKey}
-        )
-      )`,
+        location: postsTable.location,
+        profilePhoto: usersTable.profilePhoto,
+        comments: sql<number>`COUNT(DISTINCT ${commentsTable.id})`.mapWith(Number),
+        likes: sql<number>`COUNT(DISTINCT ${likesTable.id})`.mapWith(Number),
+        isLiked: sql<boolean>`BOOL_OR(CASE WHEN ${likesTable.userId} = ${userId} THEN true ELSE false END)`,
+        media: sql<Media[]>`ARRAY_AGG(
+          JSON_BUILD_OBJECT(
+            'id', ${mediaTable.id},
+            'type', ${mediaTable.type},
+            'postId', ${mediaTable.postId},
+            'objectKey', ${mediaTable.objectKey}
+          ) ORDER BY ${mediaTable.order} ASC
+        )`,
       })
       .from(postsTable)
-      .innerJoin(mediaTable, eq(postsTable.id, mediaTable.postId))
+      .innerJoin(usersTable, eq(postsTable.userId, usersTable.id))
+      .leftJoin(mediaTable, eq(postsTable.id, mediaTable.postId))
       .innerJoin(groupsTable, eq(postsTable.groupId, groupsTable.id))
+      .leftJoin(commentsTable, eq(commentsTable.postId, postsTable.id))
+      .leftJoin(likesTable, eq(likesTable.postId, postsTable.id))
       .innerJoin(
         membersTable,
         and(eq(groupsTable.id, membersTable.groupId), eq(membersTable.userId, userId)),
@@ -100,12 +132,13 @@ export class PostTransactionImpl implements PostTransaction {
         postsTable.groupId,
         postsTable.createdAt,
         postsTable.caption,
+        postsTable.location,
+        usersTable.profilePhoto,
       )
       .where(eq(postsTable.id, id));
 
     if (!result) return null;
 
-    // TODO: return post with comments and likes later
     return result;
   }
 
@@ -114,33 +147,60 @@ export class PostTransactionImpl implements PostTransaction {
     userId,
     caption,
     media,
+    location,
   }: UpdatePostPayload): Promise<PostWithMedia | null> {
     await this.checkPostOwnership(id, userId);
 
-    // update post
     const updatedPostWithMedia = await this.db.transaction(async (tx) => {
+      // update post caption and location
       const [updatedPost] = await tx
         .update(postsTable)
-        .set({ caption: caption })
+        .set({ caption, location })
         .where(and(eq(postsTable.id, id), eq(postsTable.userId, userId)))
         .returning();
 
       if (!updatedPost) return null;
 
-      // update associated media
-      let updatedMedia;
-      if (media) {
+      let updatedMedia = [];
+      if (media?.length) {
+        // delete old media
         await tx.delete(mediaTable).where(eq(mediaTable.postId, id));
+
+        // insert new media with order
         updatedMedia = await tx
           .insert(mediaTable)
-          .values(media.map((m) => ({ postId: updatedPost.id, ...m })))
+          .values(
+            media.map((m, index) => ({
+              postId: updatedPost.id,
+              ...m,
+              order: index, // maintain order
+            })),
+          )
           .returning();
       } else {
         updatedMedia = await tx
           .select()
           .from(mediaTable)
-          .where(eq(mediaTable.postId, updatedPost.id));
+          .where(eq(mediaTable.postId, updatedPost.id))
+          .orderBy(mediaTable.order); // ensure order is maintained
       }
+
+      // fetch updated likes, comments, and profile photo using JOIN
+      const [post] = await tx
+        .select({
+          comments: count(commentsTable.id),
+          likes: count(likesTable.id),
+          isLiked: sql<boolean>`BOOL_OR(CASE WHEN ${likesTable.userId} = ${userId} THEN true ELSE false END)`,
+          profilePhoto: usersTable.profilePhoto,
+        })
+        .from(postsTable)
+        .innerJoin(usersTable, eq(postsTable.userId, usersTable.id))
+        .leftJoin(commentsTable, eq(commentsTable.postId, postsTable.id))
+        .leftJoin(likesTable, eq(likesTable.postId, postsTable.id))
+        .where(eq(postsTable.id, id))
+        .groupBy(postsTable.id, usersTable.profilePhoto);
+
+      if (!post) return null;
 
       return {
         id: updatedPost.id,
@@ -148,7 +208,12 @@ export class PostTransactionImpl implements PostTransaction {
         groupId: updatedPost.groupId,
         caption: updatedPost.caption,
         createdAt: updatedPost.createdAt,
-        media: updatedMedia,
+        location: updatedPost.location,
+        media: updatedMedia.sort((a, b) => a.order - b.order), // Ensure media order
+        comments: post.comments,
+        likes: post.likes,
+        isLiked: post.isLiked,
+        profilePhoto: post.profilePhoto,
       };
     });
 

@@ -117,11 +117,11 @@ describe("DELETE /posts/:id", () => {
       .assertMessage("Successfully delete post");
   });
 
-  it("should return 404 if post does not exist", async () => {
+  it("should return 200 if post does not exist", async () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.GET,
+        type: HTTPRequest.DELETE,
         route: `/api/v1/posts/${generateUUID()}`,
         requestBody: {
           ...goodRequestBody,
@@ -131,16 +131,14 @@ describe("DELETE /posts/:id", () => {
           Authorization: `Bearer ${ALICE_JWT}`,
         },
       })
-    )
-      .assertStatusCode(Status.NotFound)
-      .assertError("Post does not exist.");
+    ).assertStatusCode(Status.OK);
   });
 
   it("should return 400 if invalid post ID", async () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.GET,
+        type: HTTPRequest.DELETE,
         route: `/api/v1/posts/bad`,
         requestBody: {
           ...goodRequestBody,
