@@ -20,6 +20,16 @@ describe("GET /users/groups", () => {
     app = await startTestApp();
   });
 
+  const ANOTHER_GROUP_WITH_NOTIFICATION = {
+    ...ANOTHER_GROUP,
+    notificationEnabled: true,
+  };
+
+  const DEARLY_GROUP_WITH_NOTIFICATION = {
+    ...DEARLY_GROUP,
+    notificationEnabled: true,
+  };
+
   it("should return 200 if user not found", async () => {
     (
       await testBuilder.request({
@@ -41,10 +51,10 @@ describe("GET /users/groups", () => {
   });
 
   it.each([
-    [USER_ANA_ID, [ANOTHER_GROUP]],
-    [USER_BOB_ID, [DEARLY_GROUP]],
+    [USER_ANA_ID, [ANOTHER_GROUP_WITH_NOTIFICATION]],
+    [USER_BOB_ID, [DEARLY_GROUP_WITH_NOTIFICATION]],
     [USER_BILL_ID, []],
-    [USER_ALICE_ID, [DEARLY_GROUP, ANOTHER_GROUP]],
+    [USER_ALICE_ID, [DEARLY_GROUP_WITH_NOTIFICATION, ANOTHER_GROUP_WITH_NOTIFICATION]],
   ])("should return 200 if for user with ID %s", async (id, expectedGroups) => {
     (
       await testBuilder.request({
@@ -62,10 +72,10 @@ describe("GET /users/groups", () => {
   });
 
   it.each([
-    ["1", "1", [DEARLY_GROUP]],
-    ["1", "2", [ANOTHER_GROUP]],
+    ["1", "1", [DEARLY_GROUP_WITH_NOTIFICATION]],
+    ["1", "2", [ANOTHER_GROUP_WITH_NOTIFICATION]],
     ["1", "3", []],
-    ["2", "1", [DEARLY_GROUP, ANOTHER_GROUP]],
+    ["2", "1", [DEARLY_GROUP_WITH_NOTIFICATION, ANOTHER_GROUP_WITH_NOTIFICATION]],
     ["2", "2", []],
   ])("should return 200 with limit %s and page %s", async (limit, page, expectedBody) => {
     (

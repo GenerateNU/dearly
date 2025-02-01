@@ -56,7 +56,6 @@ export class UserTransactionImpl implements UserTransaction {
         username: payload.username,
         mode: payload.mode,
         profilePhoto: payload.profilePhoto,
-        notificationsEnabled: payload.notificationsEnabled,
       })
       .where(eq(usersTable.id, id))
       .returning();
@@ -129,6 +128,7 @@ export class UserTransactionImpl implements UserTransaction {
         name: groupsTable.name,
         description: groupsTable.description,
         managerId: groupsTable.managerId,
+        notificationEnabled: membersTable.notificationsEnabled,
       })
       .from(groupsTable)
       .innerJoin(
