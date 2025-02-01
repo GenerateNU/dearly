@@ -13,7 +13,8 @@ RUN cd /temp/prod && bun install --frozen-lockfile --production
 
 FROM base AS prerelease 
 COPY --from=install /temp/dev/node_modules node_modules
-COPY . .
+COPY openapi.yaml .
+COPY backend ./backend
 
 ENV NODE_ENV=production
 
@@ -23,4 +24,4 @@ COPY --from=prerelease /usr/src/app/ .
 
 USER bun 
 EXPOSE 3000/tcp
-ENTRYPOINT [ "bun", "run", "./backend/src/server.ts" ]
+ENTRYPOINT [ "bun", "run", "backend/src/server.ts" ]
