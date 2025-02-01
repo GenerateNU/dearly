@@ -70,7 +70,7 @@ components:
         birthday: 
           type: string
           format: date
-          nullable: True
+          nullable: true
           description: Birthday of the user.
         timezone:
           type: string

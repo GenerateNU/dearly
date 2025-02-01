@@ -41,6 +41,8 @@ describe("GET /users/:id", () => {
         mode: "BASIC",
         timezone: null,
         profilePhoto: null,
+        bio: null,
+        birthday: null
       })
       .assertStatusCode(Status.OK);
   });

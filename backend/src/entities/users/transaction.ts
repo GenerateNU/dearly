@@ -59,6 +59,8 @@ export class UserTransactionImpl implements UserTransaction {
         username: payload.username,
         mode: payload.mode,
         profilePhoto: payload.profilePhoto,
+        bio: payload.bio,
+        birthday: payload.birthday,
       })
       .where(eq(usersTable.id, id))
       .returning();
