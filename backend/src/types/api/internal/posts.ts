@@ -29,3 +29,5 @@ export type PostMetadata = {
   isLiked: boolean;
   profilePhoto: string | null;
 };
+
+export { Media };

@@ -163,9 +163,20 @@ export class GroupTransactionImpl implements GroupTransaction {
         managerId: groupsTable.managerId,
         description: groupsTable.description,
         name: groupsTable.name,
+        notificationEnabled: membersTable.notificationsEnabled,
       })
       .from(groupsTable)
-      .groupBy(groupsTable.id, groupsTable.managerId, groupsTable.description, groupsTable.name)
+      .innerJoin(
+        membersTable,
+        and(eq(membersTable.groupId, groupId), eq(membersTable.userId, userId)),
+      )
+      .groupBy(
+        groupsTable.id,
+        groupsTable.managerId,
+        groupsTable.description,
+        groupsTable.name,
+        membersTable.notificationsEnabled,
+      )
       .where(eq(groupsTable.id, groupId));
     if (!result) return null;
     return result;

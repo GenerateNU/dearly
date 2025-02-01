@@ -143,6 +143,10 @@ components:
           type: string
           description: A description of the group.
           nullable: true
+        notificationEnabled:
+          type: boolean
+          example: true
+          description: Return true if user has notification for group turned off.
         id:
           type: string
           format: uuid
@@ -633,25 +637,7 @@ paths:
               schema:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                      description: The name of the group.
-                    description:
-                      type: string
-                      description: A description of the group.
-                      nullable: true
-                    id:
-                      type: string
-                      format: uuid
-                      example: 5e91507e-5630-4efd-9fd4-799178870b10
-                      description: A unique identifier for the group.
-                    managerId:
-                      type: string
-                      format: uuid
-                      example: 5e91507e-5630-4efd-9fd4-799178870b10
-                      description: A unique identifier of the group manager.
+                  $ref: "#/components/schemas/Group"
         400:
           description: Malformed query params
           content:
@@ -997,30 +983,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The name of the group.
-                  description:
-                    type: string
-                    description: A description of the group.
-                    nullable: true
-                  id:
-                    type: string
-                    format: uuid
-                    example: 5e91507e-5630-4efd-9fd4-799178870b10
-                    description: A unique identifier for the group.
-                  managerId:
-                    type: string
-                    format: uuid
-                    example: 5e91507e-5630-4efd-9fd4-799178870b10
-                    description: A unique identifier of the group manager.
-                required:
-                  - name
-                  - id
-                  - managerId
-                  - description
+                $ref: "#/components/schemas/Group"
         400:
           description: Malformed request
           content:
@@ -1466,6 +1429,67 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/SearchedUser"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: Forbidden since user is not member of the group
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Group not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/v1/groups/{id}/members/notifications:
+    patch:
+      tags:
+        - Member Endpoints
+      summary: Toggle member's notification for a group
+      description: Turn on or off notification for a group
+      parameters:
+        - name: id
+          in: path
+          description: ID of the group
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Successfully turn on or off group notification
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Successfully turn on notification for group"
         400:
           description: Malformed request
           content:

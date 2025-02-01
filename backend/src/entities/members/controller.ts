@@ -3,7 +3,7 @@ import { MemberService } from "./service";
 import { parseUUID } from "../../utilities/uuid";
 import { handleAppError } from "../../utilities/errors/app-error";
 import { Status } from "../../constants/http";
-import { ADD_MEMBER, DEL_MEMBER, MEMBERS_API } from "../../types/api/routes/members";
+import { ADD_MEMBER, DEL_MEMBER, MEMBERS_API, NOTIFICATION } from "../../types/api/routes/members";
 import { MemberRole } from "../../constants/database";
 import { paginationSchema } from "../../utilities/pagination";
 
@@ -11,6 +11,7 @@ export interface MemberController {
   addMember(ctx: Context): Promise<ADD_MEMBER>;
   deleteMember(ctx: Context): Promise<DEL_MEMBER>;
   getMembers(ctx: Context): Promise<MEMBERS_API>;
+  toggleNotification(ctx: Context): Promise<NOTIFICATION>;
 }
 
 export class MemberControllerImpl implements MemberController {
@@ -63,5 +64,16 @@ export class MemberControllerImpl implements MemberController {
     };
 
     return await handleAppError(getMembers)(ctx);
+  }
+
+  async toggleNotification(ctx: Context): Promise<NOTIFICATION> {
+    const toggleNotificationImpl = async () => {
+      const userId = ctx.get("userId");
+      const groupId = parseUUID(ctx.req.param("id"));
+      const notificationOn = await this.memberService.toggleNotification({ userId, id: groupId });
+      const message = notificationOn ? "turn on" : "turn off";
+      return ctx.json({ message: `Successfully ${message} notification for group` }, Status.OK);
+    };
+    return await handleAppError(toggleNotificationImpl)(ctx);
   }
 }
