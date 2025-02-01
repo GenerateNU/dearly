@@ -1,14 +1,16 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { membersTable, groupsTable, usersTable } from "../schema";
 import { eq, and, sql } from "drizzle-orm";
-import { AddMemberPayload, Member } from "./validator";
 import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
-import { Pagination, SearchedUser } from "../users/validator";
+import { AddMemberPayload, Member } from "../../types/api/internal/members";
+import { IDPayload } from "../../types/id";
+import { Pagination, SearchedUser } from "../../types/api/internal/users";
 
 export interface MemberTransaction {
   insertMember(payload: AddMemberPayload): Promise<Member | null>;
   deleteMember(clientId: string, userId: string, groupId: string): Promise<Member | null>;
   getMembers(groupId: string, payload: Pagination): Promise<SearchedUser[] | null>;
+  toggleNotification(payload: IDPayload): Promise<boolean>;
 }
 
 export class MemberTransactionImpl implements MemberTransaction {
@@ -88,5 +90,42 @@ export class MemberTransactionImpl implements MemberTransaction {
       .offset((page - 1) * limit);
 
     return paginatedMembers;
+  }
+
+  async toggleNotification({ id, userId }: IDPayload): Promise<boolean> {
+    return await this.db.transaction(async (tx) => {
+      //check if the group exists
+      const groupExists = await tx
+        .select({ id: groupsTable.id })
+        .from(groupsTable)
+        .where(eq(groupsTable.id, id))
+        .limit(1);
+
+      if (!groupExists.length) {
+        throw new NotFoundError("Group");
+      }
+
+      // check if the user is a member and get their notification setting
+      const [member] = await tx
+        .select({ notificationEnabled: membersTable.notificationsEnabled })
+        .from(membersTable)
+        .where(and(eq(membersTable.groupId, id), eq(membersTable.userId, userId)))
+        .limit(1);
+
+      if (!member) {
+        throw new ForbiddenError();
+      }
+
+      // toggle notification setting
+      const newNotificationState = !member.notificationEnabled;
+
+      // update the database within the transaction
+      await tx
+        .update(membersTable)
+        .set({ notificationsEnabled: newNotificationState })
+        .where(and(eq(membersTable.groupId, id), eq(membersTable.userId, userId)));
+
+      return newNotificationState;
+    });
   }
 }
