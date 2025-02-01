@@ -4,12 +4,12 @@ import { handleAppError } from "../../utilities/errors/app-error";
 import { parseUUID } from "../../utilities/uuid";
 import { createPostValidate, updatePostValidate } from "./validator";
 import { Status } from "../../constants/http";
-import { DEL_POST, POST_API } from "../../types/api/routes/posts";
+import { DEL_POST, GET_POST, POST_API } from "../../types/api/routes/posts";
 import { CreatePostPayload, UpdatePostPayload } from "../../types/api/internal/posts";
 
 export interface PostController {
   createPost(ctx: Context): Promise<POST_API>;
-  getPost(ctx: Context): Promise<POST_API>;
+  getPost(ctx: Context): Promise<GET_POST>;
   updatePost(ctx: Context): Promise<POST_API>;
   deletePost(ctx: Context): Promise<DEL_POST>;
 }

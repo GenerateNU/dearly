@@ -53,8 +53,8 @@ export class UserServiceImpl implements UserService {
       if (!user) {
         throw new NotFoundError("User");
       }
-
-      return user;
+      const userWithProfileURL = await this.mediaService.getUserWithSignedURL(user);
+      return userWithProfileURL;
     };
     return handleServiceError(getUserImpl)();
   }

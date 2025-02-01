@@ -4,6 +4,7 @@ import { PostTransaction, PostTransactionImpl } from "./transaction";
 import { PostService, PostServiceImpl } from "./service";
 import { PostController, PostControllerImpl } from "./controller";
 import { MediaService } from "../media/service";
+import { likeRoutes } from "../likes/route";
 
 export const postRoutes = (db: PostgresJsDatabase, mediaService: MediaService): Hono => {
   const post = new Hono();
@@ -16,6 +17,7 @@ export const postRoutes = (db: PostgresJsDatabase, mediaService: MediaService): 
   post.get("/posts/:id", (ctx) => postController.getPost(ctx));
   post.patch("/posts/:id", (ctx) => postController.updatePost(ctx));
   post.delete("/posts/:id", (ctx) => postController.deletePost(ctx));
+  post.route("/posts/:id/likes", likeRoutes(db, mediaService));
 
   return post;
 };

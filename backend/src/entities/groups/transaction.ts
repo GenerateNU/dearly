@@ -1,9 +1,17 @@
 import { ThumbnailResponse } from "./../../types/api/internal/groups";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { groupsTable, likesTable, mediaTable, membersTable, postsTable } from "../schema";
+import {
+  commentsTable,
+  groupsTable,
+  likesTable,
+  mediaTable,
+  membersTable,
+  postsTable,
+  usersTable,
+} from "../schema";
 import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
 import { and, eq, sql, desc, between } from "drizzle-orm";
-import { Media, PostWithMedia } from "../../types/api/internal/posts";
+import { PostWithMedia } from "../../types/api/internal/posts";
 import {
   CalendarParamPayload,
   CreateGroupPayload,
@@ -13,6 +21,7 @@ import {
   DayWithObjectKey,
   UpdateGroupPayload,
 } from "../../types/api/internal/groups";
+import { getPostMetadata } from "../../utilities/query";
 
 export interface GroupTransaction {
   insertGroup(payload: CreateGroupPayload): Promise<Group | null>;
@@ -59,24 +68,8 @@ export class GroupTransactionImpl implements GroupTransaction {
   }: FeedParamPayload): Promise<PostWithMedia[]> {
     await this.checkMembership(groupId, userId);
 
-    const selectedFields = {
-      id: postsTable.id,
-      userId: postsTable.userId,
-      groupId: postsTable.groupId,
-      createdAt: postsTable.createdAt,
-      caption: postsTable.caption,
-      media: sql<Media[]>`array_agg(
-            json_build_object(
-              'id', ${mediaTable.id},
-              'type', ${mediaTable.type},
-              'postId', ${mediaTable.postId},
-              'objectKey', ${mediaTable.objectKey}
-            )
-          )`,
-    };
-
     return await this.db
-      .select(selectedFields)
+      .select(getPostMetadata(userId))
       .from(postsTable)
       .innerJoin(mediaTable, eq(mediaTable.postId, postsTable.id))
       // extra check to return nothing if user is not a member of group
@@ -84,6 +77,9 @@ export class GroupTransactionImpl implements GroupTransaction {
         membersTable,
         and(eq(membersTable.groupId, groupId), eq(membersTable.userId, userId)),
       )
+      .innerJoin(usersTable, eq(postsTable.userId, usersTable.id))
+      .leftJoin(likesTable, eq(likesTable.postId, postsTable.id))
+      .leftJoin(commentsTable, eq(commentsTable.postId, postsTable.id))
       .where(
         and(
           date
@@ -98,6 +94,8 @@ export class GroupTransactionImpl implements GroupTransaction {
         postsTable.groupId,
         postsTable.createdAt,
         postsTable.caption,
+        postsTable.location,
+        usersTable.profilePhoto,
       )
       // most recent to less recent
       .orderBy(desc(postsTable.createdAt))

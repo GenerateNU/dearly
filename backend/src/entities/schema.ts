@@ -11,6 +11,8 @@ import {
   varchar,
   boolean,
   primaryKey,
+  integer,
+  unique,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { NAME_MAX_LIMIT } from "../constants/database";
@@ -18,7 +20,13 @@ import { NAME_MAX_LIMIT } from "../constants/database";
 export const userModeEnum = pgEnum("mode", ["BASIC", "ADVANCED"]);
 export const postMediaEnum = pgEnum("mediaType", ["VIDEO", "PHOTO"]);
 export const memberRoleEnum = pgEnum("role", ["MEMBER", "MANAGER"]);
-export const referenceTypeEnum = pgEnum("referenceType", ["POST", "COMMENT", "LIKE", "NUDGE"]);
+export const referenceTypeEnum = pgEnum("referenceType", [
+  "POST",
+  "COMMENT",
+  "LIKE",
+  "NUDGE",
+  "LIKE-COMMENT",
+]);
 export const invitationStatusEnum = pgEnum("status", ["PENDING", "ACCEPTED"]);
 
 export const usersTable = pgTable("users", {
@@ -57,6 +65,7 @@ export const postsTable = pgTable("posts", {
     .references(() => usersTable.id, { onDelete: "cascade" }),
   createdAt: timestamp().notNull().defaultNow(),
   caption: varchar({ length: TEXT_MAX_LIMIT }),
+  location: varchar({ length: NAME_MAX_LIMIT }),
 });
 
 export const mediaTable = pgTable("media", {
@@ -66,6 +75,7 @@ export const mediaTable = pgTable("media", {
     .references(() => postsTable.id, { onDelete: "cascade" }),
   objectKey: varchar().notNull(),
   type: postMediaEnum().notNull(),
+  order: integer("order").notNull().default(0),
 });
 
 export const membersTable = pgTable(
@@ -94,6 +104,7 @@ export const likesTable = pgTable("likes", {
   postId: uuid()
     .notNull()
     .references(() => postsTable.id, { onDelete: "cascade" }),
+  createdAt: timestamp().notNull().defaultNow(),
 });
 
 export const commentsTable = pgTable("comments", {
@@ -106,7 +117,27 @@ export const commentsTable = pgTable("comments", {
     .references(() => postsTable.id, { onDelete: "cascade" }),
   content: varchar({ length: TEXT_MAX_LIMIT }),
   voiceMemo: varchar(),
+  createdAt: timestamp().notNull().defaultNow(),
 });
+
+export const likeCommentsTable = pgTable(
+  "likeComments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp().notNull().defaultNow(),
+    userId: uuid()
+      .notNull()
+      .references(() => usersTable.id, { onDelete: "cascade" }),
+    commentId: uuid()
+      .notNull()
+      .references(() => commentsTable.id, { onDelete: "cascade" }),
+  },
+  (table) => [
+    {
+      unique: unique().on(table.userId, table.commentId),
+    },
+  ],
+);
 
 export const notificationsTable = pgTable("notifications", {
   id: uuid().primaryKey().defaultRandom(),
@@ -122,7 +153,7 @@ export const notificationsTable = pgTable("notifications", {
   postId: uuid().references(() => postsTable.id, { onDelete: "cascade" }),
   commentId: uuid().references(() => commentsTable.id, { onDelete: "cascade" }),
   likeId: uuid().references(() => likesTable.id, { onDelete: "cascade" }),
-  invitationId: uuid().references(() => invitationsTable.id, { onDelete: "cascade" }),
+  likeCommentId: uuid().references(() => likeCommentsTable.id, { onDelete: "cascade" }),
   title: varchar({ length: NAME_MAX_LIMIT }).notNull(),
   description: varchar({ length: NOTIFICATION_BODY_MAX_LIMIT }).notNull(),
 });
@@ -149,6 +180,17 @@ export const invitationsTable = pgTable("invitations", {
   status: invitationStatusEnum().notNull().default("PENDING"),
   createdAt: timestamp().notNull().defaultNow(),
 });
+
+export const likeCommentRelations = relations(likeCommentsTable, ({ one }) => ({
+  user: one(usersTable, {
+    fields: [likeCommentsTable.userId],
+    references: [usersTable.id],
+  }),
+  comment: one(commentsTable, {
+    fields: [likeCommentsTable.commentId],
+    references: [commentsTable.id],
+  }),
+}));
 
 export const userRelations = relations(usersTable, ({ many }) => ({
   posts: many(postsTable),
@@ -263,9 +305,9 @@ export const notificationRelations = relations(notificationsTable, ({ one }) => 
     fields: [notificationsTable.likeId],
     references: [likesTable.id],
   }),
-  invitation: one(invitationsTable, {
-    fields: [notificationsTable.invitationId],
-    references: [invitationsTable.id],
+  likeComment: one(likeCommentsTable, {
+    fields: [notificationsTable.likeCommentId],
+    references: [likeCommentsTable.id],
   }),
 }));
 

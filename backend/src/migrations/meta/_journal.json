@@ -50,6 +50,34 @@
       "when": 1738077430157,
       "tag": "20250128151710_melodic_mercury",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1738256795169,
+      "tag": "20250130170635_slim_solo",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1738269644622,
+      "tag": "20250130204044_wet_moondragon",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1738292701302,
+      "tag": "20250131030501_glossy_richard_fisk",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1738312383038,
+      "tag": "20250131083303_sturdy_redwing",
+      "breakpoints": true
     }
   ]
 }

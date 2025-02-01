@@ -1,0 +1,26 @@
+import { sql } from "drizzle-orm";
+import { commentsTable, likesTable, mediaTable, postsTable, usersTable } from "../entities/schema";
+import { Media } from "../types/api/internal/media";
+
+export const getPostMetadata = (userId: string) => {
+  return {
+    id: postsTable.id,
+    userId: postsTable.userId,
+    groupId: postsTable.groupId,
+    createdAt: postsTable.createdAt,
+    caption: postsTable.caption,
+    location: postsTable.location,
+    profilePhoto: usersTable.profilePhoto,
+    comments: sql<number>`COUNT(DISTINCT ${commentsTable.id})`.mapWith(Number),
+    likes: sql<number>`COUNT(DISTINCT ${likesTable.id})`.mapWith(Number),
+    isLiked: sql<boolean>`BOOL_OR(CASE WHEN ${likesTable.userId} = ${userId} THEN true ELSE false END)`,
+    media: sql<Media[]>`ARRAY_AGG(
+        JSON_BUILD_OBJECT(
+          'id', ${mediaTable.id},
+          'type', ${mediaTable.type},
+          'postId', ${mediaTable.postId},
+          'objectKey', ${mediaTable.objectKey}
+        ) ORDER BY ${mediaTable.order} ASC
+      )`,
+  };
+};

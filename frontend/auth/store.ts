@@ -57,16 +57,17 @@ export const useAuthStore = create<AuthState>()(
         set({ isPending: true });
         try {
           const session: Session = await authService.login({ email, password });
+          const user = await getUser(useAuthStore.getState().userId!);
           set({
             isAuthenticated: true,
             userId: session.user.id,
             isPending: false,
           });
-          const user = await getUser(useAuthStore.getState().userId!);
           set({
             mode: user.mode as Mode,
           });
         } catch (err) {
+          await useAuthStore.getState().logout();
           handleError(err, set);
         }
       },
@@ -94,6 +95,7 @@ export const useAuthStore = create<AuthState>()(
             isPending: false,
           });
         } catch (err) {
+          await useAuthStore.getState().logout();
           handleError(err, set);
         }
       },

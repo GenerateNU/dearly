@@ -3,6 +3,7 @@ import { Pagination, SearchedUser } from "../../types/api/internal/users";
 import { IDPayload } from "../../types/id";
 import { InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
+import { MediaService } from "../media/service";
 import { MemberTransaction } from "./transaction";
 
 export interface MemberService {
@@ -14,9 +15,11 @@ export interface MemberService {
 
 export class MemberServiceImpl implements MemberService {
   private memberTransaction: MemberTransaction;
+  private mediaService: MediaService;
 
-  constructor(memberTransaction: MemberTransaction) {
+  constructor(memberTransaction: MemberTransaction, mediaService: MediaService) {
     this.memberTransaction = memberTransaction;
+    this.mediaService = mediaService;
   }
 
   async addMember(payload: AddMemberPayload): Promise<Member> {
@@ -43,9 +46,9 @@ export class MemberServiceImpl implements MemberService {
       if (!members) {
         throw new NotFoundError("Group");
       }
-      return members;
+      const membersWithProfileURLs = await this.mediaService.getUsersWithSignedURL(members);
+      return membersWithProfileURLs;
     };
-
     return handleServiceError(getMembersImpl)();
   }
 
