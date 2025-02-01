@@ -63,6 +63,15 @@ components:
           type: string
           nullable: true
           description: A URL to the user's profile photo.
+        bio:
+          type: string
+          nullable: true
+          description: A bio for the user's profile.
+        birthday: 
+          type: string
+          format: date
+          nullable: True
+          description: Birthday of the user.
         timezone:
           type: string
           nullable: true
