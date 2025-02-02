@@ -76,6 +76,10 @@ components:
           type: string
           nullable: true
           description: Timezone that user is in for sending nudges.
+        postCount: 
+          type: number
+          nullable: true
+          description: Number of posts that a user made.
       required:
         - name
         - username

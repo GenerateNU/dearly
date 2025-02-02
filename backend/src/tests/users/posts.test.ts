@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
-import { generateJWTFromID } from "../helpers/test-token";
+import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
 import {
   MOCK_MEDIA_WITH_URL,
@@ -34,7 +34,7 @@ describe("GET /users/posts", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.GET,
-        route: `/api/v1/users/posts`,
+        route: `/api/v1/users/${generateUUID()}/posts`,
         autoAuthorized: false,
         headers: {
           Authorization: `Bearer ${generateJWTFromID()}`,
@@ -46,15 +46,15 @@ describe("GET /users/posts", () => {
   });
 
   it.each([
-    [USER_BOB_ID, []],
-    [USER_BILL_ID, []],
-    [USER_ALICE_ID, [post]],
+    [USER_BOB_ID, [post]], // Bob is in same group, and can see Alice's post
+    [USER_BILL_ID, []], // Bill is not in the group and cannot see Alice's post
+    [USER_ALICE_ID, [post]], // Alice can see her own post
   ])("should return 200 if for user with ID %s", async (id, expectedPosts) => {
     (
       await testBuilder.request({
         app,
         type: HTTPRequest.GET,
-        route: `/api/v1/users/posts`,
+        route: `/api/v1/users/${USER_ALICE_ID}/posts`,
         autoAuthorized: false,
         headers: {
           Authorization: `Bearer ${generateJWTFromID(id)}`,
@@ -76,7 +76,7 @@ describe("GET /users/posts", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.GET,
-        route: `/api/v1/users/posts`,
+        route: `/api/v1/users/${USER_ALICE_ID}/posts`,
         queryParams: {
           limit,
           page,
@@ -96,7 +96,7 @@ describe("GET /users/posts", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.GET,
-        route: `/api/v1/users/posts`,
+        route: `/api/v1/users/${USER_ALICE_ID}/posts`,
         queryParams: {
           limit: "limit",
           page: "page",
@@ -125,7 +125,7 @@ describe("GET /users/posts", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.GET,
-        route: `/api/v1/users/posts`,
+        route: `/api/v1/users/${USER_ALICE_ID}/posts`,
         queryParams: {
           limit: "0",
           page: "-1",

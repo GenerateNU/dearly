@@ -1,6 +1,14 @@
-import { sql } from "drizzle-orm";
-import { commentsTable, likesTable, mediaTable, postsTable, usersTable } from "../entities/schema";
+import { sql, eq } from "drizzle-orm";
+import {
+  commentsTable,
+  likesTable,
+  mediaTable,
+  membersTable,
+  postsTable,
+  usersTable,
+} from "../entities/schema";
 import { Media } from "../types/api/internal/media";
+import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 
 export const getPostMetadata = (userId: string) => {
   return {
@@ -23,4 +31,17 @@ export const getPostMetadata = (userId: string) => {
         ) ORDER BY ${mediaTable.order} ASC
       )`,
   };
+};
+
+export const getSharedGroups = (db: PostgresJsDatabase, viewee: string, viewer: string) => {
+  return db
+    .select({ groupId: membersTable.groupId })
+    .from(membersTable)
+    .where(eq(membersTable.userId, viewee))
+    .intersect(
+      db
+        .select({ groupId: membersTable.groupId })
+        .from(membersTable)
+        .where(eq(membersTable.userId, viewer)),
+    );
 };

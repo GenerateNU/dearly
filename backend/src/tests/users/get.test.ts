@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
-import { generateUUID } from "../helpers/test-token";
+import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { INVALID_ID_ARRAY } from "../helpers/test-constants";
 import { HTTPRequest, Status } from "../../constants/http";
 
@@ -17,7 +17,7 @@ describe("GET /users/:id", () => {
     app = await startTestApp();
   });
 
-  it("should return 200 if user exists", async () => {
+  it("should return 200 if user exists and view own profile", async () => {
     const id = (
       await testBuilder.request({
         app,
@@ -33,6 +33,10 @@ describe("GET /users/:id", () => {
       await testBuilder.request({
         app,
         route: `/api/v1/users/${id}`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${generateJWTFromID(id)}`,
+        },
       })
     )
       .assertBody({
@@ -42,7 +46,8 @@ describe("GET /users/:id", () => {
         timezone: null,
         profilePhoto: null,
         bio: null,
-        birthday: null
+        birthday: null,
+        postCount: 0,
       })
       .assertStatusCode(Status.OK);
   });

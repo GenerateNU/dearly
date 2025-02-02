@@ -49,7 +49,7 @@ describe("End-to-end User CRUD", () => {
         profilePhoto: null,
         timezone: null,
         bio: null,
-        birthday: null
+        birthday: null,
       });
   });
 
@@ -69,7 +69,8 @@ describe("End-to-end User CRUD", () => {
         profilePhoto: null,
         timezone: null,
         bio: null,
-        birthday: null
+        birthday: null,
+        postCount: 0,
       });
   });
 
