@@ -9,7 +9,7 @@ import {
   postsTable,
   usersTable,
 } from "../schema";
-import { and, eq, sql, not, exists, inArray } from "drizzle-orm";
+import { and, eq, sql, not, exists, inArray, desc } from "drizzle-orm";
 import { PostWithMedia } from "../../types/api/internal/posts";
 import {
   CreateUserPayload,
@@ -164,7 +164,7 @@ export class UserTransactionImpl implements UserTransaction {
         postsTable.location,
         usersTable.profilePhoto
       )
-      .orderBy(postsTable.createdAt)
+      .orderBy(desc(postsTable.createdAt))
       .limit(limit)
       .offset((page - 1) * limit);
   }
