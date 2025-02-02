@@ -19,7 +19,7 @@ export const getUser = async (id: string): Promise<User> => {
       headers: getHeaders(token),
       params: {
         path: {
-          id: id,
+          id,
         },
       },
     });
