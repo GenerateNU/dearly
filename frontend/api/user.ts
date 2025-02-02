@@ -74,8 +74,8 @@ export const getUserPosts = async (id: string, limit: number, page: number): Pro
           page,
         },
         path: {
-          id
-        }
+          id,
+        },
       },
     });
     return data!;

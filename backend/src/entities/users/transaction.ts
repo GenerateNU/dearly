@@ -66,7 +66,10 @@ export class UserTransactionImpl implements UserTransaction {
         postsTable,
         viewer === viewee
           ? eq(postsTable.userId, usersTable.id)
-          : and(eq(postsTable.userId, usersTable.id), inArray(postsTable.groupId, getSharedGroups(this.db, viewee, viewer))),
+          : and(
+              eq(postsTable.userId, usersTable.id),
+              inArray(postsTable.groupId, getSharedGroups(this.db, viewee, viewer)),
+            ),
       )
       .where(eq(usersTable.id, viewee))
       .groupBy(
@@ -127,7 +130,10 @@ export class UserTransactionImpl implements UserTransaction {
     return this.getUserTokens(userId);
   }
 
-  async getPosts({ id: viewee, limit, page }: Pagination, viewer: string): Promise<PostWithMedia[]> {
+  async getPosts(
+    { id: viewee, limit, page }: Pagination,
+    viewer: string,
+  ): Promise<PostWithMedia[]> {
     return await this.db
       .select(getPostMetadata(viewee))
       .from(postsTable)
@@ -149,11 +155,11 @@ export class UserTransactionImpl implements UserTransaction {
                     this.db
                       .select({ groupId: membersTable.groupId })
                       .from(membersTable)
-                      .where(eq(membersTable.userId, viewer))
-                  )
+                      .where(eq(membersTable.userId, viewer)),
+                  ),
               )
-            : undefined
-        )
+            : undefined,
+        ),
       )
       .groupBy(
         postsTable.id,
@@ -162,7 +168,7 @@ export class UserTransactionImpl implements UserTransaction {
         postsTable.createdAt,
         postsTable.caption,
         postsTable.location,
-        usersTable.profilePhoto
+        usersTable.profilePhoto,
       )
       .orderBy(desc(postsTable.createdAt))
       .limit(limit)
