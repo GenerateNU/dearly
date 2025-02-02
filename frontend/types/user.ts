@@ -1,5 +1,9 @@
 import { paths, components } from "@/gen/openapi";
+
 export type User = components["schemas"]["User"];
+
+export type SearchedUser = components["schemas"]["SearchedUser"];
+
 export type CreateUserPayload =
   paths["/api/v1/users"]["post"]["requestBody"]["content"]["application/json"];
 
