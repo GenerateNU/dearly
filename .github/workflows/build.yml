@@ -4,7 +4,8 @@ env:
   REGISTRY: docker.io
   IMAGE_NAME: liusto258/dearly 
   SERVICE: dearly 
-  region: us-east1
+  PROJECT_ID: nifty-oxide-449323-c2
+  REGION: us-east1
 
 on:
   push:
@@ -67,9 +68,10 @@ jobs:
 
       - name: Google Auth 
         id: Auth 
-        uses: 'google-github-actions/auth'
+        uses: 'google-github-actions/auth@v2'
         with:
           token_format: 'access_token'
+          project_id: ${{ env.PROJECT_ID }}
           service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'
 
       - name: Deploy to Cloud Run
