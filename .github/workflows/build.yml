@@ -67,7 +67,7 @@ jobs:
 
       - name: Google Auth 
         id: Auth 
-        uses: 'google-github-actions/auth@v0'
+        uses: 'google-github-actions/auth'
         with:
           token_format: 'access_token'
           service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'
