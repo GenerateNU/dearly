@@ -7,12 +7,6 @@ on:
       - backend-deployment
 
 jobs:
-  docker:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v4
-        - name: Check that the image builds
-          run: docker build . --file Dockerfile
   push_to_registry:
     name: Push Docker image to Docker Hub 
     runs-on: ubuntu-latest
@@ -35,7 +29,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: my-docker-hub-namespace/my-docker-hub-repository #Replace this with the namespace of docker.
+          images: liusto258/dearly 
 
       - name: Build and push Docker image
         id: push
