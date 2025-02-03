@@ -72,6 +72,7 @@ jobs:
         with:
           token_format: 'access_token'
           project_id: ${{ env.PROJECT_ID }}
+          credentials_json: ${{ secrets.CREDENTIALS_JSON }}
           service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'
 
       - name: Deploy to Cloud Run
