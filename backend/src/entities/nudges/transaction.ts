@@ -78,9 +78,9 @@ export class NudgeTransactionImpl implements NudgeTransaction {
         );
       }
 
-      // retrieve device tokens directly from users who have notifications enabled
-      const deviceTokens = await tx
-        .select({ deviceTokens: devicesTable.token })
+      // retrieve users who have both device tokens and notifications enabled
+      const usersWithTokens = await tx
+        .select({ userId: devicesTable.userId, deviceToken: devicesTable.token })
         .from(membersTable)
         .innerJoin(devicesTable, eq(membersTable.userId, devicesTable.userId))
         .where(
@@ -88,15 +88,26 @@ export class NudgeTransactionImpl implements NudgeTransaction {
             inArray(membersTable.userId, userIds),
             eq(membersTable.groupId, groupId),
             eq(membersTable.notificationsEnabled, true),
+            isNotNull(devicesTable.token),
           ),
-        )
-        .then((rows) => rows.flatMap((row) => row.deviceTokens));
+        );
 
-      // update lastManualNudge after sending the nudge
-      await tx
-        .update(membersTable)
-        .set({ lastManualNudge: new Date() })
-        .where(and(inArray(membersTable.userId, userIds), eq(membersTable.groupId, groupId)));
+      const deviceTokens = usersWithTokens.map((row) => row.deviceToken);
+      const usersToUpdate = new Set(usersWithTokens.map((row) => row.userId));
+
+      // update lastManualNudge field for users who have notification enabled and has device tokens
+      if (usersToUpdate.size > 0) {
+        await tx
+          .update(membersTable)
+          .set({ lastManualNudge: new Date() })
+          .where(
+            and(
+              inArray(membersTable.userId, Array.from(usersToUpdate)),
+              eq(membersTable.groupId, groupId),
+              eq(membersTable.notificationsEnabled, true),
+            ),
+          );
+      }
 
       return {
         deviceTokens,

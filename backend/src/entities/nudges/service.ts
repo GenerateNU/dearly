@@ -25,6 +25,7 @@ export class NudgeServiceImpl implements NudgeService {
         groupId,
         managerId,
       );
+      if (notificationMetadata.deviceTokens.length === 0) return;
       const notificationTickets = this.formatPushNotifications(notificationMetadata);
       await this.sendPushNotifications(notificationTickets);
     };

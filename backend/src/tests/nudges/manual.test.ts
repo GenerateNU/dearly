@@ -40,6 +40,23 @@ describe("PUT /groups/:id/nudges/manual", () => {
       .assertError("Group does not exist.");
   });
 
+  it("should return 200 if user does not have notification", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.PUT,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/manual`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${ALICE_JWT}`,
+        },
+        requestBody: {
+          users: [USER_BOB_ID],
+        },
+      })
+    ).assertStatusCode(200);
+  });
+
   it("should return 404 if user(s) does not exist", async () => {
     const nonExistentUser1 = generateUUID();
     const nonExistentUser2 = generateUUID();
@@ -116,17 +133,17 @@ describe("PUT /groups/:id/nudges/manual", () => {
     ).assertStatusCode(Status.Forbidden);
   });
 
-    it.each(
-      INVALID_ID_ARRAY.map((id) => [id === null ? "null" : id === undefined ? "undefined" : id, id]),
-    )("should return 400 if invalid ID %s", async (id) => {
-      (
-        await testBuilder.request({
-          app,
-          type: HTTPRequest.PUT,
-          route: `/api/v1/groups/${id}/nudges/manual`,
-        })
-      )
-        .assertStatusCode(Status.BadRequest)
-        .assertError("Invalid ID format");
-    });
+  it.each(
+    INVALID_ID_ARRAY.map((id) => [id === null ? "null" : id === undefined ? "undefined" : id, id]),
+  )("should return 400 if invalid ID %s", async (id) => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.PUT,
+        route: `/api/v1/groups/${id}/nudges/manual`,
+      })
+    )
+      .assertStatusCode(Status.BadRequest)
+      .assertError("Invalid ID format");
+  });
 });
