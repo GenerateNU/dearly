@@ -28,6 +28,11 @@ export interface S3Config {
   name: string;
 }
 
+export interface SupabaseInfo {
+  key: string;
+  url: string;
+}
+
 export interface Configuration {
   server: ServerConfig;
   database: DatabaseConfig;
@@ -38,4 +43,5 @@ export interface Configuration {
   };
   s3Config: S3Config;
   environment: string;
+  supabase: SupabaseInfo;
 }
