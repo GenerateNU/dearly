@@ -69,7 +69,7 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: ${{ env.SERVICE }}
-          image: ${{ secrets.DOCKER_IMAGE_URL }}
+          image: ${{ env.DOCKER_IMAGE_URL }}
           region: ${{ secrets.GOOGLE_REGION }}
           env_vars: |
             DB_USER=${{ secrets.DB_USER }}
