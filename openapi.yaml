@@ -2071,7 +2071,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /api/v1/groups/{id}/nudges/auto:
+  /api/v1/groups/{id}/nudges/manual:
     put:
       tags:
         - Nudge Endpoints
