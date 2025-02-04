@@ -5,9 +5,9 @@ export interface SearchedUser {
   id: string;
   name: string;
   username: string;
-  isMember: boolean;
   profilePhoto: string | null;
-  lastNudgedAt: Date | null;
+  isMember?: boolean;
+  lastNudgedAt?: Date | null;
 }
 
 export interface SearchedInfo {
