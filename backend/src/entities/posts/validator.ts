@@ -5,6 +5,8 @@ import {
   MIN_MEDIA_COUNT,
   TEXT_MAX_LIMIT,
 } from "../../constants/database";
+import { postsTable } from "../schema";
+import { createSelectSchema } from "drizzle-zod";
 
 export const createPostValidate = z
   .object({
@@ -28,5 +30,11 @@ export const createPostValidate = z
       .max(MAX_MEDIA_COUNT, { message: `At most ${MAX_MEDIA_COUNT} media items are allowed.` }),
   })
   .passthrough();
+
+
+
+export const postValidate = createSelectSchema(postsTable);
+
+
 
 export const updatePostValidate = createPostValidate.partial();

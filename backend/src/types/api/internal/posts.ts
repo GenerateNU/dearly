@@ -11,7 +11,7 @@ export type CreatePostPayload = z.infer<typeof createPostValidate> & {
 
 export type UpdatePostPayload = z.infer<typeof updatePostValidate> & IDPayload;
 
-type Post = typeof postsTable.$inferSelect;
+export type Post = typeof postsTable.$inferSelect;
 
 export type PostWithMedia = Post & {
   media: Media[];
