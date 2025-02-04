@@ -74,7 +74,7 @@ jobs:
           service: ${{ env.SERVICE }}
           image: ${{ env.DOCKER_IMAGE_URL }}
           region: ${{ env.REGION }}
-          secrets: |
+          env_vars: |
             DB_USER=${{ secrets.DB_USER }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             DB_HOST=${{ secrets.DB_HOST }}
