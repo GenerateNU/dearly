@@ -90,6 +90,7 @@ export const membersTable = pgTable(
     joinedAt: timestamp().notNull().defaultNow(),
     role: memberRoleEnum().notNull().default("MEMBER"),
     notificationsEnabled: boolean().notNull().default(true),
+    lastManualNudge: timestamp(),
   },
   (table) => {
     return [primaryKey({ columns: [table.userId, table.groupId] })];
