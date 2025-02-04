@@ -83,6 +83,7 @@ jobs:
           service: ${{ env.SERVICE }}
           image: ${{ env.DOCKER_IMAGE_URL }}
           region: ${{ env.REGION }}
+          port: 3000
           env_vars: |
             DB_USER=${{ secrets.DB_USER }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
@@ -97,4 +98,3 @@ jobs:
             AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}
             AWS_REGION=${{ secrets.AWS_REGION }} 
             AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }}
-            PORT=3000
