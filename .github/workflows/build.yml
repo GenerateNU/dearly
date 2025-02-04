@@ -18,11 +18,13 @@ jobs:
   push_to_registry:
     name: Push Docker image to Docker Hub 
     runs-on: ubuntu-latest
+
     permissions:
       packages: write 
       contents: read 
       attestations: write
       id-token: write
+
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
@@ -56,17 +58,6 @@ jobs:
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
 
-  push-to-gcr:
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: 'read'
-      id-token: 'write'
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
       - name: Google Auth 
         id: Auth 
         uses: 'google-github-actions/auth@v2'
@@ -83,8 +74,7 @@ jobs:
           service: ${{ env.SERVICE }}
           image: ${{ env.DOCKER_IMAGE_URL }}
           region: ${{ env.REGION }}
-          port: 3000
-          env_vars: |
+          secrets: |
             DB_USER=${{ secrets.DB_USER }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             DB_HOST=${{ secrets.DB_HOST }}
@@ -98,3 +88,4 @@ jobs:
             AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}
             AWS_REGION=${{ secrets.AWS_REGION }} 
             AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }}
+          flags: --port=3000
