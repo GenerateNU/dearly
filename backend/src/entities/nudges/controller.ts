@@ -3,9 +3,10 @@ import { NudgeService } from "./service";
 import { handleAppError } from "../../utilities/errors/app-error";
 import { userIDValidate } from "./validator";
 import { parseUUID } from "../../utilities/uuid";
+import { MANUAL_NUDGE } from "../../types/api/routes/nudges";
 
 export interface NudgeController {
-  manualNudge(ctx: Context): Promise<Response>;
+  manualNudge(ctx: Context): Promise<MANUAL_NUDGE>;
 }
 
 export class NudgeControllerImpl implements NudgeController {
@@ -15,7 +16,7 @@ export class NudgeControllerImpl implements NudgeController {
     this.nudgeService = nudgeService;
   }
 
-  async manualNudge(ctx: Context): Promise<Response> {
+  async manualNudge(ctx: Context): Promise<MANUAL_NUDGE> {
     const manualNudgeImpl = async () => {
       const groupId = parseUUID(ctx.req.param("id"));
       const managerId = ctx.get("userId");
