@@ -18,14 +18,6 @@ export PATH=$PATH:$BUN_PATH
 
 echo "Environment variables successfully loaded"
 
-echo "Building dependencies..."
-task install
-task generate
-task db:up
-task db:generate
-task db:migrate
-task db:down
-
 echo "Building docker image..."
 
 docker build --pull -t dearly_backend .
