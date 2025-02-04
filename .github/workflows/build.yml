@@ -81,5 +81,5 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: ${{ env.SERVICE }}
-          image: ${{DOCKER_IMAGE_URL}}
+          image: ${{ env.DOCKER_IMAGE_URL }}
           region: ${{ env.REGION }}
