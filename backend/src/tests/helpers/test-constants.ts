@@ -96,6 +96,7 @@ export const SEARCHED_ALICE: SearchedUser = {
   username: USER_ALICE["username"],
   profilePhoto: null,
   isMember: true,
+  lastNudgedAt: null,
 };
 
 export const USER_BOB: CreateUserPayload = {
@@ -111,6 +112,7 @@ export const SEARCHED_BOB: SearchedUser = {
   username: USER_BOB["username"],
   profilePhoto: null,
   isMember: true,
+  lastNudgedAt: null,
 };
 
 export const USER_ANA: CreateUserPayload = {
@@ -126,6 +128,7 @@ export const SEARCHED_ANA: SearchedUser = {
   username: USER_ANA["username"],
   profilePhoto: null,
   isMember: true,
+  lastNudgedAt: null,
 };
 
 export const USER_BILL: CreateUserPayload = {

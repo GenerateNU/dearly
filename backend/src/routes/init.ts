@@ -9,6 +9,7 @@ import { postRoutes } from "../entities/posts/route";
 import { IS3Operations } from "../services/s3Service";
 import { MediaServiceImpl } from "../entities/media/service";
 import { commentsRoutes } from "../entities/comments/route";
+import Expo from "expo-server-sdk";
 
 export const setUpRoutes = (
   app: Hono,
@@ -41,9 +42,10 @@ export const setUpRoutes = (
 const apiRoutes = (db: PostgresJsDatabase, s3Service: IS3Operations): Hono => {
   const api = new Hono();
   const mediaService = new MediaServiceImpl(db, s3Service);
+  const expo = new Expo();
 
   api.route("/users", userRoutes(db, mediaService));
-  api.route("/groups", groupRoutes(db, mediaService));
+  api.route("/groups", groupRoutes(db, mediaService, expo));
   api.route("/", postRoutes(db, mediaService));
   api.route("/", commentsRoutes(db, mediaService));
 

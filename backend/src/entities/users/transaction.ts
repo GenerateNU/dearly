@@ -153,6 +153,7 @@ export class UserTransactionImpl implements UserTransaction {
             sql<boolean>`CASE WHEN ${membersTable.groupId} = ${groupId} THEN true ELSE false END`.as(
               "isMember",
             ),
+            lastNudgedAt: membersTable.lastManualNudge,
         })
         .from(usersTable)
         .leftJoin(membersTable, eq(membersTable.userId, usersTable.id))

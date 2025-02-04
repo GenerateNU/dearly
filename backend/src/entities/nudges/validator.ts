@@ -9,4 +9,8 @@ export const userIDValidate = z.object({
   ),
 });
 
-export type UserIDsPayload = z.infer<typeof userIDValidate>;
+export type NotificationMetadata = {
+  deviceTokens: string[];
+  groupId: string;
+  groupName: string;
+};

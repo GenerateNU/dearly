@@ -8,6 +8,7 @@ export enum Status {
   Forbidden = 403,
   Conflict = 409,
   InternalServer = 500,
+  TooManyRequests = 429,
 }
 
 export enum HTTPRequest {

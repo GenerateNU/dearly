@@ -5,7 +5,7 @@ import { NudgeTransaction, NudgeTransactionImpl } from "./transaction";
 import { NudgeService, NudgeServiceImpl } from "./service";
 import Expo from "expo-server-sdk";
 
-export const postRoutes = (db: PostgresJsDatabase, expo: Expo): Hono => {
+export const nudgeRoutes = (db: PostgresJsDatabase, expo: Expo): Hono => {
   const nudge = new Hono();
 
   const nudgeTransaction: NudgeTransaction = new NudgeTransactionImpl(db);

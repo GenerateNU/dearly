@@ -27,6 +27,7 @@ describe("GET /users/search", () => {
     id: USER_ANA.id,
     profilePhoto: null,
     isMember: false,
+    lastNudgedAt: null,
   };
 
   const BOB = {
@@ -35,6 +36,7 @@ describe("GET /users/search", () => {
     id: USER_BOB.id,
     profilePhoto: null,
     isMember: true,
+    lastNudgedAt: null,
   };
 
   const BILL = {
@@ -43,6 +45,7 @@ describe("GET /users/search", () => {
     id: USER_BILL.id,
     profilePhoto: null,
     isMember: false,
+    lastNudgedAt: null,
   };
 
   it.each([

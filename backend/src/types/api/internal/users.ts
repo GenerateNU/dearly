@@ -7,6 +7,7 @@ export interface SearchedUser {
   username: string;
   isMember: boolean;
   profilePhoto: string | null;
+  lastNudgedAt: Date | null;
 }
 
 export interface SearchedInfo {
