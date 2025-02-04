@@ -2080,7 +2080,7 @@ paths:
       parameters:
         - name: id
           in: path
-          description: ID of the group a post is made in
+          description: ID of the group to nudge members
           required: true
           schema:
             type: string
