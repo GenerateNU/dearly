@@ -5,9 +5,6 @@ env:
   IMAGE_NAME: liusto258/dearly 
   DOCKER_IMAGE_URL: liusto258/dearly:backend-deployment
   SERVICE: dearly 
-  PROJECT_ID: nifty-oxide-449323-c2
-  REGION: us-east1
-
 on:
   push:
     branches:
@@ -63,7 +60,7 @@ jobs:
         uses: 'google-github-actions/auth@v2'
         with:
           token_format: 'access_token'
-          project_id: ${{ env.PROJECT_ID }}
+          project_id: ${{ secrets.PROJECT_ID }}
           credentials_json: ${{ secrets.CREDENTIALS_JSON }}
           service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'
 
@@ -72,8 +69,8 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: ${{ env.SERVICE }}
-          image: ${{ env.DOCKER_IMAGE_URL }}
-          region: ${{ env.REGION }}
+          image: ${{ secrets.DOCKER_IMAGE_URL }}
+          region: ${{ secrets.GOOGLE_REGION }}
           env_vars: |
             DB_USER=${{ secrets.DB_USER }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
