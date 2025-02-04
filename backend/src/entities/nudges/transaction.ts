@@ -35,29 +35,29 @@ export class NudgeTransactionImpl implements NudgeTransaction {
         .select({ managerId: groupsTable.managerId, name: groupsTable.name })
         .from(groupsTable)
         .where(eq(groupsTable.id, groupId));
-  
+
       if (!group) {
         throw new NotFoundError("Group");
       }
-  
+
       // check if user is manager
       if (group.managerId !== managerId) {
         throw new ForbiddenError();
       }
-  
+
       // check if user IDs exist
       const existingUsers = await tx
         .select({ userId: usersTable.id })
         .from(usersTable)
         .where(inArray(usersTable.id, userIds));
-  
+
       const existingUserIds = new Set(existingUsers.map((user) => user.userId));
       const invalidUserIds = userIds.filter((id) => !existingUserIds.has(id));
-  
+
       if (invalidUserIds.length > 0) {
         throw new NotFoundError("", `Users not found: ${invalidUserIds.join(", ")}`);
       }
-  
+
       // check cooldown period
       const now = new Date();
       const cooldownUsers = await tx
@@ -71,31 +71,38 @@ export class NudgeTransactionImpl implements NudgeTransaction {
             gt(membersTable.lastManualNudge, new Date(now.getTime() - COOLDOWN_PERIOD)),
           ),
         );
-  
+
       if (cooldownUsers.length > 0) {
         throw new TooManyRequestsError(
           `Users in cooldown: ${cooldownUsers.map((u) => u.userId).join(", ")}`,
         );
       }
-  
+
       // retrieve device tokens directly from users who have notifications enabled
       const deviceTokens = await tx
-      .select({ deviceTokens: devicesTable.token })
+        .select({ deviceTokens: devicesTable.token })
         .from(membersTable)
         .innerJoin(devicesTable, eq(membersTable.userId, devicesTable.userId))
         .where(
           and(
             inArray(membersTable.userId, userIds),
             eq(membersTable.groupId, groupId),
-            eq(membersTable.notificationsEnabled, true)
-          )
-        ).then((rows) => rows.flatMap((row) => row.deviceTokens)); 
-  
+            eq(membersTable.notificationsEnabled, true),
+          ),
+        )
+        .then((rows) => rows.flatMap((row) => row.deviceTokens));
+
+      // update lastManualNudge after sending the nudge
+      await tx
+        .update(membersTable)
+        .set({ lastManualNudge: new Date() })
+        .where(and(inArray(membersTable.userId, userIds), eq(membersTable.groupId, groupId)));
+
       return {
         deviceTokens,
         groupId,
         groupName: group.name,
       };
     });
-  }  
+  }
 }
