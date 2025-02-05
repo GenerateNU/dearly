@@ -1,4 +1,4 @@
-import { mock, jest } from "bun:test";
+import { mock, jest, spyOn } from "bun:test";
 import { MOCK_SIGNED_URL } from "./test-constants";
 import { Expo, ExpoPushMessage, ExpoPushTicket } from "expo-server-sdk";
 
@@ -13,11 +13,16 @@ mock.module("expo-server-sdk", () => {
     Expo: class {
       static isExpoPushToken = Expo.isExpoPushToken;
       getPushNotificationReceiptsAsync = Expo.prototype.getPushNotificationReceiptsAsync;
-      
+
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      sendPushNotificationsAsync(messages: ExpoPushMessage[]): Promise<ExpoPushTicket[]> {
+      async sendPushNotificationsAsync(message: ExpoPushMessage[]): Promise<ExpoPushTicket[]> {
         return Promise.resolve([]);
       }
-    }
+    },
   };
 });
+
+export const getPushNotificationReceiptsAsyncSpy = spyOn(
+  Expo.prototype,
+  "sendPushNotificationsAsync",
+);

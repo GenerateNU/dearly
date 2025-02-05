@@ -3,12 +3,14 @@ import {
   USER_ALICE_ID,
   INVALID_ID_ARRAY,
   DEARLY_GROUP_ID,
+  MOCK_EXPO_TOKEN,
 } from "../helpers/test-constants";
 import { Hono } from "hono";
 import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
+import { getPushNotificationReceiptsAsyncSpy } from "../helpers/mock";
 
 describe("PUT /groups/:id/nudges/manual", () => {
   let app: Hono;
@@ -40,7 +42,7 @@ describe("PUT /groups/:id/nudges/manual", () => {
       .assertError("Group does not exist.");
   });
 
-  it("should return 200 if user does not have notification", async () => {
+  it("should return 200 if user does have device and notification on", async () => {
     (
       await testBuilder.request({
         app,
@@ -55,6 +57,35 @@ describe("PUT /groups/:id/nudges/manual", () => {
         },
       })
     ).assertStatusCode(200);
+
+    expect(await getPushNotificationReceiptsAsyncSpy).toHaveBeenCalledTimes(1);
+    expect(await getPushNotificationReceiptsAsyncSpy).toHaveBeenCalledWith([
+      {
+        title: "Time to Connect! 🚀",
+        body: `✨ Share a post with your dearly group now! ✨`,
+        to: [MOCK_EXPO_TOKEN],
+        data: {
+          groupId: DEARLY_GROUP_ID,
+          groupName: "dearly",
+        },
+      },
+    ]);
+
+    // try to nudge again right after first nudge
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.PUT,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/manual`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${ALICE_JWT}`,
+        },
+        requestBody: {
+          users: [USER_BOB_ID],
+        },
+      })
+    ).assertStatusCode(429);
   });
 
   it("should return 404 if user(s) does not exist", async () => {

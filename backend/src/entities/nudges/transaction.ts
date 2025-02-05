@@ -1,7 +1,7 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { NotificationMetadata } from "./validator";
 import { devicesTable, groupsTable, membersTable, usersTable } from "../schema";
-import { eq, inArray, and, isNotNull, gt } from "drizzle-orm";
+import { eq, inArray, and, isNotNull, gt, not } from "drizzle-orm";
 import {
   ForbiddenError,
   NotFoundError,
@@ -89,6 +89,7 @@ export class NudgeTransactionImpl implements NudgeTransaction {
             eq(membersTable.groupId, groupId),
             eq(membersTable.notificationsEnabled, true),
             isNotNull(devicesTable.token),
+            not(eq(membersTable.userId, managerId)),
           ),
         );
 
