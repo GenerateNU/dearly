@@ -116,7 +116,7 @@ export const commentsTable = pgTable("comments", {
     .notNull()
     .references(() => postsTable.id, { onDelete: "cascade" }),
   content: varchar({ length: TEXT_MAX_LIMIT }),
-  voiceMemo: varchar(),
+  voiceMemo: uuid(),
   createdAt: timestamp().notNull().defaultNow(),
 });
 

@@ -11,7 +11,7 @@ export enum MediaType {
 
 export enum CommentType {
   AUDIO = "AUDIO",
-  TEXT = "TEXT"
+  TEXT = "TEXT",
 }
 
 export enum MemberRole {
