@@ -18,3 +18,8 @@ export type NotificationMetadata = {
   groupId: string;
   groupName: string;
 };
+
+export type NudgeTarget = {
+  userId: string;
+  deviceToken: string;
+}
