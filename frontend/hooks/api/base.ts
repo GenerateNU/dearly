@@ -1,4 +1,11 @@
-import { MutationFunction, useInfiniteQuery, useMutation, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
+import {
+  MutationFunction,
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+  UseQueryOptions,
+} from "@tanstack/react-query";
 import { useCallback, useEffect, useState } from "react";
 
 /**
@@ -121,7 +128,7 @@ export const useToggleBase = <T, P>({
  *                    It receives the data returned by the mutation function as an argument.
  * @param onError - (Optional) A callback function that is called when the mutation fails.
  *                  It receives the error as an argument.
- * 
+ *
  * @returns A mutation object that contains:
  *   - `mutate`: A function that triggers the mutation.
  *   - `isLoading`: A boolean indicating if the mutation is in progress.
@@ -131,9 +138,9 @@ export const useToggleBase = <T, P>({
  */
 export const useMutationBase = <I, O>(
   mutationFn: MutationFunction<O, I>,
-  key: string[],      
+  key: string[],
   onSuccess?: (data: O) => void,
-  onError?: (error: unknown) => void 
+  onError?: (error: unknown) => void,
 ) => {
   const queryClient = useQueryClient();
 
@@ -149,6 +156,6 @@ export const useMutationBase = <I, O>(
       if (onError) {
         onError(error);
       }
-    }
+    },
   });
 };
