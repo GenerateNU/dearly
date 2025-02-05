@@ -25,14 +25,17 @@ export class NudgeTransactionImpl {
     this.db = db;
   }
 
-  async getNotificationMetadata(userIds: string[], groupId: string, managerId: string): Promise<NotificationMetadata> {
-
+  async getNotificationMetadata(
+    userIds: string[],
+    groupId: string,
+    managerId: string,
+  ): Promise<NotificationMetadata> {
     return await this.db.transaction(async (tx) => {
       // validate group existence
       const group = await this.validateGroup(tx, groupId, managerId);
       // validate selected users' existence and their group membership
       const validUserIds = await this.validateUsers(tx, userIds, groupId);
-      // get nudge targets (those have device tokens and notification enabled) 
+      // get nudge targets (those have device tokens and notification enabled)
       const validNudgeTargets = await this.findValidNudgeTargets(
         tx,
         validUserIds,

@@ -2076,7 +2076,7 @@ paths:
       tags:
         - Nudge Endpoints
       summary: Manually nudge a user
-      description: Manager can select at least one member in the group to nudge.
+      description: Manager can select at least one member in the group to nudge. Will not nudge if users do not have notifications turned on for groups or for devices.
       parameters:
         - name: id
           in: path
@@ -2088,6 +2088,24 @@ paths:
             example: 5e91507e-5630-4efd-9fd4-799178870b10
       security:
         - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                users:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                    example: 5e91507e-5630-4efd-9fd4-799178870b10
+                  description: User IDs to be nudged
+              required:
+                - users
+              additionalProperties: true
+
       responses:
         200:
           description: Successfully nudge members
