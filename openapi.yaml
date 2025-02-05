@@ -253,6 +253,37 @@ components:
             - VIDEO
             - AUDIO
           description: The type of the media (e.g., photo, audio, video).
+    Comment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b11
+          description: A unique identifier for the comment item.
+        postId:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: The ID of the post to which the comment belongs.
+        userID:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: The ID of the user to which the comment belongs.
+        type:
+          type: string
+          example: "TEXT"
+          enum:
+            - AUDIO
+            - TEXT
+          description: The type of comment (e.g., text or audio)
+        objectKey:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: The unique object key associated with the audio in S3.
+          nullable: true
 
 paths:
   /healthcheck:
@@ -2026,4 +2057,73 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+
+  /api/v1/posts/{id}/comments:
+    get:
+      tags:
+        - Post Endpoints
+      summary: Get all comments under a post (paginated)
+      description: get all comments under a post including fetching the audio from s3 bucket
+      parameters:
+        - name: id
+          in: path
+          description: ID of the post the commentd are under
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Successfully retrieve comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MediaUpload"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: User not member of group
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Group not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
+
+    post:
+
+  /api/v1/comments/{id}:
+    get:
+
+
+
 
