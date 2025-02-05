@@ -226,6 +226,8 @@ describe("PUT /groups/:id/nudges/manual", () => {
     )
       .assertStatusCode(Status.NotFound)
       .assertError(`Users not found: ${nonExistentUser1}, ${nonExistentUser2}`);
+
+    expect(await getPushNotificationReceiptsAsyncSpy).not.toHaveBeenCalled();
   });
 
   it("should return 400 if empty selected users", async () => {
@@ -277,10 +279,12 @@ describe("PUT /groups/:id/nudges/manual", () => {
           Authorization: `Bearer ${generateJWTFromID(USER_BOB_ID)}`,
         },
         requestBody: {
-          users: [generateUUID()],
+          users: [USER_ALICE_ID],
         },
       })
     ).assertStatusCode(Status.Forbidden);
+
+    expect(await getPushNotificationReceiptsAsyncSpy).not.toHaveBeenCalled();
   });
 
   it.each(
