@@ -74,7 +74,7 @@ export class NudgeTransactionImpl implements NudgeTransaction {
 
       if (cooldownUsers.length > 0) {
         throw new TooManyRequestsError(
-          `Users in cooldown: ${cooldownUsers.map((u) => u.userId).join(", ")}`,
+          `Too many nudges send to users ${cooldownUsers.map((u) => u.userId).join(", ")}`,
         );
       }
 
