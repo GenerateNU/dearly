@@ -3,7 +3,7 @@ import { Hono } from "hono";
 import { NudgeController, NudgeControllerImpl } from "./controller";
 import { NudgeTransaction, NudgeTransactionImpl } from "./transaction";
 import { NudgeService, NudgeServiceImpl } from "./service";
-import Expo from "expo-server-sdk";
+import { Expo } from "expo-server-sdk";
 
 export const nudgeRoutes = (db: PostgresJsDatabase, expo: Expo): Hono => {
   const nudge = new Hono();

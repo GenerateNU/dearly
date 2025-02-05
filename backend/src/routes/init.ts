@@ -9,7 +9,7 @@ import { postRoutes } from "../entities/posts/route";
 import { IS3Operations } from "../services/s3Service";
 import { MediaServiceImpl } from "../entities/media/service";
 import { commentsRoutes } from "../entities/comments/route";
-import Expo from "expo-server-sdk";
+import { Expo } from "expo-server-sdk";
 
 export const setUpRoutes = (
   app: Hono,

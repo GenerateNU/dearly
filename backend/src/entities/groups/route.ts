@@ -8,7 +8,7 @@ import { MediaService } from "../media/service";
 import { invitationRoutes } from "../invitations/route";
 import { mediaRoutes } from "../media/route";
 import { memberRoutes } from "../members/route";
-import Expo from "expo-server-sdk";
+import { Expo } from "expo-server-sdk";
 
 export const groupRoutes = (
   db: PostgresJsDatabase,

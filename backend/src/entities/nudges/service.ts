@@ -1,9 +1,10 @@
 import { NudgeTransaction } from "./transaction";
 import { handleServiceError } from "../../utilities/errors/service-error";
-import Expo, { ExpoPushMessage } from "expo-server-sdk";
+import { ExpoPushMessage, Expo } from "expo-server-sdk";
 import { NotificationMetadata } from "./validator";
 import logger from "../../utilities/logger";
 import { getNotificationBody } from "../../utilities/nudge";
+import { InternalServerError } from "../../utilities/errors/app-error";
 
 export interface NudgeService {
   manualNudge(userIds: string[], groupId: string, managerId: string): Promise<void>;
@@ -34,10 +35,15 @@ export class NudgeServiceImpl implements NudgeService {
 
   // TODO: refactor later with Nudge and Notification Service
   private async sendPushNotifications(notifications: ExpoPushMessage[]): Promise<void> {
-    const receipts = await this.expoService.sendPushNotificationsAsync(notifications);
-    const failedToSend = receipts.filter((receipt) => receipt.status === "error");
-    if (failedToSend.length > 0) {
-      logger.error(failedToSend);
+    try {
+      const receipts = await this.expoService.sendPushNotificationsAsync(notifications);
+      const failedToSend = receipts.filter((receipt) => receipt.status === "error");
+      if (failedToSend.length > 0) {
+        logger.error(failedToSend);
+      }
+    } catch (error) {
+      logger.error(error);
+      throw new InternalServerError("Failed to send nudge to users");
     }
   }
 
