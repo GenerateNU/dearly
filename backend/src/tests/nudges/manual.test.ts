@@ -11,7 +11,7 @@ import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
-import { getPushNotificationReceiptsAsyncSpy } from "../helpers/mock";
+import { sendPushNotificationsAsyncSpy } from "../helpers/mock";
 import { COOLDOWN_PERIOD } from "../../constants/nudge";
 
 describe("PUT /groups/:id/nudges/manual", () => {
@@ -26,7 +26,7 @@ describe("PUT /groups/:id/nudges/manual", () => {
 
   beforeEach(() => {
     // to reset number of times its method gets called
-    getPushNotificationReceiptsAsyncSpy.mockClear();
+    sendPushNotificationsAsyncSpy.mockClear();
   });
 
   it("should return 404 if group does not exist", async () => {
@@ -47,7 +47,7 @@ describe("PUT /groups/:id/nudges/manual", () => {
       .assertStatusCode(Status.NotFound)
       .assertError("Group does not exist.");
 
-    expect(await getPushNotificationReceiptsAsyncSpy).not.toHaveBeenCalled();
+    expect(await sendPushNotificationsAsyncSpy).not.toHaveBeenCalled();
   });
 
   it("should return 200 if user does have device and notification on", async () => {
@@ -66,8 +66,8 @@ describe("PUT /groups/:id/nudges/manual", () => {
       })
     ).assertStatusCode(200);
 
-    expect(await getPushNotificationReceiptsAsyncSpy).toHaveBeenCalledTimes(1);
-    expect(await getPushNotificationReceiptsAsyncSpy).toHaveBeenCalledWith([
+    expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledTimes(1);
+    expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledWith([
       {
         title: "Time to Connect! 🚀",
         body: `✨ Share a post with your dearly group now! ✨`,
@@ -96,7 +96,7 @@ describe("PUT /groups/:id/nudges/manual", () => {
       })
     ).assertStatusCode(429);
 
-    expect(await getPushNotificationReceiptsAsyncSpy).not.toHaveBeenCalled();
+    expect(await sendPushNotificationsAsyncSpy).not.toHaveBeenCalled();
   });
 
   it("should return 403 if try to nudge users not member", async () => {
@@ -115,7 +115,7 @@ describe("PUT /groups/:id/nudges/manual", () => {
       })
     ).assertStatusCode(403);
 
-    expect(await getPushNotificationReceiptsAsyncSpy).not.toHaveBeenCalled();
+    expect(await sendPushNotificationsAsyncSpy).not.toHaveBeenCalled();
   });
 
   it("should return 200 ignore if try to nudge oneself", async () => {
@@ -135,7 +135,7 @@ describe("PUT /groups/:id/nudges/manual", () => {
     ).assertStatusCode(200);
 
     // expo actually did not get called
-    expect(await getPushNotificationReceiptsAsyncSpy).not.toHaveBeenCalled();
+    expect(await sendPushNotificationsAsyncSpy).not.toHaveBeenCalled();
   });
 
   it("should return 200 try to send nudge after cooldown", async () => {
@@ -156,8 +156,8 @@ describe("PUT /groups/:id/nudges/manual", () => {
       })
     ).assertStatusCode(200);
 
-    expect(await getPushNotificationReceiptsAsyncSpy).toHaveBeenCalledTimes(1);
-    expect(await getPushNotificationReceiptsAsyncSpy).toHaveBeenCalledWith([
+    expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledTimes(1);
+    expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledWith([
       {
         title: "Time to Connect! 🚀",
         body: `✨ Share a post with your dearly group now! ✨`,
@@ -204,7 +204,7 @@ describe("PUT /groups/:id/nudges/manual", () => {
     ).assertStatusCode(200);
 
     // check that Expo actually did not send anything
-    expect(await getPushNotificationReceiptsAsyncSpy).not.toHaveBeenCalled();
+    expect(await sendPushNotificationsAsyncSpy).not.toHaveBeenCalled();
   });
 
   it("should return 404 if user(s) does not exist", async () => {
@@ -227,7 +227,7 @@ describe("PUT /groups/:id/nudges/manual", () => {
       .assertStatusCode(Status.NotFound)
       .assertError(`Users not found: ${nonExistentUser1}, ${nonExistentUser2}`);
 
-    expect(await getPushNotificationReceiptsAsyncSpy).not.toHaveBeenCalled();
+    expect(await sendPushNotificationsAsyncSpy).not.toHaveBeenCalled();
   });
 
   it("should return 400 if empty selected users", async () => {
@@ -284,7 +284,7 @@ describe("PUT /groups/:id/nudges/manual", () => {
       })
     ).assertStatusCode(Status.Forbidden);
 
-    expect(await getPushNotificationReceiptsAsyncSpy).not.toHaveBeenCalled();
+    expect(await sendPushNotificationsAsyncSpy).not.toHaveBeenCalled();
   });
 
   it.each(

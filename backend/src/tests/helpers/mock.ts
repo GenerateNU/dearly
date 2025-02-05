@@ -22,7 +22,7 @@ mock.module("expo-server-sdk", () => {
   };
 });
 
-export const getPushNotificationReceiptsAsyncSpy = spyOn(
+export const sendPushNotificationsAsyncSpy = spyOn(
   Expo.prototype,
   "sendPushNotificationsAsync",
 );
