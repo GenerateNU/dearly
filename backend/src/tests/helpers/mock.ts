@@ -12,7 +12,6 @@ mock.module("expo-server-sdk", () => {
   return {
     Expo: class {
       static isExpoPushToken = Expo.isExpoPushToken;
-      getPushNotificationReceiptsAsync = Expo.prototype.getPushNotificationReceiptsAsync;
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       async sendPushNotificationsAsync(message: ExpoPushMessage[]): Promise<ExpoPushTicket[]> {
