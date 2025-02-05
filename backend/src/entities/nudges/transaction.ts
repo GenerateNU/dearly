@@ -58,29 +58,12 @@ export class NudgeTransactionImpl implements NudgeTransaction {
         throw new NotFoundError("", `Users not found: ${invalidUserIds.join(", ")}`);
       }
 
-      // check cooldown period
-      const now = new Date();
-      const cooldownUsers = await tx
-        .select({ userId: membersTable.userId })
-        .from(membersTable)
-        .where(
-          and(
-            inArray(membersTable.userId, userIds),
-            eq(membersTable.groupId, groupId),
-            isNotNull(membersTable.lastManualNudge),
-            gt(membersTable.lastManualNudge, new Date(now.getTime() - COOLDOWN_PERIOD)),
-          ),
-        );
-
-      if (cooldownUsers.length > 0) {
-        throw new TooManyRequestsError(
-          `Too many nudges send to users ${cooldownUsers.map((u) => u.userId).join(", ")}`,
-        );
-      }
-
-      // retrieve users who have both device tokens and notifications enabled
-      const usersWithTokens = await tx
-        .select({ userId: devicesTable.userId, deviceToken: devicesTable.token })
+      // find users with valid tokens and notifications enabled
+      const validNudgeTargets = await tx
+        .select({
+          userId: membersTable.userId,
+          deviceToken: devicesTable.token,
+        })
         .from(membersTable)
         .innerJoin(devicesTable, eq(membersTable.userId, devicesTable.userId))
         .where(
@@ -93,25 +76,36 @@ export class NudgeTransactionImpl implements NudgeTransaction {
           ),
         );
 
-      const deviceTokens = usersWithTokens.map((row) => row.deviceToken);
-      const usersToUpdate = new Set(usersWithTokens.map((row) => row.userId));
+      const validUserIds = validNudgeTargets.map((target) => target.userId);
 
-      // update lastManualNudge field for users who have notification enabled and has device tokens
-      if (usersToUpdate.size > 0) {
-        await tx
-          .update(membersTable)
-          .set({ lastManualNudge: new Date() })
-          .where(
-            and(
-              inArray(membersTable.userId, Array.from(usersToUpdate)),
-              eq(membersTable.groupId, groupId),
-              eq(membersTable.notificationsEnabled, true),
-            ),
-          );
+      // check cooldown for valid nudge targets
+      const now = new Date();
+      const cooldownUsers = await tx
+        .select({ userId: membersTable.userId })
+        .from(membersTable)
+        .where(
+          and(
+            inArray(membersTable.userId, validUserIds),
+            eq(membersTable.groupId, groupId),
+            isNotNull(membersTable.lastManualNudge),
+            gt(membersTable.lastManualNudge, new Date(now.getTime() - COOLDOWN_PERIOD)),
+          ),
+        );
+
+      if (cooldownUsers.length > 0) {
+        throw new TooManyRequestsError(
+          `Too many nudges send to users ${cooldownUsers.map((u) => u.userId).join(", ")}`,
+        );
       }
 
+      // update lastManualNudge for valid targets
+      await tx
+        .update(membersTable)
+        .set({ lastManualNudge: new Date() })
+        .where(and(inArray(membersTable.userId, validUserIds), eq(membersTable.groupId, groupId)));
+
       return {
-        deviceTokens,
+        deviceTokens: validNudgeTargets.map((target) => target.deviceToken),
         groupId,
         groupName: group.name,
       };

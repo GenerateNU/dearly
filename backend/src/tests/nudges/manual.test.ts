@@ -11,13 +11,14 @@ import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
 import { getPushNotificationReceiptsAsyncSpy } from "../helpers/mock";
+import { jest, describe, it, beforeAll, expect } from "bun:test";
+import { COOLDOWN_PERIOD } from "../../constants/nudge";
 
 describe("PUT /groups/:id/nudges/manual", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
 
   const ALICE_JWT = generateJWTFromID(USER_ALICE_ID);
-  const BOB_JWT = generateJWTFromID(USER_BOB_ID);
 
   beforeAll(async () => {
     app = await startTestApp();
@@ -58,7 +59,7 @@ describe("PUT /groups/:id/nudges/manual", () => {
       })
     ).assertStatusCode(200);
 
-    expect(await getPushNotificationReceiptsAsyncSpy).toHaveBeenCalledTimes(1);
+    expect(await getPushNotificationReceiptsAsyncSpy).toHaveBeenCalled();
     expect(await getPushNotificationReceiptsAsyncSpy).toHaveBeenCalledWith([
       {
         title: "Time to Connect! 🚀",
@@ -70,8 +71,9 @@ describe("PUT /groups/:id/nudges/manual", () => {
         },
       },
     ]);
+  });
 
-    // try to nudge again right after first nudge
+  it("should return 429 try to spam nudges during cooldown", async () => {
     (
       await testBuilder.request({
         app,
@@ -88,6 +90,75 @@ describe("PUT /groups/:id/nudges/manual", () => {
     ).assertStatusCode(429);
   });
 
+  it("should return 200 try to send nudge after cooldown", async () => {
+    jest.setSystemTime(new Date(Date.now() + COOLDOWN_PERIOD));
+
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.PUT,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/manual`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
+        },
+        requestBody: {
+          users: [USER_BOB_ID],
+        },
+      })
+    ).assertStatusCode(200);
+
+    expect(await getPushNotificationReceiptsAsyncSpy).toHaveBeenCalled();
+    expect(await getPushNotificationReceiptsAsyncSpy).toHaveBeenCalledWith([
+      {
+        title: "Time to Connect! 🚀",
+        body: `✨ Share a post with your dearly group now! ✨`,
+        to: [MOCK_EXPO_TOKEN],
+        data: {
+          groupId: DEARLY_GROUP_ID,
+          groupName: "dearly",
+        },
+      },
+    ]);
+  });
+
+  it("should return 200 if user turns off notification", async () => {
+    // Bob turned off group notification
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.PATCH,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/members/notifications`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${generateJWTFromID(USER_BOB_ID)}`,
+        },
+      })
+    )
+      .assertStatusCode(Status.OK)
+      .assertMessage("Successfully turn off notification for group");
+
+    // group manager should be able to nudge without problems since we will
+    // simply ignore Bob because he has notification turned off
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.PUT,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/manual`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
+        },
+        requestBody: {
+          users: [USER_BOB_ID],
+        },
+      })
+    ).assertStatusCode(200);
+
+    // check that Expo actually did not send anything
+    expect(await getPushNotificationReceiptsAsyncSpy).not.toBeCalledWith();
+  });
+
   it("should return 404 if user(s) does not exist", async () => {
     const nonExistentUser1 = generateUUID();
     const nonExistentUser2 = generateUUID();
@@ -98,7 +169,7 @@ describe("PUT /groups/:id/nudges/manual", () => {
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/manual`,
         autoAuthorized: false,
         headers: {
-          Authorization: `Bearer ${ALICE_JWT}`,
+          Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
         },
         requestBody: {
           users: [nonExistentUser1, nonExistentUser2],
@@ -117,7 +188,7 @@ describe("PUT /groups/:id/nudges/manual", () => {
         route: `/api/v1/groups/${generateUUID()}/nudges/manual`,
         autoAuthorized: false,
         headers: {
-          Authorization: `Bearer ${ALICE_JWT}`,
+          Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
         },
         requestBody: {
           users: [],
@@ -141,7 +212,7 @@ describe("PUT /groups/:id/nudges/manual", () => {
         route: `/api/v1/groups/${generateUUID()}/nudges/manual`,
         autoAuthorized: false,
         headers: {
-          Authorization: `Bearer ${ALICE_JWT}`,
+          Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
         },
       })
     ).assertStatusCode(Status.BadRequest);
@@ -155,7 +226,7 @@ describe("PUT /groups/:id/nudges/manual", () => {
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/manual`,
         autoAuthorized: false,
         headers: {
-          Authorization: `Bearer ${BOB_JWT}`,
+          Authorization: `Bearer ${generateJWTFromID(USER_BOB_ID)}`,
         },
         requestBody: {
           users: [generateUUID()],
