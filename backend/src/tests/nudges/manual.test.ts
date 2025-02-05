@@ -41,6 +41,8 @@ describe("PUT /groups/:id/nudges/manual", () => {
     )
       .assertStatusCode(Status.NotFound)
       .assertError("Group does not exist.");
+
+    expect(await getPushNotificationReceiptsAsyncSpy).not.toBeCalledWith();
   });
 
   it("should return 200 if user does have device and notification on", async () => {
@@ -178,6 +180,8 @@ describe("PUT /groups/:id/nudges/manual", () => {
     )
       .assertStatusCode(Status.NotFound)
       .assertError(`Users not found: ${nonExistentUser1}, ${nonExistentUser2}`);
+
+    expect(await getPushNotificationReceiptsAsyncSpy).not.toBeCalledWith();
   });
 
   it("should return 400 if empty selected users", async () => {
@@ -202,6 +206,8 @@ describe("PUT /groups/:id/nudges/manual", () => {
           path: "users",
         },
       ]);
+
+    expect(await getPushNotificationReceiptsAsyncSpy).not.toBeCalledWith();
   });
 
   it("should return 400 if no request body", async () => {
