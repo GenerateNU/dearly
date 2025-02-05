@@ -1,9 +1,9 @@
-name: Docker Image Build And Publish
+name: Deployment
 
 env:
   REGISTRY: docker.io
   IMAGE_NAME: liusto258/dearly 
-  DOCKER_IMAGE_URL: liusto258/dearly:backend-deployment
+  DOCKER_IMAGE_URL: liusto258/dearly:main
   SERVICE: dearly 
 on:
   push:
