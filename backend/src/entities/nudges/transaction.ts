@@ -58,6 +58,19 @@ export class NudgeTransactionImpl implements NudgeTransaction {
         throw new NotFoundError("", `Users not found: ${invalidUserIds.join(", ")}`);
       }
 
+      // check if all users are members of the group
+      const groupMembers = await tx
+        .select({ userId: membersTable.userId })
+        .from(membersTable)
+        .where(and(inArray(membersTable.userId, userIds), eq(membersTable.groupId, groupId)));
+
+      const groupMemberIds = new Set(groupMembers.map((member) => member.userId));
+      const nonMemberUsers = userIds.filter((userId) => !groupMemberIds.has(userId));
+
+      if (nonMemberUsers.length > 0) {
+        throw new ForbiddenError(`Users not in group: ${nonMemberUsers.join(", ")}`);
+      }
+
       // find users with valid tokens and notifications enabled
       const validNudgeTargets = await tx
         .select({
@@ -68,11 +81,11 @@ export class NudgeTransactionImpl implements NudgeTransaction {
         .innerJoin(devicesTable, eq(membersTable.userId, devicesTable.userId))
         .where(
           and(
+            not(eq(membersTable.userId, managerId)),
             inArray(membersTable.userId, userIds),
             eq(membersTable.groupId, groupId),
             eq(membersTable.notificationsEnabled, true),
             isNotNull(devicesTable.token),
-            not(eq(membersTable.userId, managerId)),
           ),
         );
 
