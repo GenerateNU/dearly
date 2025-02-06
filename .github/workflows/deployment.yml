@@ -3,7 +3,7 @@ name: Deployment
 env:
   REGISTRY: docker.io
   IMAGE_NAME: liusto258/dearly 
-  DOCKER_IMAGE_URL: liusto258/dearly:main
+  DOCKER_IMAGE_URL: liusto258/dearly:deployment_debug
   SERVICE: dearly 
 on:
   push:
@@ -71,7 +71,7 @@ jobs:
           service: ${{ env.SERVICE }}
           image: ${{ env.DOCKER_IMAGE_URL }}
           region: ${{ secrets.GOOGLE_REGION }}
-          env_vars: |
+          secrets: |
             DB_USER=${{ secrets.DB_USER }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             DB_HOST=${{ secrets.DB_HOST }}
