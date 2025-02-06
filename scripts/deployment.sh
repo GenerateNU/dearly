@@ -22,7 +22,8 @@ echo "Building docker image..."
 docker build --pull -t dearly_backend .
 
 if [ $# -eq 0 ]; then
-  docker run -i -t --env-file=$ENV_PATH dearly_backend:latest /bin/bash
+  echo "Please supply the port to run on for this docker container. I recommend 3000."
+  exit 1
 elif [ $# -eq 1 ]; then
   docker run -p $1:$1 -i -t --env-file=$ENV_PATH dearly_backend:latest /bin/bash
 fi
