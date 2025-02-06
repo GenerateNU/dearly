@@ -1,12 +1,14 @@
 import { createClient, PostgrestSingleResponse, SupabaseClient } from "@supabase/supabase-js";
-import Expo from "expo-server-sdk";
+import Expo, { ExpoPushMessage } from "expo-server-sdk";
 import { NotFoundError } from "../utilities/errors/app-error";
 import { Configuration } from "../types/config";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { createPostValidate, postValidate } from "../entities/posts/validator";
 import { Post } from "../types/api/internal/posts";
 import { eq } from "drizzle-orm";
-import { membersTable } from "../entities/schema";
+import { groupsTable, likesTable, membersTable, postsTable } from "../entities/schema";
+import { IDPayload } from "../types/id";
+import { Like, likeValidate } from "../entities/likes/validator";
 
 /*
 Questions for our tech leads
@@ -21,26 +23,24 @@ export interface INotificationService {
   unsubscribe(pushToken: string): void;
 
   // instead of notify make post/comment/like methods for specificity??
-  notifyPost(title: string, message: string): Promise<void>;
+  notifyPost(post: Post): Promise<void>;
 
-  notifyLike(title: string, message: string): Promise<void>;
+  notifyLike(like: Like): Promise<void>;
 
-  notifyComment(title: string, message: string): Promise<void>;
+  notifyComment(comment: Comment): Promise<void>;
 }
 
-
 export class ExpoNotificationService implements INotificationService {
-    
   private expo = new Expo();
-  private supabaseClient : SupabaseClient;
-
+  private supabaseClient: SupabaseClient;
+  private db: PostgresJsDatabase;
   constructor(config: Configuration, db: PostgresJsDatabase) {
     this.supabaseClient = createClient(config.supabase.url, config.supabase.key);
 
     this.supabaseClient
       .channel("posts")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "posts" }, (payload) => {
-         const post: Post = postValidate.parse(payload.new);
+        const post: Post = postValidate.parse(payload.new);
         this.notifyPost(post);
       })
       .subscribe();
@@ -51,7 +51,8 @@ export class ExpoNotificationService implements INotificationService {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "likeComments" },
         (payload) => {
-          this.notifyLike();
+          const like: Like = likeValidate.parse(payload.new);
+          this.notifyLike(like);
         },
       )
       .subscribe();
@@ -62,6 +63,59 @@ export class ExpoNotificationService implements INotificationService {
         this.notifyComment();
       })
       .subscribe();
+
+    this.db = db;
+  }
+
+  async notifyLike(like: Like): Promise<void> {
+    try {
+      // Get the userId of the post maker
+      const [userId] = await this.db
+        .select({
+          userId: postsTable.userId,
+        })
+        .from(postsTable)
+        .where(eq(postsTable.userId, like.userId));
+
+      if (userId === undefined) {
+        throw new NotFoundError("UserId");
+      }
+
+      // TODO: CHANGE SCHEMA TO STORE PUSH TOKEN.
+      const messages: ExpoPushMessage[] = [
+        {
+          to: userId.userId,
+          sound: "default",
+          body: "Someone liked your post!",
+          data: { like },
+        },
+      ];
+
+      const chunks = this.expo.chunkPushNotifications(messages);
+      for (let chunk of chunks) {
+        await this.expo.sendPushNotificationsAsync(chunk);
+      }
+    } catch (Error) {
+      throw new NotFoundError("Supabase Issue"); // need to create this error
+    }
+  }
+
+  /** 
+   * 
+   * export const likesTable = pgTable("likes", {
+  id: uuid().primaryKey().defaultRandom(),
+  userId: uuid()
+    .notNull()
+    .references(() => usersTable.id, { onDelete: "cascade" }),
+  postId: uuid()
+    .notNull()
+    .references(() => postsTable.id, { onDelete: "cascade" }),
+});
+
+  */
+
+  notifyComment(title: string, message: string): Promise<void> {
+    throw new Error("Method not implemented.");
   }
 
   // Subscribe a user (store push token)
@@ -76,7 +130,11 @@ export class ExpoNotificationService implements INotificationService {
     }
 
     try {
-      await this.supabaseClient.from("users").update({ pushToken: pushToken }).eq("id", userId).select();
+      await this.supabaseClient
+        .from("users")
+        .update({ pushToken: pushToken })
+        .eq("id", userId)
+        .select();
     } catch (error) {
       throw new Error(); // need to create this error
     }
@@ -87,41 +145,60 @@ export class ExpoNotificationService implements INotificationService {
   async unsubscribe(userId: string): Promise<void> {
     let result;
     try {
-      result = await this.supabaseClient.from("users").update({ pushToken: null }).eq("id", userId).select();
+      result = await this.supabaseClient
+        .from("users")
+        .update({ pushToken: null })
+        .eq("id", userId)
+        .select();
     } catch (error) {
       throw new NotFoundError("User");
     }
   }
 
   // Send a notification to all members of the person's group
-  async notifyPost(post: Post, db: PostgresJsDatabase): Promise<Notification | undefined> {
+  async notifyPost(post: Post): Promise<void> {
     try {
+      // Get the Group Id of the post maker
+      const [posterGroupId] = await this.db
+        .select({
+          groupId: postsTable.groupId,
+        })
+        .from(postsTable)
+        .where(eq(groupsTable.id, post.id));
 
-      let posterGroupId = await this.supabaseClient.from("posts").select("groupId").eq("id", post.id).select();
-
-      let  [mt] = await db
-      .select({
-        groupId: membersTable.groupId,
-        userId: membersTable.userId,
-        joinedAt: membersTable.joinedAt,
-        role: membersTable.role
-
-      })
-      .from(membersTable)
-      .where(eq(membersTable.groupId, posterGroupId))
-
-
-      // Save notification in the database
-      // createNotification();
-
-        const chunks = this.expo.chunkPushNotifications(
-        for (let group of groupMembers) {
-          await this.expo.sendPushNotificationsAsync(chunk);
-        }
-      } catch (error) {
-        throw new PushTokenError();
+      if (posterGroupId === undefined) {
+        throw new NotFoundError("Group");
       }
 
-      return undefined;
+      // get the list of members who are in the group
+      const members = await this.db
+        .select({
+          groupId: membersTable.groupId,
+          userId: membersTable.userId,
+          joinedAt: membersTable.joinedAt,
+          role: membersTable.role,
+        })
+        .from(membersTable)
+        .where(eq(membersTable.groupId, posterGroupId.groupId));
+
+      if (members === undefined) {
+        throw new NotFoundError("Group Members");
+      }
+
+      // TODO: CHANGE SCHEMA TO STORE PUSH TOKEN.
+      const messages: ExpoPushMessage[] = members.map((member) => ({
+        to: member.userId,
+        sound: "default",
+        body: "New post in your group!",
+        data: { post },
+      }));
+
+      const chunks = this.expo.chunkPushNotifications(messages);
+      for (let chunk of chunks) {
+        await this.expo.sendPushNotificationsAsync(chunk);
+      }
+    } catch (Error) {
+      throw new NotFoundError("Supabase Issue"); // need to create this error
+    }
   }
 }
