@@ -9,6 +9,7 @@ import { eq } from "drizzle-orm";
 import { groupsTable, likesTable, membersTable, postsTable } from "../entities/schema";
 import { IDPayload } from "../types/id";
 import { Like, likeValidate } from "../entities/likes/validator";
+import { Comment, commentValidate } from "../types/api/internal/comments";
 
 /*
 Questions for our tech leads
@@ -60,70 +61,14 @@ export class ExpoNotificationService implements INotificationService {
     this.supabaseClient
       .channel("likes")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "likes" }, (payload) => {
-        this.notifyComment();
+        const comment: Comment = commentValidate.parse(payload.new);
+        this.notifyComment(comment);
       })
       .subscribe();
 
     this.db = db;
   }
 
-  async notifyLike(like: Like): Promise<void> {
-    try {
-      // Get the userId of the post maker
-      const [userId] = await this.db
-        .select({
-          userId: postsTable.userId,
-        })
-        .from(postsTable)
-        .where(eq(postsTable.userId, like.userId));
-
-      if (userId === undefined) {
-        throw new NotFoundError("UserId");
-      }
-
-      // TODO: CHANGE SCHEMA TO STORE PUSH TOKEN.
-      const messages: ExpoPushMessage[] = [
-        {
-          to: userId.userId,
-          sound: "default",
-          body: "Someone liked your post!",
-          data: { like },
-        },
-      ];
-
-      const chunks = this.expo.chunkPushNotifications(messages);
-      for (let chunk of chunks) {
-        await this.expo.sendPushNotificationsAsync(chunk);
-      }
-    } catch (Error) {
-      throw new NotFoundError("Supabase Issue"); // need to create this error
-    }
-  }
-
-  /** 
-   * 
-   * export const likesTable = pgTable("likes", {
-  id: uuid().primaryKey().defaultRandom(),
-  userId: uuid()
-    .notNull()
-    .references(() => usersTable.id, { onDelete: "cascade" }),
-  postId: uuid()
-    .notNull()
-    .references(() => postsTable.id, { onDelete: "cascade" }),
-});
-
-  */
-
-  notifyComment(title: string, message: string): Promise<void> {
-    throw new Error("Method not implemented.");
-  }
-
-  // Subscribe a user (store push token)
-  // if the user has a token, update it to given token
-  // if the user has null token, update it to given token.
-  // if the user has a token already, update it to the given token
-  // if the user is not found, throw error
-  // if the push token is invalid, throw error
   async subscribe(userId: string, pushToken: string): Promise<void> {
     if (!Expo.isExpoPushToken(pushToken)) {
       throw new Error(); // need to create this error
@@ -192,6 +137,72 @@ export class ExpoNotificationService implements INotificationService {
         body: "New post in your group!",
         data: { post },
       }));
+
+      const chunks = this.expo.chunkPushNotifications(messages);
+      for (let chunk of chunks) {
+        await this.expo.sendPushNotificationsAsync(chunk);
+      }
+    } catch (Error) {
+      throw new NotFoundError("Supabase Issue"); // need to create this error
+    }
+  }
+
+  async notifyLike(like: Like): Promise<void> {
+    try {
+      // Get the userId of the post maker
+      const [userId] = await this.db
+        .select({
+          userId: postsTable.userId,
+        })
+        .from(postsTable)
+        .where(eq(postsTable.id, like.postId));
+
+      if (userId === undefined) {
+        throw new NotFoundError("UserId");
+      }
+
+      // TODO: CHANGE SCHEMA TO STORE PUSH TOKEN.
+      const messages: ExpoPushMessage[] = [
+        {
+          to: userId.userId,
+          sound: "default",
+          body: "Someone liked your post!",
+          data: { like },
+        },
+      ];
+
+      const chunks = this.expo.chunkPushNotifications(messages);
+      for (let chunk of chunks) {
+        await this.expo.sendPushNotificationsAsync(chunk);
+      }
+    } catch (Error) {
+      throw new NotFoundError("Supabase Issue"); // need to create this error
+    }
+  }
+
+  async notifyComment(comment: Comment): Promise<void> {
+    try {
+      // Get the userId of person whose post was commented on
+      const [userId] = await this.db
+        .select({
+          userId: postsTable.userId,
+        })
+        .from(postsTable)
+        .where(eq(postsTable.id, comment.postId));
+
+      if (userId === undefined) {
+        throw new NotFoundError("UserId");
+      }
+
+      // TODO: CHANGE SCHEMA TO STORE PUSH TOKEN.
+      const messages: ExpoPushMessage[] = [
+        {
+          to: userId.userId,
+          sound: "default",
+          body: "Someone liked your post!",
+          data: { comment },
+        },
+      ];
 
       const chunks = this.expo.chunkPushNotifications(messages);
       for (let chunk of chunks) {
