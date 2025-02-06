@@ -2,7 +2,7 @@
 
 ## 1. High-Level Architecture Overview
 
-For a visual representation of the architecture, see [Architecture Diagrams](https://excalidraw.com/#json=ULLzWiO3-sebjd1LTfRKF,dd3sT-r286TX5AnahfS_MQ).
+For a visual representation of the architecture, see [Architecture Diagrams](https://excalidraw.com/#json=MKq_QP6_qnWmLIzsoADu_,NvwSJ2Ou1Av4axQda_Pu7A).
 
 --- 
 
