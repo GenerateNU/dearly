@@ -118,11 +118,11 @@ export class S3Impl implements IS3Operations {
           Tagging: `GroupID=${tag}`,
         }),
       );
+      return objectKey;
     } catch (error) {
       logger.error(error);
       throw new InternalServerError("Unable to upload media to S3");
     }
-    return objectKey;
   }
 
   private async blobToBuffer(blob: Blob): Promise<Buffer> {
@@ -143,15 +143,14 @@ export class S3Impl implements IS3Operations {
       const res = await this.client!.send(
         new DeleteObjectCommand({ Bucket: this.bucketName, Key: objectKey }),
       );
-
       if (res.$metadata.httpStatusCode! > 300) {
         throw new NotFoundError(url);
       }
+      return true;
     } catch (error) {
       logger.error(error);
       throw new InternalServerError("Unable to delete media from S3");
     }
-    return true;
   }
 
   /**
