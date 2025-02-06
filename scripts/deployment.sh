@@ -13,7 +13,6 @@ if [ ! -f $BUN_PATH ]; then
   exit 1
 fi
 
-source .env
 export PATH=$PATH:$BUN_PATH
 
 echo "Environment variables successfully loaded"

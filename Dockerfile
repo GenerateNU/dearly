@@ -16,10 +16,8 @@ COPY --from=install /temp/dev/node_modules node_modules
 COPY openapi.yaml .
 COPY backend ./backend
 
-ENV NODE_ENV=production
-
 FROM base AS release 
-COPY --from=install /temp/prod/node_modules node_modules
+COPY --from=install /temp/prod/node_modules backend/node_modules
 COPY --from=prerelease /usr/src/app/ .
 
 USER bun 
