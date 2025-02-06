@@ -1,15 +1,18 @@
-import { createClient, PostgrestSingleResponse, SupabaseClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import Expo, { ExpoPushMessage } from "expo-server-sdk";
 import { NotFoundError } from "../utilities/errors/app-error";
 import { Configuration } from "../types/config";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { createPostValidate, postValidate } from "../entities/posts/validator";
+import { postValidate } from "../entities/posts/validator";
 import { Post } from "../types/api/internal/posts";
 import { eq } from "drizzle-orm";
-import { groupsTable, likesTable, membersTable, postsTable } from "../entities/schema";
-import { IDPayload } from "../types/id";
+import { groupsTable, membersTable, postsTable } from "../entities/schema";
 import { Like, likeValidate } from "../entities/likes/validator";
 import { Comment, commentValidate } from "../types/api/internal/comments";
+import { Platform } from "react-native";
+import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
+import Constants from "expo-constants";
 
 /*
 Questions for our tech leads
@@ -35,6 +38,7 @@ export class ExpoNotificationService implements INotificationService {
   private expo = new Expo();
   private supabaseClient: SupabaseClient;
   private db: PostgresJsDatabase;
+
   constructor(config: Configuration, db: PostgresJsDatabase) {
     this.supabaseClient = createClient(config.supabase.url, config.supabase.key);
 
@@ -69,9 +73,65 @@ export class ExpoNotificationService implements INotificationService {
     this.db = db;
   }
 
-  async subscribe(userId: string, pushToken: string): Promise<void> {
-    if (!Expo.isExpoPushToken(pushToken)) {
-      throw new Error(); // need to create this error
+  /**
+   * Subscribes a user to push notifications (when they get the popup, fill in their data with their push token)
+   * @param userId id of the user
+   * @param pushToken the expoId that is generated when the user allows push notifications
+   */
+  async subscribe(userId: string): Promise<void> {
+    function handleRegistrationError(errorMessage: string) {
+      alert(errorMessage);
+      throw new Error(errorMessage);
+    }
+
+    let pushToken: string = "undefined";
+
+    if (Platform.OS === "android") {
+      Notifications.setNotificationChannelAsync("default", {
+        name: "default",
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: "#FF231F7C",
+      });
+    }
+
+    if (Device.isDevice) {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== "granted") {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+
+      if (finalStatus !== "granted") {
+        handleRegistrationError("Permission not granted to get push token for push notification!");
+        return;
+      }
+
+      const projectId =
+        Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
+
+      if (!projectId) {
+        handleRegistrationError("Project ID not found");
+      }
+
+      try {
+        const pushTokenString = (
+          await Notifications.getExpoPushTokenAsync({
+            projectId,
+          })
+        ).data;
+        console.log(pushTokenString);
+        pushToken = pushTokenString;
+      } catch (e: unknown) {
+        handleRegistrationError(`${e}`);
+      }
+    } else {
+      handleRegistrationError("Must use physical device for push notifications");
+    }
+
+    if (pushToken === "undefined") {
+      handleRegistrationError("Push token not found");
     }
 
     try {
@@ -85,16 +145,9 @@ export class ExpoNotificationService implements INotificationService {
     }
   }
 
-  // Unsubscribe a user (remove push token)
-  // if the user has a token, update it to given token
   async unsubscribe(userId: string): Promise<void> {
-    let result;
     try {
-      result = await this.supabaseClient
-        .from("users")
-        .update({ pushToken: null })
-        .eq("id", userId)
-        .select();
+      await this.supabaseClient.from("users").update({ pushToken: null }).eq("id", userId).select();
     } catch (error) {
       throw new NotFoundError("User");
     }
