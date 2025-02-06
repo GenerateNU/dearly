@@ -2,7 +2,7 @@ import { TypedResponse } from "hono";
 import { paths } from "../../../gen/openapi";
 import { API_ERROR } from "../schemas/error";
 
-export type MEDIA = TypedResponse<
-  | paths["/api/v1/groups/{id}/media"]["post"]["responses"]["201"]["content"]["application/json"]
+export type MANUAL_NUDGE = TypedResponse<
+  | paths["/api/v1/groups/{id}/nudges/manual"]["post"]["responses"]["200"]["content"]["application/json"]
   | API_ERROR
 >;

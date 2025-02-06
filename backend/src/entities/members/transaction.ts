@@ -81,6 +81,7 @@ export class MemberTransactionImpl implements MemberTransaction {
           sql<boolean>`CASE WHEN ${membersTable.groupId} = ${groupId} THEN true ELSE false END`.as(
             "isMember", // assuming that member includes manager
           ),
+        lastNudgedAt: membersTable.lastManualNudge,
       })
       .from(usersTable)
       .innerJoin(membersTable, eq(usersTable.id, membersTable.userId))
