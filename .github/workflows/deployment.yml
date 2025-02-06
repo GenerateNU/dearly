@@ -72,17 +72,17 @@ jobs:
           image: ${{ env.DOCKER_IMAGE_URL }}
           region: ${{ secrets.GOOGLE_REGION }}
           secrets: |
-            DB_USER=${{ secrets.DB_USER }}
-            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-            DB_HOST=${{ secrets.DB_HOST }}
-            DB_PORT=${{ secrets.DB_PORT }}
-            DB_NAME=${{ secrets.DB_NAME }}
-            DB_SSL=${{ secrets.DB_SSL }}
-            NODE_ENV=${{ secrets.NODE_ENV }}
-            JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
-            APP_PORT=${{ secrets.APP_PORT }} 
-            AWS_PUBLIC_KEY=${{ secrets.AWS_PUBLIC_KEY }}
-            AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}
-            AWS_REGION=${{ secrets.AWS_REGION }} 
-            AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }}
+            DB_USER:latest=${{ secrets.DB_USER }}
+            DB_PASSWORD:latest=${{ secrets.DB_PASSWORD }}
+            DB_HOST:latest=${{ secrets.DB_HOST }}
+            DB_PORT:latest=${{ secrets.DB_PORT }}
+            DB_NAME:latest=${{ secrets.DB_NAME }}
+            DB_SSL:latest=${{ secrets.DB_SSL }}
+            NODE_ENV:latest=${{ secrets.NODE_ENV }}
+            JWT_SECRET_KEY:latest=${{ secrets.JWT_SECRET_KEY }}
+            APP_PORT:latest=${{ secrets.APP_PORT }} 
+            AWS_PUBLIC_KEY:latest=${{ secrets.AWS_PUBLIC_KEY }}
+            AWS_SECRET_KEY:latest=${{ secrets.AWS_SECRET_KEY }}
+            AWS_REGION:latest=${{ secrets.AWS_REGION }} 
+            AWS_BUCKET_NAME:latest=${{ secrets.AWS_BUCKET_NAME }}
           flags: --port=3000 --allow-unauthenticated
