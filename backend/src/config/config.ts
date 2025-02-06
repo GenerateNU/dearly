@@ -3,7 +3,7 @@ import { resolve } from "path";
 import { Configuration } from "../types/config";
 
 const nodeEnv = process.env.NODE_ENV || "test";
-const envFile = nodeEnv === "test" || nodeEnv === "development" ? ".env.test" : ".env";
+const envFile = nodeEnv === "test" || nodeEnv === "development" ? ".env" : ".env";
 
 dotenv.config({ path: resolve(__dirname, "../../../", envFile) });
 

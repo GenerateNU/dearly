@@ -108,15 +108,26 @@ export class S3Impl implements IS3Operations {
     const objectKey: string = uuidv4();
     const compressedFile =
       fileType == MediaType.PHOTO ? await this.compressImage(file) : await this.compressAudio(file);
-    await this.client!.send(
-      new PutObjectCommand({
-        Bucket: this.bucketName,
-        Key: objectKey,
-        Body: compressedFile,
-        Tagging: `GroupID=${tag}`,
-      }),
-    );
+    const fileBuffer = await this.blobToBuffer(compressedFile);
+    try {
+      await this.client!.send(
+        new PutObjectCommand({
+          Bucket: this.bucketName,
+          Key: objectKey,
+          Body: fileBuffer,
+          Tagging: `GroupID=${tag}`,
+        }),
+      );
+    } catch (error) {
+      logger.error(error);
+      throw new InternalServerError("Unable to upload media to S3");
+    }
     return objectKey;
+  }
+
+  private async blobToBuffer(blob: Blob): Promise<Buffer> {
+    const arrayBuffer = await blob.arrayBuffer();
+    return Buffer.from(arrayBuffer);
   }
 
   /**
@@ -127,12 +138,18 @@ export class S3Impl implements IS3Operations {
   async deleteObject(url: string): Promise<boolean> {
     const indexOfDotCom = url.indexOf(".com/");
     const objectKey: string = url.substring(indexOfDotCom + 5);
-    const res = await this.client!.send(
-      new DeleteObjectCommand({ Bucket: this.bucketName, Key: objectKey }),
-    );
 
-    if (res.$metadata.httpStatusCode! > 300) {
-      throw new NotFoundError(url);
+    try {
+      const res = await this.client!.send(
+        new DeleteObjectCommand({ Bucket: this.bucketName, Key: objectKey }),
+      );
+
+      if (res.$metadata.httpStatusCode! > 300) {
+        throw new NotFoundError(url);
+      }
+    } catch (error) {
+      logger.error(error);
+      throw new InternalServerError("Unable to delete media from S3");
     }
     return true;
   }
