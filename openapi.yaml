@@ -2072,7 +2072,7 @@ paths:
                 $ref: "#/components/schemas/Error"
 
   /api/v1/groups/{id}/nudges/manual:
-    put:
+    post:
       tags:
         - Nudge Endpoints
       summary: Manually nudge a user

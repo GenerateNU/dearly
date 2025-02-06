@@ -14,7 +14,7 @@ import { HTTPRequest, Status } from "../../constants/http";
 import { sendPushNotificationsAsyncSpy } from "../helpers/mock";
 import { COOLDOWN_PERIOD } from "../../constants/nudge";
 
-describe("PUT /groups/:id/nudges/manual", () => {
+describe("POST /groups/:id/nudges/manual", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
 
@@ -33,7 +33,7 @@ describe("PUT /groups/:id/nudges/manual", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.PUT,
+        type: HTTPRequest.POST,
         route: `/api/v1/groups/${generateUUID()}/nudges/manual`,
         autoAuthorized: false,
         headers: {
@@ -54,7 +54,7 @@ describe("PUT /groups/:id/nudges/manual", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.PUT,
+        type: HTTPRequest.POST,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/manual`,
         autoAuthorized: false,
         headers: {
@@ -84,7 +84,7 @@ describe("PUT /groups/:id/nudges/manual", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.PUT,
+        type: HTTPRequest.POST,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/manual`,
         autoAuthorized: false,
         headers: {
@@ -103,7 +103,7 @@ describe("PUT /groups/:id/nudges/manual", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.PUT,
+        type: HTTPRequest.POST,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/manual`,
         autoAuthorized: false,
         headers: {
@@ -122,7 +122,7 @@ describe("PUT /groups/:id/nudges/manual", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.PUT,
+        type: HTTPRequest.POST,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/manual`,
         autoAuthorized: false,
         headers: {
@@ -144,7 +144,7 @@ describe("PUT /groups/:id/nudges/manual", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.PUT,
+        type: HTTPRequest.POST,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/manual`,
         autoAuthorized: false,
         headers: {
@@ -191,7 +191,7 @@ describe("PUT /groups/:id/nudges/manual", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.PUT,
+        type: HTTPRequest.POST,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/manual`,
         autoAuthorized: false,
         headers: {
@@ -213,7 +213,7 @@ describe("PUT /groups/:id/nudges/manual", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.PUT,
+        type: HTTPRequest.POST,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/manual`,
         autoAuthorized: false,
         headers: {
@@ -234,7 +234,7 @@ describe("PUT /groups/:id/nudges/manual", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.PUT,
+        type: HTTPRequest.POST,
         route: `/api/v1/groups/${generateUUID()}/nudges/manual`,
         autoAuthorized: false,
         headers: {
@@ -258,7 +258,7 @@ describe("PUT /groups/:id/nudges/manual", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.PUT,
+        type: HTTPRequest.POST,
         route: `/api/v1/groups/${generateUUID()}/nudges/manual`,
         autoAuthorized: false,
         headers: {
@@ -272,7 +272,7 @@ describe("PUT /groups/:id/nudges/manual", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.PUT,
+        type: HTTPRequest.POST,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/manual`,
         autoAuthorized: false,
         headers: {
@@ -293,7 +293,7 @@ describe("PUT /groups/:id/nudges/manual", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.PUT,
+        type: HTTPRequest.POST,
         route: `/api/v1/groups/${id}/nudges/manual`,
       })
     )
