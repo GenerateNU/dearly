@@ -34,35 +34,4 @@ describe("S3 Service Testing", () => {
       expect(Error);
     }
   });
-
-  it("test that delete returns true when url does exist", async () => {
-    const mockS3Client = mockClient(S3Client);
-    const client = mockS3Client
-      .on(DeleteObjectCommand)
-      .resolves({ $metadata: { httpStatusCode: 300 } }) as unknown as S3Client;
-    const s3Impl = new S3Impl(config, client);
-    const res = await s3Impl.deleteObject("");
-    expect(res).toBe(true);
-  });
-
-  it("test image compression", async () => {
-    const mockS3Client = mockClient(S3Client);
-    const s3Impl = new S3Impl(config, mockS3Client as unknown as S3Client);
-    const buffer = fs.readFileSync(PROJECT_ROOT + "/tests/test-assets/test_image.tiff");
-    const blob = new Blob([buffer]);
-    const compressed_image = await s3Impl.compressImage(blob);
-    expect(blob.size).toBeGreaterThan(compressed_image.size);
-  });
-
-  it("test audio compression", async () => {
-    const mockS3Client = mockClient(S3Client);
-    const s3Impl = new S3Impl(config, mockS3Client as unknown as S3Client);
-    const buffer = fs.readFileSync(PROJECT_ROOT + "/tests/test-assets/test_audio.m4a");
-    const blob = new Blob([buffer]);
-    const compressed_audio = await s3Impl.compressAudio(blob);
-    expect(blob.size).toBeGreaterThan(compressed_audio.size);
-  });
 });
-function connectDb(config: Configuration) {
-  throw new Error("Function not implemented.");
-}

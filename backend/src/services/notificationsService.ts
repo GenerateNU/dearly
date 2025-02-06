@@ -6,7 +6,7 @@ import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { postValidate } from "../entities/posts/validator";
 import { Post } from "../types/api/internal/posts";
 import { eq } from "drizzle-orm";
-import { groupsTable, membersTable, postsTable } from "../entities/schema";
+import { groupsTable, membersTable, notificationsTable, postsTable } from "../entities/schema";
 import { Like, likeValidate } from "../entities/likes/validator";
 import { Comment, commentValidate } from "../types/api/internal/comments";
 import { Platform } from "react-native";
@@ -17,11 +17,9 @@ import Constants from "expo-constants";
 /*
 Questions for our tech leads
 - Where should we store our push tokens in the database (probably in the users table)
-/**
- * POST: a new post is made in the group
- * LIKE: someone like your post
- * COMMENT: someone comments on your post
- */
+- what is the referenceType in the notifications table
+- how to mock the expo push notifications
+*/
 
 export interface INotificationService {
   unsubscribe(pushToken: string): void;
@@ -190,6 +188,18 @@ export class ExpoNotificationService implements INotificationService {
       for (let chunk of chunks) {
         await this.expo.sendPushNotificationsAsync(chunk);
       }
+
+      for (let member of members) {
+        // Insert the notification into the database
+        await this.db.insert(notificationsTable).values({
+          actorId: post.userId,
+          receiverId: member.userId,
+          referenceType: "POST",
+          postId: post.id,
+          title: "New Post",
+          description: "New post in your group",
+        });
+      }
     } catch (Error) {
       throw new NotFoundError("Supabase Issue"); // need to create this error
     }
@@ -223,6 +233,17 @@ export class ExpoNotificationService implements INotificationService {
       for (let chunk of chunks) {
         await this.expo.sendPushNotificationsAsync(chunk);
       }
+
+      // Insert the notification into the database
+      await this.db.insert(notificationsTable).values({
+        actorId: like.userId,
+        receiverId: userId.userId,
+        referenceType: "LIKE",
+        likeId: like.id,
+        postId: like.postId,
+        title: "New Like",
+        description: "Someone liked your post",
+      });
     } catch (Error) {
       throw new NotFoundError("Supabase Issue"); // need to create this error
     }
@@ -256,6 +277,17 @@ export class ExpoNotificationService implements INotificationService {
       for (let chunk of chunks) {
         await this.expo.sendPushNotificationsAsync(chunk);
       }
+
+      // Insert the notification into the database
+      await this.db.insert(notificationsTable).values({
+        actorId: comment.userId,
+        receiverId: userId.userId,
+        referenceType: "COMMENT",
+        commentId: comment.id,
+        postId: comment.postId,
+        title: "New Comment",
+        description: "Someone commented on your post",
+      });
     } catch (Error) {
       throw new NotFoundError("Supabase Issue"); // need to create this error
     }
