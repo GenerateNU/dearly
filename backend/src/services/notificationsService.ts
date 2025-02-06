@@ -26,7 +26,8 @@ Questions for our tech leads
 export interface INotificationService {
   unsubscribe(pushToken: string): void;
 
-  // instead of notify make post/comment/like methods for specificity??
+  subscribe(userId: string): void;
+
   notifyPost(post: Post): Promise<void>;
 
   notifyLike(like: Like): Promise<void>;
@@ -108,17 +109,11 @@ export class ExpoNotificationService implements INotificationService {
         return;
       }
 
-      const projectId =
-        Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
-
-      if (!projectId) {
-        handleRegistrationError("Project ID not found");
-      }
-
+      //Project id: 767a3d1e-0356-4d65-92f1-ea095dc722ea
       try {
         const pushTokenString = (
           await Notifications.getExpoPushTokenAsync({
-            projectId,
+            projectId: Constants.extra.expo.projectId,
           })
         ).data;
         console.log(pushTokenString);
