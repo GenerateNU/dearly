@@ -2,7 +2,7 @@
 
 ## 1. High-Level Architecture Overview
 
-For a visual representation of the architecture, see [Architecture Diagrams](https://excalidraw.com/#json=JnQrQrEm9c-MgRECVfWH8,qKH-QGbm337kJHC99dp9LQ).
+For a visual representation of the architecture, see [Architecture Diagrams](https://excalidraw.com/#json=ULLzWiO3-sebjd1LTfRKF,dd3sT-r286TX5AnahfS_MQ).
 
 --- 
 
@@ -51,9 +51,11 @@ backend/src/
 ├── middlewares/     # Custom middlewares (e.g., logging, authorization, compression)
 ├── migrations/      # Database migration files
 ├── routes/          # API routes and endpoints
+├── services/        # External service integration
 ├── tests/           # Unit and integration tests for the backend
-├── types/           # TypeScript type definitions for the backend
-└── utilities/       # Helper functions
+├── types/           # Type definitions for the backend
+├── utilities/       # Helper functions
+└── server.ts        # Main entry into our app (server)
 ```
 -----
 
@@ -80,6 +82,8 @@ frontend/
 ### Deployment
 
 - **PostgresDB**: Hosted on Supabase.
+- **Backend**: Hosted on Google Cloud Run at [dearly-35496165508.us-east1.run.app](dearly-35496165508.us-east1.run.app) with Docker Image.
+- **Frontend**: TestFlight with EAS Build.
 
 ### Automated Workflow
 
@@ -93,3 +97,5 @@ Any pull request to the `main` branch will need to pass code reviews, have all g
 2. **Linter**: Enforces consistent coding style using ESLint with a TypeScript configuration.
 3. **Formatter**: Uses Prettier to ensure consistent code formatting across the project.
 4. **Tests**: Automated testing to ensure code reliability and correctness (unit and integration tests).
+5. **Backend Deployment**: Pulls latest docker image, build, and deploy.
+
