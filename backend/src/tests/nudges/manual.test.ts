@@ -12,7 +12,7 @@ import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
 import { sendPushNotificationsAsyncSpy } from "../helpers/mock";
-import { COOLDOWN_PERIOD } from "../../constants/nudge";
+import { ONE_DAY_COOLDOWN_SEC } from "../../constants/nudge";
 
 describe("POST /groups/:id/nudges/manual", () => {
   let app: Hono;
@@ -139,7 +139,7 @@ describe("POST /groups/:id/nudges/manual", () => {
   });
 
   it("should return 200 try to send nudge after cooldown", async () => {
-    jest.setSystemTime(new Date(Date.now() + COOLDOWN_PERIOD));
+    jest.setSystemTime(new Date(Date.now() + ONE_DAY_COOLDOWN_SEC));
 
     (
       await testBuilder.request({

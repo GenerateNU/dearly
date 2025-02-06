@@ -1,1 +1,1 @@
-export const COOLDOWN_PERIOD = 24 * 3600 * 1000;
+export const ONE_DAY_COOLDOWN_SEC = 24 * 3600 * 1000;

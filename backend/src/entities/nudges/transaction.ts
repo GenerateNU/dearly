@@ -7,7 +7,7 @@ import {
   NotFoundError,
   TooManyRequestsError,
 } from "../../utilities/errors/app-error";
-import { COOLDOWN_PERIOD } from "../../constants/nudge";
+import { ONE_DAY_COOLDOWN_SEC } from "../../constants/nudge";
 import { Transaction } from "../../types/api/internal/transaction";
 
 export interface NudgeTransaction {
@@ -141,7 +141,7 @@ export class NudgeTransactionImpl {
           inArray(membersTable.userId, validUserIds),
           eq(membersTable.groupId, groupId),
           isNotNull(membersTable.lastManualNudge),
-          gt(membersTable.lastManualNudge, new Date(now.getTime() - COOLDOWN_PERIOD)),
+          gt(membersTable.lastManualNudge, new Date(now.getTime() - ONE_DAY_COOLDOWN_SEC)),
         ),
       );
 
