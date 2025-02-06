@@ -97,5 +97,5 @@ Any pull request to the `main` branch will need to pass code reviews, have all g
 2. **Linter**: Enforces consistent coding style using ESLint with a TypeScript configuration.
 3. **Formatter**: Uses Prettier to ensure consistent code formatting across the project.
 4. **Tests**: Automated testing to ensure code reliability and correctness (unit and integration tests).
-5. **Backend Deployment**: Pulls latest docker image, build, and deploy.
+5. **Backend Deployment**: Pulls latest docker image, builds, and deploys.
 
