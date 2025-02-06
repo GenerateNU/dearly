@@ -2324,3 +2324,31 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /api/v1/test_my_deployment:
+    patch:
+      tags:
+        - My Own Endpoint
+      summary: Toggles like on a comment
+      description: Likes if user has not liked the comment, unlikes otherwise
+      parameters:
+        - name: id
+          in: path
+          description: ID of the comment
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Successfully toggle like of the comment
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Successfully like comment"
