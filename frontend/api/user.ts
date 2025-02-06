@@ -19,7 +19,7 @@ export const getUser = async (id: string): Promise<User> => {
       headers: getHeaders(token),
       params: {
         path: {
-          id: id,
+          id,
         },
       },
     });
@@ -64,14 +64,17 @@ export const getUserGroups = async (limit: number, page: number): Promise<UserGr
   return authWrapper<UserGroups>()(req);
 };
 
-export const getUserPosts = async (limit: number, page: number): Promise<UserPosts> => {
+export const getUserPosts = async (id: string, limit: number, page: number): Promise<UserPosts> => {
   const req = async (token: string): Promise<UserPosts> => {
-    const { data } = await fetchClient.GET("/api/v1/users/posts", {
+    const { data } = await fetchClient.GET("/api/v1/users/{id}/posts", {
       headers: getHeaders(token),
       params: {
         query: {
           limit,
           page,
+        },
+        path: {
+          id,
         },
       },
     });
