@@ -3,7 +3,6 @@ name: Deployment
 env:
   REGISTRY: docker.io
   IMAGE_NAME: liusto258/dearly 
-  DOCKER_IMAGE_URL: liusto258/dearly:deployment_debug
   SERVICE: dearly 
 on:
   push:
@@ -69,7 +68,7 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: ${{ env.SERVICE }}
-          image: ${{ env.DOCKER_IMAGE_URL }}
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.push.outputs.digest }}
           region: ${{ secrets.GOOGLE_REGION }}
           env_vars_update_strategy: "overwrite"
           tag: "latest"
