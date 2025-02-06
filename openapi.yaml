@@ -63,10 +63,23 @@ components:
           type: string
           nullable: true
           description: A URL to the user's profile photo.
+        bio:
+          type: string
+          nullable: true
+          description: A bio for the user's profile.
+        birthday: 
+          type: string
+          format: date
+          nullable: true
+          description: Birthday of the user.
         timezone:
           type: string
           nullable: true
           description: Timezone that user is in for sending nudges.
+        postCount: 
+          type: number
+          nullable: true
+          description: Number of posts that a user made.
       required:
         - name
         - username
@@ -721,7 +734,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /api/v1/users/posts:
+  /api/v1/users/{id}/posts:
     get:
       tags:
         - User Endpoints
@@ -744,6 +757,14 @@ paths:
           schema:
             type: integer
             default: 1
+        - name: id
+          in: path
+          description: ID of the user to get posts
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
       responses:
         200:
           description: Successfully retrieve posts user posted

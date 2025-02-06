@@ -57,7 +57,7 @@ export const useAuthStore = create<AuthState>()(
         set({ isPending: true });
         try {
           const session: Session = await authService.login({ email, password });
-          const user = await getUser(useAuthStore.getState().userId!);
+          const user = await getUser(session.user.id);
           set({
             isAuthenticated: true,
             userId: session.user.id,
