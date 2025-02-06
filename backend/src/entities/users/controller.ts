@@ -56,8 +56,9 @@ export class UserControllerImpl implements UserController {
   async getUser(ctx: Context): Promise<USER_RESPONSE> {
     const getUserImpl = async () => {
       const id = ctx.req.param("id");
-      const idAsUUID = parseUUID(id);
-      const user = await this.userService.getUser(idAsUUID);
+      const viewee = parseUUID(id);
+      const viewer = ctx.get("userId");
+      const user = await this.userService.getUser(viewee, viewer);
       return ctx.json(user, Status.OK);
     };
     return await handleAppError(getUserImpl)(ctx);
@@ -112,8 +113,9 @@ export class UserControllerImpl implements UserController {
     const getPostsImpl = async () => {
       const { limit, page } = ctx.req.query();
       const queryParams = paginationSchema.parse({ limit, page });
-      const userId = ctx.get("userId");
-      const posts = await this.userService.getPosts({ id: userId, ...queryParams });
+      const viewee = parseUUID(ctx.req.param("id"));
+      const viewer = ctx.get("userId");
+      const posts = await this.userService.getPosts({ id: viewee, ...queryParams }, viewer);
       return ctx.json(posts, Status.OK);
     };
     return await handleAppError(getPostsImpl)(ctx);

@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "frontend",
-    "slug": "frontend",
+    "slug": "dearly",
     "icon": "./assets/icon.png",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -21,7 +21,17 @@
       "adaptiveIcon": {
         "backgroundColor": "#ffffff"
       },
-      "package": "dearly.frontend"
+      "package": "dearly.frontend",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_BACKGROUND_LOCATION",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_LOCATION"
+      ]
     },
     "plugins": [
       "expo-router",
@@ -67,8 +77,9 @@
         "origin": false
       },
       "eas": {
-        "projectId": "767a3d1e-0356-4d65-92f1-ea095dc722ea"
+        "projectId": "b8227235-775d-410e-ba1f-3e13ef707088"
       }
-    }
+    },
+    "owner": "generate-dearly"
   }
 }

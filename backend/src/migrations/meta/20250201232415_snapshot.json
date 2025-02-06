@@ -1,6 +1,6 @@
 {
-  "id": "3b0b89df-bd2a-489a-9a28-2a9cc27b1118",
-  "prevId": "8f3f2b49-476d-4d4f-ba52-460b11419080",
+  "id": "8f3f2b49-476d-4d4f-ba52-460b11419080",
+  "prevId": "039ca12b-2817-4fc7-9b00-cd9b72cdf49f",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -509,12 +509,6 @@
           "primaryKey": false,
           "notNull": true,
           "default": true
-        },
-        "lastManualNudge": {
-          "name": "lastManualNudge",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
         }
       },
       "indexes": {},

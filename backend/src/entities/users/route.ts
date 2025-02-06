@@ -12,11 +12,11 @@ export const userRoutes = (db: PostgresJsDatabase, mediaService: MediaService): 
   const userService: UserService = new UserServiceImpl(userTransaction, mediaService);
   const userController: UserController = new UserControllerImpl(userService);
 
-  user.get("/posts", (ctx) => userController.getPosts(ctx));
   user.get("/groups", (ctx) => userController.getGroups(ctx));
   user.get("/search", (ctx) => userController.searchByUsername(ctx));
   user.post("/", (ctx) => userController.createUser(ctx));
   user.get("/:id", (ctx) => userController.getUser(ctx));
+  user.get("/:id/posts", (ctx) => userController.getPosts(ctx));
   user.patch("/me", (ctx) => userController.updateUser(ctx));
   user.delete("/me", (ctx) => userController.deleteUser(ctx));
   user.post("/devices", (ctx) => userController.registerDevice(ctx));

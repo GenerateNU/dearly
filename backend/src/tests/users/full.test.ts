@@ -48,6 +48,8 @@ describe("End-to-end User CRUD", () => {
         mode: "BASIC",
         profilePhoto: null,
         timezone: null,
+        bio: null,
+        birthday: null,
       });
   });
 
@@ -66,6 +68,9 @@ describe("End-to-end User CRUD", () => {
         mode: "BASIC",
         profilePhoto: null,
         timezone: null,
+        bio: null,
+        birthday: null,
+        postCount: 0,
       });
   });
 
