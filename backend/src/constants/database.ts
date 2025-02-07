@@ -9,6 +9,11 @@ export enum MediaType {
   AUDIO = "AUDIO",
 }
 
+export enum Tag {
+  USER = "UserID",
+  GROUP = "GroupID",
+}
+
 export enum MemberRole {
   MEMBER = "MEMBER",
   MANAGER = "MANAGER",

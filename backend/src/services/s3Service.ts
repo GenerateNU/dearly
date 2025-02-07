@@ -113,7 +113,7 @@ export class S3Impl implements IS3Operations {
         Bucket: this.bucketName,
         Key: objectKey,
         Body: compressedFile,
-        Tagging: `GroupID=${tag}`,
+        Tagging: tag,
       }),
     );
     return objectKey;

@@ -7,7 +7,7 @@ import {
 import { IS3Operations } from "../../services/s3Service";
 import { PostWithMedia, PostWithMediaURL } from "../../types/api/internal/posts";
 import { SearchedUser, User } from "../../types/api/internal/users";
-import { MediaType } from "../../constants/database";
+import { MediaType, Tag } from "../../constants/database";
 import { Media, MediaResponse, MediaWithURL } from "../../types/api/internal/media";
 import { BadRequestError, ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
@@ -59,7 +59,17 @@ export interface MediaService {
    * @param userId - The ID of the user uploading the media.
    * @returns A promise that resolves to a list of `MediaResponse` objects, each containing the media object key and type.
    */
-  uploadMedia(blobs: Blob[], groupId: string, userId: string): Promise<MediaResponse[]>;
+  uploadPostMedia(blobs: Blob[], groupId: string, userId: string): Promise<MediaResponse[]>;
+
+  /**
+   * Uploads user media (only one media at a time)
+   *
+   * @param blobs - A list of `Blob` objects representing the media to upload.
+   * @param groupId - The ID of the group the media is being uploaded to.
+   * @param userId - The ID of the user uploading the media.
+   * @returns A promise that resolves to a list of `MediaResponse` objects, each containing the media object key and type.
+   */
+  uploadUserMedia(blobs: Blob, userId: string): Promise<MediaResponse>;
 
   /**
    * Get pre-signed url of a medium given its object key
@@ -203,13 +213,14 @@ export class MediaServiceImpl {
     }
   }
 
-  async uploadMedia(blobs: Blob[], groupId: string, userId: string): Promise<MediaResponse[]> {
+  async uploadPostMedia(blobs: Blob[], groupId: string, userId: string): Promise<MediaResponse[]> {
     await this.checkPermissions(groupId, userId);
+    const groupTag = this.getObjectTag(Tag.GROUP, groupId);
     const objectKeys: MediaResponse[] = await Promise.all(
       blobs.map(async (blob) => {
         const objectKey = await this.s3Service.saveObject(
           blob,
-          groupId,
+          groupTag,
           this.getMediaType(blob.type),
         );
         return {
@@ -219,6 +230,20 @@ export class MediaServiceImpl {
       }),
     );
     return objectKeys;
+  }
+
+  async uploadUserMedia(blob: Blob, userId: string): Promise<MediaResponse> {
+    const userTag = this.getObjectTag(Tag.USER, userId);
+
+    const objectKey = await this.s3Service.saveObject(blob, userTag, this.getMediaType(blob.type));
+    return {
+      objectKey,
+      type: this.getMediaType(blob.type),
+    };
+  }
+
+  private getObjectTag(tag: Tag, id: string): string {
+    return `${tag}=${id}`;
   }
 
   private getMediaType = (mimeType: string): MediaType => {
