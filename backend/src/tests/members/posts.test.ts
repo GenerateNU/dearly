@@ -100,7 +100,7 @@ describe("GET /groups/:id/members/:userId/posts", () => {
     [USER_BOB_ID, USER_ALICE_ID, [post]],
     [USER_ALICE_ID, USER_BOB_ID, []],
   ])(
-    "should return 200 if user views their own posts in a group",
+    "should return 200 if user views other members' posts in a group",
     async (viewer, viewee, expectedPosts) => {
       (
         await testBuilder.request({
