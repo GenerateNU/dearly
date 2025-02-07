@@ -73,4 +73,6 @@ const getTheme = (ratio: number) => {
   return theme;
 };
 
-export { getTheme };
+type Theme = ReturnType<typeof getTheme>;
+
+export { getTheme, Theme };

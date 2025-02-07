@@ -1,4 +1,4 @@
-import { router, Stack } from "expo-router";
+import { router, SplashScreen, Stack } from "expo-router";
 import { StatusBar } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -10,7 +10,6 @@ import { NotificationProvider } from "@/contexts/notification";
 import { useNotificationPermission } from "@/hooks/permission/notification";
 import { useRequestDevicePermission } from "@/hooks/permission/device";
 import { useFonts } from "expo-font";
-import AppLoading from "expo-app-loading";
 import { useAccessibility } from "@/hooks/component/accessibility";
 
 const queryClient = new QueryClient();
@@ -53,7 +52,7 @@ const RootLayout = () => {
   });
 
   if (!fontsLoaded) {
-    return <AppLoading />;
+    SplashScreen.hideAsync();
   }
 
   return (
