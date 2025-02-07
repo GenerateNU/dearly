@@ -8,7 +8,6 @@ import { AuthProvider, useAuth } from "@/auth/provider";
 import { getTheme } from "@/design-system/base/theme";
 import { NotificationProvider } from "@/contexts/notification";
 import { useNotificationPermission } from "@/hooks/permission/notification";
-import { Mode } from "@/types/mode";
 import { useRequestDevicePermission } from "@/hooks/permission/device";
 import { useFonts } from "expo-font";
 import AppLoading from "expo-app-loading";
