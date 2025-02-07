@@ -63,10 +63,23 @@ components:
           type: string
           nullable: true
           description: A URL to the user's profile photo.
+        bio:
+          type: string
+          nullable: true
+          description: A bio for the user's profile.
+        birthday: 
+          type: string
+          format: date
+          nullable: true
+          description: Birthday of the user.
         timezone:
           type: string
           nullable: true
           description: Timezone that user is in for sending nudges.
+        postCount: 
+          type: number
+          nullable: true
+          description: Number of posts that a user made.
       required:
         - name
         - username
@@ -691,7 +704,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /api/v1/users/posts:
+  /api/v1/users/{id}/posts:
     get:
       tags:
         - User Endpoints
@@ -714,6 +727,14 @@ paths:
           schema:
             type: integer
             default: 1
+        - name: id
+          in: path
+          description: ID of the user to get posts
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
       responses:
         200:
           description: Successfully retrieve posts user posted
@@ -2094,6 +2115,91 @@ paths:
                 $ref: "#/components/schemas/Error"
         404:
           description: Group not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/v1/groups/{id}/nudges/manual:
+    post:
+      tags:
+        - Nudge Endpoints
+      summary: Manually nudge a user
+      description: Manager can select at least one member in the group to nudge. Will not nudge if users do not have notifications turned on for groups or for devices.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the group to nudge members
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                users:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                    example: 5e91507e-5630-4efd-9fd4-799178870b10
+                  description: User IDs to be nudged
+              required:
+                - users
+              additionalProperties: true
+
+      responses:
+        200:
+          description: Successfully nudge members
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Successfully nudge selected users"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: User not manager of the group
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Group not found or user not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        429:
+          description: Cannot nudge during cooldown period to prevent spamming
           content:
             application/json:
               schema:

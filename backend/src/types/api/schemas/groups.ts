@@ -14,6 +14,6 @@ export type CREATE_GROUP_INVITE = TypedResponse<
 >;
 
 export type VERIFY_GROUP_INVITE = TypedResponse<
-  | paths["/api/v1/groups/{groupId}/{token}/verify"]["put"]["responses"]["200"]["content"]["application/json"]
+  | paths["/api/v1/groups/{token}/verify"]["put"]["responses"]["200"]["content"]["application/json"]
   | API_ERROR
 >;

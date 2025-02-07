@@ -13,6 +13,7 @@ import {
   primaryKey,
   integer,
   unique,
+  date,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { NAME_MAX_LIMIT } from "../constants/database";
@@ -36,6 +37,8 @@ export const usersTable = pgTable("users", {
   mode: userModeEnum().notNull().default("BASIC"),
   profilePhoto: varchar(),
   timezone: varchar(),
+  bio: varchar({ length: NAME_MAX_LIMIT }),
+  birthday: date("birthday"),
 });
 
 export const devicesTable = pgTable("devices", {
@@ -90,6 +93,7 @@ export const membersTable = pgTable(
     joinedAt: timestamp().notNull().defaultNow(),
     role: memberRoleEnum().notNull().default("MEMBER"),
     notificationsEnabled: boolean().notNull().default(true),
+    lastManualNudge: timestamp(),
   },
   (table) => {
     return [primaryKey({ columns: [table.userId, table.groupId] })];

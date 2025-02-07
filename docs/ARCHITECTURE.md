@@ -2,7 +2,7 @@
 
 ## 1. High-Level Architecture Overview
 
-For a visual representation of the architecture, see [Architecture Diagrams](https://excalidraw.com/#json=JnQrQrEm9c-MgRECVfWH8,qKH-QGbm337kJHC99dp9LQ).
+For a visual representation of the architecture, see [Architecture Diagrams](https://excalidraw.com/#json=MsMc--KKNrDPQOIynAkza,iGESHr9rTon6OhNCAwlzXg).
 
 --- 
 
@@ -14,11 +14,11 @@ For a visual representation of the architecture, see [Architecture Diagrams](htt
 |--------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Framework**            | **[Hono](https://hono.dev/)** (lightweight alternative to Express) and **[Bun](https://bun.sh/)** (high-performance alternative to Node.js) with excellent TypeScript support.                           |
 | **Language**             | **TypeScript** for type safety and scalability.                                                                                                                   |
-| **Database**             | **[PostgreSQL](https://www.postgresql.org/docs/current/)** for transactional data handling and support for complex queries.                                                                                  |
+| **Database**             | - **[PostgreSQL](https://www.postgresql.org/docs/current/)** for transactional data handling and support for complex queries.<br>- **[Docker](https://www.docker.com/)**: Containerized database for testing and development.                                                                                 |
 | **Authorization**        | **JSON Web Tokens (JWT)**, a stateless and standardized approach to authorization, ensuring compatibility with different client applications.                                             |
 | **ORM**                  | **[DrizzleORM](https://orm.drizzle.team/docs/overview)** for database migrations and efficient query handling.                                                                                             |
 | **Documentation**        | API documentation with **[Scalar](https://scalar.com/)**.                                                                                                                               |
-| **External Services**    | - **[AWS S3](https://docs.aws.amazon.com/AmazonS3/latest/API/Welcome.html)**: Used for storing and managing voice memos and images.<br>- **[Expo Push API](https://docs.expo.dev/push-notifications/sending-notifications/)**: For sending push notifications to mobile devices.                     |
+| **External Services**    | - **[AWS S3](https://docs.aws.amazon.com/AmazonS3/latest/API/Welcome.html)**: Used for storing and managing voice memos and images.<br>- **[Expo Push API](https://docs.expo.dev/push-notifications/sending-notifications/)**: For sending push notifications to mobile devices.<br>- **[AWS EventBridge](https://aws.amazon.com/eventbridge/)**: Create scheduled rules to trigger automatic push notifications.<br>- **[AWS Lambda](https://aws.amazon.com/lambda/)**: Run code in response to events triggered by AWS EventBridge for nudge feature.                    |
 | **Layered Architecture** | The backend follows a **Model-View-Controller (MVC)**-inspired design, separating into Controller (C), Service (M), and Transaction layers.                      |
 | **Controller (C)**       | Manages incoming HTTP requests and outgoing responses, delegating client requests to appropriate services.                                                       |
 | **Service (M)**          | Core business rules and logic that define how the application behaves.                                                                                          |
@@ -51,9 +51,11 @@ backend/src/
 ├── middlewares/     # Custom middlewares (e.g., logging, authorization, compression)
 ├── migrations/      # Database migration files
 ├── routes/          # API routes and endpoints
+├── services/        # External service integration
 ├── tests/           # Unit and integration tests for the backend
-├── types/           # TypeScript type definitions for the backend
-└── utilities/       # Helper functions
+├── types/           # Type definitions for the backend
+├── utilities/       # Helper functions
+└── server.ts        # Main entry into our app (server)
 ```
 -----
 
@@ -80,6 +82,8 @@ frontend/
 ### Deployment
 
 - **PostgresDB**: Hosted on Supabase.
+- **Backend**: Hosted on Google Cloud Run at [dearly-35496165508.us-east1.run.app](dearly-35496165508.us-east1.run.app) with Docker Image.
+- **Frontend**: TestFlight with EAS Build.
 
 ### Automated Workflow
 
@@ -93,3 +97,5 @@ Any pull request to the `main` branch will need to pass code reviews, have all g
 2. **Linter**: Enforces consistent coding style using ESLint with a TypeScript configuration.
 3. **Formatter**: Uses Prettier to ensure consistent code formatting across the project.
 4. **Tests**: Automated testing to ensure code reliability and correctness (unit and integration tests).
+5. **Backend Deployment**: Pulls latest docker image, builds, and deploys.
+

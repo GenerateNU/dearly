@@ -7,9 +7,9 @@ import { useEffect } from "react";
 import { AuthProvider, useAuth } from "@/auth/provider";
 import { advancedTheme, basicTheme } from "@/design-system/base/theme";
 import { NotificationProvider } from "@/contexts/notification";
-import { useNotificationPermission } from "@/hooks/notification";
+import { useNotificationPermission } from "@/hooks/permission/notification";
 import { Mode } from "@/types/mode";
-import { useRequestPermission } from "@/hooks/permission";
+import { useRequestDevicePermission } from "@/hooks/permission/device";
 import { useFonts } from "expo-font";
 import AppLoading from "expo-app-loading";
 
@@ -30,7 +30,7 @@ const InitialLayout = () => {
   useNotificationPermission();
 
   // ask for camera and audio permission
-  useRequestPermission();
+  useRequestDevicePermission();
 
   return (
     <ThemeProvider theme={mode === Mode.ADVANCED ? advancedTheme : basicTheme}>

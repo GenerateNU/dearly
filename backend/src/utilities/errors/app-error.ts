@@ -44,6 +44,12 @@ class ConflictError extends AbstractAppError {
   }
 }
 
+class TooManyRequestsError extends AbstractAppError {
+  constructor(message: string = "Too Many Requests Error") {
+    super("TooManyRequestsError", message, Status.TooManyRequests);
+  }
+}
+
 class ForbiddenError extends AbstractAppError {
   constructor(message: string = "Forbidden") {
     super("ForbiddenError", message, Status.Forbidden);
@@ -95,4 +101,5 @@ export {
   NotFoundError,
   InternalServerError,
   BadRequestError,
+  TooManyRequestsError,
 };

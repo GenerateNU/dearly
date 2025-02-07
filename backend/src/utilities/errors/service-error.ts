@@ -1,3 +1,4 @@
+import logger from "../logger";
 import { InternalServerError, isAppError } from "./app-error";
 import { isDatabaseError, mapDBErrorToAppError } from "./db-error";
 
@@ -11,6 +12,7 @@ export const handleServiceError = <T>(fn: () => T) => {
       } else if (isDatabaseError(error)) {
         throw mapDBErrorToAppError(error);
       } else {
+        logger.error(error);
         throw new InternalServerError("An unexpected server error occurred.");
       }
     }
