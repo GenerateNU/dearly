@@ -23,16 +23,16 @@ const ADVANCED_SPACING = {
   ps: 4,
 };
 
-const BASIC_SPACING = {
-  xxs: 8,
-  xs: 4,
-  s: 16,
-  m: 24,
-  l: 30,
-  xl: 42,
-  xxl: 54,
-  ps: 4,
-};
+// const BASIC_SPACING = {
+//   xxs: 8,
+//   xs: 4,
+//   s: 16,
+//   m: 24,
+//   l: 30,
+//   xl: 42,
+//   xxl: 54,
+//   ps: 4,
+// };
 
 const BORDER_RADIUS = {
   s: 8,
