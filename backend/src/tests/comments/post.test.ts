@@ -2,7 +2,7 @@ import { USER_ANA_ID, POST_ID } from "../helpers/test-constants";
 import { Hono } from "hono";
 import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
-import { generateJWTFromID, generateUUID } from "../helpers/test-token";
+import { generateJWTFromID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
 import { randomUUIDv7 } from "bun";
 

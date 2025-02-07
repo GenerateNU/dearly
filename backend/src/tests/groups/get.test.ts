@@ -4,7 +4,6 @@ import {
   USER_ALICE_ID,
   INVALID_ID_ARRAY,
   GROUP_MOCK,
-  DEARLY_COMMENT_ID,
 } from "./../helpers/test-constants";
 import { Hono } from "hono";
 import { startTestApp } from "../helpers/test-app";

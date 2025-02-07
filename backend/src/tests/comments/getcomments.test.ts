@@ -2,7 +2,7 @@ import { USER_ANA_ID, USER_ALICE_ID, POST_ID } from "../helpers/test-constants";
 import { Hono } from "hono";
 import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
-import { generateJWTFromID, generateUUID } from "../helpers/test-token";
+import { generateJWTFromID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
 import { randomUUIDv7 } from "bun";
 
@@ -13,9 +13,6 @@ describe("GET /posts/:id/comments", () => {
   const ALICE_JWT = generateJWTFromID(USER_ALICE_ID);
   const ANA_JWT = generateJWTFromID(USER_ANA_ID);
 
-  const badRequestBody = {
-    page: -1,
-  };
   const goodRequestBody = {
     content: "i like this photo",
   };
@@ -41,20 +38,18 @@ describe("GET /posts/:id/comments", () => {
   });
 
   it("should return 200 if comment is added and then comments are successfully fetched", async () => {
-    const postId = (
-      await testBuilder.request({
-        app,
-        type: HTTPRequest.POST,
-        route: `/api/v1/posts/${POST_ID}/comments`,
-        requestBody: {
-          ...goodRequestBody,
-        },
-        autoAuthorized: false,
-        headers: {
-          Authorization: `Bearer ${ALICE_JWT}`,
-        },
-      })
-    ).getResponseId();
+    await testBuilder.request({
+      app,
+      type: HTTPRequest.POST,
+      route: `/api/v1/posts/${POST_ID}/comments`,
+      requestBody: {
+        ...goodRequestBody,
+      },
+      autoAuthorized: false,
+      headers: {
+        Authorization: `Bearer ${ALICE_JWT}`,
+      },
+    });
     (
       await testBuilder.request({
         app,

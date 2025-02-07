@@ -3,7 +3,6 @@ import {
   CommentPagination,
   CreateCommentPayload,
 } from "../../types/api/internal/comments";
-import { Pagination } from "../../types/api/internal/users";
 import { IDPayload } from "../../types/id";
 import { handleServiceError } from "../../utilities/errors/service-error";
 import { MediaService } from "../media/service";

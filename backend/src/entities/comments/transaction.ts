@@ -8,7 +8,6 @@ import {
   CommentPagination,
   CreateCommentPayload,
 } from "../../types/api/internal/comments";
-import { P } from "pino";
 
 export interface CommentTransaction {
   toggleLikeComment(payload: IDPayload): Promise<boolean>;
