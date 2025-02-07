@@ -13,6 +13,9 @@ describe("GET /posts/:id/comments", () => {
   const ALICE_JWT = generateJWTFromID(USER_ALICE_ID);
   const ANA_JWT = generateJWTFromID(USER_ANA_ID);
 
+  const badRequestBody = {
+    page: -1,
+  };
   const goodRequestBody = {
     content: "i like this photo",
   };
@@ -107,5 +110,47 @@ describe("GET /posts/:id/comments", () => {
         },
       })
     ).assertStatusCode(Status.Forbidden);
+  });
+
+  it("should return 400 if limit is not valid", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.GET,
+        route: `/api/v1/posts/${POST_ID}/comments?limit=-1`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${ALICE_JWT}`,
+        },
+      })
+    ).assertStatusCode(Status.BadRequest);
+  });
+
+  it("should return 400 if page is not valid", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.GET,
+        route: `/api/v1/posts/${POST_ID}/comments?page=-1`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${ALICE_JWT}`,
+        },
+      })
+    ).assertStatusCode(Status.BadRequest);
+  });
+
+  it("should return 400 if both page and limit is not valid", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.GET,
+        route: `/api/v1/posts/${POST_ID}/comments?page=-1&limit=-1`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${ALICE_JWT}`,
+        },
+      })
+    ).assertStatusCode(Status.BadRequest);
   });
 });

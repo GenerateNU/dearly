@@ -67,10 +67,15 @@ export class CommentControllerImpl implements CommentController {
     const getCommentImpl = async () => {
       const postId = parseUUID(ctx.req.param("id"));
       const userId = ctx.get("userId");
-      const page = ctx.get("page");
-      const limit = ctx.get("limit");
-
-      const comments = await this.commentService.getComments({ userId, postId, page, limit });
+      const { limit, page } = ctx.req.query();
+      const numLimit = Number(limit);
+      const numPage = Number(page);
+      const comments = await this.commentService.getComments({
+        userId,
+        postId,
+        limit: numLimit,
+        page: numPage,
+      });
       return ctx.json(comments, 200);
     };
     return await handleAppError(getCommentImpl)(ctx);
