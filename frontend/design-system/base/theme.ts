@@ -41,57 +41,36 @@ const BORDER_RADIUS = {
   xl: 40,
 };
 
-const ADVANCED_TEXT = {
-  primary: {
-    fontSize: 43,
-    fontFamily: "ProximaNova-Bold",
-  },
-  secondary: {
-    fontSize: 32,
-    fontFamily: "ProximaNova-Medium",
-  },
-  body: {
-    fontSize: 16,
-    fontFamily: "ProximaNova-Bold",
-  },
-  defaults: {
-    fontSize: 16,
-    fontFamily: "ProximaNova-Regular",
-  },
+const getFontConfig = (scaleRatio: number) => {
+  const FONT_CONFIG = {
+    primary: {
+      fontSize: 43 * scaleRatio,
+      fontFamily: "ProximaNova-Bold",
+    },
+    secondary: {
+      fontSize: 32 * scaleRatio,
+      fontFamily: "ProximaNova-Medium",
+    },
+    body: {
+      fontSize: 16 * scaleRatio,
+      fontFamily: "ProximaNova-Bold",
+    },
+    defaults: {
+      fontSize: 16 * scaleRatio,
+      fontFamily: "ProximaNova-Regular",
+    },
+  };
+  return FONT_CONFIG;
 };
 
-const BASIC_TEXT = {
-  primary: {
-    fontSize: 60,
-    fontFamily: "ProximaNova-Bold",
-  },
-  secondary: {
-    fontSize: 40,
-    fontFamily: "ProximaNova-Medium",
-  },
-  body: {
-    fontSize: 24,
-    fontFamily: "ProximaNova-Bold",
-  },
-  defaults: {
-    fontSize: 24,
-    fontFamily: "ProximaNova-Regular",
-  },
+const getTheme = (ratio: number) => {
+  const theme = createTheme({
+    colors: COLOR_PALETTE,
+    spacing: ADVANCED_SPACING,
+    borderRadii: BORDER_RADIUS,
+    textVariants: getFontConfig(ratio),
+  });
+  return theme;
 };
 
-const advancedTheme = createTheme({
-  colors: COLOR_PALETTE,
-  spacing: ADVANCED_SPACING,
-  borderRadii: BORDER_RADIUS,
-  textVariants: ADVANCED_TEXT,
-});
-
-const basicTheme: Theme = {
-  ...advancedTheme,
-  spacing: BASIC_SPACING,
-  textVariants: BASIC_TEXT,
-};
-
-export type Theme = typeof advancedTheme;
-
-export { advancedTheme, basicTheme };
+export { getTheme };

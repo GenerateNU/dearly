@@ -5,18 +5,19 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "@shopify/restyle";
 import { useEffect } from "react";
 import { AuthProvider, useAuth } from "@/auth/provider";
-import { advancedTheme, basicTheme } from "@/design-system/base/theme";
+import { getTheme } from "@/design-system/base/theme";
 import { NotificationProvider } from "@/contexts/notification";
 import { useNotificationPermission } from "@/hooks/permission/notification";
 import { Mode } from "@/types/mode";
 import { useRequestDevicePermission } from "@/hooks/permission/device";
 import { useFonts } from "expo-font";
 import AppLoading from "expo-app-loading";
+import { useAccessibility } from "@/hooks/component/accessibility";
 
 const queryClient = new QueryClient();
 
 const InitialLayout = () => {
-  const { isAuthenticated, mode } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -32,8 +33,11 @@ const InitialLayout = () => {
   // ask for camera and audio permission
   useRequestDevicePermission();
 
+  // listen for accessibility setting on device
+  const scaleRatio = useAccessibility();
+
   return (
-    <ThemeProvider theme={mode === Mode.ADVANCED ? advancedTheme : basicTheme}>
+    <ThemeProvider theme={getTheme(scaleRatio)}>
       <Stack screenOptions={{ gestureEnabled: false }}>
         <Stack.Screen name="(auth)" options={{ headerShown: false, gestureEnabled: false }} />
         <Stack.Screen name="(app)" options={{ headerShown: false, gestureEnabled: false }} />
