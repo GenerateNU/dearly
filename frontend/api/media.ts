@@ -1,12 +1,16 @@
 import { authWrapper, getHeaders } from "@/utilities/auth-token";
 import fetchClient from "./client";
-import { UploadMediaPayload, UploadMediaResponse } from "@/types/media";
+import {
+  UploadMediaPayload,
+  UploadGroupMediaResponse,
+  UploadUserMediaResponse,
+} from "@/types/media";
 
-export const uploadMedia = async (
+export const uploadPostMedia = async (
   id: string,
   payload: UploadMediaPayload,
-): Promise<UploadMediaResponse> => {
-  const req = async (token: string): Promise<UploadMediaResponse> => {
+): Promise<UploadGroupMediaResponse> => {
+  const req = async (token: string): Promise<UploadGroupMediaResponse> => {
     const { data } = await fetchClient.POST("/api/v1/groups/{id}/media", {
       headers: getHeaders(token, "multipart/form-data"),
       body: payload,
@@ -18,5 +22,18 @@ export const uploadMedia = async (
     });
     return data!;
   };
-  return authWrapper<UploadMediaResponse>()(req);
+  return authWrapper<UploadGroupMediaResponse>()(req);
+};
+
+export const uploadUserMedia = async (
+  payload: UploadMediaPayload,
+): Promise<UploadUserMediaResponse> => {
+  const req = async (token: string): Promise<UploadUserMediaResponse> => {
+    const { data } = await fetchClient.POST("/api/v1/users/media", {
+      headers: getHeaders(token, "multipart/form-data"),
+      body: payload,
+    });
+    return data!;
+  };
+  return authWrapper<UploadUserMediaResponse>()(req);
 };
