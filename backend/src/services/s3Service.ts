@@ -155,11 +155,6 @@ export class S3Impl implements IS3Operations {
     }
   }
 
-  private async blobToBuffer(blob: Blob): Promise<Buffer> {
-    const arrayBuffer = await blob.arrayBuffer();
-    return Buffer.from(arrayBuffer);
-  }
-
   /**
    * Will delete an object from S3 with the given S3 objectKey.
    * @param url The URL of the object that will be deleted
