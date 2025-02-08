@@ -66,5 +66,4 @@ describe("S3 Service Testing", () => {
     const compressed_audio = await s3Impl.compressAudio(blob);
     expect(blob.size).toBeGreaterThan(compressed_audio.length);
   });
-
 });
