@@ -102,7 +102,6 @@ export class S3Impl implements IS3Operations {
       ffmpeg(inputStream)
         .audioFrequency(44100) // standard sample rate
         .audioCodec("libmp3lame") // convert to MP3 (compress)
-        .audioQuality(5) // reduce audio quality for smaller size
         .audioFilters([
           "equalizer=f=1000:t=q:w=1:g=10", // boost mid-range frequencies for clarity
           "loudnorm=I=-16:LRA=11:TP=-1.5", // normalize volume
@@ -112,6 +111,7 @@ export class S3Impl implements IS3Operations {
           "acompressor=threshold=-20dB:ratio=4:attack=2:release=100", // compress dynamics
           "pan=mono|c0=c0+c1", // convert stereo to mono
         ])
+        .audioBitrate("128k") // reduce file size
         .format("mp3")
         .on("error", (err) => reject(err))
         .on("end", () => resolve(Buffer.concat(chunks)))
