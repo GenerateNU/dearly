@@ -115,6 +115,7 @@ export class S3Impl implements IS3Operations {
           Bucket: this.bucketName,
           Key: objectKey,
           Body: fileBuffer,
+          ContentType: file.type,
           Tagging: `GroupID=${tag}`,
         }),
       );
