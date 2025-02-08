@@ -16,7 +16,6 @@ const Index = () => {
       <Button label="Toggle Mode" onPress={toggleTheme} />
       <Button label="Login" onPress={() => router.push("/(auth)/login")} />
       <Button label="Register" onPress={() => router.push("/(auth)/register")} />
-      
     </Box>
   );
 };
