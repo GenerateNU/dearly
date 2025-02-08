@@ -83,19 +83,53 @@ export class S3Impl implements IS3Operations {
    * @returns A promise of a blob of the newly compressed audio recording
    */
   async compressAudio(file: Blob): Promise<Blob> {
-    const compressedAudio = []; // holds the final compressed audio
-    const mp3encoder = new lame.Mp3Encoder(1, 44100, 128);
-    const audioBuffer: ArrayBuffer = await file.arrayBuffer();
-    const audioBufferInt16 = new Int16Array(audioBuffer, 0, Math.floor(audioBuffer.byteLength / 2));
-    let mp3Tmp = mp3encoder.encodeBuffer(audioBufferInt16);
-
-    compressedAudio.push(mp3Tmp);
-    // flush the mp3encoder so that any remaining data is also pushed into the final
-    // compressed audio
-    mp3Tmp = mp3encoder.flush();
-    compressedAudio.push(mp3Tmp);
-    return new Blob(compressedAudio);
-  }
+    // First, decode the audio file to get raw PCM data
+    const audioContext = new (window.AudioContext)();
+    
+    // Read the file as an ArrayBuffer
+    const arrayBuffer = await file.arrayBuffer();
+    
+    // Decode the audio data
+    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+    
+    // Get the raw PCM data from the audio buffer
+    const channelData = audioBuffer.getChannelData(0); // Get first channel
+    
+    // Convert Float32Array to Int16Array (required format for MP3 encoding)
+    const samples = new Int16Array(channelData.length);
+    for (let i = 0; i < channelData.length; i++) {
+        // Convert float to int16
+        const s = Math.max(-1, Math.min(1, channelData[i]!));
+        samples[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+    }
+    
+    // Get the sample rate, default to 44100 if undefined
+    const sampleRate = audioBuffer.sampleRate || 44100;
+    
+    // Initialize the MP3 encoder with the correct sample rate
+    const mp3encoder = new lame.Mp3Encoder(1, sampleRate, 128);
+    
+    const compressedAudio = [];
+    
+    // Encode the buffer in chunks to avoid memory issues
+    const chunkSize = 1152; // Must be a multiple of 576 for MP3 encoding
+    for (let i = 0; i < samples.length; i += chunkSize) {
+        const chunk = samples.slice(i, i + chunkSize);
+        const mp3Chunk = mp3encoder.encodeBuffer(chunk);
+        if (mp3Chunk && mp3Chunk.length > 0) {
+            compressedAudio.push(mp3Chunk);
+        }
+    }
+    
+    // Flush the encoder and add any remaining data
+    const finalChunk = mp3encoder.flush();
+    if (finalChunk && finalChunk.length > 0) {
+        compressedAudio.push(finalChunk);
+    }
+    
+    // Create and return the final Blob
+    return new Blob(compressedAudio, { type: 'audio/mp3' });
+}
 
   /**
    * Will save a blob to s3 with some image type and and tag.
