@@ -67,23 +67,4 @@ describe("S3 Service Testing", () => {
     expect(blob.size).toBeGreaterThan(compressed_audio.length);
   });
 
-  // it("test local audio compression", async () => {
-  //   const mockS3Client = mockClient(S3Client);
-  //   const s3Impl = new S3Impl(config, mockS3Client as unknown as S3Client);
-  //   const buffer = fs.readFileSync(PROJECT_ROOT + "/tests/test-assets/piano.mp3");
-  //   const blob = new Blob([buffer]);
-  //   const compressedAudio = await s3Impl.compressAudio(blob);
-  
-  //   // save audio locally
-  //   const compressedAudioPath = resolve(PROJECT_ROOT, "tests/test-assets/compressed_piano.mp3");
-  
-  //   fs.writeFileSync(compressedAudioPath, compressedAudio);
-  //   const fileExists = fs.existsSync(compressedAudioPath);
-  //   const fileExtension = compressedAudioPath.split(".").pop();
-  
-  //   // check if it is right format and compressed
-  //   expect(fileExists).toBe(true);
-  //   expect(fileExtension).toBe("mp3");
-  //   expect(blob.size).toBeGreaterThan(compressedAudio.length);
-  // });
 });
