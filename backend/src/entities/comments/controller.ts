@@ -10,6 +10,7 @@ import {
 } from "../../types/api/routes/comment";
 import { createCommentValidate } from "./validator";
 import { CreateCommentPayload } from "../../types/api/internal/comments";
+import { paginationSchema } from "../../utilities/pagination";
 
 export interface CommentController {
   toggleLikeComment(ctx: Context): Promise<COMMENT_API>;
@@ -40,7 +41,6 @@ export class CommentControllerImpl implements CommentController {
     const createCommentImpl = async () => {
       const userId = ctx.get("userId");
       const postId = parseUUID(ctx.req.param("id"));
-
       const commentPayload = createCommentValidate.parse(await ctx.req.json());
       const createCommentPayload: CreateCommentPayload = {
         postId,
@@ -68,13 +68,12 @@ export class CommentControllerImpl implements CommentController {
       const postId = parseUUID(ctx.req.param("id"));
       const userId = ctx.get("userId");
       const { limit, page } = ctx.req.query();
-      const numLimit = Number(limit);
-      const numPage = Number(page);
+      const pagination = paginationSchema.parse({ limit, page });
       const comments = await this.commentService.getComments({
         userId,
         postId,
-        limit: numLimit,
-        page: numPage,
+        limit: pagination.limit,
+        page: pagination.page,
       });
       return ctx.json(comments, 200);
     };

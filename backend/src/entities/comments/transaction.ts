@@ -2,7 +2,12 @@ import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { IDPayload } from "../../types/id";
 import { commentsTable, groupsTable, likeCommentsTable, membersTable, postsTable } from "../schema";
 import { eq, and, sql } from "drizzle-orm";
-import { BadRequestError, ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
+import {
+  BadRequestError,
+  ForbiddenError,
+  InternalServerError,
+  NotFoundError,
+} from "../../utilities/errors/app-error";
 import {
   Comment,
   CommentPagination,
@@ -11,7 +16,7 @@ import {
 
 export interface CommentTransaction {
   toggleLikeComment(payload: IDPayload): Promise<boolean>;
-  createComment(payload: CreateCommentPayload): Promise<Comment | null>;
+  createComment(payload: CreateCommentPayload): Promise<Comment>;
   getComments(payload: CommentPagination): Promise<Comment[]>;
   deleteComment(payload: IDPayload): Promise<void>;
 }
@@ -68,35 +73,13 @@ export class CommentTransactionImpl implements CommentTransaction {
     });
   }
 
-  async createComment(comment: CreateCommentPayload): Promise<Comment | null> {
-    const createdComment = await this.db.transaction(async (tx) => {
-      // insert comment
-      const [newComment] = await tx.insert(commentsTable).values(comment).returning();
-      if (!newComment) return null;
-
-      return {
-        id: newComment.id,
-        userId: newComment.userId,
-        postId: newComment.postId,
-        content: newComment.content,
-        voiceMemo: newComment.voiceMemo,
-        createdAt: newComment.createdAt,
-      };
-    });
-
-    return createdComment;
+  async createComment(comment: CreateCommentPayload): Promise<Comment> {
+    const [newComment] = await this.db.insert(commentsTable).values(comment).returning();
+    if (!newComment) throw new InternalServerError();
+    return newComment;
   }
 
   async getComments({ userId, postId, limit, page }: CommentPagination): Promise<Comment[]> {
-    if (page < 0 || limit < 0) {
-      throw new BadRequestError();
-    }
-    if (!limit) {
-      limit = 10;
-    }
-    if (!page) {
-      page = 1;
-    }
     // check if postId is a valid post
     const [post] = await this.db.select().from(postsTable).where(eq(postsTable.id, postId));
     if (!post) {

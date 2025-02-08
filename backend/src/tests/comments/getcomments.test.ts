@@ -1,4 +1,4 @@
-import { USER_ANA_ID, USER_ALICE_ID, POST_ID } from "../helpers/test-constants";
+import { USER_ANA_ID, USER_ALICE_ID, POST_ID, USER_BOB_ID } from "../helpers/test-constants";
 import { Hono } from "hono";
 import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
@@ -17,8 +17,82 @@ describe("GET /posts/:id/comments", () => {
     content: "i like this photo",
   };
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     app = await startTestApp();
+  });
+
+  it.each([
+    [
+      "1",
+      "1",
+      [
+        {
+          content: "amazing photos!",
+          userId: USER_BOB_ID,
+          postId: POST_ID,
+        },
+      ],
+    ],
+    [
+      "1",
+      "2",
+      [
+        {
+          content: "i like this photo",
+          userId: USER_ANA_ID,
+          postId: POST_ID,
+        },
+      ],
+    ],
+    ["1", "3", []],
+    ["1", "4", []],
+    [
+      "2",
+      "1",
+      [
+        {
+          content: "amazing photos!",
+          userId: USER_BOB_ID,
+          postId: POST_ID,
+        },
+        {
+          content: "i like this photo",
+          userId: USER_ANA_ID,
+          postId: POST_ID,
+        },
+      ],
+    ],
+    ["2", "2", []],
+  ])("should return 200 with limit %s and page %s", async (limit, page, expectedBody) => {
+    await testBuilder.request({
+      app,
+      type: HTTPRequest.POST,
+      route: `/api/v1/posts/${POST_ID}/comments`,
+      requestBody: {
+        ...goodRequestBody,
+      },
+      autoAuthorized: false,
+      headers: {
+        Authorization: `Bearer ${ANA_JWT}`,
+      },
+    });
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.GET,
+        route: `/api/v1/posts/${POST_ID}/comments`,
+        queryParams: {
+          limit,
+          page,
+        },
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${ALICE_JWT}`,
+        },
+      })
+    )
+      .assertStatusCode(Status.OK)
+      .assertFieldsArray(expectedBody);
   });
 
   it("should return 200 if comments are successfully fetched", async () => {
