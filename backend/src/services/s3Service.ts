@@ -15,7 +15,6 @@ import logger from "../utilities/logger";
 import { PassThrough, Readable } from "stream";
 import ffmpegInstaller from "@ffmpeg-installer/ffmpeg";
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);
-
 export interface IS3Operations {
   // group is the uuid of the group this photo is being sent to (used as tagging number) -> make public group id number
 
@@ -98,14 +97,18 @@ export class S3Impl implements IS3Operations {
     return new Promise((resolve, reject) => {
       const inputStream = Readable.from(fileBuffer);
       const outputStream = new PassThrough();
-      const chunks: Buffer[] = [];
+      const chunks: Buffer[] = []; 
   
       ffmpeg(inputStream)
         .audioFrequency(44100) // standard sample rate
         .audioChannels(1) // enforce mono
         .audioCodec("libmp3lame") // convert to MP3 (compress)
-        .audioBitrate("128k") // control compression level (128kbps is standard)
-        .audioFilters("loudnorm=I=-16:LRA=11:TP=-1.5") // configure audio level
+        .audioQuality(5) // reduce audio quality for smaller size
+        .audioFilters([
+          "loudnorm=I=-16:LRA=11:TP=-1.5", // normalize volume
+          "afftdn", // reduce background noise
+          "silenceremove=1:0:-50dB" // trim silent parts
+        ])
         .format("mp3")
         .on("error", (err) => reject(err))
         .on("end", () => resolve(Buffer.concat(chunks)))
