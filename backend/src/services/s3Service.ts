@@ -100,20 +100,25 @@ export class S3Impl implements IS3Operations {
       const chunks: Buffer[] = []; 
   
       ffmpeg(inputStream)
-        .audioFrequency(44100) // standard sample rate
-        .audioCodec("libmp3lame") // convert to MP3 (compress)
+        .audioFrequency(44100)
+        .audioCodec("libmp3lame")
         .audioFilters([
-          "equalizer=f=1000:t=q:w=1:g=10", // boost mid-range frequencies for clarity
-          "loudnorm=I=-16:LRA=11:TP=-1.5", // normalize volume
-          "afftdn", // reduce background noise
-          "silenceremove=1:0:-50dB", // trim silent parts
-          "deesser=frequency=4000:width=4", // reduce s sound around 4kHz
-          "acompressor=threshold=-20dB:ratio=4:attack=2:release=100", // compress dynamics
-          "pan=mono|c0=c0+c1", // convert stereo to mono
+          // boosts the sound around 1000 Hz (mid-range), making it clearer
+          "equalizer=f=1000:t=q:w=1:g=10", 
+          // adjusts the overall loudness of the track to match a specific loudness standard
+          "loudnorm=I=-16:LRA=11:TP=-1.5",
+          // reduces background noise
+          "afftdn",
+          // trims silence
+          "silenceremove=1:0:-50dB",
+          // reduces loud sounds that are too high and makes soft sounds louder
+          "acompressor=threshold=-20dB:ratio=4:attack=2:release=100",
+          // converts stereo sound (left and right channels) into a single mono sound (one channel)
+          "pan=mono|c0=c0+c1"
         ])
-        .audioBitrate("128k") // reduce file size
+        .audioQuality(5)
         .format("mp3")
-        .on("error", (err) => reject(err))
+        .on("error", (err) => reject(err)) 
         .on("end", () => resolve(Buffer.concat(chunks)))
         .pipe(outputStream);
   
@@ -121,6 +126,7 @@ export class S3Impl implements IS3Operations {
       outputStream.on("end", () => resolve(Buffer.concat(chunks)));
     });
   }
+  
 
   /**
    * Will save a blob to s3 with some image type and and tag.
