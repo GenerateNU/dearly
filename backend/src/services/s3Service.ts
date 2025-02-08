@@ -84,11 +84,6 @@ export class S3Impl implements IS3Operations {
    * @param file The audio blob that will be compressed
    * @returns A promise of a buffer of the newly compressed audio recording
    *
-   * Frontend has to send it raw PCM format, and must obey the rule
-   * - audio/wav
-   * - sample rate: 44100
-   * - bit depth: 16
-   *
    * Number of channels: how many separate audio signals it contains
    * - Mono: Single audio track (same sound in both ears/speakers).
    * - Stereo: Two separate tracks (left & right channels for spatial sound).
@@ -98,24 +93,24 @@ export class S3Impl implements IS3Operations {
    * - higher sample rate leads to larger file size
    */
   async compressAudio(file: Blob): Promise<Buffer> {
-    // convert Blob to Buffer
     const fileBuffer = Buffer.from(await file.arrayBuffer());
-
+  
     return new Promise((resolve, reject) => {
       const inputStream = Readable.from(fileBuffer);
       const outputStream = new PassThrough();
       const chunks: Buffer[] = [];
-
+  
       ffmpeg(inputStream)
-        .audioFrequency(44100) // enforce 44.1kHz sample rate
+        .audioFrequency(44100) // standard sample rate
         .audioChannels(1) // enforce mono
-        .audioCodec("pcm_s16le") // force 16-bit PCM
-        .audioCodec("libmp3lame") // convert to MP3
-        .format("mp3") // output format
+        .audioCodec("libmp3lame") // convert to MP3 (compress)
+        .audioBitrate("128k") // control compression level (128kbps is standard)
+        .audioFilters("loudnorm=I=-16:LRA=11:TP=-1.5") // configure audio level
+        .format("mp3")
         .on("error", (err) => reject(err))
         .on("end", () => resolve(Buffer.concat(chunks)))
         .pipe(outputStream);
-
+  
       outputStream.on("data", (chunk) => chunks.push(chunk));
       outputStream.on("end", () => resolve(Buffer.concat(chunks)));
     });
