@@ -163,6 +163,7 @@ export class S3Impl implements IS3Operations {
       const command = new GetObjectCommand({
         Bucket: this.bucketName,
         Key: objectKey,
+        ResponseContentDisposition: 'inline',
       });
       const request = await getSignedUrl(this.client, command, { expiresIn: waitInSeconds });
       return request;
