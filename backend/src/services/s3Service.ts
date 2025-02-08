@@ -7,11 +7,14 @@ import {
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { InternalServerError, NotFoundError } from "../utilities/errors/app-error";
 import sharp from "sharp";
-import * as lame from "@breezystack/lamejs";
+import ffmpeg from "fluent-ffmpeg";
 import { MediaType } from "../constants/database";
 import { Configuration } from "../types/config";
 import { v4 as uuidv4 } from "uuid";
 import logger from "../utilities/logger";
+import { PassThrough, Readable } from "stream";
+import ffmpegInstaller from "@ffmpeg-installer/ffmpeg";
+ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 
 export interface IS3Operations {
   // group is the uuid of the group this photo is being sent to (used as tagging number) -> make public group id number
@@ -69,32 +72,53 @@ export class S3Impl implements IS3Operations {
    * In general small images can lower qualities but less than 40 is not recomended
    * @param file The blob that will be compressed
    * @param imageQuality The quality of the image [0, 100]
-   * @returns A promise of the blob of the newly compressed image
+   * @returns A promise of the buffer of the newly compressed image
    */
-  async compressImage(file: Blob): Promise<Blob> {
+  async compressImage(file: Blob): Promise<Buffer> {
     const imageBuffer = await file.arrayBuffer();
-    const compressedImage = await sharp(imageBuffer).jpeg({ quality: 80 }).toBuffer();
-    return new Blob([compressedImage]);
+    return await sharp(Buffer.from(imageBuffer)).jpeg({ quality: 80 }).toBuffer();
   }
 
   /**
    * Will compress a given blob so that it takes up less storage and reduces load times
    * @param file The audio blob that will be compressed
-   * @returns A promise of a blob of the newly compressed audio recording
+   * @returns A promise of a buffer of the newly compressed audio recording
+   *
+   * Frontend has to send it raw PCM format, and must obey the rule
+   * - audio/wav
+   * - sample rate: 44100
+   * - bit depth: 16
+   *
+   * Number of channels: how many separate audio signals it contains
+   * - Mono: Single audio track (same sound in both ears/speakers).
+   * - Stereo: Two separate tracks (left & right channels for spatial sound).
+   * Bit depth: Number of bits used per sample to represent audio amplitude (volume precision, noise floor).
+   * - higher bit depth leads to larger file size
+   * Sample rate refers to the number of samples taken per sec to represent a continuous audio signal (how accurately sound is captured).
+   * - higher sample rate leads to larger file size
    */
-  async compressAudio(file: Blob): Promise<Blob> {
-    const compressedAudio = []; // holds the final compressed audio
-    const mp3encoder = new lame.Mp3Encoder(1, 44100, 128);
-    const audioBuffer: ArrayBuffer = await file.arrayBuffer();
-    const audioBufferInt16 = new Int16Array(audioBuffer, 0, Math.floor(audioBuffer.byteLength / 2));
-    let mp3Tmp = mp3encoder.encodeBuffer(audioBufferInt16);
+  async compressAudio(file: Blob): Promise<Buffer> {
+    // convert Blob to Buffer
+    const fileBuffer = Buffer.from(await file.arrayBuffer());
 
-    compressedAudio.push(mp3Tmp);
-    // flush the mp3encoder so that any remaining data is also pushed into the final
-    // compressed audio
-    mp3Tmp = mp3encoder.flush();
-    compressedAudio.push(mp3Tmp);
-    return new Blob(compressedAudio);
+    return new Promise((resolve, reject) => {
+      const inputStream = Readable.from(fileBuffer);
+      const outputStream = new PassThrough();
+      const chunks: Buffer[] = [];
+
+      ffmpeg(inputStream)
+        .audioFrequency(44100) // enforce 44.1kHz sample rate
+        .audioChannels(1) // enforce mono
+        .audioCodec("pcm_s16le") // force 16-bit PCM
+        .audioCodec("libmp3lame") // convert to MP3
+        .format("mp3") // output format
+        .on("error", (err) => reject(err))
+        .on("end", () => resolve(Buffer.concat(chunks)))
+        .pipe(outputStream);
+
+      outputStream.on("data", (chunk) => chunks.push(chunk));
+      outputStream.on("end", () => resolve(Buffer.concat(chunks)));
+    });
   }
 
   /**
@@ -108,13 +132,12 @@ export class S3Impl implements IS3Operations {
     const objectKey: string = uuidv4();
     const compressedFile =
       fileType == MediaType.PHOTO ? await this.compressImage(file) : await this.compressAudio(file);
-    const fileBuffer = await this.blobToBuffer(compressedFile);
     try {
       await this.client!.send(
         new PutObjectCommand({
           Bucket: this.bucketName,
           Key: objectKey,
-          Body: fileBuffer,
+          Body: compressedFile,
           ContentType: file.type,
           Tagging: `GroupID=${tag}`,
         }),
@@ -164,7 +187,7 @@ export class S3Impl implements IS3Operations {
       const command = new GetObjectCommand({
         Bucket: this.bucketName,
         Key: objectKey,
-        ResponseContentDisposition: 'inline',
+        ResponseContentDisposition: "inline",
       });
       const request = await getSignedUrl(this.client, command, { expiresIn: waitInSeconds });
       return request;
