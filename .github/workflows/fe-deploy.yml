@@ -1,4 +1,4 @@
-name: EAS Build
+name: EAS Deployment Build
 
 on:
   push:
