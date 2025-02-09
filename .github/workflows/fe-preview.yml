@@ -12,9 +12,6 @@ on:
 
 jobs:
   build:
-    # Run only if:
-    # 1. PR is ready for review, is a 'feat' PR, and not a draft.
-    # 2. A comment with "/trigger-build" is added on a PR.
     if: |
       github.event.issue.pull_request != null &&
       contains(github.event.comment.body, '/preview-build') &&
