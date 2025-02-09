@@ -12,22 +12,10 @@
       "distribution": "internal"
     },
     "production": {
-      "ios": {
-        "buildType": "release",
-        "distribution": "app-store"
-      },
-      "android": {
-        "buildType": "apk"
-      },
       "autoIncrement": true
     }
   },
   "submit": {
-    "production": {
-      "ios": {
-        "appleId": ""
-      }
-    }
+    "production": {}
   }
 }
-
