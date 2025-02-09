@@ -13,6 +13,8 @@ export const commentsRoutes = (db: PostgresJsDatabase, mediaService: MediaServic
   const commentController: CommentController = new CommentControllerImpl(commentService);
 
   comment.patch("/comments/:id/likes", (ctx) => commentController.toggleLikeComment(ctx));
-
+  comment.post("/posts/:id/comments", (ctx) => commentController.createComment(ctx));
+  comment.get("posts/:id/comments", (ctx) => commentController.getComments(ctx));
+  comment.delete("comments/:id", (ctx) => commentController.deleteComment(ctx));
   return comment;
 };
