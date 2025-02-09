@@ -4,17 +4,27 @@
     "appVersionSource": "remote"
   },
   "build": {
+    "base": {
+      "android": {
+        "image": "latest"
+      },
+      "ios": {
+        "image": "latest"
+      }
+    },
     "development": {
+      "extends": "base",
       "developmentClient": true,
       "distribution": "internal"
     },
     "preview": {
+      "extends": "base",
       "distribution": "internal"
     },
     "production": {
+      "extends": "base",
       "ios": {
-        "buildType": "release",
-        "distribution": "app-store"
+        "distribution": "store"
       },
       "android": {
         "buildType": "apk"
@@ -25,7 +35,7 @@
   "submit": {
     "production": {
       "ios": {
-        "appleId": ""
+        "appleId": "to-be-added@example.com"
       }
     }
   }
