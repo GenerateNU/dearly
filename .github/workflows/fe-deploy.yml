@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "frontend/**"
+
 jobs:
   build:
     name: Install and build

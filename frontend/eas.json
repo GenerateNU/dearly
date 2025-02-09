@@ -35,7 +35,8 @@
   "submit": {
     "production": {
       "ios": {
-        "appleId": "to-be-added@example.com"
+        "appleId": "to-be-added@example.com",
+        "ascAppId": "to-be-added-app-store-connect-app-id"
       }
     }
   }
