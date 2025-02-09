@@ -1,16 +1,28 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { membersTable, groupsTable, usersTable } from "../schema";
-import { eq, and, sql } from "drizzle-orm";
+import {
+  membersTable,
+  groupsTable,
+  usersTable,
+  postsTable,
+  likesTable,
+  commentsTable,
+  mediaTable,
+} from "../schema";
+import { eq, and, sql, desc } from "drizzle-orm";
 import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
 import { AddMemberPayload, Member } from "../../types/api/internal/members";
 import { IDPayload } from "../../types/id";
 import { Pagination, SearchedUser } from "../../types/api/internal/users";
+import { PostWithMedia } from "../../types/api/internal/posts";
+import { getPostMetadata } from "../../utilities/query";
+import { Transaction } from "../../types/api/internal/transaction";
 
 export interface MemberTransaction {
   insertMember(payload: AddMemberPayload): Promise<Member | null>;
   deleteMember(clientId: string, userId: string, groupId: string): Promise<Member | null>;
   getMembers(groupId: string, payload: Pagination): Promise<SearchedUser[] | null>;
   toggleNotification(payload: IDPayload): Promise<boolean>;
+  getMemberPosts(payload: Pagination, viewer: string, groupId: string): Promise<PostWithMedia[]>;
 }
 
 export class MemberTransactionImpl implements MemberTransaction {
@@ -95,30 +107,10 @@ export class MemberTransactionImpl implements MemberTransaction {
 
   async toggleNotification({ id, userId }: IDPayload): Promise<boolean> {
     return await this.db.transaction(async (tx) => {
-      //check if the group exists
-      const groupExists = await tx
-        .select({ id: groupsTable.id })
-        .from(groupsTable)
-        .where(eq(groupsTable.id, id))
-        .limit(1);
-
-      if (!groupExists.length) {
-        throw new NotFoundError("Group");
-      }
-
-      // check if the user is a member and get their notification setting
-      const [member] = await tx
-        .select({ notificationEnabled: membersTable.notificationsEnabled })
-        .from(membersTable)
-        .where(and(eq(membersTable.groupId, id), eq(membersTable.userId, userId)))
-        .limit(1);
-
-      if (!member) {
-        throw new ForbiddenError();
-      }
+      const member = await this.validateGroup(id, userId, tx);
 
       // toggle notification setting
-      const newNotificationState = !member.notificationEnabled;
+      const newNotificationState = !member.notificationsEnabled;
 
       // update the database within the transaction
       await tx
@@ -127,6 +119,70 @@ export class MemberTransactionImpl implements MemberTransaction {
         .where(and(eq(membersTable.groupId, id), eq(membersTable.userId, userId)));
 
       return newNotificationState;
+    });
+  }
+
+  private async validateGroup(groupId: string, userId: string, tx: Transaction): Promise<Member> {
+    // check if the group exists
+    const groupExists = await tx
+      .select({ id: groupsTable.id })
+      .from(groupsTable)
+      .where(eq(groupsTable.id, groupId))
+      .limit(1);
+
+    if (!groupExists.length) {
+      throw new NotFoundError("Group");
+    }
+
+    // check if the user is a member and get their notification setting
+    const [member] = await tx
+      .select()
+      .from(membersTable)
+      .where(and(eq(membersTable.groupId, groupId), eq(membersTable.userId, userId)))
+      .limit(1);
+
+    if (!member) {
+      throw new ForbiddenError();
+    }
+
+    return member;
+  }
+
+  async getMemberPosts(
+    { id: viewee, limit, page }: Pagination,
+    viewer: string,
+    groupId: string,
+  ): Promise<PostWithMedia[]> {
+    return await this.db.transaction(async (tx) => {
+      // validate whether group exists or viewer belongs to the group
+      await this.validateGroup(groupId, viewer, tx);
+
+      // check if user exists or not
+      const [user] = await tx.select().from(usersTable).where(eq(usersTable.id, viewee));
+      if (!user) {
+        throw new NotFoundError("User");
+      }
+
+      return await tx
+        .select(getPostMetadata(viewee))
+        .from(postsTable)
+        .leftJoin(likesTable, eq(likesTable.postId, postsTable.id))
+        .leftJoin(commentsTable, eq(commentsTable.postId, postsTable.id))
+        .innerJoin(usersTable, eq(postsTable.userId, usersTable.id))
+        .innerJoin(mediaTable, eq(mediaTable.postId, postsTable.id))
+        .where(and(eq(postsTable.userId, viewee), eq(postsTable.groupId, groupId)))
+        .groupBy(
+          postsTable.id,
+          postsTable.userId,
+          postsTable.groupId,
+          postsTable.createdAt,
+          postsTable.caption,
+          postsTable.location,
+          usersTable.profilePhoto,
+        )
+        .orderBy(desc(postsTable.createdAt))
+        .limit(limit)
+        .offset((page - 1) * limit);
     });
   }
 }

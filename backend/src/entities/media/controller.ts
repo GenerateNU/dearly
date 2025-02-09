@@ -2,10 +2,11 @@ import { Context } from "hono";
 import { MediaService } from "./service";
 import { BadRequestError, handleAppError } from "../../utilities/errors/app-error";
 import { parseUUID } from "../../utilities/uuid";
-import { MEDIA } from "../../types/api/routes/media";
+import { GROUP_MEDIA, USER_MEDIA } from "../../types/api/routes/media";
 
 export interface MediaController {
-  uploadMedia(ctx: Context): Promise<MEDIA>;
+  uploadPostMedia(ctx: Context): Promise<GROUP_MEDIA>;
+  uploadUserMedia(ctx: Context): Promise<USER_MEDIA>;
 }
 
 export class MediaControllerImpl implements MediaController {
@@ -15,7 +16,7 @@ export class MediaControllerImpl implements MediaController {
     this.mediaService = mediaService;
   }
 
-  async uploadMedia(ctx: Context): Promise<MEDIA> {
+  async uploadPostMedia(ctx: Context): Promise<GROUP_MEDIA> {
     const uploadMediaImpl = async () => {
       const groupId = parseUUID(ctx.req.param("id"));
       const userId = ctx.get("userId");
@@ -28,8 +29,28 @@ export class MediaControllerImpl implements MediaController {
 
       const blobs = this.checkMediaType(media);
 
-      const objectKeys = await this.mediaService.uploadMedia(blobs, groupId, userId);
+      const objectKeys = await this.mediaService.uploadPostMedia(blobs, groupId, userId);
       return ctx.json(objectKeys, 201);
+    };
+    return await handleAppError(uploadMediaImpl)(ctx);
+  }
+
+  async uploadUserMedia(ctx: Context): Promise<USER_MEDIA> {
+    const uploadMediaImpl = async () => {
+      const userId = ctx.get("userId");
+      const body = await ctx.req.parseBody();
+      const media = body["media"];
+
+      if (!media) {
+        throw new BadRequestError("No media found");
+      }
+
+      if (media instanceof File) {
+        const objectKeys = await this.mediaService.uploadUserMedia(media, userId);
+        return ctx.json(objectKeys, 201);
+      }
+
+      throw new BadRequestError("Invalid file type");
     };
     return await handleAppError(uploadMediaImpl)(ctx);
   }

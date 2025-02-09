@@ -6,7 +6,7 @@ import { HTTPRequest, Status } from "../../constants/http";
 import { MemberRole } from "../../constants/database";
 import { DEARLY_GROUP_ID, USER_ALICE_ID, USER_ANA_ID } from "./../helpers/test-constants";
 
-describe("POST /members", () => {
+describe("POST /groups/:id/members", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
 

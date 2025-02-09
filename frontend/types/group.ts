@@ -19,3 +19,6 @@ export type GroupMembers =
 
 export type InvitationToken =
   paths["/api/v1/groups/{groupId}/invites"]["get"]["responses"]["200"]["content"]["application/json"];
+
+export type MemberPosts =
+  paths["/api/v1/groups/{id}/members/{userId}/posts"]["get"]["responses"]["200"]["content"]["application/json"];

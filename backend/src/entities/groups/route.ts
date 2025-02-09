@@ -6,7 +6,6 @@ import { GroupTransaction, GroupTransactionImpl } from "./transaction";
 import { GroupService, GroupServiceImpl } from "./service";
 import { MediaService } from "../media/service";
 import { invitationRoutes } from "../invitations/route";
-import { mediaRoutes } from "../media/route";
 import { memberRoutes } from "../members/route";
 import { Expo } from "expo-server-sdk";
 
@@ -28,7 +27,6 @@ export const groupRoutes = (
   group.get("/:id", (ctx) => groupController.getGroup(ctx));
   group.patch("/:id", (ctx) => groupController.updateGroup(ctx));
   group.route("/", invitationRoutes(db));
-  group.route("/:id/media", mediaRoutes(mediaService));
   group.route("/:id/members", memberRoutes(db, mediaService));
   group.route("/:id/nudges", nudgeRoutes(db, expo));
 

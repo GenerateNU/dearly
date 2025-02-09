@@ -7,7 +7,8 @@ export const mediaRoutes = (mediaService: MediaService): Hono => {
 
   const mediaController: MediaController = new MediaControllerImpl(mediaService);
 
-  media.post("/", (ctx) => mediaController.uploadMedia(ctx));
+  media.post("/groups/:id/media", (ctx) => mediaController.uploadPostMedia(ctx));
+  media.post("/users/media", (ctx) => mediaController.uploadUserMedia(ctx));
 
   return media;
 };

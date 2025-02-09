@@ -15,6 +15,3 @@ export type AgeGroup =
 
 export type UserGroups =
   paths["/api/v1/users/groups"]["get"]["responses"]["200"]["content"]["application/json"];
-
-export type UserPosts =
-  paths["/api/v1/users/{id}/posts"]["get"]["responses"]["200"]["content"]["application/json"];
