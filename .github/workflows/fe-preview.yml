@@ -7,13 +7,22 @@ on:
     paths:
       - "frontend/**"
 
+  issue_comment:
+    types: [created]
+
 jobs:
   build:
-    # only build if there is frontend change, a feature, and not a draft PR
+    # Run only if:
+    # 1. PR is ready for review, is a 'feat' PR, and not a draft.
+    # 2. A comment with "/trigger-build" is added on a PR.
     if: |
-      contains(github.event.pull_request.title, 'feat') &&
-      github.event.pull_request.draft == false &&
-      github.actor != 'dependabot[bot]'    
+      github.event.issue.pull_request != null &&
+      contains(github.event.comment.body, '/preview-build') &&
+      github.actor != 'dependabot[bot]'
+
+    concurrency:
+      group: pr-${{ github.event.issue.number || github.event.pull_request.number }}
+      cancel-in-progress: true
 
     name: Install and build
     runs-on: ubuntu-latest
@@ -55,11 +64,14 @@ jobs:
           ISSUE_URL=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             -X POST -d '{"query": "query { repository(owner: \"${{ github.repository_owner }}\", name: \"${{ github.event.repository.name }}\") { pullRequest(number: ${{ github.event.pull_request.number }}) { closingIssuesReferences(first: 1) { nodes { url } } } } }"}' \
             https://api.github.com/graphql | jq -r '.data.repository.pullRequest.closingIssuesReferences.nodes[0].url')
-          
+        
           if [[ "$ISSUE_URL" != "null" && -n "$ISSUE_URL" ]]; then
             echo "issue_url=$ISSUE_URL" >> $GITHUB_OUTPUT
+          else
+            echo "No linked issue found."
+            echo "issue_url=" >> $GITHUB_OUTPUT
           fi
-
+        
       - name: Start EAS Build
         id: eas_build
         run: |
@@ -88,18 +100,19 @@ jobs:
             sleep 60
           done
 
-      # TODO: figure out how to get Slack Github bot token
       - name: Send Slack notification
         uses: slackapi/slack-github-action@v1.24.0
         with:
           channel-id: '${{ secrets.DEARLY_SLACK_CHANNEL_ID }}'
           slack-message: |
             Hey <!subteam^${{ secrets.DEARLY_MEMBERS_SLACK_ID }}> designers and engineers! 💛
-            
+              
             A new version of the app is ready for testing: "${{ github.event.pull_request.title }}"
-            
+              
             📱 Test the changes: ${{ steps.wait_build.outputs.build_url }}
             🔍 View the PR: ${{ github.event.pull_request.html_url }}
-            ${{ steps.extract_issue.outputs.issue_url && format('🔗 View the ticket: {0}', steps.extract_issue.outputs.issue_url) || '' }}
+            ${{ steps.extract_issue.outputs.issue_url != '' && format('🔗 View the ticket: {0}', steps.extract_issue.outputs.issue_url) || '' }}
+        
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        
