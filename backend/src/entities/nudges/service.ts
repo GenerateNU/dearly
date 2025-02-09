@@ -5,9 +5,11 @@ import { NotificationMetadata } from "./validator";
 import logger from "../../utilities/logger";
 import { getNotificationBody } from "../../utilities/nudge";
 import { InternalServerError } from "../../utilities/errors/app-error";
+import { AddNudgeSchedulePayload, NudgeSchedule } from "../../types/api/internal/nudges";
 
 export interface NudgeService {
   manualNudge(userIds: string[], groupId: string, managerId: string): Promise<void>;
+  createSchedule(managerId: string, payload: AddNudgeSchedulePayload): Promise<NudgeSchedule | null>;
 }
 
 export class NudgeServiceImpl implements NudgeService {
@@ -30,6 +32,26 @@ export class NudgeServiceImpl implements NudgeService {
       const notificationTickets = this.formatPushNotifications(notificationMetadata);
       await this.sendPushNotifications(notificationTickets);
     };
+    return await handleServiceError(manualNudgeImpl)();
+  }
+
+  async createSchedule(managerId: string, payload: AddNudgeSchedulePayload): Promise<NudgeSchedule | null> {
+    const manualNudgeImpl = async () => {
+      // Add schedule
+      const schedule = await this.nudgeTransaction.createSchedule (
+        managerId, 
+        payload
+      );
+
+      if (!schedule) {
+        throw new InternalServerError("Failed to add schedule");
+      }
+      
+      // TODO: call the eventbridge scheduler to add the schedule
+
+      return schedule;
+    };
+
     return await handleServiceError(manualNudgeImpl)();
   }
 

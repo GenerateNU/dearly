@@ -13,6 +13,10 @@ export const nudgeRoutes = (db: PostgresJsDatabase, expo: Expo): Hono => {
   const nudgeController: NudgeController = new NudgeControllerImpl(nudgeService);
 
   nudge.post("/manual", (ctx) => nudgeController.manualNudge(ctx));
+  nudge.post("/auto", (ctx) => nudgeController.manualNudge(ctx));
+  nudge.get("/auto", (ctx) => nudgeController.manualNudge(ctx));
+  nudge.put("/auto", (ctx) => nudgeController.manualNudge(ctx));
+
 
   return nudge;
 };

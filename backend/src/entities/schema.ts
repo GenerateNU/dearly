@@ -21,6 +21,7 @@ import { NAME_MAX_LIMIT } from "../constants/database";
 export const userModeEnum = pgEnum("mode", ["BASIC", "ADVANCED"]);
 export const postMediaEnum = pgEnum("mediaType", ["VIDEO", "PHOTO"]);
 export const memberRoleEnum = pgEnum("role", ["MEMBER", "MANAGER"]);
+export const nudgeFrequencyEnum = pgEnum("frequency", ["DAILY", "WEEKLY", "BIWEEKLY", "MONTHLY", "YEARLY"])
 export const referenceTypeEnum = pgEnum("referenceType", [
   "POST",
   "COMMENT",
@@ -184,6 +185,20 @@ export const invitationsTable = pgTable("invitations", {
   status: invitationStatusEnum().notNull().default("PENDING"),
   createdAt: timestamp().notNull().defaultNow(),
 });
+
+export const scheduledNudgesTable = pgTable("scheduledNudges", {
+  id: uuid().primaryKey().defaultRandom(),
+  groupId: uuid().notNull().references(() => groupsTable.id, { onDelete: "cascade" }),
+  frequency: nudgeFrequencyEnum().notNull().default("WEEKLY"), // TODO: should we just set a default weekly frequency?
+  daysOfWeek: integer("days[]").array(), // (1-7) TODO: enforce min/max types?
+  day: integer("day"), // (1-31)
+  month: integer("month"), // (1-12)
+  nudge_at: timestamp("nudge_at", { withTimezone: true }).notNull(),
+  isActive: boolean().notNull().default(true),
+  lastSent: date("lastSent").notNull(), // TODO: add default value and figure out correct datatype
+  created_at: timestamp("created_at").notNull().defaultNow(), // immutable
+  updated_at: timestamp("updated_at").notNull().defaultNow(),
+})
 
 export const likeCommentRelations = relations(likeCommentsTable, ({ one }) => ({
   user: one(usersTable, {

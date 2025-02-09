@@ -1,6 +1,6 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { NotificationMetadata, NudgeTarget } from "./validator";
-import { devicesTable, groupsTable, membersTable, usersTable } from "../schema";
+import { devicesTable, groupsTable, membersTable, scheduledNudgesTable, usersTable } from "../schema";
 import { eq, inArray, and, isNotNull, gt, not } from "drizzle-orm";
 import {
   ForbiddenError,
@@ -9,6 +9,7 @@ import {
 } from "../../utilities/errors/app-error";
 import { ONE_DAY_COOLDOWN_SEC } from "../../constants/nudge";
 import { Transaction } from "../../types/api/internal/transaction";
+import { AddNudgeSchedulePayload, NudgeSchedule } from "../../types/api/internal/nudges";
 
 export interface NudgeTransaction {
   getNotificationMetadata(
@@ -16,6 +17,8 @@ export interface NudgeTransaction {
     groupId: string,
     managerId: string,
   ): Promise<NotificationMetadata>;
+
+  createSchedule(managerId: string, payload: AddNudgeSchedulePayload): Promise<NudgeSchedule | null>;
 }
 
 export class NudgeTransactionImpl {
@@ -23,6 +26,27 @@ export class NudgeTransactionImpl {
 
   constructor(db: PostgresJsDatabase) {
     this.db = db;
+  }
+
+  async createSchedule(managerId: string, payload: AddNudgeSchedulePayload): Promise<NudgeSchedule | null> {
+    return await this.db.transaction(async (tx) => {
+      // validate group existence and manager permissions
+      await this.validateGroup(tx, payload.groupId, managerId);
+
+      // Insert the value into the database
+      await this.db.insert(scheduledNudgesTable).values(payload).onConflictDoNothing();
+
+      // TODO: handle updating a schedule that already exists for this group
+      const [nudgeSchedule] = await this.db
+        .select()
+        .from(scheduledNudgesTable)
+        .where(
+          eq(scheduledNudgesTable.groupId, payload.groupId),
+        )
+        .limit(1);
+
+      return nudgeSchedule ?? null;
+    });
   }
 
   async getNotificationMetadata(
