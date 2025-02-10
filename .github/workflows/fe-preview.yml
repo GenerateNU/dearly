@@ -149,6 +149,11 @@ jobs:
           status: ${{ job.status }}
 
       - name: Send Slack notification via Webhook
+        env:
+          PR_TITLE: ${{ github.event.issue.title }}
+          PR_URL: ${{ github.event.issue.html_url }}
+          BUILD_URL: ${{ steps.wait_build.outputs.build_url }}
+          SLACK_ID: ${{ secrets.DEARLY_MEMBERS_SLACK_ID }}
         run: |
           ISSUE_URL="${{ steps.extract_issue.outputs.issue_url }}"
 
@@ -159,11 +164,11 @@ jobs:
           fi
 
           PAYLOAD=$(jq -n \
-            --arg pr_title "${{ github.event.issue.title }}" \
-            --arg pr_url "${{ github.event.issue.html_url }}" \
+            --arg pr_title "$PR_TITLE" \
+            --arg pr_url "$PR_URL" \
             --arg issue_text "$ISSUE_TEXT" \
-            --arg slack_id "${{ secrets.DEARLY_MEMBERS_SLACK_ID }}" \
-            --arg build_url "${{ steps.wait_build.outputs.build_url }}"
+            --arg slack_id "$SLACK_ID" \
+            --arg build_url "$BUILD_URL"
             '{
               text: "Hey <!subteam^$slack_id> designers and engineers! 💛\n\n"
               A new version of Dearly is now ready for review: \"\($pr_title)\"\n\n
