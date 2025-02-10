@@ -1,19 +1,13 @@
 name: EAS Internal Preview Build
 
 on:
-  pull_request:
-    types:
-      - ready_for_review
-    # paths:
-    #   - "frontend/**"
-
   issue_comment:
     types: [created]
 
 jobs:
   build:
     if: |
-      github.event.issue.pull_request != null &&
+      github.event.issue.pull_request &&
       contains(github.event.comment.body, '/preview-build') &&
       github.actor != 'dependabot[bot]'
 
