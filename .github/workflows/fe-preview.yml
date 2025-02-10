@@ -1,9 +1,6 @@
 name: EAS Internal Preview Build
 
 on:
-  push:
-    branches-ignore:
-      - main
   issue_comment:
     types: [created]
 
