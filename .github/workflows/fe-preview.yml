@@ -114,7 +114,7 @@ jobs:
               echo "Build failed ❌"
               exit 1
             fi
-            sleep 60
+            sleep 30
           done
   
       - name: Add workflow result as comment on PR
