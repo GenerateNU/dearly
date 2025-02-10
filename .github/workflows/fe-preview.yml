@@ -1,15 +1,22 @@
 name: EAS Internal Preview Build
 
 on:
+  push:
+    branches-ignore:
+      - main
   issue_comment:
     types: [created]
+
+permissions:
+  issues: write
+  pull-requests: write
+  contents: read
 
 jobs:
   build:
     if: |
-      github.event.issue && 
-      github.event.issue.pull_request && 
-      contains(github.event.comment.body, '/preview-build') &&
+      github.event.comment.body == '/preview-build' &&
+      github.event.issue.pull_request != null &&
       github.actor != 'dependabot[bot]'
 
     name: Install and build
@@ -46,35 +53,35 @@ jobs:
               body: body
             })
       
-      # - name: Setup Bun
-      #   uses: oven-sh/setup-bun@v1
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
       
-      # - name: Install dependencies
-      #   run: cd frontend && bun install
+      - name: Install dependencies
+        run: cd frontend && bun install
       
-      # - name: Setup Expo and EAS
-      #   uses: expo/expo-github-action@v8
-      #   with:
-      #     eas-version: latest
-      #     token: ${{ secrets.EXPO_TOKEN }}
+      - name: Setup Expo and EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
       
-      # - name: Validate env variables
-      #   run: |
-      #     for var in EXPO_PUBLIC_SUPABASE_URL EXPO_PUBLIC_SUPABASE_ANON_KEY; do
-      #       if [[ -z "${!var}" ]]; then
-      #         echo "Missing $var"
-      #         exit 1
-      #       fi
-      #     done
-      #   env:
-      #     EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
-      #     EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
+      - name: Validate env variables
+        run: |
+          for var in EXPO_PUBLIC_SUPABASE_URL EXPO_PUBLIC_SUPABASE_ANON_KEY; do
+            if [[ -z "${!var}" ]]; then
+              echo "Missing $var"
+              exit 1
+            fi
+          done
+        env:
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
 
       - name: Extract Linked Issue
         id: extract_issue
         run: |
           ISSUE_URL=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            -X POST -d '{"query": "query { repository(owner: \"${{ github.repository_owner }}\", name: \"${{ github.event.repository.name }}\") { pullRequest(number: ${{ github.event.pull_request.number }}) { closingIssuesReferences(first: 1) { nodes { url } } } } }"}' \
+            -X POST -d '{"query": "query { repository(owner: \"${{ github.repository_owner }}\", name: \"${{ github.event.repository.name }}\") { pullRequest(number: ${{ github.event.issue.number }}) { closingIssuesReferences(first: 1) { nodes { url } } } } }"}' \
             https://api.github.com/graphql | jq -r '.data.repository.pullRequest.closingIssuesReferences.nodes[0].url')
         
           if [[ "$ISSUE_URL" != "null" && -n "$ISSUE_URL" ]]; then
@@ -84,33 +91,33 @@ jobs:
             echo "issue_url=" >> $GITHUB_OUTPUT
           fi
         
-      # - name: Start EAS Build
-      #   id: eas_build
-      #   run: |
-      #     BUILD_OUTPUT=$(eas build --platform "$DEPLOY_PLATFORM" --non-interactive --profile "$BUILD_PROFILE" --json)
-      #     BUILD_ID=$(echo "$BUILD_OUTPUT" | jq -r '.id')
-      #     if [[ -z "$BUILD_ID" ]]; then 
-      #       echo "Failed to extract BUILD_ID"
-      #       exit 1
-      #     fi
-      #     echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
+      - name: Start EAS Build
+        id: eas_build
+        run: |
+          BUILD_OUTPUT=$(eas build --platform "$DEPLOY_PLATFORM" --non-interactive --profile "$BUILD_PROFILE" --json)
+          BUILD_ID=$(echo "$BUILD_OUTPUT" | jq -r '.id')
+          if [[ -z "$BUILD_ID" ]]; then 
+            echo "Failed to extract BUILD_ID"
+            exit 1
+          fi
+          echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
 
-      # - name: Wait for Build Completion
-      #   id: wait_build
-      #   run: |
-      #     while true; do
-      #       STATUS_OUTPUT=$(eas build:list --json | jq -r --arg BUILD_ID "${{ steps.eas_build.outputs.build_id }}" '.[] | select(.id == $BUILD_ID) | .status')
-      #       echo "Current build status: $STATUS_OUTPUT"
-      #       if [[ "$STATUS_OUTPUT" == "finished" ]]; then
-      #         BUILD_URL=$(eas build:list --json | jq -r --arg BUILD_ID "${{ steps.eas_build.outputs.build_id }}" '.[] | select(.id == $BUILD_ID) | .artifacts.buildUrl')
-      #         echo "build_url=$BUILD_URL" >> $GITHUB_OUTPUT  # Store in GITHUB_OUTPUT
-      #         break
-      #       elif [[ "$STATUS_OUTPUT" == "errored" ]]; then
-      #         echo "Build failed ❌"
-      #         exit 1
-      #       fi
-      #       sleep 60
-      #     done
+      - name: Wait for Build Completion
+        id: wait_build
+        run: |
+          while true; do
+            STATUS_OUTPUT=$(eas build:list --json | jq -r --arg BUILD_ID "${{ steps.eas_build.outputs.build_id }}" '.[] | select(.id == $BUILD_ID) | .status')
+            echo "Current build status: $STATUS_OUTPUT"
+            if [[ "$STATUS_OUTPUT" == "finished" ]]; then
+              BUILD_URL=$(eas build:list --json | jq -r --arg BUILD_ID "${{ steps.eas_build.outputs.build_id }}" '.[] | select(.id == $BUILD_ID) | .artifacts.buildUrl')
+              echo "build_url=$BUILD_URL" >> $GITHUB_OUTPUT  # Store in GITHUB_OUTPUT
+              break
+            elif [[ "$STATUS_OUTPUT" == "errored" ]]; then
+              echo "Build failed ❌"
+              exit 1
+            fi
+            sleep 60
+          done
 
       - name: Send Slack notification via Webhook
         run: |
