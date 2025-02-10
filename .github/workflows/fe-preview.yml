@@ -88,7 +88,7 @@ jobs:
             echo "Current build status: $STATUS_OUTPUT"
             if [[ "$STATUS_OUTPUT" == "finished" ]]; then
               BUILD_URL=$(eas build:list --json | jq -r --arg BUILD_ID "${{ steps.eas_build.outputs.build_id }}" '.[] | select(.id == $BUILD_ID) | .artifacts.buildUrl')
-              echo "build_url=$BUILD_URL" >> $GITHUB_OUTPUT
+              echo "build_url=$BUILD_URL" >> $GITHUB_OUTPUT  # Store in GITHUB_OUTPUT
               break
             elif [[ "$STATUS_OUTPUT" == "errored" ]]; then
               echo "Build failed ❌"
@@ -97,19 +97,22 @@ jobs:
             sleep 60
           done
 
-      - name: Send Slack notification
-        uses: slackapi/slack-github-action@v1.24.0
-        with:
-          channel-id: '${{ secrets.DEARLY_SLACK_CHANNEL_ID }}'
-          slack-message: |
-            Hey <!subteam^${{ secrets.DEARLY_MEMBERS_SLACK_ID }}> designers and engineers! 💛
-              
-            A new version of the app is ready for testing: "${{ github.event.pull_request.title }}"
-              
-            📱 Test the changes: ${{ steps.wait_build.outputs.build_url }}
-            🔍 View the PR: ${{ github.event.pull_request.html_url }}
-            ${{ steps.extract_issue.outputs.issue_url != '' && format('🔗 View the ticket: {0}', steps.extract_issue.outputs.issue_url) || '' }}
-        
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-        
+      - name: Send Slack notification via Webhook
+        run: |
+          ISSUE_URL="${{ steps.extract_issue.outputs.issue_url }}"
+
+          if [[ -n "$ISSUE_URL" ]]; then
+            ISSUE_TEXT="🔗 *View the ticket:* <$ISSUE_URL|Ticket>"
+          else
+            ISSUE_TEXT=""
+          fi
+
+          curl -X POST -H "Content-type: application/json" \
+          --data "{
+            \"text\": \"Hey <!subteam^${{ secrets.DEARLY_MEMBERS_SLACK_ID }}> designers and engineers! 💛\n\n
+            *A new version of the app is ready for testing:* \\\"${{ github.event.pull_request.title }}\\\"\n\n
+            📱 *Test the changes:* <${{ env.BUILD_URL }}|Click here>\n
+            🔍 *View the PR:* <${{ github.event.pull_request.html_url }}|Pull Request>\n
+            $ISSUE_TEXT
+          }" \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
