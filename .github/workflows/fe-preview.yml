@@ -4,8 +4,8 @@ on:
   pull_request:
     types:
       - ready_for_review
-    paths:
-      - "frontend/**"
+    # paths:
+    #   - "frontend/**"
 
   issue_comment:
     types: [created]
