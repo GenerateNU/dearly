@@ -153,22 +153,22 @@ jobs:
           ISSUE_URL="${{ steps.extract_issue.outputs.issue_url }}"
 
           if [[ -n "$ISSUE_URL" ]]; then
-            ISSUE_TEXT="🔗 View ticket: <$ISSUE_URL|Ticket>"
+            ISSUE_TEXT="🔗 View ticket: <$ISSUE_URL|Ticket Details>"
           else
             ISSUE_TEXT=""
           fi
 
           PAYLOAD=$(jq -n \
-            --arg pr_title "PR Title" \
-            --arg pr_url "PR URL" \
+            --arg pr_title "${{ github.event.issue.title }}" \
+            --arg pr_url "${{ github.event.issue.html_url }}" \
             --arg issue_text "$ISSUE_TEXT" \
             --arg slack_id "${{ secrets.DEARLY_MEMBERS_SLACK_ID }}" \
             --arg build_url "${{ steps.wait_build.outputs.build_url }}"
             '{
               text: "Hey <!subteam^$slack_id> designers and engineers! 💛\n\n"
-              A new version of Dearly is ready for review: \"\($pr_title)\"\n\n
-              📱 Test UI/UX: <\($build_url)|Click here>\n
-              🔍 View PR: <\($pr_url)|Click here>\n\n
+              A new version of Dearly is now ready for review: \"\($pr_title)\"\n\n
+              📱 Test UI/UX: <\($build_url)|Build URL>\n
+              🔍 View PR: <\($pr_url)|Pull Request Details>\n\n
               \($issue_text)"
             }')
 
