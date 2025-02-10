@@ -6,6 +6,7 @@ import { setUpRoutes } from "./routes/init";
 import { automigrateDB } from "./database/migrate";
 import { generateJWTFromID } from "./tests/helpers/test-token";
 import { S3Impl } from "./services/s3Service";
+import { ExpoNotificationService } from "./services/notificationsService";
 
 const app = new Hono();
 
@@ -23,6 +24,8 @@ const config = getConfigurations();
     configureMiddlewares(app, config);
 
     setUpRoutes(app, db, s3ServiceProvider);
+
+    new ExpoNotificationService(config, db);
 
     console.log("Successfully initialize app");
   } catch (error) {

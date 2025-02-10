@@ -17,8 +17,15 @@ mock.module("expo-server-sdk", () => {
       async sendPushNotificationsAsync(message: ExpoPushMessage[]): Promise<ExpoPushTicket[]> {
         return Promise.resolve([]);
       }
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      async chunkPushNotifictions(message: ExpoPushMessage[]): Promise<ExpoPushMessage[]> {
+        return Promise.resolve([]);
+      }
     },
   };
 });
 
 export const sendPushNotificationsAsyncSpy = spyOn(Expo.prototype, "sendPushNotificationsAsync");
+
+export const chunkPushNotificationsSpy = spyOn(Expo.prototype, "chunkPushNotifications");

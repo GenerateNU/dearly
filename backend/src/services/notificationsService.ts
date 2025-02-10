@@ -6,21 +6,21 @@ import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { postValidate } from "../entities/posts/validator";
 import { Post } from "../types/api/internal/posts";
 import { eq } from "drizzle-orm";
-import { groupsTable, membersTable, notificationsTable, postsTable } from "../entities/schema";
+import {
+  devicesTable,
+  groupsTable,
+  membersTable,
+  notificationsTable,
+  postsTable,
+  usersTable,
+} from "../entities/schema";
 import { Like, likeValidate } from "../entities/likes/validator";
 import { Comment, commentValidate } from "../types/api/internal/comments";
-import { Platform } from "react-native";
-import * as Device from "expo-device";
-import * as Notifications from "expo-notifications";
-import Constants from "expo-constants";
+import { P } from "pino";
 
 /*
 Questions for our tech leads
-- Where should we store our push tokens in the database (probably in the users table)
-- what is the referenceType in the notifications table
-- how to mock the expo push notifications
 - **use spy (in help folder) to mock the expo push notifications
-- also why not put notifications enabled in the users table
   - Mai: we don't put it in notification table because we want users to be able to turn on/off for a specific group
     Also, you guys don't need to worry about registering device tokens since the frontend is handling that,
     which implies we won't need to import from expo-device, expo-notifications, expo-constants, react-native
@@ -28,17 +28,34 @@ Questions for our tech leads
 */
 
 export interface INotificationService {
-  unsubscribe(pushToken: string): void;
+  /**
+   * Unsubscribe a user from notifications by setting their notificationsEnabled to false
+   * @param userId the id of the user to unsubscribe
+   */
+  unsubscribe(userId: string): void;
 
-  subscribe(userId: string): void;
+  /**
+   * Notifies all group members of a new post.
+   * @param post the new post that a user has made.
+   */
+  notifyPost(post: Post): Promise<Notification[]>;
 
-  notifyPost(post: Post): Promise<void>;
+  /**
+   * Alerts the post maker that someone has liked their post.
+   * @param like a user liking a post
+   */
+  notifyLike(like: Like): Promise<Notification>;
 
-  notifyLike(like: Like): Promise<void>;
-
-  notifyComment(comment: Comment): Promise<void>;
+  /**
+   * Alerts the post maker that someone has commented on their post.
+   * @param comment a user commenting on a post
+   */
+  notifyComment(comment: Comment): Promise<Notification>;
 }
 
+/**
+ * A service that sends notifications to users when certain events occur.
+ */
 export class ExpoNotificationService implements INotificationService {
   private expo = new Expo();
   private supabaseClient: SupabaseClient;
@@ -47,19 +64,24 @@ export class ExpoNotificationService implements INotificationService {
   constructor(config: Configuration, db: PostgresJsDatabase) {
     this.supabaseClient = createClient(config.supabase.url, config.supabase.key);
 
+    const roomOne = this.supabaseClient.channel("posts_channel");
+    const roomTwo = this.supabaseClient.channel("comments");
+    const roomThree = this.supabaseClient.channel("likes");
+
     this.supabaseClient
-      .channel("posts")
+      .channel("posts_channel")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "posts" }, (payload) => {
+        console.log("New post created");
         const post: Post = postValidate.parse(payload.new);
         this.notifyPost(post);
       })
       .subscribe();
 
     this.supabaseClient
-      .channel("likeComments")
+      .channel("comments")
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "likeComments" },
+        { event: "INSERT", schema: "public", table: "comments" },
         (payload) => {
           const like: Like = likeValidate.parse(payload.new);
           this.notifyLike(like);
@@ -79,88 +101,41 @@ export class ExpoNotificationService implements INotificationService {
   }
 
   /**
-   * Subscribes a user to push notifications (when they get the popup, fill in their data with their push token)
-   * @param userId id of the user
-   * @param pushToken the expoId that is generated when the user allows push notifications
+   * Unsubscribe a user from notifications by setting their notificationsEnabled to false
+   * @param userId the id of the user to unsubscribe
    */
-  async subscribe(userId: string): Promise<void> {
-    function handleRegistrationError(errorMessage: string) {
-      alert(errorMessage);
-      throw new Error(errorMessage);
-    }
-
-    let pushToken: string = "undefined";
-
-    if (Platform.OS === "android") {
-      Notifications.setNotificationChannelAsync("default", {
-        name: "default",
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: "#FF231F7C",
-      });
-    }
-
-    if (Device.isDevice) {
-      const { status: existingStatus } = await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
-      if (existingStatus !== "granted") {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-      }
-
-      if (finalStatus !== "granted") {
-        handleRegistrationError("Permission not granted to get push token for push notification!");
-        return;
-      }
-
-      //Project id: 767a3d1e-0356-4d65-92f1-ea095dc722ea
-      try {
-        const pushTokenString = (
-          await Notifications.getExpoPushTokenAsync({
-            projectId: Constants.extra.expo.projectId,
-          })
-        ).data;
-        console.log(pushTokenString);
-        pushToken = pushTokenString;
-      } catch (e: unknown) {
-        handleRegistrationError(`${e}`);
-      }
-    } else {
-      handleRegistrationError("Must use physical device for push notifications");
-    }
-
-    if (pushToken === "undefined") {
-      handleRegistrationError("Push token not found");
-    }
-
-    try {
-      await this.supabaseClient
-        .from("users")
-        .update({ pushToken: pushToken })
-        .eq("id", userId)
-        .select();
-    } catch (error) {
-      throw new Error(); // need to create this error
-    }
-  }
-
   async unsubscribe(userId: string): Promise<void> {
     try {
-      await this.supabaseClient.from("users").update({ pushToken: null }).eq("id", userId).select();
+      const user = await this.db
+        .update(membersTable)
+        .set({ notificationsEnabled: false })
+        .where(eq(membersTable.userId, userId));
+
+      if (!user) {
+        throw new NotFoundError("User");
+      }
     } catch (error) {
       throw new NotFoundError("User");
     }
   }
 
-  // Send a notification to all members of the person's group
-  async notifyPost(post: Post): Promise<void> {
+  /**
+   * Notifies all group members of a new post.
+   * @param post the new post that a user has made.
+   */
+  async notifyPost(post: Post): Promise<Notification[]> {
+    console.log("Notifying group members of new post");
     try {
       // Get the Group Id of the post maker
       const [posterGroupId] = await this.db
         .select({
           groupId: postsTable.groupId,
+          name: usersTable.name,
+          groupName: groupsTable.name,
         })
         .from(postsTable)
+        .innerJoin(usersTable, eq(usersTable.id, postsTable.userId))
+        .innerJoin(groupsTable, eq(groupsTable.id, postsTable.groupId))
         .where(eq(groupsTable.id, post.id));
 
       if (posterGroupId === undefined) {
@@ -170,10 +145,7 @@ export class ExpoNotificationService implements INotificationService {
       // get the list of members who are in the group
       const members = await this.db
         .select({
-          groupId: membersTable.groupId,
           userId: membersTable.userId,
-          joinedAt: membersTable.joinedAt,
-          role: membersTable.role,
         })
         .from(membersTable)
         .where(eq(membersTable.groupId, posterGroupId.groupId));
@@ -181,56 +153,94 @@ export class ExpoNotificationService implements INotificationService {
       if (members === undefined) {
         throw new NotFoundError("Group Members");
       }
-
-      // TODO: CHANGE SCHEMA TO STORE PUSH TOKEN.
-      const messages: ExpoPushMessage[] = members.map((member) => ({
-        to: member.userId,
-        sound: "default",
-        body: "New post in your group!",
-        data: { post },
-      }));
-
-      const chunks = this.expo.chunkPushNotifications(messages);
-      for (let chunk of chunks) {
-        await this.expo.sendPushNotificationsAsync(chunk);
-      }
+      let notifications: Notification[] = [];
 
       for (let member of members) {
         // Insert the notification into the database
-        await this.db.insert(notificationsTable).values({
+        const [notif] = await this.db.insert(notificationsTable).values({
           actorId: post.userId,
           receiverId: member.userId,
           referenceType: "POST",
           postId: post.id,
           title: "New Post",
-          description: "New post in your group",
+          description: `${posterGroupId.name} just posted in ${posterGroupId.groupName}`,
         });
+        if (!notif) {
+          throw new NotFoundError("Notification");
+        }
+        notifications.push(notif);
       }
+
+      // Get the list of push tokens for the group members
+      const messages: ExpoPushMessage[] = await Promise.all(
+        members
+          .filter((member) => this.getNotificationEnabled(member.userId))
+          .map(async (member) => ({
+            to: await this.getPushToken(member.userId),
+            sound: "default",
+            body: "GET HYPE new group post",
+            data: { post },
+          })),
+      );
+
+      // Send the notifications and if all notifications off, empty list and none will send
+      const chunks = this.expo.chunkPushNotifications(messages);
+      for (let chunk of chunks) {
+        await this.expo.sendPushNotificationsAsync(chunk);
+      }
+
+      return notifications;
     } catch (Error) {
       throw new NotFoundError("Supabase Issue"); // need to create this error
     }
   }
 
-  async notifyLike(like: Like): Promise<void> {
+  /**
+   * Alerts the post maker that someone has liked their post.
+   * @param like a user liking a post
+   */
+  async notifyLike(like: Like): Promise<Notification> {
     try {
       // Get the userId of the post maker
       const [userId] = await this.db
         .select({
           userId: postsTable.userId,
+          name: usersTable.name,
         })
         .from(postsTable)
+        .innerJoin(usersTable, eq(usersTable.id, postsTable.userId))
         .where(eq(postsTable.id, like.postId));
 
       if (userId === undefined) {
         throw new NotFoundError("UserId");
       }
 
+      // Insert the notification into the database
+      const [notification] = await this.db.insert(notificationsTable).values({
+        actorId: like.userId,
+        receiverId: userId.userId,
+        referenceType: "LIKE",
+        likeId: like.id,
+        postId: like.postId,
+        title: "New Like",
+        description: `${userId.name} liked your post`,
+      });
+
+      if (!notification) {
+        throw new NotFoundError("Notification");
+      }
+      if (!this.getNotificationEnabled(userId.userId)) {
+        return notification;
+      }
+
+      const token = await this.getPushToken(userId.userId);
+
       // TODO: CHANGE SCHEMA TO STORE PUSH TOKEN.
       const messages: ExpoPushMessage[] = [
         {
-          to: userId.userId,
+          to: token,
           sound: "default",
-          body: "Someone liked your post!",
+          body: "OOOHHHHH someone loved your post <3",
           data: { like },
         },
       ];
@@ -239,63 +249,103 @@ export class ExpoNotificationService implements INotificationService {
       for (let chunk of chunks) {
         await this.expo.sendPushNotificationsAsync(chunk);
       }
-
-      // Insert the notification into the database
-      await this.db.insert(notificationsTable).values({
-        actorId: like.userId,
-        receiverId: userId.userId,
-        referenceType: "LIKE",
-        likeId: like.id,
-        postId: like.postId,
-        title: "New Like",
-        description: "Someone liked your post",
-      });
+      return notification;
     } catch (Error) {
       throw new NotFoundError("Supabase Issue"); // need to create this error
     }
   }
 
-  async notifyComment(comment: Comment): Promise<void> {
+  /**
+   * Alerts the post maker that someone has commented on their post.
+   * @param comment a user commenting on a post
+   */
+  async notifyComment(comment: Comment): Promise<Notification> {
     try {
       // Get the userId of person whose post was commented on
       const [userId] = await this.db
         .select({
           userId: postsTable.userId,
+          name: usersTable.name,
         })
         .from(postsTable)
+        .innerJoin(usersTable, eq(usersTable.id, postsTable.userId))
         .where(eq(postsTable.id, comment.postId));
 
       if (userId === undefined) {
         throw new NotFoundError("UserId");
       }
 
-      // TODO: CHANGE SCHEMA TO STORE PUSH TOKEN.
-      const messages: ExpoPushMessage[] = [
-        {
-          to: userId.userId,
-          sound: "default",
-          body: "Someone liked your post!",
-          data: { comment },
-        },
-      ];
-
-      const chunks = this.expo.chunkPushNotifications(messages);
-      for (let chunk of chunks) {
-        await this.expo.sendPushNotificationsAsync(chunk);
-      }
-
-      // Insert the notification into the database
-      await this.db.insert(notificationsTable).values({
+      const [notification] = await this.db.insert(notificationsTable).values({
         actorId: comment.userId,
         receiverId: userId.userId,
         referenceType: "COMMENT",
         commentId: comment.id,
         postId: comment.postId,
         title: "New Comment",
-        description: "Someone commented on your post",
+        description: `${userId.name} commented on your post`,
       });
+
+      if (!notification) {
+        throw new NotFoundError("Notification");
+      }
+
+      if (!this.getNotificationEnabled(userId.userId)) {
+        return notification;
+      }
+
+      const token = await this.getPushToken(userId.userId);
+
+      const messages: ExpoPushMessage[] = [
+        {
+          to: token,
+          sound: "default",
+          body: "TALK TALK",
+          data: { comment },
+        },
+      ];
+
+      // Send the notification
+      const chunks = this.expo.chunkPushNotifications(messages);
+      for (let chunk of chunks) {
+        await this.expo.sendPushNotificationsAsync(chunk);
+      }
+      return notification;
     } catch (Error) {
       throw new NotFoundError("Supabase Issue"); // need to create this error
+    }
+  }
+
+  private async getNotificationEnabled(userId: string): Promise<boolean> {
+    try {
+      const [notificationsEnabled] = await this.db
+        .select({
+          notificationsEnabled: membersTable.notificationsEnabled,
+        })
+        .from(membersTable)
+        .where(eq(membersTable.userId, userId));
+      if (!notificationsEnabled) {
+        throw new NotFoundError("Notifications Enabled");
+      }
+      return notificationsEnabled.notificationsEnabled;
+    } catch (Error) {
+      throw new NotFoundError("User");
+    }
+  }
+
+  private async getPushToken(userId: string): Promise<string> {
+    try {
+      const [token] = await this.db
+        .select({
+          token: devicesTable.token,
+        })
+        .from(devicesTable)
+        .where(eq(devicesTable.userId, userId));
+      if (!token) {
+        throw new NotFoundError("Token");
+      }
+      return token.token;
+    } catch (Error) {
+      throw new NotFoundError("User");
     }
   }
 }
