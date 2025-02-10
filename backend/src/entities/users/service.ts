@@ -15,12 +15,12 @@ import { Group } from "../../types/api/internal/groups";
 
 export interface UserService {
   createUser(payload: CreateUserPayload): Promise<User>;
-  getUser(id: string): Promise<User>;
+  getUser(viewee: string, viewer: string): Promise<User>;
   updateUser(id: string, payload: UpdateUserPayload): Promise<User>;
   deleteUser(id: string): Promise<void>;
   registerDevice(id: string, expoToken: string): Promise<string[]>;
   removeDevice(id: string, expoToken: string): Promise<string[]>;
-  getPosts(payload: Pagination): Promise<PostWithMediaURL[]>;
+  getPosts(payload: Pagination, viewer: string): Promise<PostWithMediaURL[]>;
   getGroups(payload: Pagination): Promise<Group[]>;
   searchByUsername(payload: SearchedInfo): Promise<SearchedUser[]>;
 }
@@ -47,14 +47,14 @@ export class UserServiceImpl implements UserService {
     return handleServiceError(createUserImpl)();
   }
 
-  async getUser(id: string): Promise<User> {
+  async getUser(viewee: string, viewer: string): Promise<User> {
     const getUserImpl = async () => {
-      const user = await this.userTransaction.selectUser(id);
+      const user = await this.userTransaction.selectUser(viewee, viewer);
       if (!user) {
         throw new NotFoundError("User");
       }
-
-      return user;
+      const userWithProfileURL = await this.mediaService.getUserWithSignedURL(user);
+      return userWithProfileURL;
     };
     return handleServiceError(getUserImpl)();
   }
@@ -93,9 +93,9 @@ export class UserServiceImpl implements UserService {
     return handleServiceError(removeDeviceImpl)();
   }
 
-  async getPosts(payload: Pagination): Promise<PostWithMediaURL[]> {
+  async getPosts(payload: Pagination, viewer: string): Promise<PostWithMediaURL[]> {
     const getPostsImpl = async () => {
-      const posts = await this.userTransaction.getPosts(payload);
+      const posts = await this.userTransaction.getPosts(payload, viewer);
       const postsWithUrls = await Promise.all(
         posts.map(this.mediaService.getPostWithMediaUrls.bind(this.mediaService)),
       );

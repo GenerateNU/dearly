@@ -21,6 +21,10 @@ Questions for our tech leads
 - how to mock the expo push notifications
 - **use spy (in help folder) to mock the expo push notifications
 - also why not put notifications enabled in the users table
+  - Mai: we don't put it in notification table because we want users to be able to turn on/off for a specific group
+    Also, you guys don't need to worry about registering device tokens since the frontend is handling that,
+    which implies we won't need to import from expo-device, expo-notifications, expo-constants, react-native
+    since they are frontend libraries and won't work in the backend!
 */
 
 export interface INotificationService {

@@ -16,3 +16,8 @@ export type MEMBERS_API = TypedResponse<
   | paths["/api/v1/groups/{id}/members"]["get"]["responses"]["200"]["content"]["application/json"]
   | API_ERROR
 >;
+
+export type NOTIFICATION = TypedResponse<
+  | paths["/api/v1/groups/{id}/members/notifications"]["patch"]["responses"]["200"]["content"]["application/json"]
+  | API_ERROR
+>;

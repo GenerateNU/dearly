@@ -3,11 +3,11 @@ import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
+import { MOCK_EXPO_TOKEN } from "../helpers/test-constants";
 
 describe("POST and DELETE /users/devices", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
-  const expoToken = "ExponentPushToken[Z9Hfn6ZxWVXaAs7MG3Pya8]";
 
   const requestBody = {
     name: "Jane Doe",
@@ -47,7 +47,7 @@ describe("POST and DELETE /users/devices", () => {
         type: HTTPRequest.POST,
         route: "/api/v1/users/devices",
         requestBody: {
-          expoToken,
+          expoToken: MOCK_EXPO_TOKEN,
           hi: "world", // irrelevant field
         },
         autoAuthorized: false,
@@ -58,7 +58,7 @@ describe("POST and DELETE /users/devices", () => {
     )
       .assertStatusCode(Status.OK)
       .assertArraySize(1)
-      .assertBody([expoToken]);
+      .assertBody([MOCK_EXPO_TOKEN]);
 
     // register device token again and make sure it's not duplicated
     (
@@ -67,7 +67,7 @@ describe("POST and DELETE /users/devices", () => {
         type: HTTPRequest.POST,
         route: "/api/v1/users/devices",
         requestBody: {
-          expoToken,
+          expoToken: MOCK_EXPO_TOKEN,
         },
         autoAuthorized: false,
         headers: {
@@ -77,7 +77,7 @@ describe("POST and DELETE /users/devices", () => {
     )
       .assertStatusCode(Status.OK)
       .assertArraySize(1)
-      .assertBody([expoToken]);
+      .assertBody([MOCK_EXPO_TOKEN]);
   });
 
   it("should return 200 if valid expo token for remove", async () => {
@@ -87,7 +87,7 @@ describe("POST and DELETE /users/devices", () => {
         type: HTTPRequest.DELETE,
         route: "/api/v1/users/devices",
         requestBody: {
-          expoToken,
+          expoToken: MOCK_EXPO_TOKEN,
         },
         autoAuthorized: false,
         headers: {
@@ -106,7 +106,7 @@ describe("POST and DELETE /users/devices", () => {
         type: HTTPRequest.DELETE,
         route: "/api/v1/users/devices",
         requestBody: {
-          expoToken,
+          expoToken: MOCK_EXPO_TOKEN,
         },
         autoAuthorized: false,
         headers: {
@@ -146,7 +146,7 @@ describe("POST and DELETE /users/devices", () => {
         type: HTTPRequest.POST,
         route: "/api/v1/users/devices",
         requestBody: {
-          expoToken,
+          expoToken: MOCK_EXPO_TOKEN,
         },
       })
     ).assertStatusCode(Status.NotFound);

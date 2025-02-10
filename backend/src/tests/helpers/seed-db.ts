@@ -1,5 +1,7 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import {
+  commentsTable,
+  devicesTable,
   groupsTable,
   mediaTable,
   membersTable,
@@ -9,9 +11,11 @@ import {
 import {
   ANOTHER_GROUP,
   ANOTHER_GROUP_ID,
+  COMMENTS,
   DEARLY_GROUP,
   DEARLY_GROUP_ID,
   MEDIA_MOCK,
+  MOCK_EXPO_TOKEN,
   POST_MOCK,
   USER_ALICE,
   USER_ALICE_ID,
@@ -27,9 +31,11 @@ import { CreateUserPayload } from "../../types/api/internal/users";
 export const seedDatabase = async (db: PostgresJsDatabase) => {
   try {
     await seedUser(db);
+    await seedDeviceTokens(db);
     await seedGroup(db);
     await seedMember(db);
     await seedPostAndMedia(db);
+    await seedComments(db);
   } catch (error) {
     console.error("Failed to seed database", error);
   }
@@ -75,4 +81,17 @@ const seedMember = async (db: PostgresJsDatabase) => {
 const seedPostAndMedia = async (db: PostgresJsDatabase) => {
   await db.insert(postsTable).values(POST_MOCK);
   await db.insert(mediaTable).values(MEDIA_MOCK);
+};
+
+const seedComments = async (db: PostgresJsDatabase) => {
+  await db.insert(commentsTable).values(COMMENTS);
+};
+
+const seedDeviceTokens = async (db: PostgresJsDatabase) => {
+  await db.insert(devicesTable).values([
+    {
+      token: MOCK_EXPO_TOKEN,
+      userId: USER_BOB_ID,
+    },
+  ]);
 };

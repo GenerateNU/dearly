@@ -1,26 +1,37 @@
 {
   "expo": {
     "name": "frontend",
-    "slug": "frontend",
+    "slug": "dearly",
     "icon": "./assets/icon.png",
     "version": "1.0.0",
     "orientation": "portrait",
-    "scheme": "myapp",
+    "scheme": "dearly",
+    "platforms": ["ios", "android"],
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "dearly.frontend"
+      "bundleIdentifier": "dearly.frontend",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Dearly needs access to your location to provide better service.",
+        "NSLocationAlwaysUsageDescription": "Dearly needs access to your location even when the app is in the background to provide accurate tracking."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#ffffff"
       },
-      "package": "dearly.frontend"
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static"
+      "package": "dearly.frontend",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_BACKGROUND_LOCATION",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_LOCATION"
+      ]
     },
     "plugins": [
       "expo-router",
@@ -30,6 +41,30 @@
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Dearly to access your camera",
+          "microphonePermission": "Allow Dearly to access your microphone",
+          "recordAudioAndroid": true
+        }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Allow Dearly to access your microphone"
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Dearly to use your location.",
+          "locationAlwaysPermission": "Allow Dearly to use your location.",
+          "locationWhenInUsePermission": "Allow Dearly to use your location.",
+          "isIosBackgroundLocationEnabled": true,
+          "isAndroidBackgroundLocationEnabled": true
         }
       ],
       "expo-secure-store"
@@ -42,8 +77,9 @@
         "origin": false
       },
       "eas": {
-        "projectId": "767a3d1e-0356-4d65-92f1-ea095dc722ea"
+        "projectId": "b8227235-775d-410e-ba1f-3e13ef707088"
       }
-    }
+    },
+    "owner": "generate-dearly"
   }
 }

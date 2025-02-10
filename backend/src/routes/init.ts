@@ -6,11 +6,10 @@ import { getOpenAPISpecification } from "../utilities/docs";
 import { HEALTHCHECK } from "../types/api/routes/healthcheck";
 import { groupRoutes } from "../entities/groups/route";
 import { postRoutes } from "../entities/posts/route";
-import { memberRoutes } from "../entities/members/route";
-import { likeRoutes } from "../entities/likes/route";
 import { IS3Operations } from "../services/s3Service";
 import { MediaServiceImpl } from "../entities/media/service";
-import { mediaRoutes } from "../entities/media/route";
+import { commentsRoutes } from "../entities/comments/route";
+import { Expo } from "expo-server-sdk";
 
 export const setUpRoutes = (
   app: Hono,
@@ -43,13 +42,12 @@ export const setUpRoutes = (
 const apiRoutes = (db: PostgresJsDatabase, s3Service: IS3Operations): Hono => {
   const api = new Hono();
   const mediaService = new MediaServiceImpl(db, s3Service);
+  const expo = new Expo();
 
   api.route("/users", userRoutes(db, mediaService));
-  api.route("/groups", groupRoutes(db, mediaService));
+  api.route("/groups", groupRoutes(db, mediaService, expo));
   api.route("/", postRoutes(db, mediaService));
-  api.route("/posts/:id/likes", likeRoutes(db, mediaService));
-  api.route("/groups/:id/media", mediaRoutes(mediaService));
-  api.route("/groups/:id/members", memberRoutes(db));
+  api.route("/", commentsRoutes(db, mediaService));
 
   return api;
 };

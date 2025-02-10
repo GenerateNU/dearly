@@ -41,7 +41,9 @@ describe("POST /users", () => {
         ...requestBody,
         mode: "BASIC",
         profilePhoto: null,
-        notificationsEnabled: true,
+        timezone: null,
+        bio: null,
+        birthday: null,
       })
       .assertFieldNotEqual("id", testId);
   });

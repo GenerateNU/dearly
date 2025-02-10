@@ -3,10 +3,11 @@ import {
   MAX_MEDIA_COUNT,
   MIN_LIMIT,
   MIN_MEDIA_COUNT,
+  NAME_MAX_LIMIT,
   TEXT_MAX_LIMIT,
 } from "../../constants/database";
-import { postsTable } from "../schema";
 import { createSelectSchema } from "drizzle-zod";
+import { postsTable } from "../schema";
 
 export const createPostValidate = z
   .object({
@@ -14,6 +15,10 @@ export const createPostValidate = z
       .string()
       .min(MIN_LIMIT, `Caption must be at least ${MIN_LIMIT} character long`)
       .max(TEXT_MAX_LIMIT, `Caption must be at most ${TEXT_MAX_LIMIT} characters long`)
+      .optional(),
+    location: z
+      .string()
+      .max(NAME_MAX_LIMIT, `Location must be at most ${NAME_MAX_LIMIT}`)
       .optional(),
     media: z
       .array(
@@ -31,10 +36,6 @@ export const createPostValidate = z
   })
   .passthrough();
 
-
-
 export const postValidate = createSelectSchema(postsTable);
-
-
 
 export const updatePostValidate = createPostValidate.partial();

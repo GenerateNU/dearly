@@ -63,9 +63,23 @@ components:
           type: string
           nullable: true
           description: A URL to the user's profile photo.
-        notificationsEnabled:
-          type: boolean
-          description: True when user enables notification.
+        bio:
+          type: string
+          nullable: true
+          description: A bio for the user's profile.
+        birthday: 
+          type: string
+          format: date
+          nullable: true
+          description: Birthday of the user.
+        timezone:
+          type: string
+          nullable: true
+          description: Timezone that user is in for sending nudges.
+        postCount: 
+          type: number
+          nullable: true
+          description: Number of posts that a user made.
       required:
         - name
         - username
@@ -142,6 +156,10 @@ components:
           type: string
           description: A description of the group.
           nullable: true
+        notificationEnabled:
+          type: boolean
+          example: true
+          description: Return true if user has notification for group turned off.
         id:
           type: string
           format: uuid
@@ -204,10 +222,86 @@ components:
           example: "This is a sample caption for the post."
           description: A textual description or caption for the post.
           nullable: true
+        likes: 
+          type: number
+          example: 20
+          description: Number of likes in a post
+        comments: 
+          type: number
+          example: 20
+          description: Number of comments in a post
+        isLiked: 
+          type: boolean
+          example: true
+          description: Return true if user liked the post
+        profilePhoto:
+          type: string
+          nullable: true
+          description: Profile photo url of user who made the post
+        location: 
+          type: string
+          description: Location of where the post is made
+          example: "home"
+          nullable: true
         media:
           type: array
           items:
             $ref: "#/components/schemas/Media"
+          description: A list of media items attached to the post.
+    
+    PostWithURL:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: A unique identifier for the post.
+        groupId:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: A unique identifier for the group.
+        userId:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: A unique identifier for the user who makes the post.
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-01-17T00:00:00Z"
+          description: The date and time when the post was created.
+        caption:
+          type: string
+          example: "This is a sample caption for the post."
+          description: A textual description or caption for the post.
+          nullable: true
+        likes: 
+          type: number
+          example: 20
+          description: Number of likes in a post
+        comments: 
+          type: number
+          example: 20
+          description: Number of comments in a post
+        isLiked: 
+          type: boolean
+          example: true
+          description: Return true if user liked the post
+        profilePhoto:
+          type: string
+          nullable: true
+          description: Profile photo url of user who made the post
+        location: 
+          type: string
+          description: Location of where the post is made
+          example: "home"
+          nullable: true
+        media:
+          type: array
+          items:
+            $ref: "#/components/schemas/MediaWithURL"
           description: A list of media items attached to the post.
 
     MediaUpload: 
@@ -245,6 +339,32 @@ components:
           format: uuid
           example: 5e91507e-5630-4efd-9fd4-799178870b10
           description: The unique object key associated with the media in S3.
+        type:
+          type: string
+          example: "PHOTO"
+          enum:
+            - PHOTO
+            - VIDEO
+            - AUDIO
+          description: The type of the media (e.g., photo, audio, video).
+    
+    MediaWithURL:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b11
+          description: A unique identifier for the media item.
+        postId:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: The ID of the post to which the media belongs.
+        url:
+          type: string
+          format: uuid
+          description: The pre-signed URL from AWS S3
         type:
           type: string
           example: "PHOTO"
@@ -403,6 +523,7 @@ paths:
       security:
         - BearerAuth: []
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -529,25 +650,7 @@ paths:
               schema:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                      description: The name of the group.
-                    description:
-                      type: string
-                      description: A description of the group.
-                      nullable: true
-                    id:
-                      type: string
-                      format: uuid
-                      example: 5e91507e-5630-4efd-9fd4-799178870b10
-                      description: A unique identifier for the group.
-                    managerId:
-                      type: string
-                      format: uuid
-                      example: 5e91507e-5630-4efd-9fd4-799178870b10
-                      description: A unique identifier of the group manager.
+                  $ref: "#/components/schemas/Group"
         400:
           description: Malformed query params
           content:
@@ -567,7 +670,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /api/v1/users/posts:
+  /api/v1/users/{id}/posts:
     get:
       tags:
         - User Endpoints
@@ -590,6 +693,14 @@ paths:
           schema:
             type: integer
             default: 1
+        - name: id
+          in: path
+          description: ID of the user to get posts
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
       responses:
         200:
           description: Successfully retrieve posts user posted
@@ -598,7 +709,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Post"
+                  $ref: "#/components/schemas/PostWithURL"
         400:
           description: Malformed query params
           content:
@@ -796,6 +907,7 @@ paths:
       security:
         - BearerAuth: []
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -892,30 +1004,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The name of the group.
-                  description:
-                    type: string
-                    description: A description of the group.
-                    nullable: true
-                  id:
-                    type: string
-                    format: uuid
-                    example: 5e91507e-5630-4efd-9fd4-799178870b10
-                    description: A unique identifier for the group.
-                  managerId:
-                    type: string
-                    format: uuid
-                    example: 5e91507e-5630-4efd-9fd4-799178870b10
-                    description: A unique identifier of the group manager.
-                required:
-                  - name
-                  - id
-                  - managerId
-                  - description
+                $ref: "#/components/schemas/Group"
         400:
           description: Malformed request
           content:
@@ -959,6 +1048,7 @@ paths:
             format: uuid
             example: 5e91507e-5630-4efd-9fd4-799178870b10
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -1393,6 +1483,67 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /api/v1/groups/{id}/members/notifications:
+    patch:
+      tags:
+        - Member Endpoints
+      summary: Toggle member's notification for a group
+      description: Turn on or off notification for a group
+      parameters:
+        - name: id
+          in: path
+          description: ID of the group
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Successfully turn on or off group notification
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Successfully turn on notification for group"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: Forbidden since user is not member of the group
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Group not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
   /api/v1/groups/{id}/posts:
     post:
       tags:
@@ -1500,7 +1651,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Post"
+                $ref: "#/components/schemas/PostWithURL"
         400:
           description: Malformed request
           content:
@@ -1656,6 +1807,67 @@ paths:
                 $ref: "#/components/schemas/Error"
         403:
           description: Forbidden since user is not creator of post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/v1/comments/{id}/likes:
+    patch:
+      tags:
+        - Comment Endpoints
+      summary: Toggles like on a comment
+      description: Likes if user has not liked the comment, unlikes otherwise
+      parameters:
+        - name: id
+          in: path
+          description: ID of the comment
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Successfully toggle like of the comment
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Successfully like comment"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: Forbidden since user is not a member of a group
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Post not found
           content:
             application/json:
               schema:
@@ -1880,6 +2092,91 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /api/v1/groups/{id}/nudges/manual:
+    post:
+      tags:
+        - Nudge Endpoints
+      summary: Manually nudge a user
+      description: Manager can select at least one member in the group to nudge. Will not nudge if users do not have notifications turned on for groups or for devices.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the group to nudge members
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                users:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                    example: 5e91507e-5630-4efd-9fd4-799178870b10
+                  description: User IDs to be nudged
+              required:
+                - users
+              additionalProperties: true
+
+      responses:
+        200:
+          description: Successfully nudge members
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Successfully nudge selected users"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: User not manager of the group
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Group not found or user not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        429:
+          description: Cannot nudge during cooldown period to prevent spamming
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
   /api/v1/groups/{id}/calendar:
     get:
       tags:
@@ -1956,7 +2253,7 @@ paths:
 
 
   /api/v1/groups/{id}/media:
-    get:
+    post:
       tags:
         - Media Endpoint
       summary: Upload media to S3 bucket
@@ -2026,4 +2323,3 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-

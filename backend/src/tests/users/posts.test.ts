@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
-import { generateJWTFromID } from "../helpers/test-token";
+import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
 import {
   MOCK_MEDIA_WITH_URL,
@@ -11,9 +11,19 @@ import {
   USER_BOB_ID,
 } from "../helpers/test-constants";
 
-describe("GET /users/posts", () => {
+describe("GET /users/:id/posts", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
+  const post = {
+    ...POST_MOCK[0],
+    media: MOCK_MEDIA_WITH_URL,
+    createdAt: POST_MOCK[0]!.createdAt?.toISOString(),
+    comments: 1,
+    isLiked: false,
+    likes: 0,
+    location: null,
+    profilePhoto: null,
+  };
 
   beforeAll(async () => {
     app = await startTestApp();
@@ -24,7 +34,7 @@ describe("GET /users/posts", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.GET,
-        route: `/api/v1/users/posts`,
+        route: `/api/v1/users/${generateUUID()}/posts`,
         autoAuthorized: false,
         headers: {
           Authorization: `Bearer ${generateJWTFromID()}`,
@@ -36,24 +46,15 @@ describe("GET /users/posts", () => {
   });
 
   it.each([
-    [USER_BOB_ID, []],
-    [USER_BILL_ID, []],
-    [
-      USER_ALICE_ID,
-      [
-        {
-          ...POST_MOCK[0],
-          media: MOCK_MEDIA_WITH_URL,
-          createdAt: POST_MOCK[0]!.createdAt?.toISOString(),
-        },
-      ],
-    ],
+    [USER_BOB_ID, [post]], // Bob is in same group, and can see Alice's post
+    [USER_BILL_ID, []], // Bill is not in the group and cannot see Alice's post
+    [USER_ALICE_ID, [post]], // Alice can see her own post
   ])("should return 200 if for user with ID %s", async (id, expectedPosts) => {
     (
       await testBuilder.request({
         app,
         type: HTTPRequest.GET,
-        route: `/api/v1/users/posts`,
+        route: `/api/v1/users/${USER_ALICE_ID}/posts`,
         autoAuthorized: false,
         headers: {
           Authorization: `Bearer ${generateJWTFromID(id)}`,
@@ -65,37 +66,17 @@ describe("GET /users/posts", () => {
   });
 
   it.each([
-    [
-      "1",
-      "1",
-      [
-        {
-          ...POST_MOCK[0],
-          media: MOCK_MEDIA_WITH_URL,
-          createdAt: POST_MOCK[0]!.createdAt?.toISOString(),
-        },
-      ],
-    ],
+    ["1", "1", [post]],
     ["1", "2", []],
     ["1", "3", []],
-    [
-      "2",
-      "1",
-      [
-        {
-          ...POST_MOCK[0],
-          media: MOCK_MEDIA_WITH_URL,
-          createdAt: POST_MOCK[0]!.createdAt?.toISOString(),
-        },
-      ],
-    ],
+    ["2", "1", [post]],
     ["2", "2", []],
   ])("should return 200 with limit %s and page %s", async (limit, page, expectedBody) => {
     (
       await testBuilder.request({
         app,
         type: HTTPRequest.GET,
-        route: `/api/v1/users/posts`,
+        route: `/api/v1/users/${USER_ALICE_ID}/posts`,
         queryParams: {
           limit,
           page,
@@ -115,7 +96,7 @@ describe("GET /users/posts", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.GET,
-        route: `/api/v1/users/posts`,
+        route: `/api/v1/users/${USER_ALICE_ID}/posts`,
         queryParams: {
           limit: "limit",
           page: "page",
@@ -144,7 +125,7 @@ describe("GET /users/posts", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.GET,
-        route: `/api/v1/users/posts`,
+        route: `/api/v1/users/${USER_ALICE_ID}/posts`,
         queryParams: {
           limit: "0",
           page: "-1",

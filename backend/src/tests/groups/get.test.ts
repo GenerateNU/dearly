@@ -70,6 +70,7 @@ describe("GET /groups/:id", () => {
         ...goodRequestBody,
         id,
         managerId: USER_ALICE_ID,
+        notificationEnabled: true,
       });
   });
 
@@ -88,6 +89,7 @@ describe("GET /groups/:id", () => {
       .assertStatusCode(Status.OK)
       .assertBody({
         ...GROUP_MOCK[0],
+        notificationEnabled: true,
       });
   });
 

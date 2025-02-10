@@ -7,8 +7,11 @@ import { useEffect } from "react";
 import { AuthProvider, useAuth } from "@/auth/provider";
 import { advancedTheme, basicTheme } from "@/design-system/base/theme";
 import { NotificationProvider } from "@/contexts/notification";
-import { useNotificationPermission } from "@/hooks/notification";
+import { useNotificationPermission } from "@/hooks/permission/notification";
 import { Mode } from "@/types/mode";
+import { useRequestDevicePermission } from "@/hooks/permission/device";
+import { useFonts } from "expo-font";
+import AppLoading from "expo-app-loading";
 
 const queryClient = new QueryClient();
 
@@ -23,11 +26,15 @@ const InitialLayout = () => {
     }
   }, [isAuthenticated]);
 
+  // ask for notification permission
   useNotificationPermission();
+
+  // ask for camera and audio permission
+  useRequestDevicePermission();
 
   return (
     <ThemeProvider theme={mode === Mode.ADVANCED ? advancedTheme : basicTheme}>
-      <Stack>
+      <Stack screenOptions={{ gestureEnabled: false }}>
         <Stack.Screen name="(auth)" options={{ headerShown: false, gestureEnabled: false }} />
         <Stack.Screen name="(app)" options={{ headerShown: false, gestureEnabled: false }} />
       </Stack>
@@ -36,6 +43,16 @@ const InitialLayout = () => {
 };
 
 const RootLayout = () => {
+  const [fontsLoaded] = useFonts({
+    "ProximaNova-Bold": require("../assets/fonts/proximanova-medium.otf"),
+    "ProximaNova-Medium": require("../assets/fonts/proximanova-medium.otf"),
+    "ProximaNova-Regular": require("../assets/fonts/proximanova-regular.otf"),
+  });
+
+  if (!fontsLoaded) {
+    return <AppLoading />;
+  }
+
   return (
     <GestureHandlerRootView>
       <NotificationProvider>

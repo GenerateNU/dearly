@@ -1,14 +1,16 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import {
+  commentsTable,
   devicesTable,
   groupsTable,
+  likesTable,
   mediaTable,
   membersTable,
   postsTable,
   usersTable,
 } from "../schema";
-import { and, eq, sql, not, exists } from "drizzle-orm";
-import { Media, PostWithMedia } from "../../types/api/internal/posts";
+import { and, eq, sql, not, exists, inArray, desc } from "drizzle-orm";
+import { PostWithMedia } from "../../types/api/internal/posts";
 import {
   CreateUserPayload,
   Pagination,
@@ -18,15 +20,16 @@ import {
   User,
 } from "../../types/api/internal/users";
 import { Group } from "../../types/api/internal/groups";
+import { getPostMetadata, getSharedGroups } from "../../utilities/query";
 
 export interface UserTransaction {
   insertUser(payload: CreateUserPayload): Promise<User | null>;
-  selectUser(id: string): Promise<User | null>;
+  selectUser(viewee: string, viewer: string): Promise<User | null>;
   updateUser(id: string, payload: UpdateUserPayload): Promise<User | null>;
   deleteUser(id: string): Promise<User | null>;
   insertDeviceToken(id: string, expoToken: string): Promise<string[]>;
   deleteDeviceToken(id: string, expoToken: string): Promise<string[]>;
-  getPosts(payload: Pagination): Promise<PostWithMedia[]>;
+  getPosts(payload: Pagination, viewer: string): Promise<PostWithMedia[]>;
   getGroups(payload: Pagination): Promise<Group[]>;
   getUsersByUsername(payload: SearchedInfo): Promise<SearchedUser[]>;
 }
@@ -43,8 +46,44 @@ export class UserTransactionImpl implements UserTransaction {
     return result ?? null;
   }
 
-  async selectUser(id: string): Promise<User | null> {
-    const [result] = await this.db.select().from(usersTable).where(eq(usersTable.id, id)).limit(1);
+  async selectUser(viewee: string, viewer: string): Promise<User | null> {
+    const userQuery = {
+      name: usersTable.name,
+      id: usersTable.id,
+      username: usersTable.username,
+      mode: usersTable.mode,
+      profilePhoto: usersTable.profilePhoto,
+      timezone: usersTable.timezone,
+      bio: usersTable.bio,
+      birthday: usersTable.birthday,
+      postCount: sql<number>`COUNT(DISTINCT ${postsTable.id})`.mapWith(Number),
+    };
+
+    const [result] = await this.db
+      .select(userQuery)
+      .from(usersTable)
+      .leftJoin(
+        postsTable,
+        viewer === viewee
+          ? eq(postsTable.userId, usersTable.id)
+          : and(
+              eq(postsTable.userId, usersTable.id),
+              inArray(postsTable.groupId, getSharedGroups(this.db, viewee, viewer)),
+            ),
+      )
+      .where(eq(usersTable.id, viewee))
+      .groupBy(
+        usersTable.name,
+        usersTable.id,
+        usersTable.username,
+        usersTable.mode,
+        usersTable.profilePhoto,
+        usersTable.timezone,
+        usersTable.bio,
+        usersTable.birthday,
+      )
+      .limit(1);
+
     return result ?? null;
   }
 
@@ -56,7 +95,8 @@ export class UserTransactionImpl implements UserTransaction {
         username: payload.username,
         mode: payload.mode,
         profilePhoto: payload.profilePhoto,
-        notificationsEnabled: payload.notificationsEnabled,
+        bio: payload.bio,
+        birthday: payload.birthday,
       })
       .where(eq(usersTable.id, id))
       .returning();
@@ -90,34 +130,47 @@ export class UserTransactionImpl implements UserTransaction {
     return this.getUserTokens(userId);
   }
 
-  async getPosts({ id, limit, page }: Pagination): Promise<PostWithMedia[]> {
+  async getPosts(
+    { id: viewee, limit, page }: Pagination,
+    viewer: string,
+  ): Promise<PostWithMedia[]> {
     return await this.db
-      .select({
-        id: postsTable.id,
-        userId: postsTable.userId,
-        groupId: postsTable.groupId,
-        createdAt: postsTable.createdAt,
-        caption: postsTable.caption,
-        media: sql<Media[]>`array_agg(
-          json_build_object(
-            'id', ${mediaTable.id},
-            'type', ${mediaTable.type},
-            'postId', ${mediaTable.postId},
-            'objectKey', ${mediaTable.objectKey}
-          )
-        )`,
-      })
+      .select(getPostMetadata(viewee))
       .from(postsTable)
+      .leftJoin(likesTable, eq(likesTable.postId, postsTable.id))
+      .leftJoin(commentsTable, eq(commentsTable.postId, postsTable.id))
+      .innerJoin(usersTable, eq(postsTable.userId, usersTable.id))
       .innerJoin(mediaTable, eq(mediaTable.postId, postsTable.id))
-      .where(eq(postsTable.userId, id))
+      .where(
+        and(
+          eq(postsTable.userId, viewee),
+          viewer !== viewee
+            ? inArray(
+                postsTable.groupId,
+                this.db
+                  .select({ groupId: membersTable.groupId })
+                  .from(membersTable)
+                  .where(eq(membersTable.userId, viewee))
+                  .intersect(
+                    this.db
+                      .select({ groupId: membersTable.groupId })
+                      .from(membersTable)
+                      .where(eq(membersTable.userId, viewer)),
+                  ),
+              )
+            : undefined,
+        ),
+      )
       .groupBy(
         postsTable.id,
         postsTable.userId,
         postsTable.groupId,
         postsTable.createdAt,
         postsTable.caption,
+        postsTable.location,
+        usersTable.profilePhoto,
       )
-      .orderBy(postsTable.createdAt)
+      .orderBy(desc(postsTable.createdAt))
       .limit(limit)
       .offset((page - 1) * limit);
   }
@@ -129,6 +182,7 @@ export class UserTransactionImpl implements UserTransaction {
         name: groupsTable.name,
         description: groupsTable.description,
         managerId: groupsTable.managerId,
+        notificationEnabled: membersTable.notificationsEnabled,
       })
       .from(groupsTable)
       .innerJoin(
@@ -159,6 +213,7 @@ export class UserTransactionImpl implements UserTransaction {
             sql<boolean>`CASE WHEN ${membersTable.groupId} = ${groupId} THEN true ELSE false END`.as(
               "isMember",
             ),
+          lastNudgedAt: membersTable.lastManualNudge,
         })
         .from(usersTable)
         .leftJoin(membersTable, eq(membersTable.userId, usersTable.id))

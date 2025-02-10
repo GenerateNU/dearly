@@ -54,10 +54,10 @@ export const getConfigurations = (): Configuration => {
       name: parseEnv("AWS_BUCKET_NAME"),
     },
     environment: nodeEnv,
-    supabase:{
+    supabase: {
       url: parseEnv("SUPABASE_URL"),
-      key: parseEnv("SUPABASE_KEY")
-    }
+      key: parseEnv("SUPABASE_KEY"),
+    },
   };
   return config;
 };

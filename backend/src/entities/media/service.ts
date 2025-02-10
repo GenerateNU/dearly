@@ -60,6 +60,13 @@ export interface MediaService {
    * @returns A promise that resolves to a list of `MediaResponse` objects, each containing the media object key and type.
    */
   uploadMedia(blobs: Blob[], groupId: string, userId: string): Promise<MediaResponse[]>;
+
+  /**
+   * Get pre-signed url of a medium given its object key
+   *
+   * @param key unique object key associated with media
+   */
+  getSignedUrl(key: string): Promise<string>;
 }
 
 export class MediaServiceImpl {
@@ -114,16 +121,28 @@ export class MediaServiceImpl {
     createdAt,
     caption,
     media,
+    location,
+    comments,
+    likes,
+    isLiked,
+    profilePhoto,
   }: PostWithMedia): Promise<PostWithMediaURL> {
     const mediaWithUrls = await Promise.all(media.map(this.getMediaWithSignedUrl.bind(this)));
-    return {
+    const profilePhotoUrl = profilePhoto ? await this.getSignedUrl(profilePhoto) : null;
+    const result = {
       id,
       groupId,
+      location,
       userId,
+      comments,
+      likes,
+      isLiked,
       createdAt,
       caption,
+      profilePhoto: profilePhotoUrl,
       media: mediaWithUrls,
     };
+    return result;
   }
 
   private async getMediaWithSignedUrl({
@@ -141,7 +160,7 @@ export class MediaServiceImpl {
     };
   }
 
-  private async getSignedUrl(key: string): Promise<string> {
+  async getSignedUrl(key: string): Promise<string> {
     return this.s3Service.getObjectURL(key);
   }
 

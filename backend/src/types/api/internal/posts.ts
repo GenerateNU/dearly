@@ -13,10 +13,21 @@ export type UpdatePostPayload = z.infer<typeof updatePostValidate> & IDPayload;
 
 export type Post = typeof postsTable.$inferSelect;
 
-export type PostWithMedia = Post & {
-  media: Media[];
+export type PostWithMedia = Post &
+  PostMetadata & {
+    media: Media[];
+  };
+
+export type PostWithMediaURL = Post &
+  PostMetadata & {
+    media: MediaWithURL[];
+  };
+
+export type PostMetadata = {
+  likes: number;
+  comments: number;
+  isLiked: boolean;
+  profilePhoto: string | null;
 };
 
-export type PostWithMediaURL = Post & {
-  media: MediaWithURL[];
-};
+export { Media };

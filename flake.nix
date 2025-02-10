@@ -26,6 +26,9 @@
             postgresql
             go-task
             nodePackages.prettier
+            google-cloud-sdk
+            awscli2
+            nodePackages_latest.eas-cli
           ];
           shellHook = ''
             chmod +x scripts/bun.sh 

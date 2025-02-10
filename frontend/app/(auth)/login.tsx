@@ -10,6 +10,7 @@ const Login = () => {
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <Box
+          backgroundColor="primary"
           className="w-full"
           flex={1}
           justifyContent="center"

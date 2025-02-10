@@ -3,7 +3,7 @@ const DEFAULT_UNHANDLED_ERROR = "An unexpected error occurred. Please try again.
 const statusCodeErrorMap = new Map<number, string>([
   [400, "Invalid data. Please check the input fields."],
   [401, "Unauthorized. Please log in again."],
-  [403, "Forbidden. You don't have permission to create a user."],
+  [403, "Forbidden. You don't have permission to do this action."],
   [404, "The requested endpoint was not found."],
   [500, "Internal server error. Please try again later."],
   [503, "Service unavailable. Please try again later."],

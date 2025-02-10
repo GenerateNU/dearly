@@ -17,6 +17,7 @@ interface AuthState {
   userId: string | null;
   error: string | null;
   isPending: boolean;
+  inviteToken: string | null;
   mode: Mode;
 
   login: ({ email, password }: { email: string; password: string }) => Promise<void>;
@@ -25,6 +26,7 @@ interface AuthState {
   forgotPassword: ({ email }: { email: string }) => Promise<void>;
   resetPassword: ({ password }: { password: string }) => Promise<void>;
   setMode: (mode: Mode) => void;
+  setInviteToken: (inviteToken: string) => void;
 }
 
 const authService: AuthService = new SupabaseAuth();
@@ -37,6 +39,7 @@ export const useAuthStore = create<AuthState>()(
       error: null,
       isPending: false,
       mode: Mode.ADVANCED,
+      inviteToken: null,
 
       setMode: (mode: Mode) => {
         set({
@@ -44,20 +47,27 @@ export const useAuthStore = create<AuthState>()(
         });
       },
 
+      setInviteToken: (inviteToken: string) => {
+        set({
+          inviteToken,
+        });
+      },
+
       login: async ({ email, password }: { email: string; password: string }) => {
         set({ isPending: true });
         try {
           const session: Session = await authService.login({ email, password });
+          const user = await getUser(session.user.id);
           set({
             isAuthenticated: true,
             userId: session.user.id,
             isPending: false,
           });
-          const user = await getUser(useAuthStore.getState().userId!);
           set({
             mode: user.mode as Mode,
           });
         } catch (err) {
+          await useAuthStore.getState().logout();
           handleError(err, set);
         }
       },
@@ -85,6 +95,7 @@ export const useAuthStore = create<AuthState>()(
             isPending: false,
           });
         } catch (err) {
+          await useAuthStore.getState().logout();
           handleError(err, set);
         }
       },

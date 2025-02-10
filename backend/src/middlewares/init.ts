@@ -10,8 +10,8 @@ export const configureMiddlewares = (app: Hono, config: Configuration) => {
   app.use(cors(config.cors));
   if (config.environment !== "test") {
     app.use(logger);
+    app.use(compress());
   }
   app.use(secureHeaders());
-  app.use(compress());
   app.use("/api/v1/*", isAuthorized(config.authorization.jwtSecretKey));
 };
