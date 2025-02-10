@@ -19,6 +19,8 @@ Questions for our tech leads
 - Where should we store our push tokens in the database (probably in the users table)
 - what is the referenceType in the notifications table
 - how to mock the expo push notifications
+- **use spy (in help folder) to mock the expo push notifications
+- also why not put notifications enabled in the users table
 */
 
 export interface INotificationService {
