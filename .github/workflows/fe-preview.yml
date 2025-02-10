@@ -1,6 +1,10 @@
 name: EAS Internal Preview Build
 
 on:
+  pull_request:
+    types:
+      - ready_for_review
+
   issue_comment:
     types: [created]
 
