@@ -1,9 +1,9 @@
 name: EAS Internal Preview Build
 
 on:
-  pull_request:
-    types:
-      - ready_for_review
+  # pull_request:
+  #   types:
+  #     - ready_for_review
 
   issue_comment:
     types: [created]
@@ -102,8 +102,8 @@ jobs:
           fi
 
           PAYLOAD=$(jq -n \
-            --arg pr_title "${{ github.event.pull_request.title }}" \
-            --arg pr_url "${{ github.event.pull_request.html_url }}" \
+            --arg pr_title "PR Title" \
+            --arg pr_url "PR URL" \
             --arg issue_text "$ISSUE_TEXT" \
             --arg slack_id "${{ secrets.DEARLY_MEMBERS_SLACK_ID }}" \
             --arg build_url "build link" \
