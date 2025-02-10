@@ -1,9 +1,9 @@
 name: EAS Internal Preview Build
 
 on:
-  # pull_request:
-  #   types:
-  #     - ready_for_review
+  pull_request:
+    types:
+      - ready_for_review
 
   issue_comment:
     types: [created]
@@ -23,7 +23,31 @@ jobs:
       BUILD_PROFILE: preview
     
     steps:
-      - uses: actions/checkout@v4
+      - name: Get PR branch
+        uses: xt0rted/pull-request-comment-branch@v1
+        id: comment-branch
+
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.comment-branch.outputs.head_ref }}
+
+      - name: Add comment to PR
+        uses: actions/github-script@v6
+        if: always()
+        with:
+          script: |
+            const name = '${{ github.workflow   }}';
+            const url = '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}';
+            const success = '${{ job.status }}' === 'success';
+            const body = `${name}: ${success ? 'succeeded ✅' : 'failed ❌'}\n${url}`;
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            })
       
       # - name: Setup Bun
       #   uses: oven-sh/setup-bun@v1
