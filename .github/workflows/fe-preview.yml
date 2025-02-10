@@ -8,15 +8,13 @@ permissions:
   issues: write
   pull-requests: write
   contents: read
+  statuses: write
 
 jobs:
   build:
-    if: |
-      github.event.comment.body == '/preview-build' &&
-      github.event.issue.pull_request != null &&
-      github.actor != 'dependabot[bot]'
+    name: Internal Preview Build
+    if: github.event.issue.pull_request && contains(github.event.comment.body, '/preview-build')
 
-    name: Install and build
     runs-on: ubuntu-latest
     
     env:
@@ -105,16 +103,50 @@ jobs:
           while true; do
             STATUS_OUTPUT=$(eas build:list --json | jq -r --arg BUILD_ID "${{ steps.eas_build.outputs.build_id }}" '.[] | select(.id == $BUILD_ID) | .status')
             echo "Current build status: $STATUS_OUTPUT"
+              
             if [[ "$STATUS_OUTPUT" == "finished" ]]; then
               BUILD_URL=$(eas build:list --json | jq -r --arg BUILD_ID "${{ steps.eas_build.outputs.build_id }}" '.[] | select(.id == $BUILD_ID) | .artifacts.buildUrl')
-              echo "build_url=$BUILD_URL" >> $GITHUB_OUTPUT  # Store in GITHUB_OUTPUT
+              echo "build_url=$BUILD_URL" >> $GITHUB_OUTPUT
               break
             elif [[ "$STATUS_OUTPUT" == "errored" ]]; then
+              BUILD_URL=$(eas build:list --json | jq -r --arg BUILD_ID "${{ steps.eas_build.outputs.build_id }}" '.[] | select(.id == $BUILD_ID) | .artifacts.buildUrl')
+              echo "build_url=$BUILD_URL" >> $GITHUB_OUTPUT
               echo "Build failed ❌"
               exit 1
             fi
             sleep 60
           done
+  
+      - name: Add workflow result as comment on PR
+        uses: actions/github-script@v6
+        if: always()
+        with:
+          script: |
+            const name = '${{ github.workflow }}';
+            const url = '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}';
+            const success = '${{ job.status }}' === 'success';
+            const buildUrl = '${{ steps.wait_build.outputs.build_url }}';
+  
+            let body = `${name}: ${success ? 'succeeded ✅' : 'failed ❌'}\n${url}`;
+  
+            if (!success && buildUrl) {
+              body += `\n🚨 Build failed: [View Build](${buildUrl})`;
+            }
+  
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+  
+      - name: Set latest commit status as ${{ job.status }}
+        uses: myrotvorets/set-commit-status-action@master
+        if: always()
+        with:
+          sha: ${{ steps.comment-branch.outputs.head_sha }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: ${{ job.status }}
 
       - name: Send Slack notification via Webhook
         run: |
@@ -131,16 +163,16 @@ jobs:
             --arg pr_url "PR URL" \
             --arg issue_text "$ISSUE_TEXT" \
             --arg slack_id "${{ secrets.DEARLY_MEMBERS_SLACK_ID }}" \
-            --arg build_url "build link" \
+            --arg build_url "${{ steps.wait_build.outputs.build_url }}"
             '{
-              text: "Hey <@\($slack_id)> designers and engineers! 💛\n\n
+              text: "Hey <!subteam^$slack_id> designers and engineers! 💛\n\n"
               A new version of Dearly is ready for review: \"\($pr_title)\"\n\n
               📱 Test UI/UX: <\($build_url)|Click here>\n
-              🔍 View PR: <\($pr_url)|Pull Request>\n\n
+              🔍 View PR: <\($pr_url)|Click here>\n\n
               \($issue_text)"
             }')
 
           curl -X POST -H "Content-type: application/json" --data "$PAYLOAD" "${{ secrets.SLACK_WEBHOOK_URL }}"
 
-    
+
     
