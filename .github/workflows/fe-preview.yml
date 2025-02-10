@@ -12,15 +12,10 @@ on:
 
 jobs:
   build:
-    # if: |
-    #   github.event.issue.pull_request != null &&
-    #   contains(github.event.comment.body, '/preview-build') &&
-    #   github.actor != 'dependabot[bot]'
-    if: always()
-
-    concurrency:
-      group: pr-${{ github.event.issue.number || github.event.pull_request.number }}
-      cancel-in-progress: true
+    if: |
+      github.event.issue.pull_request != null &&
+      contains(github.event.comment.body, '/preview-build') &&
+      github.actor != 'dependabot[bot]'
 
     name: Install and build
     runs-on: ubuntu-latest
@@ -98,67 +93,31 @@ jobs:
       #       sleep 60
       #     done
 
-      # - name: Send Slack notification via Webhook
-      #   run: |
-      #     ISSUE_URL="${{ steps.extract_issue.outputs.issue_url }}"
-
-      #     if [[ -n "$ISSUE_URL" ]]; then
-      #       ISSUE_TEXT="🔗 *View the ticket:* <$ISSUE_URL|Ticket>"
-      #     else
-      #       ISSUE_TEXT=""
-      #     fi
-
-      #     curl -X POST -H "Content-type: application/json" \
-      #     --data "{
-      #       \"text\": \"Hey <!subteam^${{ secrets.DEARLY_MEMBERS_SLACK_ID }}> designers and engineers! 💛\n\n
-      #       *A new version of the app is ready for testing:* \\\"${{ github.event.pull_request.title }}\\\"\n\n
-      #       📱 *Test the changes:* <${{ env.BUILD_URL }}|Click here>\n
-      #       🔍 *View the PR:* <${{ github.event.pull_request.html_url }}|Pull Request>\n
-      #       $ISSUE_TEXT
-      #     }" \
-      #     ${{ secrets.SLACK_WEBHOOK_URL }}
-
-      # - name: Send Slack notification via Webhook
-      #   run: |
-      #     ISSUE_URL="${{ steps.extract_issue.outputs.issue_url }}"
-
-      #     if [[ -n "$ISSUE_URL" ]]; then
-      #       ISSUE_TEXT="🔗 *View the ticket:* <$ISSUE_URL|Ticket>"
-      #     else
-      #       ISSUE_TEXT=""
-      #     fi
-
-      #     curl -X POST -H "Content-type: application/json" \
-      #     --data "{
-      #       \"text\": \"Hey <!subteam^${{ secrets.DEARLY_MEMBERS_SLACK_ID }}> designers and engineers! 💛\n\n
-      #       *A new version of the app is ready for testing:* \\\"${{ github.event.pull_request.title }}\\\"\n\n
-      #       📱 *Test the changes:* <${{ env.BUILD_URL }}|Click here>\n
-      #       🔍 *View the PR:* <${{ github.event.pull_request.html_url }}|Pull Request>\n
-      #       $ISSUE_TEXT
-      #     }" \
-      #     ${{ secrets.SLACK_WEBHOOK_URL }}
-      
       - name: Send Slack notification via Webhook
         run: |
           ISSUE_URL="${{ steps.extract_issue.outputs.issue_url }}"
-      
+
           if [[ -n "$ISSUE_URL" ]]; then
-            ISSUE_TEXT="🔗 View the ticket: <$ISSUE_URL|Ticket>"
+            ISSUE_TEXT="🔗 View ticket: <$ISSUE_URL|Ticket>"
           else
             ISSUE_TEXT=""
           fi
-      
-          PAYLOAD=$(jq -n --arg pr_title "${{ github.event.pull_request.title }}" \
-                          --arg pr_url "${{ github.event.pull_request.html_url }}" \
-                          --arg issue_text "$ISSUE_TEXT" \
-                          '{
-                            text: "Hey <@${{ secrets.DEARLY_MEMBERS_SLACK_ID }}> designers and engineers! 💛\n\n
-                            A new version of Dearly is ready for review: \"\($pr_title)\"\n\n
-                            📱 Test UI/UX: placeholder\n
-                            🔍 View PR: \($pr_url)\n\n
-                            \($issue_text)"
-                          }')
-      
-          curl -X POST -H "Content-type: application/json" --data "$PAYLOAD" ${{ secrets.SLACK_WEBHOOK_URL }}
+
+          PAYLOAD=$(jq -n \
+            --arg pr_title "${{ github.event.pull_request.title }}" \
+            --arg pr_url "${{ github.event.pull_request.html_url }}" \
+            --arg issue_text "$ISSUE_TEXT" \
+            --arg slack_id "${{ secrets.DEARLY_MEMBERS_SLACK_ID }}" \
+            --arg build_url "build link" \
+            '{
+              text: "Hey <@\($slack_id)> designers and engineers! 💛\n\n
+              A new version of Dearly is ready for review: \"\($pr_title)\"\n\n
+              📱 Test UI/UX: <\($build_url)|Click here>\n
+              🔍 View PR: <\($pr_url)|Pull Request>\n\n
+              \($issue_text)"
+            }')
+
+          curl -X POST -H "Content-type: application/json" --data "$PAYLOAD" "${{ secrets.SLACK_WEBHOOK_URL }}"
+
     
     
