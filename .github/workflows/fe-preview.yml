@@ -31,29 +31,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
+      # - name: Setup Bun
+      #   uses: oven-sh/setup-bun@v1
       
-      - name: Install dependencies
-        run: cd frontend && bun install
+      # - name: Install dependencies
+      #   run: cd frontend && bun install
       
-      - name: Setup Expo and EAS
-        uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+      # - name: Setup Expo and EAS
+      #   uses: expo/expo-github-action@v8
+      #   with:
+      #     eas-version: latest
+      #     token: ${{ secrets.EXPO_TOKEN }}
       
-      - name: Validate env variables
-        run: |
-          for var in EXPO_PUBLIC_SUPABASE_URL EXPO_PUBLIC_SUPABASE_ANON_KEY; do
-            if [[ -z "${!var}" ]]; then
-              echo "Missing $var"
-              exit 1
-            fi
-          done
-        env:
-          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
-          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
+      # - name: Validate env variables
+      #   run: |
+      #     for var in EXPO_PUBLIC_SUPABASE_URL EXPO_PUBLIC_SUPABASE_ANON_KEY; do
+      #       if [[ -z "${!var}" ]]; then
+      #         echo "Missing $var"
+      #         exit 1
+      #       fi
+      #     done
+      #   env:
+      #     EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+      #     EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
 
       - name: Extract Linked Issue
         id: extract_issue
@@ -69,50 +69,95 @@ jobs:
             echo "issue_url=" >> $GITHUB_OUTPUT
           fi
         
-      - name: Start EAS Build
-        id: eas_build
-        run: |
-          BUILD_OUTPUT=$(eas build --platform "$DEPLOY_PLATFORM" --non-interactive --profile "$BUILD_PROFILE" --json)
-          BUILD_ID=$(echo "$BUILD_OUTPUT" | jq -r '.id')
-          if [[ -z "$BUILD_ID" ]]; then 
-            echo "Failed to extract BUILD_ID"
-            exit 1
-          fi
-          echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
+      # - name: Start EAS Build
+      #   id: eas_build
+      #   run: |
+      #     BUILD_OUTPUT=$(eas build --platform "$DEPLOY_PLATFORM" --non-interactive --profile "$BUILD_PROFILE" --json)
+      #     BUILD_ID=$(echo "$BUILD_OUTPUT" | jq -r '.id')
+      #     if [[ -z "$BUILD_ID" ]]; then 
+      #       echo "Failed to extract BUILD_ID"
+      #       exit 1
+      #     fi
+      #     echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
 
-      - name: Wait for Build Completion
-        id: wait_build
-        run: |
-          while true; do
-            STATUS_OUTPUT=$(eas build:list --json | jq -r --arg BUILD_ID "${{ steps.eas_build.outputs.build_id }}" '.[] | select(.id == $BUILD_ID) | .status')
-            echo "Current build status: $STATUS_OUTPUT"
-            if [[ "$STATUS_OUTPUT" == "finished" ]]; then
-              BUILD_URL=$(eas build:list --json | jq -r --arg BUILD_ID "${{ steps.eas_build.outputs.build_id }}" '.[] | select(.id == $BUILD_ID) | .artifacts.buildUrl')
-              echo "build_url=$BUILD_URL" >> $GITHUB_OUTPUT  # Store in GITHUB_OUTPUT
-              break
-            elif [[ "$STATUS_OUTPUT" == "errored" ]]; then
-              echo "Build failed ❌"
-              exit 1
-            fi
-            sleep 60
-          done
+      # - name: Wait for Build Completion
+      #   id: wait_build
+      #   run: |
+      #     while true; do
+      #       STATUS_OUTPUT=$(eas build:list --json | jq -r --arg BUILD_ID "${{ steps.eas_build.outputs.build_id }}" '.[] | select(.id == $BUILD_ID) | .status')
+      #       echo "Current build status: $STATUS_OUTPUT"
+      #       if [[ "$STATUS_OUTPUT" == "finished" ]]; then
+      #         BUILD_URL=$(eas build:list --json | jq -r --arg BUILD_ID "${{ steps.eas_build.outputs.build_id }}" '.[] | select(.id == $BUILD_ID) | .artifacts.buildUrl')
+      #         echo "build_url=$BUILD_URL" >> $GITHUB_OUTPUT  # Store in GITHUB_OUTPUT
+      #         break
+      #       elif [[ "$STATUS_OUTPUT" == "errored" ]]; then
+      #         echo "Build failed ❌"
+      #         exit 1
+      #       fi
+      #       sleep 60
+      #     done
 
+      # - name: Send Slack notification via Webhook
+      #   run: |
+      #     ISSUE_URL="${{ steps.extract_issue.outputs.issue_url }}"
+
+      #     if [[ -n "$ISSUE_URL" ]]; then
+      #       ISSUE_TEXT="🔗 *View the ticket:* <$ISSUE_URL|Ticket>"
+      #     else
+      #       ISSUE_TEXT=""
+      #     fi
+
+      #     curl -X POST -H "Content-type: application/json" \
+      #     --data "{
+      #       \"text\": \"Hey <!subteam^${{ secrets.DEARLY_MEMBERS_SLACK_ID }}> designers and engineers! 💛\n\n
+      #       *A new version of the app is ready for testing:* \\\"${{ github.event.pull_request.title }}\\\"\n\n
+      #       📱 *Test the changes:* <${{ env.BUILD_URL }}|Click here>\n
+      #       🔍 *View the PR:* <${{ github.event.pull_request.html_url }}|Pull Request>\n
+      #       $ISSUE_TEXT
+      #     }" \
+      #     ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      # - name: Send Slack notification via Webhook
+      #   run: |
+      #     ISSUE_URL="${{ steps.extract_issue.outputs.issue_url }}"
+
+      #     if [[ -n "$ISSUE_URL" ]]; then
+      #       ISSUE_TEXT="🔗 *View the ticket:* <$ISSUE_URL|Ticket>"
+      #     else
+      #       ISSUE_TEXT=""
+      #     fi
+
+      #     curl -X POST -H "Content-type: application/json" \
+      #     --data "{
+      #       \"text\": \"Hey <!subteam^${{ secrets.DEARLY_MEMBERS_SLACK_ID }}> designers and engineers! 💛\n\n
+      #       *A new version of the app is ready for testing:* \\\"${{ github.event.pull_request.title }}\\\"\n\n
+      #       📱 *Test the changes:* <${{ env.BUILD_URL }}|Click here>\n
+      #       🔍 *View the PR:* <${{ github.event.pull_request.html_url }}|Pull Request>\n
+      #       $ISSUE_TEXT
+      #     }" \
+      #     ${{ secrets.SLACK_WEBHOOK_URL }}
+      
       - name: Send Slack notification via Webhook
         run: |
           ISSUE_URL="${{ steps.extract_issue.outputs.issue_url }}"
-
+      
           if [[ -n "$ISSUE_URL" ]]; then
-            ISSUE_TEXT="🔗 *View the ticket:* <$ISSUE_URL|Ticket>"
+            ISSUE_TEXT="🔗 View the ticket: <$ISSUE_URL|Ticket>"
           else
             ISSUE_TEXT=""
           fi
-
-          curl -X POST -H "Content-type: application/json" \
-          --data "{
-            \"text\": \"Hey <!subteam^${{ secrets.DEARLY_MEMBERS_SLACK_ID }}> designers and engineers! 💛\n\n
-            *A new version of the app is ready for testing:* \\\"${{ github.event.pull_request.title }}\\\"\n\n
-            📱 *Test the changes:* <${{ env.BUILD_URL }}|Click here>\n
-            🔍 *View the PR:* <${{ github.event.pull_request.html_url }}|Pull Request>\n
-            $ISSUE_TEXT
-          }" \
-          ${{ secrets.SLACK_WEBHOOK_URL }}
+      
+          PAYLOAD=$(jq -n --arg pr_title "${{ github.event.pull_request.title }}" \
+                          --arg pr_url "${{ github.event.pull_request.html_url }}" \
+                          --arg issue_text "$ISSUE_TEXT" \
+                          '{
+                            text: "Hey <@${{ secrets.DEARLY_MEMBERS_SLACK_ID }}> designers and engineers! 💛\n\n
+                            A new version of Dearly is ready for review: \"\($pr_title)\"\n\n
+                            📱 Test UI/UX: placeholder\n
+                            🔍 View PR: \($pr_url)\n\n
+                            \($issue_text)"
+                          }')
+      
+          curl -X POST -H "Content-type: application/json" --data "$PAYLOAD" ${{ secrets.SLACK_WEBHOOK_URL }}
+    
+    
