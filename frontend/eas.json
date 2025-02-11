@@ -38,9 +38,10 @@
   "submit": {
     "production": {
       "ios": {
-        "appleId": "to-be-added@example.com",
-        "ascAppId": "to-be-added-app-store-connect-app-id"
+        "appleTeamId": "process.env.APPLE_TEAM_ID",
+        "ascAppId": "process.env.ASC_APP_ID"
       }
     }
   }
 }
+
