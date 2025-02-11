@@ -17,6 +17,5 @@ export const nudgeRoutes = (db: PostgresJsDatabase, expo: Expo): Hono => {
   nudge.get("/auto", (ctx) => nudgeController.manualNudge(ctx));
   nudge.put("/auto", (ctx) => nudgeController.manualNudge(ctx));
 
-
   return nudge;
 };

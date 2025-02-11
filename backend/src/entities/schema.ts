@@ -14,14 +14,16 @@ import {
   integer,
   unique,
   date,
+  check,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import { NAME_MAX_LIMIT } from "../constants/database";
 
 export const userModeEnum = pgEnum("mode", ["BASIC", "ADVANCED"]);
 export const postMediaEnum = pgEnum("mediaType", ["VIDEO", "PHOTO"]);
 export const memberRoleEnum = pgEnum("role", ["MEMBER", "MANAGER"]);
-export const nudgeFrequencyEnum = pgEnum("frequency", ["DAILY", "WEEKLY", "BIWEEKLY", "MONTHLY", "YEARLY"])
+export const nudgeFrequencyEnum = pgEnum("frequency", ["DAILY", "WEEKLY", "BIWEEKLY", "MONTHLY", "YEARLY"]);
+export const dayOfWeekEnum = pgEnum("dayOfWeek", ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]);
 export const referenceTypeEnum = pgEnum("referenceType", [
   "POST",
   "COMMENT",
@@ -189,16 +191,18 @@ export const invitationsTable = pgTable("invitations", {
 export const scheduledNudgesTable = pgTable("scheduledNudges", {
   id: uuid().primaryKey().defaultRandom(),
   groupId: uuid().notNull().references(() => groupsTable.id, { onDelete: "cascade" }),
-  frequency: nudgeFrequencyEnum().notNull().default("WEEKLY"), // TODO: should we just set a default weekly frequency?
-  daysOfWeek: integer("days[]").array(), // (1-7) TODO: enforce min/max types?
-  day: integer("day"), // (1-31)
-  month: integer("month"), // (1-12)
-  nudge_at: timestamp("nudge_at", { withTimezone: true }).notNull(),
+  frequency: nudgeFrequencyEnum().notNull().default("WEEKLY"),
+  daysOfWeek: dayOfWeekEnum().array(), // MON-SUN
+  day: integer("day"), // 1-31
+  month: integer("month"), // 1-12
+  nudgeAt: timestamp("nudgeAt", { withTimezone: true }).notNull(),
   isActive: boolean().notNull().default(true),
-  lastSent: date("lastSent").notNull(), // TODO: add default value and figure out correct datatype
-  created_at: timestamp("created_at").notNull().defaultNow(), // immutable
-  updated_at: timestamp("updated_at").notNull().defaultNow(),
-})
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+}, (table) => [
+  check("day_check", sql`${table.day} > 0 AND ${table.day} <= 31`),
+  check("month_check", sql`${table.month} > 0 AND ${table.month} <= 12`),
+]);
 
 export const likeCommentRelations = relations(likeCommentsTable, ({ one }) => ({
   user: one(usersTable, {
@@ -336,6 +340,13 @@ export const linkRelations = relations(linksTable, ({ one, many }) => ({
     references: [groupsTable.id],
   }),
   invitations: many(invitationsTable),
+}));
+
+export const scheduledNudgeRelations = relations(scheduledNudgesTable, ({ one }) => ({
+  group: one(groupsTable, {
+    fields: [scheduledNudgesTable.groupId],
+    references: [groupsTable.id],
+  }),
 }));
 
 export const invitationRelations = relations(invitationsTable, ({ one, many }) => ({

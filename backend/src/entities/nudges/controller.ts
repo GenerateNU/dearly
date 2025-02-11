@@ -57,6 +57,4 @@ export class NudgeControllerImpl implements NudgeController {
   async deactivateSchedule(ctx: Context): Promise<DEACTIVE_NUDGE> {
     throw new Error("Method not implemented.");
   }
-
-
 }
