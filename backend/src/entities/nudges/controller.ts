@@ -15,6 +15,7 @@ export interface NudgeController {
 export class NudgeControllerImpl implements NudgeController {
   private nudgeService: NudgeService;
 
+
   constructor(nudgeService: NudgeService) {
     this.nudgeService = nudgeService;
   }
@@ -36,11 +37,14 @@ export class NudgeControllerImpl implements NudgeController {
       const groupId = parseUUID(ctx.req.param("id"));
       const managerId = ctx.get("userId");
 
-      const payload = {
-        groupId: groupId
+      const payload = await ctx.req.json(); // TODO: validate
+
+      const payloadWithIds = {
+        groupId: groupId,
+        ...payload
       }
 
-      await this.nudgeService.createSchedule(managerId, payload);
+      await this.nudgeService.createSchedule(managerId, payloadWithIds);
       return ctx.json({ message: "Successfully created automatic nudge schedule" }, 200);
     }
     return await handleAppError(createScheduleImpl)(ctx);

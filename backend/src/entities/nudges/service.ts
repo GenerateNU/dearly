@@ -6,6 +6,7 @@ import logger from "../../utilities/logger";
 import { getNotificationBody } from "../../utilities/nudge";
 import { InternalServerError } from "../../utilities/errors/app-error";
 import { AddNudgeSchedulePayload, NudgeSchedule } from "../../types/api/internal/nudges";
+import { SchedulerClient, CreateScheduleCommand, DeleteScheduleCommand, } from "@aws-sdk/client-scheduler";
 
 export interface NudgeService {
   manualNudge(userIds: string[], groupId: string, managerId: string): Promise<void>;
@@ -15,10 +16,12 @@ export interface NudgeService {
 export class NudgeServiceImpl implements NudgeService {
   private nudgeTransaction: NudgeTransaction;
   private expoService: Expo;
+  private scheduler: SchedulerClient;
 
-  constructor(nudgeTransaction: NudgeTransaction, expoService: Expo) {
+  constructor(nudgeTransaction: NudgeTransaction, expoService: Expo, scheduler: SchedulerClient) {
     this.nudgeTransaction = nudgeTransaction;
     this.expoService = expoService;
+    this.scheduler = scheduler;
   }
 
   async manualNudge(userIds: string[], groupId: string, managerId: string): Promise<void> {
@@ -48,6 +51,25 @@ export class NudgeServiceImpl implements NudgeService {
       }
       
       // TODO: call the eventbridge scheduler to add the schedule
+      const input = { // CreateScheduleInput
+        Name: "STRING_VALUE", // required
+        GroupName: "STRING_VALUE",
+        ScheduleExpression: "STRING_VALUE", // required
+        StartDate: new Date("TIMESTAMP"),
+        EndDate: new Date("TIMESTAMP"),
+        Description: "STRING_VALUE",
+        ScheduleExpressionTimezone: "STRING_VALUE",
+        State: "STRING_VALUE",
+        KmsKeyArn: "STRING_VALUE",
+        Target: { // Target
+          Arn: "STRING_VALUE", // required
+          RoleArn: "STRING_VALUE", // required
+          Input: "STRING_VALUE",
+        },
+      };
+      const command = new CreateScheduleCommand(input);
+      const response = await this.scheduler.send(command);
+      // TODO: check for response
 
       return schedule;
     };
