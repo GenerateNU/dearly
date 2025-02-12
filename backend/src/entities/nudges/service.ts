@@ -39,7 +39,7 @@ export class NudgeServiceImpl implements NudgeService {
 
   async manualNudge(userIds: string[], groupId: string, managerId: string): Promise<void> {
     const manualNudgeImpl = async () => {
-      const notificationMetadata = await this.nudgeTransaction.getNotificationMetadata(
+      const notificationMetadata = await this.nudgeTransaction.getManualNudgeNotificationMetadata(
         userIds,
         groupId,
         managerId,
@@ -64,8 +64,7 @@ export class NudgeServiceImpl implements NudgeService {
       }
 
       // Format EXPO Push payload
-      const notificationMetadata = await this.nudgeTransaction.getNotificationMetadata(
-        [], // TODO: getNotificationMetadata for all users.
+      const notificationMetadata = await this.nudgeTransaction.getAutoNudgeNotificationMetadata(
         payload.groupId,
         managerId,
       );

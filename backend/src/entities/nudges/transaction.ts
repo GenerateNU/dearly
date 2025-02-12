@@ -6,7 +6,7 @@ import {
   scheduledNudgesTable,
   usersTable,
 } from "../schema";
-import { eq, inArray, and, isNotNull, gt, not } from "drizzle-orm";
+import { eq, inArray, and, isNotNull, gt, not, sql } from "drizzle-orm";
 import {
   ForbiddenError,
   NotFoundError,
@@ -22,8 +22,13 @@ import {
 } from "../../types/api/internal/nudges";
 
 export interface NudgeTransaction {
-  getNotificationMetadata(
+  getManualNudgeNotificationMetadata(
     userIds: string[],
+    groupId: string,
+    managerId: string,
+  ): Promise<NotificationMetadata>;
+
+  getAutoNudgeNotificationMetadata(
     groupId: string,
     managerId: string,
   ): Promise<NotificationMetadata>;
@@ -38,7 +43,7 @@ export interface NudgeTransaction {
   deactivateNudge(groupId: string, managerId: string): Promise<NudgeSchedule | null>;
 }
 
-export class NudgeTransactionImpl {
+export class NudgeTransactionImpl implements NudgeTransaction {
   private db: PostgresJsDatabase;
 
   constructor(db: PostgresJsDatabase) {
@@ -96,7 +101,7 @@ export class NudgeTransactionImpl {
     });
   }
 
-  async getNotificationMetadata(
+  async getManualNudgeNotificationMetadata(
     userIds: string[],
     groupId: string,
     managerId: string,
@@ -113,7 +118,7 @@ export class NudgeTransactionImpl {
         groupId,
         managerId,
       );
-      // check whether any selected users are in cooldown period
+
       await this.checkAndUpdateNudgeCooldown(tx, validNudgeTargets, groupId);
 
       return {
@@ -121,6 +126,31 @@ export class NudgeTransactionImpl {
         groupId,
         groupName: group.name,
       };
+    });
+  }
+
+  async getAutoNudgeNotificationMetadata(
+    groupId: string,
+    managerId: string,
+  ): Promise<NotificationMetadata> {
+    return await this.db.transaction(async (tx) => {
+      // validate group existence and check manager's permission
+      await this.validateGroup(tx, groupId, managerId);
+
+      // retrieve members' device tokens if they have notification enabled
+      const [deviceTokens] = await tx
+        .select({
+          groupId: groupsTable.id,
+          groupName: groupsTable.name,
+          deviceTokens: sql`ARRAY_AGG(${devicesTable.token})`,
+        })
+        .from(membersTable)
+        .innerJoin(groupsTable, eq(membersTable.groupId, groupsTable.id))
+        .innerJoin(devicesTable, eq(membersTable.userId, devicesTable.userId))
+        .where(and(eq(membersTable.notificationsEnabled, true), eq(groupsTable.id, groupId)))
+        .groupBy(groupsTable.id, groupsTable.name);
+
+      return deviceTokens as NotificationMetadata;
     });
   }
 
@@ -190,7 +220,6 @@ export class NudgeTransactionImpl {
           inArray(membersTable.userId, userIds),
           eq(membersTable.groupId, groupId),
           eq(membersTable.notificationsEnabled, true),
-          isNotNull(devicesTable.token),
         ),
       );
   }
