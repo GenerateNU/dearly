@@ -16,6 +16,7 @@ export const setUpRoutes = (
   app: Hono,
   db: PostgresJsDatabase,
   s3ServiceProvider: IS3Operations,
+  schedulerClient: SchedulerClient,
 ) => {
   // api documentation
   app.get(
@@ -32,7 +33,7 @@ export const setUpRoutes = (
     return ctx.json({ message: "OK" }, 200);
   });
 
-  app.route("/api/v1", apiRoutes(db, s3ServiceProvider));
+  app.route("/api/v1", apiRoutes(db, s3ServiceProvider, schedulerClient));
 
   // unsupported route
   app.notFound((ctx: Context) => {
@@ -40,14 +41,17 @@ export const setUpRoutes = (
   });
 };
 
-const apiRoutes = (db: PostgresJsDatabase, s3Service: IS3Operations): Hono => {
+const apiRoutes = (
+  db: PostgresJsDatabase,
+  s3Service: IS3Operations,
+  schedulerClient: SchedulerClient,
+): Hono => {
   const api = new Hono();
   const mediaService = new MediaServiceImpl(db, s3Service);
   const expo = new Expo();
-  const scheduler = new SchedulerClient();
 
   api.route("/users", userRoutes(db, mediaService));
-  api.route("/groups", groupRoutes(db, mediaService, expo, scheduler));
+  api.route("/groups", groupRoutes(db, mediaService, expo, schedulerClient));
   api.route("/", postRoutes(db, mediaService));
   api.route("/", commentsRoutes(db, mediaService));
 

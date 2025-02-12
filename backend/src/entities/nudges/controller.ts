@@ -12,7 +12,7 @@ import {
 
 export interface NudgeController {
   manualNudge(ctx: Context): Promise<MANUAL_NUDGE>;
-  createSchedule(ctx: Context): Promise<AUTO_NUDGE>;
+  upsertSchedule(ctx: Context): Promise<AUTO_NUDGE>;
   getSchedule(ctx: Context): Promise<NUDGES_API>;
   deactivateSchedule(ctx: Context): Promise<DEACTIVE_NUDGE>;
 }
@@ -36,8 +36,8 @@ export class NudgeControllerImpl implements NudgeController {
     return await handleAppError(manualNudgeImpl)(ctx);
   }
 
-  async createSchedule(ctx: Context): Promise<AUTO_NUDGE> {
-    const createScheduleImpl = async () => {
+  async upsertSchedule(ctx: Context): Promise<AUTO_NUDGE> {
+    const upsertScheduleImpl = async () => {
       const groupId = parseUUID(ctx.req.param("id"));
       const managerId = ctx.get("userId");
       const payload = nudgeScheduleValidate.parse(await ctx.req.json());
@@ -45,10 +45,10 @@ export class NudgeControllerImpl implements NudgeController {
         groupId: groupId,
         ...payload,
       };
-      await this.nudgeService.createSchedule(managerId, payloadWithIds);
+      await this.nudgeService.upsertSchedule(managerId, payloadWithIds);
       return ctx.json({ message: "Successfully updated automatic nudge schedule" }, 200);
     };
-    return await handleAppError(createScheduleImpl)(ctx);
+    return await handleAppError(upsertScheduleImpl)(ctx);
   }
 
   async getSchedule(ctx: Context): Promise<NUDGES_API> {

@@ -9,9 +9,13 @@ import { seedDatabase } from "./seed-db";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { mockClient } from "aws-sdk-client-mock";
 import { S3Impl } from "../../services/s3Service";
+import { SchedulerClient } from "@aws-sdk/client-scheduler";
 
 export const startTestApp = async (): Promise<Hono> => {
   const app = new Hono();
+
+  // TODO: mock this later
+  const schedulerClient = new SchedulerClient();
 
   const config = getConfigurations();
 
@@ -30,7 +34,7 @@ export const startTestApp = async (): Promise<Hono> => {
 
   configureMiddlewares(app, config);
 
-  setUpRoutes(app, db, s3);
+  setUpRoutes(app, db, s3, schedulerClient);
 
   return app;
 };

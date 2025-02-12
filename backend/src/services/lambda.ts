@@ -7,7 +7,7 @@ export const handler: Handler = async (event) => {
   // TODO: better error handling + where should we put this lambda?
   try {
     await new Expo().sendPushNotificationsAsync(notifications);
-    
+
     return {
       statusCode: 200,
       body: JSON.stringify({ message: "Nudges sent successfully" }),
