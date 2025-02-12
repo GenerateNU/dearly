@@ -44,7 +44,7 @@ const apiRoutes = (db: PostgresJsDatabase, s3Service: IS3Operations): Hono => {
   const api = new Hono();
   const mediaService = new MediaServiceImpl(db, s3Service);
   const expo = new Expo();
-  const scheduler = new SchedulerClient()
+  const scheduler = new SchedulerClient();
 
   api.route("/users", userRoutes(db, mediaService));
   api.route("/groups", groupRoutes(db, mediaService, expo, scheduler));

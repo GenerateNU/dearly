@@ -211,25 +211,28 @@ export const scheduledNudgesTable = pgTable(
     updatedAt: timestamp("updatedAt").notNull().defaultNow(),
   },
   (table) => [
-    // Ensure day is within range
-    check("day_check", sql`${table.day} > 0 AND ${table.day} <= 31`),
-    // Ensure month is within range
-    check("month_check", sql`${table.month} > 0 AND ${table.month} <= 12`),
+    // Ensure day is within range when provided
+    check("day_check", sql`${table.day} IS NULL OR (${table.day} > 0 AND ${table.day} <= 31)`),
+    // Ensure month is within range when provided
+    check(
+      "month_check",
+      sql`${table.month} IS NULL OR (${table.month} > 0 AND ${table.month} <= 12)`,
+    ),
 
     // For WEEKLY and BIWEEKLY, at least one day of the week must be selected
     check(
       "weekly_biweekly_day_check",
       sql`
-        (${table.frequency} = 'WEEKLY' OR ${table.frequency} = 'BIWEEKLY') 
-        AND array_length(${table.daysOfWeek}, 1) > 0
+        (${table.frequency} NOT IN ('WEEKLY', 'BIWEEKLY')) OR
+        (array_length(${table.daysOfWeek}, 1) > 0)
       `,
     ),
 
-    // For MONTHLY, only day needs to be provided
+    // For MONTHLY, day needs to be provided
     check(
       "monthly_day_check",
       sql`
-        ${table.frequency} = 'MONTHLY' AND ${table.day} IS NOT NULL
+        ${table.frequency} != 'MONTHLY' OR ${table.day} IS NOT NULL
       `,
     ),
 
@@ -237,8 +240,8 @@ export const scheduledNudgesTable = pgTable(
     check(
       "yearly_day_month_check",
       sql`
-        ${table.frequency} = 'YEARLY' 
-        AND ${table.day} IS NOT NULL AND ${table.month} IS NOT NULL
+        ${table.frequency} != 'YEARLY' OR
+        (${table.day} IS NOT NULL AND ${table.month} IS NOT NULL)
       `,
     ),
   ],

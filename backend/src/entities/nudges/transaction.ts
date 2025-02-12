@@ -1,5 +1,4 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { NotificationMetadata, NudgeTarget } from "./validator";
 import {
   devicesTable,
   groupsTable,
@@ -15,7 +14,12 @@ import {
 } from "../../utilities/errors/app-error";
 import { ONE_DAY_COOLDOWN_SEC } from "../../constants/nudge";
 import { Transaction } from "../../types/api/internal/transaction";
-import { AddNudgeSchedulePayload, NudgeSchedule } from "../../types/api/internal/nudges";
+import {
+  AddNudgeSchedulePayload,
+  NotificationMetadata,
+  NudgeSchedule,
+  NudgeTarget,
+} from "../../types/api/internal/nudges";
 
 export interface NudgeTransaction {
   getNotificationMetadata(
@@ -28,6 +32,10 @@ export interface NudgeTransaction {
     managerId: string,
     payload: AddNudgeSchedulePayload,
   ): Promise<NudgeSchedule | null>;
+
+  getNudgeSchedule(groupId: string, managerId: string): Promise<NudgeSchedule | null>;
+
+  deactivateNudge(groupId: string, managerId: string): Promise<NudgeSchedule | null>;
 }
 
 export class NudgeTransactionImpl {
@@ -50,10 +58,39 @@ export class NudgeTransactionImpl {
 
       // TODO: handle updating a schedule that already exists for this group
       const [nudgeSchedule] = await this.db
+        .update(scheduledNudgesTable)
+        .set(payload)
+        .where(eq(scheduledNudgesTable.groupId, payload.groupId));
+
+      return nudgeSchedule ?? null;
+    });
+  }
+
+  async getNudgeSchedule(groupId: string, managerId: string): Promise<NudgeSchedule | null> {
+    return await this.db.transaction(async (tx) => {
+      // validate group existence and manager permissions
+      await this.validateGroup(tx, groupId, managerId);
+
+      const [nudgeSchedule] = await this.db
         .select()
         .from(scheduledNudgesTable)
-        .where(eq(scheduledNudgesTable.groupId, payload.groupId))
+        .where(eq(scheduledNudgesTable.groupId, groupId))
         .limit(1);
+
+      return nudgeSchedule ?? null;
+    });
+  }
+
+  async deactivateNudge(groupId: string, managerId: string): Promise<NudgeSchedule | null> {
+    return await this.db.transaction(async (tx) => {
+      // validate group existence and manager permissions
+      await this.validateGroup(tx, groupId, managerId);
+
+      const [nudgeSchedule] = await this.db
+        .update(scheduledNudgesTable)
+        .set({ isActive: false, updatedAt: new Date() })
+        .where(eq(scheduledNudgesTable.groupId, groupId))
+        .returning();
 
       return nudgeSchedule ?? null;
     });

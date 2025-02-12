@@ -1,5 +1,5 @@
 {
-  "id": "21f72d50-6017-4c57-ab01-4f0c9b3936c1",
+  "id": "316ca7d9-e8c8-4380-8883-0642d2d86e63",
   "prevId": "3b0b89df-bd2a-489a-9a28-2a9cc27b1118",
   "version": "7",
   "dialect": "postgresql",
@@ -860,23 +860,23 @@
       "checkConstraints": {
         "day_check": {
           "name": "day_check",
-          "value": "\"scheduledNudges\".\"day\" > 0 AND \"scheduledNudges\".\"day\" <= 31"
+          "value": "\"scheduledNudges\".\"day\" IS NULL OR (\"scheduledNudges\".\"day\" > 0 AND \"scheduledNudges\".\"day\" <= 31)"
         },
         "month_check": {
           "name": "month_check",
-          "value": "\"scheduledNudges\".\"month\" > 0 AND \"scheduledNudges\".\"month\" <= 12"
+          "value": "\"scheduledNudges\".\"month\" IS NULL OR (\"scheduledNudges\".\"month\" > 0 AND \"scheduledNudges\".\"month\" <= 12)"
         },
         "weekly_biweekly_day_check": {
           "name": "weekly_biweekly_day_check",
-          "value": "\n        (\"scheduledNudges\".\"frequency\" = 'WEEKLY' OR \"scheduledNudges\".\"frequency\" = 'BIWEEKLY') \n        AND array_length(\"scheduledNudges\".\"daysOfWeek\", 1) > 0\n      "
+          "value": "\n        (\"scheduledNudges\".\"frequency\" NOT IN ('WEEKLY', 'BIWEEKLY')) OR\n        (array_length(\"scheduledNudges\".\"daysOfWeek\", 1) > 0)\n      "
         },
         "monthly_day_check": {
           "name": "monthly_day_check",
-          "value": "\n        \"scheduledNudges\".\"frequency\" = 'MONTHLY' AND \"scheduledNudges\".\"day\" IS NOT NULL\n      "
+          "value": "\n        \"scheduledNudges\".\"frequency\" != 'MONTHLY' OR \"scheduledNudges\".\"day\" IS NOT NULL\n      "
         },
         "yearly_day_month_check": {
           "name": "yearly_day_month_check",
-          "value": "\n        \"scheduledNudges\".\"frequency\" = 'YEARLY' \n        AND \"scheduledNudges\".\"day\" IS NOT NULL AND \"scheduledNudges\".\"month\" IS NOT NULL\n      "
+          "value": "\n        \"scheduledNudges\".\"frequency\" != 'YEARLY' OR\n        (\"scheduledNudges\".\"day\" IS NOT NULL AND \"scheduledNudges\".\"month\" IS NOT NULL)\n      "
         }
       },
       "isRLSEnabled": false

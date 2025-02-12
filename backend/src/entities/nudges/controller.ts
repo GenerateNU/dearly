@@ -40,14 +40,11 @@ export class NudgeControllerImpl implements NudgeController {
     const createScheduleImpl = async () => {
       const groupId = parseUUID(ctx.req.param("id"));
       const managerId = ctx.get("userId");
-
-      const payload = nudgeScheduleValidate.parse(await ctx.req.json()); // TODO: validate
-
+      const payload = nudgeScheduleValidate.parse(await ctx.req.json());
       const payloadWithIds = {
         groupId: groupId,
         ...payload,
       };
-
       await this.nudgeService.createSchedule(managerId, payloadWithIds);
       return ctx.json({ message: "Successfully updated automatic nudge schedule" }, 200);
     };
@@ -55,10 +52,28 @@ export class NudgeControllerImpl implements NudgeController {
   }
 
   async getSchedule(ctx: Context): Promise<NUDGES_API> {
-    throw new Error("Method not implemented.");
+    const getScheduleImpl = async () => {
+      const groupId = parseUUID(ctx.req.param("id"));
+      const managerId = ctx.get("userId");
+      const schedule = await this.nudgeService.getSchedule(groupId, managerId);
+      if (schedule) {
+        return ctx.json(schedule, 200);
+      }
+      return ctx.json({ message: "Group did not have schedule configured" }, 200);
+    };
+    return await handleAppError(getScheduleImpl)(ctx);
   }
 
   async deactivateSchedule(ctx: Context): Promise<DEACTIVE_NUDGE> {
-    throw new Error("Method not implemented.");
+    const deactivateScheduleImpl = async () => {
+      const groupId = parseUUID(ctx.req.param("id"));
+      const managerId = ctx.get("userId");
+      const schedule = await this.nudgeService.deactivateNudge(groupId, managerId);
+      if (schedule) {
+        return ctx.json(schedule, 200);
+      }
+      return ctx.json({ message: "Nudge schedule not configured for deactivation" }, 200);
+    };
+    return await handleAppError(deactivateScheduleImpl)(ctx);
   }
 }

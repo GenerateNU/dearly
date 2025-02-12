@@ -11,18 +11,18 @@ CREATE TABLE "scheduledNudges" (
 	"isActive" boolean DEFAULT true NOT NULL,
 	"createdAt" timestamp DEFAULT now() NOT NULL,
 	"updatedAt" timestamp DEFAULT now() NOT NULL,
-	CONSTRAINT "day_check" CHECK ("scheduledNudges"."day" > 0 AND "scheduledNudges"."day" <= 31),
-	CONSTRAINT "month_check" CHECK ("scheduledNudges"."month" > 0 AND "scheduledNudges"."month" <= 12),
+	CONSTRAINT "day_check" CHECK ("scheduledNudges"."day" IS NULL OR ("scheduledNudges"."day" > 0 AND "scheduledNudges"."day" <= 31)),
+	CONSTRAINT "month_check" CHECK ("scheduledNudges"."month" IS NULL OR ("scheduledNudges"."month" > 0 AND "scheduledNudges"."month" <= 12)),
 	CONSTRAINT "weekly_biweekly_day_check" CHECK (
-        ("scheduledNudges"."frequency" = 'WEEKLY' OR "scheduledNudges"."frequency" = 'BIWEEKLY') 
-        AND array_length("scheduledNudges"."daysOfWeek", 1) > 0
+        ("scheduledNudges"."frequency" NOT IN ('WEEKLY', 'BIWEEKLY')) OR
+        (array_length("scheduledNudges"."daysOfWeek", 1) > 0)
       ),
 	CONSTRAINT "monthly_day_check" CHECK (
-        "scheduledNudges"."frequency" = 'MONTHLY' AND "scheduledNudges"."day" IS NOT NULL
+        "scheduledNudges"."frequency" != 'MONTHLY' OR "scheduledNudges"."day" IS NOT NULL
       ),
 	CONSTRAINT "yearly_day_month_check" CHECK (
-        "scheduledNudges"."frequency" = 'YEARLY' 
-        AND "scheduledNudges"."day" IS NOT NULL AND "scheduledNudges"."month" IS NOT NULL
+        "scheduledNudges"."frequency" != 'YEARLY' OR
+        ("scheduledNudges"."day" IS NOT NULL AND "scheduledNudges"."month" IS NOT NULL)
       )
 );
 --> statement-breakpoint

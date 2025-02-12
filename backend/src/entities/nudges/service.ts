@@ -3,7 +3,7 @@ import { handleServiceError } from "../../utilities/errors/service-error";
 import { ExpoPushMessage, Expo } from "expo-server-sdk";
 import logger from "../../utilities/logger";
 import { getNotificationBody } from "../../utilities/nudge";
-import { InternalServerError } from "../../utilities/errors/app-error";
+import { BadRequestError, InternalServerError } from "../../utilities/errors/app-error";
 import {
   AddNudgeSchedulePayload,
   NotificationMetadata,
@@ -22,6 +22,8 @@ export interface NudgeService {
     managerId: string,
     payload: AddNudgeSchedulePayload,
   ): Promise<NudgeSchedule | undefined>;
+  getSchedule(groupId: string, managerId: string): Promise<NudgeSchedule | null>;
+  deactivateNudge(groupId: string, managerId: string): Promise<NudgeSchedule | null>;
 }
 
 export class NudgeServiceImpl implements NudgeService {
@@ -72,30 +74,35 @@ export class NudgeServiceImpl implements NudgeService {
       const expoPayload = this.formatPushNotifications(notificationMetadata);
 
       await this.createRecurringSchedule(payload.groupId, expoPayload);
-      
-      return schedule
+
+      return schedule;
     };
     return await handleServiceError(manualNudgeImpl)();
   }
 
-  private async createRecurringSchedule(name: string, expoPayload: ExpoPushMessage[]): Promise<number | undefined> {
-    const input = { // CreateScheduleInput
+  private async createRecurringSchedule(
+    name: string,
+    expoPayload: ExpoPushMessage[],
+  ): Promise<number | undefined> {
+    const input = {
+      // CreateScheduleInput
       Name: name, // required
       ScheduleExpression: "STRING_VALUE", // required
       ScheduleExpressionTimezone: "STRING_VALUE",
       State: ScheduleState.ENABLED,
-      Target: { // Target
+      Target: {
+        // Target
         Arn: "arn:aws:lambda:us-east-2:194722434714:function:SendNudgeNotification", // TODO: move into global constant
         RoleArn: "arn:aws:iam::194722434714:role/service-role/SendNudgeNotification-role-kypdggif", // required
         Input: JSON.stringify(expoPayload),
       },
       FlexibleTimeWindow: undefined,
     };
-    
+
     try {
       const command = new CreateScheduleCommand(input);
       const response = await this.scheduler.send(command);
-      return response.$metadata.httpStatusCode ?? undefined
+      return response.$metadata.httpStatusCode ?? undefined;
     } catch (err) {
       throw new InternalServerError(`Failed to create a recurring schedule: ${err}`);
     }
@@ -130,5 +137,19 @@ export class NudgeServiceImpl implements NudgeService {
         ...getNotificationBody(groupName),
       },
     ];
+  }
+
+  async getSchedule(groupId: string, managerId: string): Promise<NudgeSchedule | null> {
+    const getScheduleImpl = async () => {
+      return await this.nudgeTransaction.getNudgeSchedule(groupId, managerId);
+    };
+    return handleServiceError(getScheduleImpl)();
+  }
+
+  async deactivateNudge(groupId: string, managerId: string): Promise<NudgeSchedule | null> {
+    const deactivateNudgeImpl = async () => {
+      return await this.nudgeTransaction.deactivateNudge(groupId, managerId);
+    };
+    return handleServiceError(deactivateNudgeImpl)();
   }
 }
