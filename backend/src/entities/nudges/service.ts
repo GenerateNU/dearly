@@ -13,6 +13,7 @@ import {
   SchedulerClient,
   CreateScheduleCommand,
   DeleteScheduleCommand,
+  ScheduleState,
 } from "@aws-sdk/client-scheduler";
 
 export interface NudgeService {
@@ -20,7 +21,7 @@ export interface NudgeService {
   createSchedule(
     managerId: string,
     payload: AddNudgeSchedulePayload,
-  ): Promise<NudgeSchedule | null>;
+  ): Promise<NudgeSchedule | undefined>;
 }
 
 export class NudgeServiceImpl implements NudgeService {
@@ -51,7 +52,7 @@ export class NudgeServiceImpl implements NudgeService {
   async createSchedule(
     managerId: string,
     payload: AddNudgeSchedulePayload,
-  ): Promise<NudgeSchedule | null> {
+  ): Promise<NudgeSchedule | undefined> {
     const manualNudgeImpl = async () => {
       // Add schedule
       const schedule = await this.nudgeTransaction.createSchedule(managerId, payload);
@@ -60,33 +61,44 @@ export class NudgeServiceImpl implements NudgeService {
         throw new InternalServerError("Failed to add schedule");
       }
 
-      // TODO: call the eventbridge scheduler to add the schedule
-      const input = {
-        // CreateScheduleInput
-        Name: "STRING_VALUE", // required
-        GroupName: "STRING_VALUE",
-        ScheduleExpression: "STRING_VALUE", // required
-        StartDate: new Date("TIMESTAMP"),
-        EndDate: new Date("TIMESTAMP"),
-        Description: "STRING_VALUE",
-        ScheduleExpressionTimezone: "STRING_VALUE",
-        State: "STRING_VALUE",
-        KmsKeyArn: "STRING_VALUE",
-        Target: {
-          // Target
-          Arn: "STRING_VALUE", // required
-          RoleArn: "STRING_VALUE", // required
-          Input: "STRING_VALUE",
-        },
-      };
+      // Format EXPO Push payload
+      const notificationMetadata = await this.nudgeTransaction.getNotificationMetadata(
+        [], // TODO: getNotificationMetadata for all users.
+        payload.groupId,
+        managerId,
+      );
+
+      if (notificationMetadata.deviceTokens.length === 0) return;
+      const expoPayload = this.formatPushNotifications(notificationMetadata);
+
+      await this.createRecurringSchedule(payload.groupId, expoPayload);
+      
+      return schedule
+    };
+    return await handleServiceError(manualNudgeImpl)();
+  }
+
+  private async createRecurringSchedule(name: string, expoPayload: ExpoPushMessage[]): Promise<number | undefined> {
+    const input = { // CreateScheduleInput
+      Name: name, // required
+      ScheduleExpression: "STRING_VALUE", // required
+      ScheduleExpressionTimezone: "STRING_VALUE",
+      State: ScheduleState.ENABLED,
+      Target: { // Target
+        Arn: "STRING_VALUE", // required
+        RoleArn: "STRING_VALUE", // required
+        Input: JSON.stringify(expoPayload),
+      },
+      FlexibleTimeWindow: undefined,
+    };
+    
+    try {
       const command = new CreateScheduleCommand(input);
       const response = await this.scheduler.send(command);
-      // TODO: check for response
-
-      return schedule;
-    };
-
-    return await handleServiceError(manualNudgeImpl)();
+      return response.$metadata.httpStatusCode ?? undefined
+    } catch (err) {
+      throw new InternalServerError(`Failed to create a recurring schedule: ${err}`);
+    }
   }
 
   // TODO: refactor later with Nudge and Notification Service

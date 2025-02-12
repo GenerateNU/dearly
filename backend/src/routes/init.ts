@@ -10,6 +10,7 @@ import { IS3Operations } from "../services/s3Service";
 import { MediaServiceImpl } from "../entities/media/service";
 import { commentsRoutes } from "../entities/comments/route";
 import { Expo } from "expo-server-sdk";
+import { SchedulerClient } from "@aws-sdk/client-scheduler";
 
 export const setUpRoutes = (
   app: Hono,
@@ -43,9 +44,10 @@ const apiRoutes = (db: PostgresJsDatabase, s3Service: IS3Operations): Hono => {
   const api = new Hono();
   const mediaService = new MediaServiceImpl(db, s3Service);
   const expo = new Expo();
+  const scheduler = new SchedulerClient()
 
   api.route("/users", userRoutes(db, mediaService));
-  api.route("/groups", groupRoutes(db, mediaService, expo));
+  api.route("/groups", groupRoutes(db, mediaService, expo, scheduler));
   api.route("/", postRoutes(db, mediaService));
   api.route("/", commentsRoutes(db, mediaService));
 

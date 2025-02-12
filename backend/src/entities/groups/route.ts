@@ -9,11 +9,13 @@ import { invitationRoutes } from "../invitations/route";
 import { mediaRoutes } from "../media/route";
 import { memberRoutes } from "../members/route";
 import { Expo } from "expo-server-sdk";
+import { SchedulerClient } from "@aws-sdk/client-scheduler"
 
 export const groupRoutes = (
   db: PostgresJsDatabase,
   mediaService: MediaService,
   expo: Expo,
+  scheduler: SchedulerClient
 ): Hono => {
   const group = new Hono();
 
@@ -30,7 +32,7 @@ export const groupRoutes = (
   group.route("/", invitationRoutes(db));
   group.route("/:id/media", mediaRoutes(mediaService));
   group.route("/:id/members", memberRoutes(db, mediaService));
-  group.route("/:id/nudges", nudgeRoutes(db, expo));
+  group.route("/:id/nudges", nudgeRoutes(db, expo, scheduler));
 
   return group;
 };
