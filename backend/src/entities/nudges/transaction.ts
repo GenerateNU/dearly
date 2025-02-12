@@ -33,7 +33,7 @@ export interface NudgeTransaction {
     managerId: string,
   ): Promise<NotificationMetadata>;
 
-  createSchedule(
+  upsertSchedule(
     managerId: string,
     payload: AddNudgeSchedulePayload,
   ): Promise<NudgeSchedule | null>;
@@ -50,7 +50,7 @@ export class NudgeTransactionImpl implements NudgeTransaction {
     this.db = db;
   }
 
-  async createSchedule(
+  async upsertSchedule(
     managerId: string,
     payload: AddNudgeSchedulePayload,
   ): Promise<NudgeSchedule | null> {
@@ -58,14 +58,11 @@ export class NudgeTransactionImpl implements NudgeTransaction {
       // validate group existence and manager permissions
       await this.validateGroup(tx, payload.groupId, managerId);
 
-      // Insert the value into the database
-      await this.db.insert(scheduledNudgesTable).values(payload).onConflictDoNothing();
-
-      // TODO: handle updating a schedule that already exists for this group
-      const [nudgeSchedule] = await this.db
-        .update(scheduledNudgesTable)
-        .set({ ...payload, updatedAt: new Date() })
-        .where(eq(scheduledNudgesTable.groupId, payload.groupId));
+      // insert the value into the database
+      const [nudgeSchedule] = await this.db.insert(scheduledNudgesTable).values(payload).onConflictDoUpdate({
+        target: scheduledNudgesTable.id,
+        set: { ...payload, updatedAt: new Date() }
+      });
 
       return nudgeSchedule ?? null;
     });

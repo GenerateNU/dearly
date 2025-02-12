@@ -1,4 +1,5 @@
 import { SchedulerClient } from "@aws-sdk/client-scheduler";
+import { CreateScheduleCommand, DeleteScheduleCommand, UpdateScheduleCommand } from "@aws-sdk/client-scheduler";
 
 export interface NudgeScheduler {
   // TODO: input and output type of this, just dummy for now

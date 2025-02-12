@@ -56,7 +56,7 @@ export class NudgeServiceImpl implements NudgeService {
   ): Promise<NudgeSchedule | undefined> {
     const manualNudgeImpl = async () => {
       // Add schedule
-      const schedule = await this.nudgeTransaction.createSchedule(managerId, payload);
+      const schedule = await this.nudgeTransaction.upsertSchedule(managerId, payload);
 
       if (!schedule) {
         throw new InternalServerError("Failed to add schedule");

@@ -27,6 +27,7 @@
     "@hono/zod-validator": "^0.4.2",
     "@jest/globals": "^29.7.0",
     "@scalar/hono-api-reference": "^0.5.165",
+    "@types/aws-lambda": "^8.10.147",
     "@types/fluent-ffmpeg": "^2.1.27",
     "@types/jest": "^29.5.14",
     "@types/jsonwebtoken": "^9.0.7",
