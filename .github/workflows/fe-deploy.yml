@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - fe-deployment
     paths:
       - "frontend/**"
 
