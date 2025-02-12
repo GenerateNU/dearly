@@ -16,11 +16,7 @@ jobs:
     if: github.event.issue.pull_request && contains(github.event.comment.body, '/preview-build')
 
     runs-on: ubuntu-latest
-    
-    env:
-      DEPLOY_PLATFORM: ios
-      BUILD_PROFILE: preview
-    
+
     steps:
       - name: Get PR branch
         uses: xt0rted/pull-request-comment-branch@v1
@@ -36,7 +32,7 @@ jobs:
         if: always()
         with:
           script: |
-            const name = '${{ github.workflow   }}';
+            const name = '${{ github.workflow }}';
             const url = '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}';
             const success = '${{ job.status }}' === 'success';
             const body = `${name}: ${success ? 'succeeded ✅' : 'failed ❌'}\n${url}`;
@@ -77,77 +73,10 @@ jobs:
       - name: Start EAS Build
         id: eas_build
         run: |
-          BUILD_OUTPUT=$(eas build --platform "$DEPLOY_PLATFORM" --non-interactive --no-wait --profile "$BUILD_PROFILE" --json)
+          BUILD_OUTPUT=$(eas build --platform ios --non-interactive --no-wait --profile preview --json)
           BUILD_ID=$(echo "$BUILD_OUTPUT" | jq -r '.id')
           if [[ -z "$BUILD_ID" ]]; then 
             echo "Failed to extract BUILD_ID"
             exit 1
           fi
           echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
-  
-      # TODO: figure out way to trigger send to Slack when build is done
-      
-      - name: Add workflow result as comment on PR
-        uses: actions/github-script@v6
-        if: always()
-        with:
-          script: |
-            const name = '${{ github.workflow }}';
-            const url = '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}';
-            const success = '${{ job.status }}' === 'success';
-            const buildUrl = '${{ steps.wait_build.outputs.build_url }}';
-  
-            let body = `${name}: ${success ? 'succeeded ✅' : 'failed ❌'}\n${url}`;
-  
-            if (!success && buildUrl) {
-              body += `\n🚨 Build failed: [View Build](${buildUrl})`;
-            }
-  
-            await github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: body
-            });
-  
-      - name: Set latest commit status as ${{ job.status }}
-        uses: myrotvorets/set-commit-status-action@master
-        if: always()
-        with:
-          sha: ${{ steps.comment-branch.outputs.head_sha }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          status: ${{ job.status }}
-
-      - name: Send Slack notification via Webhook
-        env:
-          PR_TITLE: ${{ github.event.issue.title }}
-          PR_URL: ${{ github.event.issue.html_url }}
-          BUILD_URL: ${{ steps.wait_build.outputs.build_url }}
-          SLACK_ID: ${{ secrets.DEARLY_MEMBERS_SLACK_ID }}
-        run: |
-          ISSUE_URL="${{ steps.extract_issue.outputs.issue_url }}"
-
-          if [[ -n "$ISSUE_URL" ]]; then
-            ISSUE_TEXT="🔗 View ticket: <$ISSUE_URL|Ticket Details>"
-          else
-            ISSUE_TEXT=""
-          fi
-
-          PAYLOAD=$(jq -n \
-            --arg pr_title "$PR_TITLE" \
-            --arg pr_url "$PR_URL" \
-            --arg issue_text "$ISSUE_TEXT" \
-            --arg slack_id "$SLACK_ID" \
-            --arg build_url "$BUILD_URL"
-            '{
-              text: "Hey <!subteam^$slack_id> designers and engineers! 💛\n\n"
-              A new version of Dearly is now ready for review: \"\($pr_title)\"\n\n
-              📱 Test UI/UX: <\($build_url)|Build URL>\n
-              🔍 View PR: <\($pr_url)|Pull Request Details>\n\n
-              \($issue_text)"
-            }')
-
-          curl -X POST -H "Content-type: application/json" --data "$PAYLOAD" "${{ secrets.SLACK_WEBHOOK_URL }}"
-
-
-    

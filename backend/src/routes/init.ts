@@ -1,3 +1,4 @@
+import { Configuration } from "./../types/config";
 import { Context, Hono } from "hono";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { userRoutes } from "../entities/users/route";
@@ -10,10 +11,12 @@ import { IS3Operations } from "../services/s3Service";
 import { MediaServiceImpl } from "../entities/media/service";
 import { commentsRoutes } from "../entities/comments/route";
 import { Expo } from "expo-server-sdk";
+import { SlackController, SlackControllerImpl } from "./webhook";
 
 export const setUpRoutes = (
   app: Hono,
   db: PostgresJsDatabase,
+  config: Configuration,
   s3ServiceProvider: IS3Operations,
 ) => {
   // api documentation
@@ -30,6 +33,10 @@ export const setUpRoutes = (
   app.get("/healthcheck", (ctx: Context): HEALTHCHECK => {
     return ctx.json({ message: "OK" }, 200);
   });
+
+  // webhook to send to slack channel for CI message
+  const slackController: SlackController = new SlackControllerImpl(config.slackConfig);
+  app.post("/slack", (ctx: Context) => slackController.receiveBuildEvent(ctx));
 
   app.route("/api/v1", apiRoutes(db, s3ServiceProvider));
 

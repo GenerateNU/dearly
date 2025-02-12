@@ -28,6 +28,13 @@ export interface S3Config {
   name: string;
 }
 
+export interface SlackConfig {
+  expoSignature: string;
+  slackWebhookUrl: string;
+  slackUserID: string;
+  slackChannelID: string;
+}
+
 export interface Configuration {
   server: ServerConfig;
   database: DatabaseConfig;
@@ -37,5 +44,6 @@ export interface Configuration {
     migrationsFolder: string;
   };
   s3Config: S3Config;
+  slackConfig: SlackConfig;
   environment: string;
 }

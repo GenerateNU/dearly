@@ -53,6 +53,12 @@ export const getConfigurations = (): Configuration => {
       region: parseEnv("AWS_REGION"),
       name: parseEnv("AWS_BUCKET_NAME"),
     },
+    slackConfig: {
+      expoSignature: parseEnv("SECRET_WEBHOOK_KEY"),
+      slackWebhookUrl: parseEnv("SLACK_WEBHOOK_URL"),
+      slackChannelID: parseEnv("SLACK_CHANNEL_ID"),
+      slackUserID: parseEnv("SLACK_USER_GROUP_ID"),
+    },
     environment: nodeEnv,
   };
   return config;

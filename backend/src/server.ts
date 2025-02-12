@@ -22,7 +22,7 @@ const config = getConfigurations();
 
     configureMiddlewares(app, config);
 
-    setUpRoutes(app, db, s3ServiceProvider);
+    setUpRoutes(app, db, config, s3ServiceProvider);
 
     console.log("Successfully initialize app");
   } catch (error) {
