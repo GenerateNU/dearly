@@ -1,0 +1,35 @@
+import React, { useEffect, useRef } from "react";
+import { Animated } from "react-native";
+import Box from "../base/box";
+
+interface ProgressBarProps {
+  progress: number; // progress percentage, between 0 and 100
+}
+
+const ProgressBar = ({ progress }: ProgressBarProps) => {
+  const animatedWidth = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(animatedWidth, {
+      toValue: progress,
+      duration: 300, // sliding animation 300 ms
+      useNativeDriver: false,
+    }).start();
+  }, [progress]); // runs when the progress changes
+
+  return (
+    <Box backgroundColor="white" width="auto" borderRadius="m" overflow="hidden">
+      <Animated.View
+        className="h-2 bg-gray-600"
+        style={{
+          width: animatedWidth.interpolate({
+            inputRange: [0, 100],
+            outputRange: ["0%", "100%"],
+          }),
+        }}
+      />
+    </Box>
+  );
+};
+
+export default ProgressBar;
