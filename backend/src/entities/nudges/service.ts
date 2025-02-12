@@ -3,7 +3,7 @@ import { handleServiceError } from "../../utilities/errors/service-error";
 import { ExpoPushMessage, Expo } from "expo-server-sdk";
 import logger from "../../utilities/logger";
 import { getNotificationBody } from "../../utilities/nudge";
-import { BadRequestError, InternalServerError } from "../../utilities/errors/app-error";
+import { InternalServerError } from "../../utilities/errors/app-error";
 import {
   AddNudgeSchedulePayload,
   NotificationMetadata,
@@ -12,7 +12,6 @@ import {
 import {
   SchedulerClient,
   CreateScheduleCommand,
-  DeleteScheduleCommand,
   ScheduleState,
 } from "@aws-sdk/client-scheduler";
 
