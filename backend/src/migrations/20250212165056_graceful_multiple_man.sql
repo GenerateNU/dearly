@@ -11,6 +11,7 @@ CREATE TABLE "scheduledNudges" (
 	"isActive" boolean DEFAULT true NOT NULL,
 	"createdAt" timestamp DEFAULT now() NOT NULL,
 	"updatedAt" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "scheduledNudges_groupId_id_unique" UNIQUE("groupId","id"),
 	CONSTRAINT "day_check" CHECK ("scheduledNudges"."day" IS NULL OR ("scheduledNudges"."day" > 0 AND "scheduledNudges"."day" <= 31)),
 	CONSTRAINT "month_check" CHECK ("scheduledNudges"."month" IS NULL OR ("scheduledNudges"."month" > 0 AND "scheduledNudges"."month" <= 12)),
 	CONSTRAINT "weekly_biweekly_day_check" CHECK (

@@ -211,6 +211,7 @@ export const scheduledNudgesTable = pgTable(
     updatedAt: timestamp("updatedAt").notNull().defaultNow(),
   },
   (table) => [
+    unique().on(table.groupId, table.id),
     // Ensure day is within range when provided
     check("day_check", sql`${table.day} IS NULL OR (${table.day} > 0 AND ${table.day} <= 31)`),
     // Ensure month is within range when provided

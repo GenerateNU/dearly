@@ -60,7 +60,7 @@ export class NudgeTransactionImpl implements NudgeTransaction {
 
       // insert the value into the database
       const [nudgeSchedule] = await this.db.insert(scheduledNudgesTable).values(payload).onConflictDoUpdate({
-        target: scheduledNudgesTable.id,
+        target: [scheduledNudgesTable.id, groupsTable.id],
         set: { ...payload, updatedAt: new Date() }
       });
 
