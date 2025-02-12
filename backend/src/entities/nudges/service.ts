@@ -13,7 +13,10 @@ import { NudgeScheduler } from "../../services/nudgeScheduler";
 
 export interface NudgeService {
   manualNudge(userIds: string[], groupId: string, managerId: string): Promise<void>;
-  upsertSchedule(managerId: string, payload: AddNudgeSchedulePayload): Promise<NudgeSchedule>;
+  upsertSchedule(
+    managerId: string,
+    payload: AddNudgeSchedulePayload,
+  ): Promise<NudgeSchedule | undefined>;
   getSchedule(groupId: string, managerId: string): Promise<NudgeSchedule | null>;
   deactivateNudge(groupId: string, managerId: string): Promise<NudgeSchedule | null>;
 }
@@ -46,15 +49,14 @@ export class NudgeServiceImpl implements NudgeService {
   async upsertSchedule(
     managerId: string,
     payload: AddNudgeSchedulePayload,
-  ): Promise<NudgeSchedule> {
-    const manualNudgeImpl = async () => {
+  ): Promise<NudgeSchedule | undefined> {
+    const upsertScheduleImpl = async () => {
       // upsert schedule into database
       const schedule = await this.nudgeTransaction.upsertSchedule(managerId, payload);
       if (!schedule) {
         throw new InternalServerError("Failed to add schedule");
       }
 
-      // format Expo push notification payload
       const notificationMetadata = await this.nudgeTransaction.getAutoNudgeNotificationMetadata(
         payload.groupId,
         managerId,
@@ -68,8 +70,7 @@ export class NudgeServiceImpl implements NudgeService {
 
       return schedule;
     };
-    // not sure why this is undefined, very strange
-    return await handleServiceError(manualNudgeImpl)();
+    return await handleServiceError(upsertScheduleImpl)();
   }
 
   private async sendPushNotifications(notifications: ExpoPushMessage[]): Promise<void> {
