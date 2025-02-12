@@ -78,7 +78,7 @@ export class SlackControllerImpl implements SlackController {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: `You can access the build in two ways:\n• <${buildUrl}|Click here to download build directly> ✨\n`,
+            text: `You can access the build in two ways:\n• <${buildUrl}|Click here to download directly> ✨\n• Scan the QR code below 📲\n`,
           },
         },
         {
