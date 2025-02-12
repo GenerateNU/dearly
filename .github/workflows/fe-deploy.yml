@@ -37,7 +37,4 @@ jobs:
         run: echo "DEPLOY_PLATFORM=ios" >> $GITHUB_ENV
         
       - name: Build on EAS and Auto-Submit to App Store if successful
-        env:
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          ASC_APP_ID: ${{ secrets.ASC_APP_ID }}
-        run: cd frontend && pwd && eas build --platform "$DEPLOY_PLATFORM" --non-interactive --no-wait --profile production --auto-submit
+        run: cd frontend && eas build --platform "$DEPLOY_PLATFORM" --non-interactive --no-wait --profile production --auto-submit
