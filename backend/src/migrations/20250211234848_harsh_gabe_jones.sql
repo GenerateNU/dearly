@@ -12,7 +12,18 @@ CREATE TABLE "scheduledNudges" (
 	"createdAt" timestamp DEFAULT now() NOT NULL,
 	"updatedAt" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "day_check" CHECK ("scheduledNudges"."day" > 0 AND "scheduledNudges"."day" <= 31),
-	CONSTRAINT "month_check" CHECK ("scheduledNudges"."month" > 0 AND "scheduledNudges"."month" <= 12)
+	CONSTRAINT "month_check" CHECK ("scheduledNudges"."month" > 0 AND "scheduledNudges"."month" <= 12),
+	CONSTRAINT "weekly_biweekly_day_check" CHECK (
+        ("scheduledNudges"."frequency" = 'WEEKLY' OR "scheduledNudges"."frequency" = 'BIWEEKLY') 
+        AND array_length("scheduledNudges"."daysOfWeek", 1) > 0
+      ),
+	CONSTRAINT "monthly_day_check" CHECK (
+        "scheduledNudges"."frequency" = 'MONTHLY' AND "scheduledNudges"."day" IS NOT NULL
+      ),
+	CONSTRAINT "yearly_day_month_check" CHECK (
+        "scheduledNudges"."frequency" = 'YEARLY' 
+        AND "scheduledNudges"."day" IS NOT NULL AND "scheduledNudges"."month" IS NOT NULL
+      )
 );
 --> statement-breakpoint
 ALTER TABLE "scheduledNudges" ADD CONSTRAINT "scheduledNudges_groupId_groups_id_fk" FOREIGN KEY ("groupId") REFERENCES "public"."groups"("id") ON DELETE cascade ON UPDATE no action;

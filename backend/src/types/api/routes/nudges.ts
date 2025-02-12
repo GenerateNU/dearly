@@ -13,8 +13,8 @@ export type AUTO_NUDGE = TypedResponse<
 >;
 
 export type NUDGES_API = TypedResponse<
-| paths["/api/v1/groups/{id}/nudges/auto"]["get"]["responses"]["200"]["content"]["application/json"]
-| API_ERROR
+  | paths["/api/v1/groups/{id}/nudges/auto"]["get"]["responses"]["200"]["content"]["application/json"]
+  | API_ERROR
 >;
 
 export type DEACTIVE_NUDGE = TypedResponse<

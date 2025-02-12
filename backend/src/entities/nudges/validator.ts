@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { validate } from "uuid";
+import { createInsertSchema } from "drizzle-zod";
+import { scheduledNudgesTable } from "../schema";
 
 export const userIDValidate = z
   .object({
@@ -15,13 +17,3 @@ export const userIDValidate = z
   })
   .passthrough();
 
-export type NotificationMetadata = {
-  deviceTokens: string[];
-  groupId: string;
-  groupName: string;
-};
-
-export type NudgeTarget = {
-  userId: string;
-  deviceToken: string;
-};

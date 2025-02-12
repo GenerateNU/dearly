@@ -22,7 +22,13 @@ import { NAME_MAX_LIMIT } from "../constants/database";
 export const userModeEnum = pgEnum("mode", ["BASIC", "ADVANCED"]);
 export const postMediaEnum = pgEnum("mediaType", ["VIDEO", "PHOTO"]);
 export const memberRoleEnum = pgEnum("role", ["MEMBER", "MANAGER"]);
-export const nudgeFrequencyEnum = pgEnum("frequency", ["DAILY", "WEEKLY", "BIWEEKLY", "MONTHLY", "YEARLY"]);
+export const nudgeFrequencyEnum = pgEnum("frequency", [
+  "DAILY",
+  "WEEKLY",
+  "BIWEEKLY",
+  "MONTHLY",
+  "YEARLY",
+]);
 export const dayOfWeekEnum = pgEnum("dayOfWeek", ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]);
 export const referenceTypeEnum = pgEnum("referenceType", [
   "POST",
@@ -188,21 +194,55 @@ export const invitationsTable = pgTable("invitations", {
   createdAt: timestamp().notNull().defaultNow(),
 });
 
-export const scheduledNudgesTable = pgTable("scheduledNudges", {
-  id: uuid().primaryKey().defaultRandom(),
-  groupId: uuid().notNull().references(() => groupsTable.id, { onDelete: "cascade" }),
-  frequency: nudgeFrequencyEnum().notNull().default("WEEKLY"),
-  daysOfWeek: dayOfWeekEnum().array(), // MON-SUN
-  day: integer("day"), // 1-31
-  month: integer("month"), // 1-12
-  nudgeAt: timestamp("nudgeAt", { withTimezone: true }).notNull(),
-  isActive: boolean().notNull().default(true),
-  createdAt: timestamp("createdAt").notNull().defaultNow(),
-  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
-}, (table) => [
-  check("day_check", sql`${table.day} > 0 AND ${table.day} <= 31`),
-  check("month_check", sql`${table.month} > 0 AND ${table.month} <= 12`),
-]);
+export const scheduledNudgesTable = pgTable(
+  "scheduledNudges",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    groupId: uuid()
+      .notNull()
+      .references(() => groupsTable.id, { onDelete: "cascade" }),
+    frequency: nudgeFrequencyEnum().notNull().default("WEEKLY"),
+    daysOfWeek: dayOfWeekEnum().array(), // MON-SUN
+    day: integer("day"), // 1-31
+    month: integer("month"), // 1-12
+    nudgeAt: timestamp("nudgeAt", { withTimezone: true }).notNull(),
+    isActive: boolean().notNull().default(true),
+    createdAt: timestamp("createdAt").notNull().defaultNow(),
+    updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+  },
+  (table) => [
+    // Ensure day is within range
+    check("day_check", sql`${table.day} > 0 AND ${table.day} <= 31`),
+    // Ensure month is within range
+    check("month_check", sql`${table.month} > 0 AND ${table.month} <= 12`),
+
+    // For WEEKLY and BIWEEKLY, at least one day of the week must be selected
+    check(
+      "weekly_biweekly_day_check",
+      sql`
+        (${table.frequency} = 'WEEKLY' OR ${table.frequency} = 'BIWEEKLY') 
+        AND array_length(${table.daysOfWeek}, 1) > 0
+      `,
+    ),
+
+    // For MONTHLY, only day needs to be provided
+    check(
+      "monthly_day_check",
+      sql`
+        ${table.frequency} = 'MONTHLY' AND ${table.day} IS NOT NULL
+      `,
+    ),
+
+    // For YEARLY, both day and month must be provided
+    check(
+      "yearly_day_month_check",
+      sql`
+        ${table.frequency} = 'YEARLY' 
+        AND ${table.day} IS NOT NULL AND ${table.month} IS NOT NULL
+      `,
+    ),
+  ],
+);
 
 export const likeCommentRelations = relations(likeCommentsTable, ({ one }) => ({
   user: one(usersTable, {

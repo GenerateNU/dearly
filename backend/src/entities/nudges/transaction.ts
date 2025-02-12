@@ -1,6 +1,12 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { NotificationMetadata, NudgeTarget } from "./validator";
-import { devicesTable, groupsTable, membersTable, scheduledNudgesTable, usersTable } from "../schema";
+import {
+  devicesTable,
+  groupsTable,
+  membersTable,
+  scheduledNudgesTable,
+  usersTable,
+} from "../schema";
 import { eq, inArray, and, isNotNull, gt, not } from "drizzle-orm";
 import {
   ForbiddenError,
@@ -18,7 +24,10 @@ export interface NudgeTransaction {
     managerId: string,
   ): Promise<NotificationMetadata>;
 
-  createSchedule(managerId: string, payload: AddNudgeSchedulePayload): Promise<NudgeSchedule | null>;
+  createSchedule(
+    managerId: string,
+    payload: AddNudgeSchedulePayload,
+  ): Promise<NudgeSchedule | null>;
 }
 
 export class NudgeTransactionImpl {
@@ -28,7 +37,10 @@ export class NudgeTransactionImpl {
     this.db = db;
   }
 
-  async createSchedule(managerId: string, payload: AddNudgeSchedulePayload): Promise<NudgeSchedule | null> {
+  async createSchedule(
+    managerId: string,
+    payload: AddNudgeSchedulePayload,
+  ): Promise<NudgeSchedule | null> {
     return await this.db.transaction(async (tx) => {
       // validate group existence and manager permissions
       await this.validateGroup(tx, payload.groupId, managerId);
@@ -40,9 +52,7 @@ export class NudgeTransactionImpl {
       const [nudgeSchedule] = await this.db
         .select()
         .from(scheduledNudgesTable)
-        .where(
-          eq(scheduledNudgesTable.groupId, payload.groupId),
-        )
+        .where(eq(scheduledNudgesTable.groupId, payload.groupId))
         .limit(1);
 
       return nudgeSchedule ?? null;

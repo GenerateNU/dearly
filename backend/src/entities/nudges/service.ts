@@ -1,16 +1,26 @@
 import { NudgeTransaction } from "./transaction";
 import { handleServiceError } from "../../utilities/errors/service-error";
 import { ExpoPushMessage, Expo } from "expo-server-sdk";
-import { NotificationMetadata } from "./validator";
 import logger from "../../utilities/logger";
 import { getNotificationBody } from "../../utilities/nudge";
 import { InternalServerError } from "../../utilities/errors/app-error";
-import { AddNudgeSchedulePayload, NudgeSchedule } from "../../types/api/internal/nudges";
-import { SchedulerClient, CreateScheduleCommand, DeleteScheduleCommand, } from "@aws-sdk/client-scheduler";
+import {
+  AddNudgeSchedulePayload,
+  NotificationMetadata,
+  NudgeSchedule,
+} from "../../types/api/internal/nudges";
+import {
+  SchedulerClient,
+  CreateScheduleCommand,
+  DeleteScheduleCommand,
+} from "@aws-sdk/client-scheduler";
 
 export interface NudgeService {
   manualNudge(userIds: string[], groupId: string, managerId: string): Promise<void>;
-  createSchedule(managerId: string, payload: AddNudgeSchedulePayload): Promise<NudgeSchedule | null>;
+  createSchedule(
+    managerId: string,
+    payload: AddNudgeSchedulePayload,
+  ): Promise<NudgeSchedule | null>;
 }
 
 export class NudgeServiceImpl implements NudgeService {
@@ -38,20 +48,21 @@ export class NudgeServiceImpl implements NudgeService {
     return await handleServiceError(manualNudgeImpl)();
   }
 
-  async createSchedule(managerId: string, payload: AddNudgeSchedulePayload): Promise<NudgeSchedule | null> {
+  async createSchedule(
+    managerId: string,
+    payload: AddNudgeSchedulePayload,
+  ): Promise<NudgeSchedule | null> {
     const manualNudgeImpl = async () => {
       // Add schedule
-      const schedule = await this.nudgeTransaction.createSchedule (
-        managerId, 
-        payload
-      );
+      const schedule = await this.nudgeTransaction.createSchedule(managerId, payload);
 
       if (!schedule) {
         throw new InternalServerError("Failed to add schedule");
       }
-      
+
       // TODO: call the eventbridge scheduler to add the schedule
-      const input = { // CreateScheduleInput
+      const input = {
+        // CreateScheduleInput
         Name: "STRING_VALUE", // required
         GroupName: "STRING_VALUE",
         ScheduleExpression: "STRING_VALUE", // required
@@ -61,7 +72,8 @@ export class NudgeServiceImpl implements NudgeService {
         ScheduleExpressionTimezone: "STRING_VALUE",
         State: "STRING_VALUE",
         KmsKeyArn: "STRING_VALUE",
-        Target: { // Target
+        Target: {
+          // Target
           Arn: "STRING_VALUE", // required
           RoleArn: "STRING_VALUE", // required
           Input: "STRING_VALUE",
