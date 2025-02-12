@@ -3,7 +3,6 @@ import { IDPayload } from "../../types/id";
 import { commentsTable, groupsTable, likeCommentsTable, membersTable, postsTable } from "../schema";
 import { eq, and, sql } from "drizzle-orm";
 import {
-  BadRequestError,
   ForbiddenError,
   InternalServerError,
   NotFoundError,
@@ -74,8 +73,24 @@ export class CommentTransactionImpl implements CommentTransaction {
   }
 
   async createComment(comment: CreateCommentPayload): Promise<Comment> {
+    // checks that post exists
+    const [post] = await this.db.select().from(postsTable).where(eq(postsTable.id, comment.postId));
+    if (!post) {
+      throw new NotFoundError("Post not found");
+    }
+
+    const [userInGroup] = await this.db
+    .select()
+    .from(groupsTable)
+    .innerJoin(membersTable, eq(membersTable.groupId, post.groupId))
+    .where(eq(membersTable.userId, comment.userId));
+
+    if (!userInGroup) {
+      throw new ForbiddenError("You do not have access to this post");
+    }
+
     const [newComment] = await this.db.insert(commentsTable).values(comment).returning();
-    if (!newComment) throw new InternalServerError();
+    if (!newComment) throw new InternalServerError("Fsailed to Create Comment");
     return newComment;
   }
 
@@ -83,7 +98,7 @@ export class CommentTransactionImpl implements CommentTransaction {
     // check if postId is a valid post
     const [post] = await this.db.select().from(postsTable).where(eq(postsTable.id, postId));
     if (!post) {
-      throw new NotFoundError("Post");
+      throw new NotFoundError("Post not found");
     }
 
     // check if user has access to this post
@@ -94,7 +109,7 @@ export class CommentTransactionImpl implements CommentTransaction {
       .where(eq(membersTable.userId, userId));
 
     if (!userInGroup) {
-      throw new ForbiddenError();
+      throw new ForbiddenError("You do not have access to this post");
     }
 
     // select all comments under post and return as an array
@@ -130,7 +145,7 @@ export class CommentTransactionImpl implements CommentTransaction {
       .from(commentsTable)
       .where(eq(commentsTable.id, commentId));
     if (comment && comment.userId != userId) {
-      throw new ForbiddenError();
+      throw new ForbiddenError("This comment is not owned by you");
     }
   }
 }

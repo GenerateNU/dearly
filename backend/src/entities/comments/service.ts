@@ -10,7 +10,7 @@ import { CommentTransaction } from "./transaction";
 
 export interface CommentService {
   toggleLikeComment(payload: IDPayload): Promise<boolean>;
-  createComment(payload: CreateCommentPayload): Promise<Comment | null>;
+  createComment(payload: CreateCommentPayload): Promise<Comment>;
   deleteComment(payload: IDPayload): Promise<void>;
   getComments(payload: CommentPagination): Promise<Comment[]>;
 }
@@ -31,7 +31,7 @@ export class CommentServiceImpl implements CommentService {
     return await handleServiceError(toggleLikeCommentImpl)();
   }
 
-  async createComment(payload: CreateCommentPayload): Promise<Comment | null> {
+  async createComment(payload: CreateCommentPayload): Promise<Comment> {
     const createCommentImpl = async () => {
       return await this.commentTransaction.createComment(payload);
     };

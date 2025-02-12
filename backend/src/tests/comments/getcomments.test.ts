@@ -4,7 +4,7 @@ import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
-import { randomUUIDv7 } from "bun";
+import { generateUUID } from "../helpers/test-token";
 
 describe("GET /posts/:id/comments", () => {
   let app: Hono;
@@ -17,51 +17,28 @@ describe("GET /posts/:id/comments", () => {
     content: "i like this photo",
   };
 
+  const BOB_COMMENT = {
+    content: "amazing photos!",
+    userId: USER_BOB_ID,
+    postId: POST_ID,
+  };
+
+  const ALICE_COMMENT = {
+    content: "i like this photo",
+    userId: USER_ALICE_ID,
+    postId: POST_ID,
+  };
+
   beforeEach(async () => {
     app = await startTestApp();
   });
 
   it.each([
-    [
-      "1",
-      "1",
-      [
-        {
-          content: "amazing photos!",
-          userId: USER_BOB_ID,
-          postId: POST_ID,
-        },
-      ],
-    ],
-    [
-      "1",
-      "2",
-      [
-        {
-          content: "i like this photo",
-          userId: USER_ANA_ID,
-          postId: POST_ID,
-        },
-      ],
-    ],
+    ["1", "1", [BOB_COMMENT]],
+    ["1", "2", [ALICE_COMMENT]],
     ["1", "3", []],
     ["1", "4", []],
-    [
-      "2",
-      "1",
-      [
-        {
-          content: "amazing photos!",
-          userId: USER_BOB_ID,
-          postId: POST_ID,
-        },
-        {
-          content: "i like this photo",
-          userId: USER_ANA_ID,
-          postId: POST_ID,
-        },
-      ],
-    ],
+    ["2", "1", [BOB_COMMENT, ALICE_COMMENT]],
     ["2", "2", []],
   ])("should return 200 with limit %s and page %s", async (limit, page, expectedBody) => {
     await testBuilder.request({
@@ -73,7 +50,7 @@ describe("GET /posts/:id/comments", () => {
       },
       autoAuthorized: false,
       headers: {
-        Authorization: `Bearer ${ANA_JWT}`,
+        Authorization: `Bearer ${ALICE_JWT}`,
       },
     });
     (
@@ -158,7 +135,7 @@ describe("GET /posts/:id/comments", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.GET,
-        route: `/api/v1/posts/${randomUUIDv7()}/comments`,
+        route: `/api/v1/posts/${generateUUID()}/comments`,
         autoAuthorized: false,
         headers: {
           Authorization: `Bearer ${ALICE_JWT}`,

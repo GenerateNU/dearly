@@ -1,25 +1,26 @@
-import { USER_ANA_ID, POST_ID } from "../helpers/test-constants";
+import { USER_ALICE_ID, POST_ID, USER_ANA_ID } from "../helpers/test-constants";
 import { Hono } from "hono";
 import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
-import { randomUUIDv7 } from "bun";
+import { generateUUID } from "../helpers/test-token";
 
 describe("POST /posts/:id/comments", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
+  const ALICE_JWT = generateJWTFromID(USER_ALICE_ID);
   const ANA_JWT = generateJWTFromID(USER_ANA_ID);
   const goodRequestBody = {
     content: "i like this photo",
   };
   const goodRequestBody2 = {
-    voiceMemo: randomUUIDv7(),
+    voiceMemo: generateUUID(),
   };
   const badRequestBody = {};
 
   const badRequestBody2 = {
-    voiceMemo: randomUUIDv7(),
+    voiceMemo: generateUUID(),
     content: "hiii",
   };
 
@@ -38,7 +39,7 @@ describe("POST /posts/:id/comments", () => {
         },
         autoAuthorized: false,
         headers: {
-          Authorization: `Bearer ${ANA_JWT}`,
+          Authorization: `Bearer ${ALICE_JWT}`,
         },
       })
     )
@@ -47,7 +48,7 @@ describe("POST /posts/:id/comments", () => {
       .assertStatusCode(Status.Created)
       .assertFields({
         content: goodRequestBody.content,
-        userId: USER_ANA_ID,
+        userId: USER_ALICE_ID,
         postId: POST_ID,
       });
   });
@@ -63,7 +64,7 @@ describe("POST /posts/:id/comments", () => {
         },
         autoAuthorized: false,
         headers: {
-          Authorization: `Bearer ${ANA_JWT}`,
+          Authorization: `Bearer ${ALICE_JWT}`,
         },
       })
     )
@@ -72,7 +73,7 @@ describe("POST /posts/:id/comments", () => {
       .assertStatusCode(Status.Created)
       .assertFields({
         voiceMemo: goodRequestBody2.voiceMemo,
-        userId: USER_ANA_ID,
+        userId: USER_ALICE_ID,
         postId: POST_ID,
       });
   });
@@ -88,7 +89,7 @@ describe("POST /posts/:id/comments", () => {
         },
         autoAuthorized: false,
         headers: {
-          Authorization: `Bearer ${ANA_JWT}`,
+          Authorization: `Bearer ${ALICE_JWT}`,
         },
       })
     ).assertStatusCode(Status.BadRequest);
@@ -105,7 +106,7 @@ describe("POST /posts/:id/comments", () => {
         },
         autoAuthorized: false,
         headers: {
-          Authorization: `Bearer ${ANA_JWT}`,
+          Authorization: `Bearer ${ALICE_JWT}`,
         },
       })
     ).assertStatusCode(Status.BadRequest);
@@ -118,14 +119,14 @@ describe("POST /posts/:id/comments", () => {
         type: HTTPRequest.POST,
         route: `/api/v1/posts/${POST_ID}/comments`,
         requestBody: {
-          ...badRequestBody,
+          ...goodRequestBody,
         },
         autoAuthorized: false,
         headers: {
           Authorization: `Bearer ${ANA_JWT}`,
         },
       })
-    ).assertStatusCode(Status.BadRequest);
+    ).assertStatusCode(Status.Forbidden);
   });
 
   it("should return 404 if post is not found", async () => {
@@ -133,13 +134,13 @@ describe("POST /posts/:id/comments", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.POST,
-        route: `/api/v1/posts/${randomUUIDv7()}/comments`,
+        route: `/api/v1/posts/${generateUUID()}/comments`,
         requestBody: {
           ...goodRequestBody,
         },
         autoAuthorized: false,
         headers: {
-          Authorization: `Bearer ${ANA_JWT}`,
+          Authorization: `Bearer ${ALICE_JWT}`,
         },
       })
     ).assertStatusCode(Status.NotFound);
