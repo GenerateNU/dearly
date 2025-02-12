@@ -85,8 +85,8 @@ export class NudgeServiceImpl implements NudgeService {
       ScheduleExpressionTimezone: "STRING_VALUE",
       State: ScheduleState.ENABLED,
       Target: { // Target
-        Arn: "STRING_VALUE", // required
-        RoleArn: "STRING_VALUE", // required
+        Arn: "arn:aws:lambda:us-east-2:194722434714:function:SendNudgeNotification", // TODO: move into global constant
+        RoleArn: "arn:aws:iam::194722434714:role/service-role/SendNudgeNotification-role-kypdggif", // required
         Input: JSON.stringify(expoPayload),
       },
       FlexibleTimeWindow: undefined,
