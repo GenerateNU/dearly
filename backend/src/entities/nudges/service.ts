@@ -73,6 +73,20 @@ export class NudgeServiceImpl implements NudgeService {
     return await handleServiceError(upsertScheduleImpl)();
   }
 
+  async getSchedule(groupId: string, managerId: string): Promise<NudgeSchedule | null> {
+    const getScheduleImpl = async () => {
+      return await this.nudgeTransaction.getNudgeSchedule(groupId, managerId);
+    };
+    return handleServiceError(getScheduleImpl)();
+  }
+
+  async deactivateNudge(groupId: string, managerId: string): Promise<NudgeSchedule | null> {
+    const deactivateNudgeImpl = async () => {
+      return await this.nudgeTransaction.deactivateNudge(groupId, managerId);
+    };
+    return handleServiceError(deactivateNudgeImpl)();
+  }
+
   private async sendPushNotifications(notifications: ExpoPushMessage[]): Promise<void> {
     try {
       const receipts = await this.expoService.sendPushNotificationsAsync(notifications);
@@ -101,19 +115,5 @@ export class NudgeServiceImpl implements NudgeService {
         ...getNotificationBody(groupName),
       },
     ];
-  }
-
-  async getSchedule(groupId: string, managerId: string): Promise<NudgeSchedule | null> {
-    const getScheduleImpl = async () => {
-      return await this.nudgeTransaction.getNudgeSchedule(groupId, managerId);
-    };
-    return handleServiceError(getScheduleImpl)();
-  }
-
-  async deactivateNudge(groupId: string, managerId: string): Promise<NudgeSchedule | null> {
-    const deactivateNudgeImpl = async () => {
-      return await this.nudgeTransaction.deactivateNudge(groupId, managerId);
-    };
-    return handleServiceError(deactivateNudgeImpl)();
   }
 }
