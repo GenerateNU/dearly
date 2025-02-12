@@ -59,7 +59,7 @@ export class NudgeTransactionImpl {
       // TODO: handle updating a schedule that already exists for this group
       const [nudgeSchedule] = await this.db
         .update(scheduledNudgesTable)
-        .set(payload)
+        .set({ ...payload, updatedAt: new Date() })
         .where(eq(scheduledNudgesTable.groupId, payload.groupId));
 
       return nudgeSchedule ?? null;
