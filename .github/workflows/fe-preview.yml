@@ -60,18 +60,6 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
       
-      - name: Validate env variables
-        run: |
-          for var in EXPO_PUBLIC_SUPABASE_URL EXPO_PUBLIC_SUPABASE_ANON_KEY; do
-            if [[ -z "${!var}" ]]; then
-              echo "Missing $var"
-              exit 1
-            fi
-          done
-        env:
-          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
-          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
-
       - name: Extract Linked Issue
         id: extract_issue
         run: |
@@ -89,34 +77,16 @@ jobs:
       - name: Start EAS Build
         id: eas_build
         run: |
-          BUILD_OUTPUT=$(eas build --platform "$DEPLOY_PLATFORM" --non-interactive --profile "$BUILD_PROFILE" --json)
+          BUILD_OUTPUT=$(eas build --platform "$DEPLOY_PLATFORM" --non-interactive --no-wait --profile "$BUILD_PROFILE" --json)
           BUILD_ID=$(echo "$BUILD_OUTPUT" | jq -r '.id')
           if [[ -z "$BUILD_ID" ]]; then 
             echo "Failed to extract BUILD_ID"
             exit 1
           fi
           echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
-
-      - name: Wait for Build Completion
-        id: wait_build
-        run: |
-          while true; do
-            STATUS_OUTPUT=$(eas build:list --json | jq -r --arg BUILD_ID "${{ steps.eas_build.outputs.build_id }}" '.[] | select(.id == $BUILD_ID) | .status')
-            echo "Current build status: $STATUS_OUTPUT"
-              
-            if [[ "$STATUS_OUTPUT" == "finished" ]]; then
-              BUILD_URL=$(eas build:list --json | jq -r --arg BUILD_ID "${{ steps.eas_build.outputs.build_id }}" '.[] | select(.id == $BUILD_ID) | .artifacts.buildUrl')
-              echo "build_url=$BUILD_URL" >> $GITHUB_OUTPUT
-              break
-            elif [[ "$STATUS_OUTPUT" == "errored" ]]; then
-              BUILD_URL=$(eas build:list --json | jq -r --arg BUILD_ID "${{ steps.eas_build.outputs.build_id }}" '.[] | select(.id == $BUILD_ID) | .artifacts.buildUrl')
-              echo "build_url=$BUILD_URL" >> $GITHUB_OUTPUT
-              echo "Build failed ❌"
-              exit 1
-            fi
-            sleep 30
-          done
   
+      # TODO: figure out way to trigger send to Slack when build is done
+      
       - name: Add workflow result as comment on PR
         uses: actions/github-script@v6
         if: always()
