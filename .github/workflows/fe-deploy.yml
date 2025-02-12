@@ -5,8 +5,8 @@ on:
     branches:
       - main
       - fe-deployment
-    paths:
-      - "frontend/**"
+    # paths:
+    #   - "frontend/**"
 
 jobs:
   build:
