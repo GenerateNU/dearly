@@ -82,7 +82,9 @@ export class NudgeServiceImpl implements NudgeService {
 
   async deactivateNudge(groupId: string, managerId: string): Promise<NudgeSchedule | null> {
     const deactivateNudgeImpl = async () => {
-      return await this.nudgeTransaction.deactivateNudge(groupId, managerId);
+      const nudge = await this.nudgeTransaction.deactivateNudge(groupId, managerId);
+      await this.scheduler.disableSchedule(groupId);
+      return nudge;
     };
     return handleServiceError(deactivateNudgeImpl)();
   }
