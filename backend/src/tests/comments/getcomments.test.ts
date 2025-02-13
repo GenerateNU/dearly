@@ -199,4 +199,18 @@ describe("GET /posts/:id/comments", () => {
       })
     ).assertStatusCode(Status.BadRequest);
   });
+
+  it("should return 404 if the post is not found", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.GET,
+        route: `/api/v1/posts/${generateUUID()}/comments`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${ALICE_JWT}`,
+        },
+      })
+    ).assertStatusCode(Status.NotFound);
+  });
 });
