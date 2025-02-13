@@ -2414,6 +2414,20 @@ paths:
             type: string
             format: uuid
             example: 5e91507e-5630-4efd-9fd4-799178870b10
+        - name: limit
+          in: query
+          description: The maximum number of groups to return.
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: page
+          in: query
+          description: The page number for pagination.
+          required: false
+          schema:
+            type: integer
+            default: 1
       security:
         - BearerAuth: []
       responses:
@@ -2464,7 +2478,7 @@ paths:
       summary: Creates a comment
       description: Creates a comment from the specified body and associates it with a specific post
       parameters:
-        - name: postID
+        - name: id
           in: path
           description: ID of the post the comment is under
           required: true
