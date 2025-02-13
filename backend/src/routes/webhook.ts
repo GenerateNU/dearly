@@ -2,19 +2,15 @@ import { SlackConfig } from "./../types/config";
 import { Context } from "hono";
 import { handleAppError } from "../utilities/errors/app-error";
 import * as crypto from "crypto";
-import logger from "../utilities/logger";
 import { getSlackMessage } from "../utilities/slack";
 
-interface ExpoSubmitWebhookPayload {
-  status: "errored" | "finished" | "canceled";
-  platform: "android" | "ios";
-  submissionInfo?: {
-    error?: {
-      message?: string;
-      errorCode?: string;
-    };
-    logsUrl?: string;
+interface ExpoBuildWebhookPayload {
+  status: string;
+  artifacts?: {
+    buildUrl?: string;
   };
+  platform: string;
+  buildDetailsPageUrl?: string;
 }
 
 export interface SlackController {
@@ -31,52 +27,47 @@ export class SlackControllerImpl implements SlackController {
   async receiveBuildEvent(ctx: Context): Promise<Response> {
     const slackMessageImpl = async () => {
       const expoSignature = ctx.req.header("expo-signature");
-      if (!expoSignature) {
-        return ctx.json({ error: "Missing expo-signature header" }, 400);
-      }
-
-      const rawBody = await ctx.req.text();
-      if (!rawBody) {
-        return ctx.json({ error: "Empty request body" }, 400);
-      }
+      const bodyText = await ctx.req.text();
 
       const hmac = crypto.createHmac(
         "sha1",
         this.config.expoSignature as crypto.BinaryLike | crypto.KeyObject,
       );
-      hmac.update(rawBody);
+      hmac.update(bodyText);
       const hash = `sha1=${hmac.digest("hex")}`;
 
       if (expoSignature !== hash) {
-        return ctx.json({ error: "Invalid signature" }, 403);
+        return ctx.json("Signatures didn't match", 500);
       }
 
-      try {
-        const payload = JSON.parse(rawBody) as ExpoSubmitWebhookPayload;
+      const payload = JSON.parse(bodyText) as ExpoBuildWebhookPayload;
 
-        if (payload.status === "finished") {
-          await this.sendSlackMessage();
-          return ctx.json({ message: "Successfully sent slack notification" }, 200);
-        }
-
-        if (payload.status === "errored") {
-          logger.warn("Failed to build:", payload.submissionInfo?.error?.message);
-          return ctx.json({ message: "Error finishing the build" }, 200);
-        }
-
-        return ctx.json({ message: "Build not finished, no notification sent" }, 200);
-      } catch (error) {
-        logger.error("Failed to parse JSON payload:", error);
-        return ctx.json({ error: "Invalid JSON payload" }, 400);
+      if (payload.status === "finished") {
+        await this.sendSlackMessage(payload);
+        return ctx.text("Successfully sent slack notification", 200);
       }
+
+      return ctx.text("Build not finished, no notification sent", 200);
     };
     return await handleAppError(slackMessageImpl)(ctx);
   }
 
-  private async sendSlackMessage(): Promise<void> {
+  private async generateQRCodeUrl(buildUrl: string): Promise<string> {
+    return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(buildUrl)}`;
+  }
+
+  private async sendSlackMessage(payload: ExpoBuildWebhookPayload): Promise<void> {
+    const buildUrl = payload.artifacts?.buildUrl || payload.buildDetailsPageUrl;
+
+    if (!buildUrl) {
+      throw new Error("No build URL available in the payload");
+    }
+
+    const qrCodeUrl = await this.generateQRCodeUrl(buildUrl);
+
     const messagePayload = {
       channel: this.config.slackChannelID,
-      blocks: getSlackMessage(this.config.slackUserID),
+      blocks: getSlackMessage(qrCodeUrl, buildUrl, this.config.slackUserID),
     };
 
     const response = await fetch(this.config.slackWebhookUrl, {

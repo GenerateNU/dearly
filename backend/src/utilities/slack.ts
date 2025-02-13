@@ -1,4 +1,4 @@
-export const getSlackMessage = (slackId: string) => {
+export const getSlackMessage = (qrCodeUrl: string, buildUrl: string, slackId: string) => {
   const message = [
     {
       type: "section",
@@ -11,10 +11,18 @@ export const getSlackMessage = (slackId: string) => {
       type: "section",
       text: {
         type: "mrkdwn",
-        text: `Please check your mailbox for an email from TestFlight and install the build on your phone! 📲✨`,
+        text: `You can access the build in two ways:\n• <${buildUrl}|Click here to download directly> ✨\n• Scan the QR code below 📲\n`,
       },
     },
+    {
+      type: "image",
+      title: {
+        type: "plain_text",
+        text: `QR Code for iOS Build`,
+      },
+      image_url: qrCodeUrl,
+      alt_text: "QR Code for the build URL",
+    },
   ];
-
   return message;
 };
