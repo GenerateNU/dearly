@@ -274,6 +274,28 @@ export class TestBuilder {
   }
 
   /**
+   * Assert that multiple fields in the response body, with different fields for each array match the expected values
+   */
+  assertFieldsArray(expectedFields: Record<string, unknown>[]): TestBuilder {
+    if (!this.body) {
+      throw new Error("Response is not defined.");
+    }
+    if (expectedFields.length != this.body.length) {
+      console.log(expectedFields.length);
+      console.log(this.body.length);
+      throw new Error("Number of expected fields not equal to length of arry in response");
+    }
+    if (Array.isArray(this.body)) {
+      this.body.forEach((item, index) => {
+        Object.entries(expectedFields[index]!).forEach(([fieldName, expectedValue]) => {
+          expect(item![fieldName]).toBe(expectedValue);
+        });
+      });
+    }
+    return this;
+  }
+
+  /**
    * Debug method to log response details
    */
   debug(): TestBuilder {
