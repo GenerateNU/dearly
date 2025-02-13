@@ -2,23 +2,25 @@ import React, { useState } from "react";
 import { TouchableOpacity, LayoutChangeEvent } from "react-native";
 import Box from "@/design-system/base/box";
 import Text from "@/design-system/base/text";
+import { AnimatedBox } from "@/design-system/base/animated-box";
+import { useAnimatedStyle, withTiming, Easing } from "react-native-reanimated";
 
 const MenuTab = <T extends string>({
   isSelected,
   label,
   onPress,
+  width,
 }: {
   isSelected: boolean;
   label: T;
   onPress: () => void;
+  width: number;
 }) => {
   return (
-    <TouchableOpacity
-      onPress={onPress}
-      activeOpacity={0.7}
-      className="flex-1 justify-center items-center py-2"
-    >
-      <Text color={isSelected ? "black" : "gray"}>{label}</Text>
+    <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+      <Box width={width} justifyContent="center" alignItems="center" paddingVertical="xxs">
+        <Text color={isSelected ? "black" : "gray"}>{label}</Text>
+      </Box>
     </TouchableOpacity>
   );
 };
@@ -39,8 +41,21 @@ const HomeMenu = <T extends string>({
     setContainerWidth(width);
   };
 
-  const tabWidth = containerWidth / categories.length;
-  const animation = categories.indexOf(selected) === 0 ? 0 : containerWidth / 2;
+  const tabWidth = (containerWidth / categories.length) * 0.995;
+
+  const translateX = useAnimatedStyle(() => {
+    const selectedIndex = categories.indexOf(selected);
+    return {
+      transform: [
+        {
+          translateX: withTiming(selectedIndex * tabWidth, {
+            duration: 300,
+            easing: Easing.inOut(Easing.ease),
+          }),
+        },
+      ],
+    };
+  }, [selected, categories, tabWidth, containerWidth]);
 
   return (
     <Box
@@ -52,26 +67,37 @@ const HomeMenu = <T extends string>({
       borderColor="black"
       paddingVertical="s"
     >
-      <Box
-        backgroundColor="darkGray"
+      <AnimatedBox
+        backgroundColor="secondaryDark"
         position="absolute"
         justifyContent="center"
-        borderRadius="l"
-        width={tabWidth * 0.97}
-        margin="xxs"
-        height="170%"
-        style={{
-          left: animation,
-        }}
+        alignItems="center"
+        borderRadius="xl"
+        width={tabWidth * 0.99}
+        height="160%"
+        style={[
+          translateX,
+          {
+            shadowColor: "black",
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+            elevation: 0,
+            borderWidth: 2,
+            borderColor: "rgba(1,1,1,0.1)",
+            margin: 1,
+          },
+        ]}
       />
 
-      <Box width="100%" flexDirection="row" justifyContent="space-around">
+      <Box width="100%" flexDirection="row">
         {categories.map((category) => (
           <MenuTab
             key={category}
             isSelected={selected === category}
             label={category}
             onPress={() => setSelected(category)}
+            width={tabWidth}
           />
         ))}
       </Box>

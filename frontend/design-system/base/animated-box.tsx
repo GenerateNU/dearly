@@ -1,7 +1,7 @@
 import { ComponentProps, ReactNode } from "react";
 import Box from "./box";
-import { AnimatedProps } from "react-native-reanimated";
-import { Animated, ViewProps } from "react-native";
+import { ViewProps } from "react-native";
+import Animated from "react-native-reanimated";
 import {
   boxRestyleFunctions,
   createRestyleComponent,
@@ -10,7 +10,9 @@ import {
 import { Theme } from "./theme";
 
 type BoxProps = ComponentProps<typeof Box>;
-type AnimatedViewProps = AnimatedProps<ViewProps & { children?: ReactNode }>;
+type AnimatedViewProps = Partial<ViewProps> & {
+  children?: ReactNode;
+};
 type Props = BoxProps & AnimatedViewProps;
 
 export const AnimatedBox = createRestyleComponent<BoxProps & Omit<Props, keyof BoxProps>, Theme>(

@@ -3,21 +3,20 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 
 import { useTheme } from "@shopify/restyle";
 import { Theme } from "@/design-system/base/theme";
-import { useState } from "react";
 import { Pressable } from "react-native";
 
 interface HeartProps {
   like: boolean;
+  onLike: () => void;
 }
 
-export const Heart: React.FC<HeartProps> = ({ like }) => {
-  const [initialState, setState] = useState<boolean>(like);
+export const Heart: React.FC<HeartProps> = ({ like, onLike }) => {
   const theme = useTheme<Theme>();
 
-  const variantStyle = theme.heartIconVariants[initialState ? "filled" : "outlined"];
+  const variantStyle = theme.heartIconVariants[like ? "filled" : "outlined"];
 
   return (
-    <Pressable onPress={() => setState(!initialState)}>
+    <Pressable onPress={onLike}>
       <Box
         borderRadius="xl"
         alignItems="center"
