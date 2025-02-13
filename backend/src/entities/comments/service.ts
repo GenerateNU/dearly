@@ -40,7 +40,17 @@ export class CommentServiceImpl implements CommentService {
 
   async getComments(payload: CommentPagination): Promise<Comment[]> {
     const getCommentsImpl = async () => {
-      return await this.commentTransaction.getComments(payload, this.mediaService);
+      const comments = await this.commentTransaction.getComments(payload);
+      const commentsWithURL = await Promise.all(
+        comments.map(async (comment) => {
+          if (comment.voiceMemo) {
+            const voiceMemoURL = await this.mediaService.getSignedUrl(comment.voiceMemo);
+            comment.voiceMemo = voiceMemoURL;
+          }
+          return comment;
+        }),
+      );
+      return commentsWithURL;
     };
     return await handleServiceError(getCommentsImpl)();
   }

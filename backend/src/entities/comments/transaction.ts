@@ -12,12 +12,11 @@ import {
   CommentPagination,
   CreateCommentPayload,
 } from "../../types/api/internal/comments";
-import { MediaService } from "../media/service";
 
 export interface CommentTransaction {
   toggleLikeComment(payload: IDPayload): Promise<boolean>;
   createComment(payload: CreateCommentPayload): Promise<Comment>;
-  getComments(payload: CommentPagination, mediaService: MediaService): Promise<Comment[]>;
+  getComments(payload: CommentPagination): Promise<Comment[]>;
   deleteComment(payload: IDPayload): Promise<void>;
 }
 
@@ -94,10 +93,7 @@ export class CommentTransactionImpl implements CommentTransaction {
     return newComment;
   }
 
-  async getComments(
-    { userId, postId, limit, page }: CommentPagination,
-    mediaService: MediaService,
-  ): Promise<Comment[]> {
+  async getComments({ userId, postId, limit, page }: CommentPagination): Promise<Comment[]> {
     // check if postId is a valid post
     const [post] = await this.db.select().from(postsTable).where(eq(postsTable.id, postId));
     if (!post) {
@@ -131,12 +127,6 @@ export class CommentTransactionImpl implements CommentTransaction {
       .limit(limit)
       .offset((page - 1) * limit);
 
-    comments.forEach(async (comment) => {
-      if (comment.voiceMemo) {
-        const voiceMemoURL = await mediaService.getSignedUrl(comment.voiceMemo);
-        comment.voiceMemo = voiceMemoURL;
-      }
-    });
     return comments;
   }
 
