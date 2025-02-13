@@ -6,8 +6,8 @@ import {
 } from "@aws-sdk/client-scheduler";
 import { LambdaClient, GetFunctionCommand } from "aws-lambda";
 import { InternalServerError } from "../utilities/errors/app-error";
+import { NudgeLambda } from "./lambda";
 
-const SEND_NUDGE_LAMBDA_NAME = "sendNudgeNotification"
 
 export interface NudgeScheduler {
   // TODO: think about I/O type of this & more debugging
@@ -19,9 +19,9 @@ export interface NudgeScheduler {
 
 export class AWSEventBridgeScheduler implements NudgeScheduler {
   private scheduler: SchedulerClient;
-  private lambda: LambdaClient;
+  private lambda: NudgeLambda;
 
-  constructor(scheduler: SchedulerClient, lambda: LambdaClient) {
+  constructor(scheduler: SchedulerClient, lambda: NudgeLambda) {
     this.scheduler = scheduler;
     this.lambda = lambda
 
@@ -86,8 +86,8 @@ export class AWSEventBridgeScheduler implements NudgeScheduler {
       ScheduleExpressionTimezone: timezone,
       State: disabled,
       Target: {
-        Arn: await this.getLambdaArn(),
-        RoleArn: await this.getLambdaRoleArn(),
+        Arn: this.lambda.getLambdaArn(),
+        RoleArn: this.lambda.getLambdaRoleArn(),
         Input: JSON.stringify(payload),
       },
       FlexibleTimeWindow: undefined,
@@ -96,26 +96,5 @@ export class AWSEventBridgeScheduler implements NudgeScheduler {
     return input
   }
 
-  private async getLambdaArn(): Promise<string> {
-    const lambdaResponse = await this.lambda.send(new GetFunctionCommand({ FunctionName: SEND_NUDGE_LAMBDA_NAME }))
-
-    const lambdaArn = lambdaResponse.Configuration?.FunctionArn;
-
-    if (!lambdaArn) {
-      throw new InternalServerError(`Failed to fetch lambda ARN.`);
-    }
-
-    return lambdaArn
-  }
-  private async getLambdaRoleArn(): Promise<string> {
-    const lambdaResponse = await this.lambda.send(new GetFunctionCommand({ FunctionName: SEND_NUDGE_LAMBDA_NAME }))
-
-    const lambdaArn = lambdaResponse.Configuration?.Role;
-
-    if (!lambdaArn) {
-      throw new InternalServerError(`Failed to fetch lambda ARN.`);
-    }
-
-    return lambdaArn
-  }
+  
 }
