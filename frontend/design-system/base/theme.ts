@@ -28,17 +28,16 @@ const ADVANCED_SPACING = {
   none: 0,
 };
 
-const BASIC_SPACING = {
-  xxs: 8,
-  xs: 4,
-  s: 16,
-  m: 24,
-  l: 30,
-  xl: 42,
-  xxl: 54,
-  ps: 4,
-  none: 0,
-};
+// const BASIC_SPACING = {
+//   xxs: 8,
+//   xs: 4,
+//   s: 16,
+//   m: 24,
+//   l: 30,
+//   xl: 42,
+//   xxl: 54,
+//   ps: 4,
+// };
 
 const BORDER_RADIUS = {
   s: 8,
@@ -47,42 +46,38 @@ const BORDER_RADIUS = {
   xl: 40,
 };
 
-const ADVANCED_TEXT = {
-  primary: {
-    fontSize: 43,
-    fontFamily: "ProximaNova-Bold",
-  },
-  secondary: {
-    fontSize: 32,
-    fontFamily: "ProximaNova-Medium",
-  },
-  body: {
-    fontSize: 16,
-    fontFamily: "ProximaNova-Bold",
-  },
-  defaults: {
-    fontSize: 16,
-    fontFamily: "ProximaNova-Regular",
-  },
+const getFontConfig = (scaleRatio: number) => {
+  const FONT_CONFIG = {
+    primary: {
+      fontSize: 43 * scaleRatio,
+      fontFamily: "ProximaNova-Bold",
+    },
+    secondary: {
+      fontSize: 32 * scaleRatio,
+      fontFamily: "ProximaNova-Medium",
+    },
+    body: {
+      fontSize: 16 * scaleRatio,
+      fontFamily: "ProximaNova-Bold",
+    },
+    defaults: {
+      fontSize: 16 * scaleRatio,
+      fontFamily: "ProximaNova-Regular",
+    },
+  };
+  return FONT_CONFIG;
 };
 
-const BASIC_TEXT = {
-  primary: {
-    fontSize: 60,
-    fontFamily: "ProximaNova-Bold",
-  },
-  secondary: {
-    fontSize: 40,
-    fontFamily: "ProximaNova-Medium",
-  },
-  body: {
-    fontSize: 24,
-    fontFamily: "ProximaNova-Bold",
-  },
-  defaults: {
-    fontSize: 24,
-    fontFamily: "ProximaNova-Regular",
-  },
+const getTheme = (ratio: number) => {
+  const theme = createTheme({
+    colors: COLOR_PALETTE,
+    spacing: ADVANCED_SPACING,
+    borderRadii: BORDER_RADIUS,
+    textVariants: getFontConfig(ratio),
+    heartVariants: heartVariants,
+    avatarVariants: avatarVariants,
+  });
+  return theme;
 };
 
 const heartVariants = {
@@ -109,21 +104,6 @@ const avatarVariants = {
   },
 };
 
-const advancedTheme = createTheme({
-  colors: COLOR_PALETTE,
-  spacing: ADVANCED_SPACING,
-  borderRadii: BORDER_RADIUS,
-  textVariants: ADVANCED_TEXT,
-  heartIconVariants: heartVariants,
-  avatarVariants: avatarVariants,
-});
+type Theme = ReturnType<typeof getTheme>;
 
-const basicTheme: Theme = {
-  ...advancedTheme,
-  spacing: BASIC_SPACING,
-  textVariants: BASIC_TEXT,
-};
-
-export type Theme = typeof advancedTheme;
-
-export { advancedTheme, basicTheme };
+export { getTheme, Theme };

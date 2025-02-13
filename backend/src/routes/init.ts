@@ -12,6 +12,7 @@ import { MediaServiceImpl } from "../entities/media/service";
 import { commentsRoutes } from "../entities/comments/route";
 import { Expo } from "expo-server-sdk";
 import { SlackController, SlackControllerImpl } from "./webhook";
+import { mediaRoutes } from "../entities/media/route";
 
 export const setUpRoutes = (
   app: Hono,
@@ -55,6 +56,7 @@ const apiRoutes = (db: PostgresJsDatabase, s3Service: IS3Operations): Hono => {
   api.route("/groups", groupRoutes(db, mediaService, expo));
   api.route("/", postRoutes(db, mediaService));
   api.route("/", commentsRoutes(db, mediaService));
+  api.route("/", mediaRoutes(mediaService));
 
   return api;
 };

@@ -10,3 +10,9 @@ export type UpdatePostPayload =
 
 export type LikePostUsers =
   paths["/api/v1/posts/{id}/likes"]["get"]["responses"]["200"]["content"]["application/json"];
+
+export type CreateCommentPayload =
+  paths["/api/v1/posts/{id}/comments"]["post"]["requestBody"]["content"]["application/json"];
+
+export type Comments =
+  paths["/api/v1/posts/{id}/comments"]["get"]["responses"]["200"]["content"]["application/json"];
