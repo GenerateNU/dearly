@@ -408,7 +408,15 @@ components:
           type: string
           minLength: 1
           maxLength: 500
-          description: the text being commented 
+          description: The text being commented 
+          nullable: true
+        profilePhoto:
+          type: string
+          description: Profile photo of user that posted comment
+          nullable: true
+        username:
+          type: string
+          description: Username of user that posted comment
           nullable: true
         createdAt:
           type: string

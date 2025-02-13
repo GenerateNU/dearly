@@ -1,6 +1,7 @@
 import {
   Comment,
   CommentPagination,
+  CommentWithMetadata,
   CreateCommentPayload,
 } from "../../types/api/internal/comments";
 import { IDPayload } from "../../types/id";
@@ -38,17 +39,19 @@ export class CommentServiceImpl implements CommentService {
     return await handleServiceError(createCommentImpl)();
   }
 
-  async getComments(payload: CommentPagination): Promise<Comment[]> {
+  async getComments(payload: CommentPagination): Promise<CommentWithMetadata[]> {
     const getCommentsImpl = async () => {
       const comments = await this.commentTransaction.getComments(payload);
       const commentsWithURL = await Promise.all(
-        comments.map(async (comment) => {
-          if (comment.voiceMemo) {
-            const voiceMemoURL = await this.mediaService.getSignedUrl(comment.voiceMemo);
-            comment.voiceMemo = voiceMemoURL;
-          }
-          return comment;
-        }),
+        comments.map(async (comment) => ({
+          ...comment,
+          voiceMemo: comment.voiceMemo
+            ? await this.mediaService.getSignedUrl(comment.voiceMemo)
+            : null,
+          profilePhoto: comment.profilePhoto
+            ? await this.mediaService.getSignedUrl(comment.profilePhoto)
+            : null,
+        })),
       );
       return commentsWithURL;
     };
