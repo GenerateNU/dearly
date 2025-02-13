@@ -145,7 +145,7 @@ export class S3Impl implements IS3Operations {
           Key: objectKey,
           Body: compressedFile,
           ContentType: file.type,
-          Tagging: `GroupID=${tag}`,
+          Tagging: tag,
         }),
       );
       return objectKey;

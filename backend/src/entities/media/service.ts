@@ -215,27 +215,23 @@ export class MediaServiceImpl {
 
   async uploadPostMedia(blobs: Blob[], groupId: string, userId: string): Promise<MediaResponse[]> {
     await this.checkPermissions(groupId, userId);
-    const groupTag = this.getObjectTag(Tag.GROUP, groupId);
     const objectKeys: MediaResponse[] = await Promise.all(
-      blobs.map(async (blob) => {
-        const objectKey = await this.s3Service.saveObject(
-          blob,
-          groupTag,
-          this.getMediaType(blob.type),
-        );
-        return {
-          objectKey,
-          type: this.getMediaType(blob.type),
-        };
-      }),
+      blobs.map(async (blob) => this.uploadMedia(blob, groupId, Tag.GROUP)),
     );
     return objectKeys;
   }
 
   async uploadUserMedia(blob: Blob, userId: string): Promise<MediaResponse> {
-    const userTag = this.getObjectTag(Tag.USER, userId);
+    return this.uploadMedia(blob, userId, Tag.USER);
+  }
 
-    const objectKey = await this.s3Service.saveObject(blob, userTag, this.getMediaType(blob.type));
+  private async uploadMedia(blob: Blob, id: string, tag: Tag): Promise<MediaResponse> {
+    const objectTag = this.getObjectTag(tag, id);
+    const objectKey = await this.s3Service.saveObject(
+      blob,
+      objectTag,
+      this.getMediaType(blob.type),
+    );
     return {
       objectKey,
       type: this.getMediaType(blob.type),
