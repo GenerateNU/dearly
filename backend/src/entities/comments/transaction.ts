@@ -81,10 +81,10 @@ export class CommentTransactionImpl implements CommentTransaction {
     }
 
     const [userInGroup] = await this.db
-    .select()
-    .from(groupsTable)
-    .innerJoin(membersTable, eq(membersTable.groupId, post.groupId))
-    .where(eq(membersTable.userId, comment.userId));
+      .select()
+      .from(groupsTable)
+      .innerJoin(membersTable, eq(membersTable.groupId, post.groupId))
+      .where(eq(membersTable.userId, comment.userId));
     if (!userInGroup) {
       throw new ForbiddenError("You do not have access to this post");
     }
@@ -94,7 +94,10 @@ export class CommentTransactionImpl implements CommentTransaction {
     return newComment;
   }
 
-  async getComments({ userId, postId, limit, page }: CommentPagination, mediaService: MediaService): Promise<Comment[]> {
+  async getComments(
+    { userId, postId, limit, page }: CommentPagination,
+    mediaService: MediaService,
+  ): Promise<Comment[]> {
     // check if postId is a valid post
     const [post] = await this.db.select().from(postsTable).where(eq(postsTable.id, postId));
     if (!post) {
@@ -128,12 +131,12 @@ export class CommentTransactionImpl implements CommentTransaction {
       .limit(limit)
       .offset((page - 1) * limit);
 
-    comments.forEach(async (comment) =>{
-      if(comment.voiceMemo){
-        const voiceMemoURL = await mediaService.getSignedUrl(comment.voiceMemo)
-        comment.voiceMemo = voiceMemoURL
+    comments.forEach(async (comment) => {
+      if (comment.voiceMemo) {
+        const voiceMemoURL = await mediaService.getSignedUrl(comment.voiceMemo);
+        comment.voiceMemo = voiceMemoURL;
       }
-    })
+    });
     return comments;
   }
 

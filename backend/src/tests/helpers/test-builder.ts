@@ -281,8 +281,8 @@ export class TestBuilder {
       throw new Error("Response is not defined.");
     }
     if (expectedFields.length != this.body.length) {
-      console.log(expectedFields.length)
-      console.log(this.body.length)
+      console.log(expectedFields.length);
+      console.log(this.body.length);
       throw new Error("Number of expected fields not equal to length of arry in response");
     }
     if (Array.isArray(this.body)) {
