@@ -347,7 +347,74 @@ components:
             - VIDEO
             - AUDIO
           description: The type of the media (e.g., photo, audio, video).
-    
+    Comment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b11
+          description: A unique identifier for the comment item.
+        postId:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: The ID of the post to which the comment belongs.
+        userID:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: The ID of the user to which the comment belongs.
+        voiceMemo:
+          type: string
+          format: uuid 
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: The unique object key associated with the audio in S3.
+          nullable: true
+        content:
+          type: string
+          minLength: 1
+          maxLength: 500
+          description: the text being commented 
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-01-17T00:00:00Z"
+          description: The date and time when the post was created.
+    CommentWithURL:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b11
+          description: A unique identifier for the comment item.
+        postId:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: The ID of the post to which the comment belongs.
+        userID:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: The ID of the user to which the comment belongs.
+        voiceMemo:
+          type: string
+          description: The pre-signed url from AWS S3
+          nullable: true
+        content:
+          type: string
+          minLength: 1
+          maxLength: 500
+          description: the text being commented 
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-01-17T00:00:00Z"
+          description: The date and time when the post was created.
     MediaWithURL:
       type: object
       properties:
@@ -2331,6 +2398,195 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+
+  /api/v1/posts/{id}/comments:
+    get:
+      tags:
+        - Comment Endpoints
+      summary: Get all comments under a post (paginated)
+      description: get all comments under a post including fetching the audio from s3 bucket
+      parameters:
+        - name: id
+          in: path
+          description: ID of the post the comments are under
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Successfully retrieve comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CommentWithURL"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: Forbidden since user not member of group
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    post:
+      tags:
+        - Comment Endpoints
+      summary: Creates a comment
+      description: Creates a comment from the specified body and associates it with a specific post
+      parameters:
+        - name: postID
+          in: path
+          description: ID of the post the comment is under
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  format: uuid
+                voiceMemo:
+                  type: string
+                  format: uuid
+                createdAt:
+                  type: string
+                  format: date-time
+                  example: "2025-01-17T00:00:00Z"
+                  description: The date and time when the post was created.
+      responses:
+        201:
+          description: successfully created a comment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comment"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: Forbidden since user not Member of Group
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      
+
+  /api/v1/comments/{id}:
+    delete:
+      tags:
+        - Comment Endpoints
+      summary: Deletes a comment
+      description: Deletes a comment and ensures the comment can be deleted.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the comment.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Successfully deleted a comment
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Successfully deleted comment"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        403:
+          description: Forbidden since user is not creator of comment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      
+
 
   /api/v1/users/media:
     post:

@@ -14,6 +14,11 @@ export enum Tag {
   GROUP = "GroupID",
 }
 
+export enum CommentType {
+  AUDIO = "AUDIO",
+  TEXT = "TEXT",
+}
+
 export enum MemberRole {
   MEMBER = "MEMBER",
   MANAGER = "MANAGER",
