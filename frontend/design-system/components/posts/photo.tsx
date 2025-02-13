@@ -6,6 +6,7 @@ interface PhotoProps {
   image: string;
 }
 
+// TODO: photo loading is very scuffed, wondering if there's a better way
 export const Photo: React.FC<PhotoProps> = ({ image }) => {
   const [aspectRatio, setAspectRatio] = useState<number | null>(null);
 
