@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { TouchableOpacity, LayoutChangeEvent } from "react-native";
-import Animated, { Easing, useAnimatedStyle, withTiming } from "react-native-reanimated";
-import Box from "../base/box";
-import Text from "../base/text";
+import Box from "@/design-system/base/box";
+import Text from "@/design-system/base/text";
 
 const MenuTab = <T extends string>({
   isSelected,
@@ -19,7 +18,7 @@ const MenuTab = <T extends string>({
       activeOpacity={0.7}
       className="flex-1 justify-center items-center py-2"
     >
-      <Text color={isSelected ? "white" : "black"}>{label}</Text>
+      <Text color={isSelected ? "black" : "gray"}>{label}</Text>
     </TouchableOpacity>
   );
 };
@@ -40,43 +39,42 @@ const HomeMenu = <T extends string>({
     setContainerWidth(width);
   };
 
-  const translateX = useAnimatedStyle(() => {
-    return {
-      transform: [
-        {
-          translateX: withTiming(categories.indexOf(selected) === 0 ? 0 : containerWidth / 2, {
-            duration: 300,
-            easing: Easing.inOut(Easing.ease),
-          }),
-        },
-      ],
-    };
-  }, [selected, categories]);
+  const tabWidth = containerWidth / categories.length;
+  const animation = categories.indexOf(selected) === 0 ? 0 : containerWidth / 2;
 
   return (
     <Box
       onLayout={handleLayout}
       flexDirection="row"
-      width="auto"
-      overflow="hidden"
       alignItems="center"
       borderRadius="l"
       borderWidth={1}
       borderColor="black"
       paddingVertical="s"
     >
-      <Animated.View style={[translateX]}>
-        <Box backgroundColor="black" position="absolute" top={0} bottom={0} borderRadius="l" width={1/2}/>
-      </Animated.View>
+      <Box
+        backgroundColor="darkGray"
+        position="absolute"
+        justifyContent="center"
+        borderRadius="l"
+        width={tabWidth * 0.97}
+        margin="xxs"
+        height="170%"
+        style={{
+          left: animation,
+        }}
+      />
 
-      {categories.map((category) => (
-        <MenuTab
-          key={category}
-          isSelected={selected === category}
-          label={category}
-          onPress={() => setSelected(category)}
-        />
-      ))}
+      <Box width="100%" flexDirection="row" justifyContent="space-around">
+        {categories.map((category) => (
+          <MenuTab
+            key={category}
+            isSelected={selected === category}
+            label={category}
+            onPress={() => setSelected(category)}
+          />
+        ))}
+      </Box>
     </Box>
   );
 };

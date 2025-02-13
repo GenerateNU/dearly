@@ -9,10 +9,9 @@ import {
   BackgroundColorProps,
   composeRestyleFunctions,
 } from "@shopify/restyle";
-import Text from "../base/text";
-
-import { Theme } from "../base/theme";
-import Box from "../base/box";
+import Text from "@/design-system/base/text";
+import Box from "@/design-system/base/box";
+import { Theme } from "@/design-system/base/theme";
 
 type RestyleProps = SpacingProps<Theme> & BorderProps<Theme> & BackgroundColorProps<Theme>;
 

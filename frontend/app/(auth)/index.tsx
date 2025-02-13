@@ -1,11 +1,13 @@
 import { useAuth } from "@/auth/provider";
 import Box from "@/design-system/base/box";
-import Button from "@/design-system/components/button";
+import Button from "@/design-system/components/ui/button";
 import { Mode } from "@/types/mode";
 import { router } from "expo-router";
+import { useState } from "react";
 
 const Index = () => {
   const { setMode, mode } = useAuth();
+  const [category, setCategory] = useState<string>("Home");
 
   const toggleTheme = () => {
     setMode(mode === Mode.ADVANCED ? Mode.BASIC : Mode.ADVANCED);

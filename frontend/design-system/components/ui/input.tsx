@@ -3,9 +3,9 @@ import { TextInput, TextInputProps } from "react-native";
 
 import { BoxProps, createBox } from "@shopify/restyle";
 
-import { Theme } from "../base/theme";
-import Box from "../base/box";
-import Text from "../base/text";
+import Text from "@/design-system/base/text";
+import Box from "@/design-system/base/box";
+import { Theme } from "@/design-system/base/theme";
 
 type TextboxProps = {
   title?: string;

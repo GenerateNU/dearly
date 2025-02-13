@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Animated } from "react-native";
-import Box from "../base/box";
+import Box from "../../base/box";
 
 interface ProgressBarProps {
   progress: number; // progress percentage, between 0 and 100
