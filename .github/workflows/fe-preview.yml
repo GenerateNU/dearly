@@ -13,8 +13,7 @@ permissions:
 jobs:
   build:
     name: Internal Preview Build
-    if: contains(github.event.comment.body, '/preview-build') && github.event.issue.pull_request
-
+    if: github.event.issue.pull_request && contains(github.event.comment.body, '/preview-build')
     runs-on: ubuntu-latest
 
     steps:
@@ -57,4 +56,4 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
       
       - name: Start EAS Build
-        run: cd frontend && eas build --platform ios --non-interactive --no-wait --profile production
+        run: cd frontend && eas build --platform ios --non-interactive --no-wait --profile preview
