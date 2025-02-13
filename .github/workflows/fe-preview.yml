@@ -56,20 +56,6 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
       
-      - name: Extract Linked Issue
-        id: extract_issue
-        run: |
-          ISSUE_URL=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            -X POST -d '{"query": "query { repository(owner: \"${{ github.repository_owner }}\", name: \"${{ github.event.repository.name }}\") { pullRequest(number: ${{ github.event.issue.number }}) { closingIssuesReferences(first: 1) { nodes { url } } } } }"}' \
-            https://api.github.com/graphql | jq -r '.data.repository.pullRequest.closingIssuesReferences.nodes[0].url')
-        
-          if [[ "$ISSUE_URL" != "null" && -n "$ISSUE_URL" ]]; then
-            echo "issue_url=$ISSUE_URL" >> $GITHUB_OUTPUT
-          else
-            echo "No linked issue found."
-            echo "issue_url=" >> $GITHUB_OUTPUT
-          fi
-        
       - name: Start EAS Build
         id: eas_build
         run: |

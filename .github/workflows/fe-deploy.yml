@@ -26,15 +26,5 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Set env variables
-        run: |
-          if [[ -z "${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}" ]]; then echo "Missing EXPO_PUBLIC_SUPABASE_URL"; exit 1; fi
-          if [[ -z "${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}" ]]; then echo "Missing EXPO_PUBLIC_SUPABASE_ANON_KEY"; exit 1; fi
-          echo "EXPO_PUBLIC_SUPABASE_URL=${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}" >> $GITHUB_ENV
-          echo "EXPO_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}" >> $GITHUB_ENV
-        
-      - name: Set the variables
-        run: echo "DEPLOY_PLATFORM=ios" >> $GITHUB_ENV
-        
       - name: Build on EAS and Auto-Submit to App Store if successful
-        run: cd frontend && eas build --platform "$DEPLOY_PLATFORM" --non-interactive --no-wait --profile production --auto-submit
+        run: cd frontend && eas build --platform ios --non-interactive --no-wait --profile production --auto-submit

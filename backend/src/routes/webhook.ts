@@ -2,14 +2,18 @@ import { SlackConfig } from "./../types/config";
 import { Context } from "hono";
 import { handleAppError } from "../utilities/errors/app-error";
 import * as crypto from "crypto";
+import logger from "../utilities/logger";
 
 interface ExpoBuildWebhookPayload {
   status: string;
   artifacts?: {
-    url?: string;
+    buildUrl?: string;
   };
-  platform: string;
-  buildDetailsPageUrl?: string;
+  platform?: string;
+  error?: {
+    message?: string;
+    errorCode?: string;
+  }
 }
 
 export interface SlackController {
@@ -46,6 +50,10 @@ export class SlackControllerImpl implements SlackController {
         return ctx.text("Successfully sent slack notification", 200);
       }
 
+      if (payload.status === "errored" && payload.error?.message) {
+        logger.warn(payload.error.message);
+      }
+
       return ctx.text("Build not finished, no notification sent", 200);
     };
     return await handleAppError(slackMessageImpl)(ctx);
@@ -56,7 +64,7 @@ export class SlackControllerImpl implements SlackController {
   }
 
   private async sendSlackMessage(payload: ExpoBuildWebhookPayload): Promise<void> {
-    const buildUrl = payload.artifacts?.url || payload.buildDetailsPageUrl;
+    const buildUrl = payload.artifacts?.buildUrl;
 
     if (!buildUrl) {
       throw new Error("No build URL available in the payload");

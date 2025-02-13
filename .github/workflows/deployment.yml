@@ -85,4 +85,8 @@ jobs:
             AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}
             AWS_REGION=${{ secrets.AWS_REGION }} 
             AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }}
+            SECRET_WEBHOOK_KEY=${{ secrets.SECRET_WEBHOOK_KEY }}
+            SLACK_WEBHOOK_URL=${{ secrets.SLACK_WEBHOOK_URL }}
+            SLACK_CHANNEL_ID=${{ secrets.SLACK_CHANNEL_ID }} 
+            SLACK_USER_GROUP_ID=${{ secrets.SLACK_USER_GROUP_ID }}
           flags: --port=3000 --allow-unauthenticated
