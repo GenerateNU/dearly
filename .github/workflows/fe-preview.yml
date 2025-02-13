@@ -57,12 +57,4 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
       
       - name: Start EAS Build
-        id: eas_build
-        run: |
-          BUILD_OUTPUT=$(eas build --platform ios --non-interactive --no-wait --profile preview --json)
-          BUILD_ID=$(echo "$BUILD_OUTPUT" | jq -r '.id')
-          if [[ -z "$BUILD_ID" ]]; then 
-            echo "Failed to extract BUILD_ID"
-            exit 1
-          fi
-          echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
+        run: cd frontend && eas build --platform ios --non-interactive --no-wait --profile production
