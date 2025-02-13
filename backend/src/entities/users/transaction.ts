@@ -1,16 +1,6 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import {
-  commentsTable,
-  devicesTable,
-  groupsTable,
-  likesTable,
-  mediaTable,
-  membersTable,
-  postsTable,
-  usersTable,
-} from "../schema";
-import { and, eq, sql, not, exists, inArray, desc } from "drizzle-orm";
-import { PostWithMedia } from "../../types/api/internal/posts";
+import { devicesTable, groupsTable, membersTable, postsTable, usersTable } from "../schema";
+import { and, eq, sql, not, exists, inArray } from "drizzle-orm";
 import {
   CreateUserPayload,
   Pagination,
@@ -20,7 +10,7 @@ import {
   User,
 } from "../../types/api/internal/users";
 import { Group } from "../../types/api/internal/groups";
-import { getPostMetadata, getSharedGroups } from "../../utilities/query";
+import { getSharedGroups } from "../../utilities/query";
 
 export interface UserTransaction {
   insertUser(payload: CreateUserPayload): Promise<User | null>;
@@ -29,7 +19,6 @@ export interface UserTransaction {
   deleteUser(id: string): Promise<User | null>;
   insertDeviceToken(id: string, expoToken: string): Promise<string[]>;
   deleteDeviceToken(id: string, expoToken: string): Promise<string[]>;
-  getPosts(payload: Pagination, viewer: string): Promise<PostWithMedia[]>;
   getGroups(payload: Pagination): Promise<Group[]>;
   getUsersByUsername(payload: SearchedInfo): Promise<SearchedUser[]>;
 }
@@ -128,51 +117,6 @@ export class UserTransactionImpl implements UserTransaction {
       .where(and(eq(devicesTable.userId, userId), eq(devicesTable.token, token)));
 
     return this.getUserTokens(userId);
-  }
-
-  async getPosts(
-    { id: viewee, limit, page }: Pagination,
-    viewer: string,
-  ): Promise<PostWithMedia[]> {
-    return await this.db
-      .select(getPostMetadata(viewee))
-      .from(postsTable)
-      .leftJoin(likesTable, eq(likesTable.postId, postsTable.id))
-      .leftJoin(commentsTable, eq(commentsTable.postId, postsTable.id))
-      .innerJoin(usersTable, eq(postsTable.userId, usersTable.id))
-      .innerJoin(mediaTable, eq(mediaTable.postId, postsTable.id))
-      .where(
-        and(
-          eq(postsTable.userId, viewee),
-          viewer !== viewee
-            ? inArray(
-                postsTable.groupId,
-                this.db
-                  .select({ groupId: membersTable.groupId })
-                  .from(membersTable)
-                  .where(eq(membersTable.userId, viewee))
-                  .intersect(
-                    this.db
-                      .select({ groupId: membersTable.groupId })
-                      .from(membersTable)
-                      .where(eq(membersTable.userId, viewer)),
-                  ),
-              )
-            : undefined,
-        ),
-      )
-      .groupBy(
-        postsTable.id,
-        postsTable.userId,
-        postsTable.groupId,
-        postsTable.createdAt,
-        postsTable.caption,
-        postsTable.location,
-        usersTable.profilePhoto,
-      )
-      .orderBy(desc(postsTable.createdAt))
-      .limit(limit)
-      .offset((page - 1) * limit);
   }
 
   async getGroups({ id, limit, page }: Pagination): Promise<Group[]> {
