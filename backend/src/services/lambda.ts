@@ -1,47 +1,29 @@
-import { LambdaClient, CreateFunctionCommand, Handler } from "@aws-sdk/client-lambda"; 
+import { LambdaClient, CreateFunctionCommand } from "@aws-sdk/client-lambda"; 
 import { readFileSync } from "fs";
-import Expo, { ExpoPushMessage } from "expo-server-sdk";
-
-export const handler: Handler = async (event) => {
-  const notifications: ExpoPushMessage[] = event.notifications;
-
-  // TODO: better error handling + where should we put this lambda?
-  try {
-    await new Expo().sendPushNotificationsAsync(notifications);
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ message: "Nudges sent successfully" }),
-    };
-  } catch {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ message: "Failed to send nudges" }),
-    };
-  }
-};
+import { InternalServerError } from "../utilities/errors/app-error";
 
 export interface NudgeLambda {
   // TODO: think about I/O type of this & more debugging
-  getLambdaArn(): string;
-  getLambdaRoleArn(): string;
+  getLambdaArn(): string | null;
+  getLambdaRoleArn(): string | null;
 }
 
-const SEND_NUDGE_LAMBDA_NAME = "sendNudgeNotification"
+
 
 // Creates one function per object
 export class AWSLambda implements NudgeLambda {
   private lambda: LambdaClient;
-  private functionName: string;
-  private lambdaARN: string;
-  private lambdaRoleARN: string;
+  // TODO: fix how to deal with initializing these types
+  private functionName: string | null = null;
+  private lambdaARN: string | null = null;
+  private lambdaRoleARN: string | null = null;
 
-  constructor() {
-    this.lambda = new LambdaClient();
+  constructor(lambdaClient: LambdaClient) {
+    this.lambda = lambdaClient;
   }
 
   // TODO: Should create the function/should be initialized prior to passing it to the 
-  async createFunction(functionName: string, zipFilePath: string) {
+  async createSendNudgeFunction(functionName: string, zipFilePath: string) {
     this.functionName = functionName
     const zipFile = readFileSync(zipFilePath); // Read the pre-zipped function
     const command = new CreateFunctionCommand({
@@ -56,16 +38,24 @@ export class AWSLambda implements NudgeLambda {
 
     const response = await this.lambda.send(command);
 
-    this.lambdaARN = response.FunctionArn
+    const lambdaARN = response.FunctionArn ?? null
+    const lambdaRoleARN = response.FunctionArn ?? null
+
+    if(!lambdaARN || !lambdaRoleARN) {
+      throw new InternalServerError();
+    }
+
+    this.lambdaARN = lambdaARN
+    this.lambdaRoleARN = lambdaRoleARN
 
     // TODO: have some response for successfully creating function
     console.log("Lambda created:", response.FunctionArn);
   }
 
-  getLambdaArn(): string {
+  getLambdaArn(): string | null {
     return this.lambdaARN
   }
-  getLambdaRoleArn(): string {
+  getLambdaRoleArn(): string | null {
     return this.lambdaRoleARN
   }
 }

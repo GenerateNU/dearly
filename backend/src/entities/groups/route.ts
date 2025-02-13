@@ -8,13 +8,13 @@ import { MediaService } from "../media/service";
 import { invitationRoutes } from "../invitations/route";
 import { memberRoutes } from "../members/route";
 import { Expo } from "expo-server-sdk";
-import { SchedulerClient } from "@aws-sdk/client-scheduler";
+import { AWSEventBridgeScheduler } from "../../services/nudgeScheduler";
 
 export const groupRoutes = (
   db: PostgresJsDatabase,
   mediaService: MediaService,
   expo: Expo,
-  scheduler: SchedulerClient,
+  scheduler: AWSEventBridgeScheduler
 ): Hono => {
   const group = new Hono();
 

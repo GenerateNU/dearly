@@ -4,7 +4,6 @@ import {
   DeleteScheduleCommand,
   UpdateScheduleCommand,
 } from "@aws-sdk/client-scheduler";
-import { LambdaClient, GetFunctionCommand } from "aws-lambda";
 import { InternalServerError } from "../utilities/errors/app-error";
 import { NudgeLambda } from "./lambda";
 
@@ -20,10 +19,21 @@ export interface NudgeScheduler {
 export class AWSEventBridgeScheduler implements NudgeScheduler {
   private scheduler: SchedulerClient;
   private lambda: NudgeLambda;
+  private lambdaARN: string;
+  private lambdaRoleARN: string;
 
   constructor(scheduler: SchedulerClient, lambda: NudgeLambda) {
     this.scheduler = scheduler;
-    this.lambda = lambda
+    this.lambda = lambda;
+
+    const lambdaARN = this.lambda.getLambdaArn();
+    const lambdaRoleARN = this.lambda.getLambdaRoleArn();
+    if (!lambdaARN || !lambdaRoleARN) {
+      throw new InternalServerError("Failed to fetch get Lambda ARN"); // TODO: update error
+    }
+
+    this.lambdaARN = lambdaARN;
+    this.lambdaRoleARN = lambdaRoleARN;
 
   }
 
@@ -86,8 +96,8 @@ export class AWSEventBridgeScheduler implements NudgeScheduler {
       ScheduleExpressionTimezone: timezone,
       State: disabled,
       Target: {
-        Arn: this.lambda.getLambdaArn(),
-        RoleArn: this.lambda.getLambdaRoleArn(),
+        Arn: this.lambdaARN,
+        RoleArn: this.lambdaRoleARN,
         Input: JSON.stringify(payload),
       },
       FlexibleTimeWindow: undefined,

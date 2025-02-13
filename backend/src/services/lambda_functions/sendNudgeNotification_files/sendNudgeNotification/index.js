@@ -11,6 +11,11 @@ export const handler = async (event) => {
     if (failedToSend.length > 0) {
      throw new Error('Failed to send.');
     }
+    const response = {
+      statusCode: 200,
+      body: JSON.stringify({message: "Successfully sent notifications schedule"}),
+    };
+    return response;
   } catch (error) {
     const response = {
       statusCode: 500,
@@ -18,11 +23,6 @@ export const handler = async (event) => {
     };
     return response;
   }
-  const response = {
-    statusCode: 200,
-    body: JSON.stringify({message: "Successfully sent notifications schedule"}),
-  };
-  return response;
 };
 
 // Convert ExpoPushMessage[] to Expo notification format

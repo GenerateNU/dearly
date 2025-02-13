@@ -11,13 +11,13 @@ import { MediaServiceImpl } from "../entities/media/service";
 import { commentsRoutes } from "../entities/comments/route";
 import { Expo } from "expo-server-sdk";
 import { mediaRoutes } from "../entities/media/route";
-import { SchedulerClient } from "@aws-sdk/client-scheduler";
+import { AWSEventBridgeScheduler } from "../services/nudgeScheduler";
 
 export const setUpRoutes = (
   app: Hono,
   db: PostgresJsDatabase,
   s3ServiceProvider: IS3Operations,
-  schedulerClient: SchedulerClient,
+  scheduler: AWSEventBridgeScheduler,
 ) => {
   // api documentation
   app.get(
@@ -34,7 +34,7 @@ export const setUpRoutes = (
     return ctx.json({ message: "OK" }, 200);
   });
 
-  app.route("/api/v1", apiRoutes(db, s3ServiceProvider, schedulerClient));
+  app.route("/api/v1", apiRoutes(db, s3ServiceProvider, scheduler));
 
   // unsupported route
   app.notFound((ctx: Context) => {
@@ -45,14 +45,14 @@ export const setUpRoutes = (
 const apiRoutes = (
   db: PostgresJsDatabase,
   s3Service: IS3Operations,
-  schedulerClient: SchedulerClient,
+  scheduler: AWSEventBridgeScheduler,
 ): Hono => {
   const api = new Hono();
   const mediaService = new MediaServiceImpl(db, s3Service);
   const expo = new Expo();
 
   api.route("/users", userRoutes(db, mediaService));
-  api.route("/groups", groupRoutes(db, mediaService, expo, schedulerClient));
+  api.route("/groups", groupRoutes(db, mediaService, expo, scheduler));
   api.route("/", postRoutes(db, mediaService));
   api.route("/", commentsRoutes(db, mediaService));
   api.route("/", mediaRoutes(mediaService));

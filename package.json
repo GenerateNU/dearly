@@ -6,6 +6,7 @@
     "lint-staged": "^15.2.11"
   },
   "dependencies": {
+    "@aws-sdk/client-lambda": "^3.744.0",
     "@aws-sdk/client-s3": "^3.731.0",
     "@aws-sdk/client-scheduler": "^3.744.0",
     "sharp": "^0.33.5"
