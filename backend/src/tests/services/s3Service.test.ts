@@ -55,7 +55,7 @@ describe("S3 Service Testing", () => {
     const buffer = fs.readFileSync(PROJECT_ROOT + "/tests/test-assets/test_image.tiff");
     const blob = new Blob([buffer]);
     const compressed_image = await s3Impl.compressImage(blob);
-    expect(blob.size).toBeGreaterThan(compressed_image.size);
+    expect(blob.size).toBeGreaterThan(compressed_image.length);
   });
 
   it("test audio compression", async () => {
@@ -64,6 +64,6 @@ describe("S3 Service Testing", () => {
     const buffer = fs.readFileSync(PROJECT_ROOT + "/tests/test-assets/test_audio.m4a");
     const blob = new Blob([buffer]);
     const compressed_audio = await s3Impl.compressAudio(blob);
-    expect(blob.size).toBeGreaterThan(compressed_audio.size);
+    expect(blob.size).toBeGreaterThan(compressed_audio.length);
   });
 });
