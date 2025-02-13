@@ -1,10 +1,9 @@
 import { paths } from "@/gen/openapi";
 import createFetchClient, { Middleware } from "openapi-fetch";
-import { API_BASE_URL } from "@/constants/api";
 import { handleHTTPStatusError } from "@/utilities/errors";
 
 const fetchClient = createFetchClient<paths>({
-  baseUrl: API_BASE_URL,
+  baseUrl: process.env.EXPO_API_BASE_URL,
 });
 
 const middleware: Middleware = {
