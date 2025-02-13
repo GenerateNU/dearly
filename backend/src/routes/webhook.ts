@@ -5,15 +5,15 @@ import * as crypto from "crypto";
 import logger from "../utilities/logger";
 import { getSlackMessage } from "../utilities/slack";
 
-interface ExpoBuildWebhookPayload {
-  status: "finished" | "errored" | string;
-  artifacts?: {
-    buildUrl?: string;
-  };
-  platform?: string;
-  error?: {
-    message?: string;
-    errorCode?: string;
+interface ExpoSubmitWebhookPayload {
+  status: "errored" | "finished" | "canceled";
+  platform: "android" | "ios";
+  submissionInfo?: {
+    error?: {
+      message?: string;
+      errorCode?: string;
+    };
+    logsUrl?: string;
   };
 }
 
@@ -52,15 +52,15 @@ export class SlackControllerImpl implements SlackController {
       }
 
       try {
-        const payload = JSON.parse(rawBody) as ExpoBuildWebhookPayload;
+        const payload = JSON.parse(rawBody) as ExpoSubmitWebhookPayload;
 
         if (payload.status === "finished") {
-          await this.sendSlackMessage(payload);
+          await this.sendSlackMessage();
           return ctx.json({ message: "Successfully sent slack notification" }, 200);
         }
 
-        if (payload.status === "errored" && payload.error?.message) {
-          logger.warn(payload.error.message);
+        if (payload.status === "errored") {
+          logger.warn("Failed to build:", payload.submissionInfo?.error?.message);
           return ctx.json({ message: "Error finishing the build" }, 200);
         }
 
@@ -73,22 +73,10 @@ export class SlackControllerImpl implements SlackController {
     return await handleAppError(slackMessageImpl)(ctx);
   }
 
-  private async generateQRCodeUrl(buildUrl: string): Promise<string> {
-    return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(buildUrl)}`;
-  }
-
-  private async sendSlackMessage(payload: ExpoBuildWebhookPayload): Promise<void> {
-    const buildUrl = payload.artifacts?.buildUrl;
-
-    if (!buildUrl) {
-      throw new Error("No build URL available in the payload");
-    }
-
-    const qrCodeUrl = await this.generateQRCodeUrl(buildUrl);
-
+  private async sendSlackMessage(): Promise<void> {
     const messagePayload = {
       channel: this.config.slackChannelID,
-      blocks: getSlackMessage(buildUrl, qrCodeUrl, this.config.slackUserID),
+      blocks: getSlackMessage(this.config.slackUserID),
     };
 
     const response = await fetch(this.config.slackWebhookUrl, {
