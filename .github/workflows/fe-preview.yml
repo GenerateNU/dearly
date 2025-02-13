@@ -13,7 +13,7 @@ permissions:
 jobs:
   build:
     name: Internal Preview Build
-    if: github.event.issue.pull_request && contains(github.event.comment.body, '/preview-build')
+    if: contains(github.event.comment.body, '/preview-build') && github.event.issue.pull_request
 
     runs-on: ubuntu-latest
 
