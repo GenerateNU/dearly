@@ -63,8 +63,10 @@ export class NudgeServiceImpl implements NudgeService {
       );
 
       if (notificationMetadata.deviceTokens.length === 0) return;
-      const expoPayload = this.formatPushNotifications(notificationMetadata);
-
+      const expoPayload = {
+        notifications: this.formatPushNotifications(notificationMetadata)
+      }
+      
       // TODO: mechanism to update schedule
       await this.scheduler.addSchedule(payload.groupId, expoPayload);
 

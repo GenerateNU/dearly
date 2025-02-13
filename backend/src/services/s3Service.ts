@@ -145,7 +145,7 @@ export class S3Impl implements IS3Operations {
           Key: objectKey,
           Body: compressedFile,
           ContentType: file.type,
-          Tagging: `GroupID=${tag}`,
+          Tagging: tag,
         }),
       );
       return objectKey;
@@ -153,11 +153,6 @@ export class S3Impl implements IS3Operations {
       logger.error(error);
       throw new InternalServerError("Unable to upload media to S3");
     }
-  }
-
-  private async blobToBuffer(blob: Blob): Promise<Buffer> {
-    const arrayBuffer = await blob.arrayBuffer();
-    return Buffer.from(arrayBuffer);
   }
 
   /**

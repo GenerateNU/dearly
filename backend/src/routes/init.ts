@@ -10,6 +10,7 @@ import { IS3Operations } from "../services/s3Service";
 import { MediaServiceImpl } from "../entities/media/service";
 import { commentsRoutes } from "../entities/comments/route";
 import { Expo } from "expo-server-sdk";
+import { mediaRoutes } from "../entities/media/route";
 import { SchedulerClient } from "@aws-sdk/client-scheduler";
 
 export const setUpRoutes = (
@@ -54,6 +55,7 @@ const apiRoutes = (
   api.route("/groups", groupRoutes(db, mediaService, expo, schedulerClient));
   api.route("/", postRoutes(db, mediaService));
   api.route("/", commentsRoutes(db, mediaService));
+  api.route("/", mediaRoutes(mediaService));
 
   return api;
 };

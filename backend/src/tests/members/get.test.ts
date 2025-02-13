@@ -16,7 +16,7 @@ import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
 
-describe.only("GET /members", () => {
+describe.only("GET /groups/:id/members", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
 

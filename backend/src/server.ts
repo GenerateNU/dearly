@@ -4,7 +4,6 @@ import { connectDB } from "./database/connect";
 import { configureMiddlewares } from "./middlewares/init";
 import { setUpRoutes } from "./routes/init";
 import { automigrateDB } from "./database/migrate";
-import { generateJWTFromID } from "./tests/helpers/test-token";
 import { S3Impl } from "./services/s3Service";
 import { SchedulerClient } from "@aws-sdk/client-scheduler";
 
@@ -18,8 +17,6 @@ const config = getConfigurations();
 
   try {
     const db = connectDB(config);
-
-    console.log("JWT for manual testing:", generateJWTFromID(), "\n");
 
     await automigrateDB(db, config);
 

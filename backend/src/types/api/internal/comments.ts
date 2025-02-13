@@ -10,6 +10,11 @@ export type CreateCommentPayload = z.infer<typeof createCommentValidate> & {
 
 export type Comment = typeof commentsTable.$inferSelect;
 
+export type CommentWithMetadata = Comment & {
+  profilePhoto: string | null;
+  username: string;
+};
+
 export type CommentPagination = PaginationParams & {
   postId: string;
   userId: string;
