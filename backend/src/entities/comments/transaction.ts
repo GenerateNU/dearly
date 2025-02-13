@@ -1,6 +1,13 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { IDPayload } from "../../types/id";
-import { commentsTable, groupsTable, likeCommentsTable, membersTable, postsTable } from "../schema";
+import {
+  commentsTable,
+  groupsTable,
+  likeCommentsTable,
+  membersTable,
+  postsTable,
+  usersTable,
+} from "../schema";
 import { eq, and, sql } from "drizzle-orm";
 import {
   ForbiddenError,
@@ -10,13 +17,14 @@ import {
 import {
   Comment,
   CommentPagination,
+  CommentWithMetadata,
   CreateCommentPayload,
 } from "../../types/api/internal/comments";
 
 export interface CommentTransaction {
   toggleLikeComment(payload: IDPayload): Promise<boolean>;
   createComment(payload: CreateCommentPayload): Promise<Comment>;
-  getComments(payload: CommentPagination): Promise<Comment[]>;
+  getComments(payload: CommentPagination): Promise<CommentWithMetadata[]>;
   deleteComment(payload: IDPayload): Promise<void>;
 }
 
@@ -89,11 +97,16 @@ export class CommentTransactionImpl implements CommentTransaction {
     }
 
     const [newComment] = await this.db.insert(commentsTable).values(comment).returning();
-    if (!newComment) throw new InternalServerError("Fsailed to Create Comment");
+    if (!newComment) throw new InternalServerError("Failed to Create Comment");
     return newComment;
   }
 
-  async getComments({ userId, postId, limit, page }: CommentPagination): Promise<Comment[]> {
+  async getComments({
+    userId,
+    postId,
+    limit,
+    page,
+  }: CommentPagination): Promise<CommentWithMetadata[]> {
     // check if postId is a valid post
     const [post] = await this.db.select().from(postsTable).where(eq(postsTable.id, postId));
     if (!post) {
@@ -120,8 +133,11 @@ export class CommentTransactionImpl implements CommentTransaction {
         content: commentsTable.content,
         voiceMemo: commentsTable.voiceMemo,
         createdAt: commentsTable.createdAt,
+        username: usersTable.username,
+        profilePhoto: usersTable.profilePhoto,
       })
       .from(commentsTable)
+      .innerJoin(usersTable, eq(commentsTable.userId, usersTable.id))
       .where(eq(commentsTable.postId, postId))
       .orderBy(commentsTable.createdAt)
       .limit(limit)

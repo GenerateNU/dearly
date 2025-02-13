@@ -1,4 +1,5 @@
 import { AddMemberPayload, Member } from "../../types/api/internal/members";
+import { PostWithMediaURL } from "../../types/api/internal/posts";
 import { Pagination, SearchedUser } from "../../types/api/internal/users";
 import { IDPayload } from "../../types/id";
 import { InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
@@ -11,6 +12,7 @@ export interface MemberService {
   deleteMember(clientId: string, userId: string, groupId: string): Promise<void>;
   getMembers(groupId: string, payload: Pagination): Promise<SearchedUser[]>;
   toggleNotification(payload: IDPayload): Promise<boolean>;
+  getMemberPosts(payload: Pagination, viewer: string, groupId: string): Promise<PostWithMediaURL[]>;
 }
 
 export class MemberServiceImpl implements MemberService {
@@ -50,6 +52,21 @@ export class MemberServiceImpl implements MemberService {
       return membersWithProfileURLs;
     };
     return handleServiceError(getMembersImpl)();
+  }
+
+  async getMemberPosts(
+    payload: Pagination,
+    viewer: string,
+    groupId: string,
+  ): Promise<PostWithMediaURL[]> {
+    const getMemberPostsImpl = async () => {
+      const posts = await this.memberTransaction.getMemberPosts(payload, viewer, groupId);
+      const postsWithUrls = await Promise.all(
+        posts.map(this.mediaService.getPostWithMediaUrls.bind(this.mediaService)),
+      );
+      return postsWithUrls;
+    };
+    return handleServiceError(getMemberPostsImpl)();
   }
 
   async toggleNotification(payload: IDPayload): Promise<boolean> {

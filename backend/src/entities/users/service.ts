@@ -9,7 +9,6 @@ import {
   UpdateUserPayload,
   User,
 } from "../../types/api/internal/users";
-import { PostWithMediaURL } from "../../types/api/internal/posts";
 import { MediaService } from "../media/service";
 import { Group } from "../../types/api/internal/groups";
 
@@ -20,7 +19,6 @@ export interface UserService {
   deleteUser(id: string): Promise<void>;
   registerDevice(id: string, expoToken: string): Promise<string[]>;
   removeDevice(id: string, expoToken: string): Promise<string[]>;
-  getPosts(payload: Pagination, viewer: string): Promise<PostWithMediaURL[]>;
   getGroups(payload: Pagination): Promise<Group[]>;
   searchByUsername(payload: SearchedInfo): Promise<SearchedUser[]>;
 }
@@ -91,17 +89,6 @@ export class UserServiceImpl implements UserService {
       return devices;
     };
     return handleServiceError(removeDeviceImpl)();
-  }
-
-  async getPosts(payload: Pagination, viewer: string): Promise<PostWithMediaURL[]> {
-    const getPostsImpl = async () => {
-      const posts = await this.userTransaction.getPosts(payload, viewer);
-      const postsWithUrls = await Promise.all(
-        posts.map(this.mediaService.getPostWithMediaUrls.bind(this.mediaService)),
-      );
-      return postsWithUrls;
-    };
-    return handleServiceError(getPostsImpl)();
   }
 
   async getGroups(payload: Pagination): Promise<Group[]> {
