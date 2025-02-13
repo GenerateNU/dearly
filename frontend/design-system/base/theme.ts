@@ -92,7 +92,7 @@ const heartVariants = {
     size: 30,
     width: 55,
   },
-outlined: {
+  outlined: {
     icon: outlinedHeart,
     color: COLOR_PALETTE.black,
     size: 30,
