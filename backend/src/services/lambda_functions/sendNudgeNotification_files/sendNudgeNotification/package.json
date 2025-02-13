@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "expo-server-sdk": "^3.14.0"
+  }
+}

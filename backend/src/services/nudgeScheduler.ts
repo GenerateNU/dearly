@@ -1,10 +1,13 @@
-import { SchedulerClient, ScheduleState } from "@aws-sdk/client-scheduler";
+import { CreateScheduleCommandInput, SchedulerClient, ScheduleState } from "@aws-sdk/client-scheduler";
 import {
   CreateScheduleCommand,
   DeleteScheduleCommand,
   UpdateScheduleCommand,
 } from "@aws-sdk/client-scheduler";
+import { LambdaClient, GetFunctionCommand } from "aws-lambda";
 import { InternalServerError } from "../utilities/errors/app-error";
+
+const SEND_NUDGE_LAMBDA_NAME = "sendNudgeNotification"
 
 export interface NudgeScheduler {
   // TODO: think about I/O type of this & more debugging
@@ -16,25 +19,17 @@ export interface NudgeScheduler {
 
 export class AWSEventBridgeScheduler implements NudgeScheduler {
   private scheduler: SchedulerClient;
+  private lambda: LambdaClient;
 
-  constructor(scheduler: SchedulerClient) {
+  constructor(scheduler: SchedulerClient, lambda: LambdaClient) {
     this.scheduler = scheduler;
+    this.lambda = lambda
+
   }
 
   // Add a new schedule
   async addSchedule(name: string, payload: unknown): Promise<unknown> {
-    const input = {
-      Name: name, // required
-      ScheduleExpression: "STRING_VALUE", // required (you need to define schedule expression logic)
-      ScheduleExpressionTimezone: "STRING_VALUE", // optional
-      State: ScheduleState.ENABLED, // enable schedule by default
-      Target: {
-        Arn: "arn:aws:lambda:us-east-2:194722434714:function:SendNudgeNotification", // replace with your ARN
-        RoleArn: "arn:aws:iam::194722434714:role/service-role/SendNudgeNotification-role-kypdggif", // replace with your Role ARN
-        Input: JSON.stringify(payload), // Pass the payload as input to Lambda
-      },
-      FlexibleTimeWindow: undefined,
-    };
+    const input = await this.scheduleCommandInput(name, "", "", payload);
 
     try {
       const command = new CreateScheduleCommand(input);
@@ -46,18 +41,7 @@ export class AWSEventBridgeScheduler implements NudgeScheduler {
   }
 
   async updateSchedule(id: string, payload: unknown): Promise<unknown> {
-    const input = {
-      Name: id,
-      ScheduleExpression: "STRING_VALUE",
-      ScheduleExpressionTimezone: "STRING_VALUE",
-      State: ScheduleState.ENABLED,
-      Target: {
-        Arn: "arn:aws:lambda:us-east-2:194722434714:function:SendNudgeNotification",
-        RoleArn: "arn:aws:iam::194722434714:role/service-role/SendNudgeNotification-role-kypdggif",
-        Input: JSON.stringify(payload),
-      },
-      FlexibleTimeWindow: undefined,
-    };
+    const input = await this.scheduleCommandInput(id, "", "", payload)
 
     try {
       const command = new UpdateScheduleCommand(input);
@@ -70,17 +54,7 @@ export class AWSEventBridgeScheduler implements NudgeScheduler {
 
   // TODO: don't think this is correct though
   async disableSchedule(id: string): Promise<unknown> {
-    const input = {
-      Name: id,
-      ScheduleExpression: "STRING_VALUE",
-      ScheduleExpressionTimezone: "STRING_VALUE",
-      State: ScheduleState.DISABLED,
-      Target: {
-        Arn: "arn:aws:lambda:us-east-2:194722434714:function:SendNudgeNotification",
-        RoleArn: "arn:aws:iam::194722434714:role/service-role/SendNudgeNotification-role-kypdggif",
-      },
-      FlexibleTimeWindow: undefined,
-    };
+    const input = await this.scheduleCommandInput(id, "", "", ScheduleState.DISABLED); // TODO: unneeded params time and timezone
 
     try {
       const command = new UpdateScheduleCommand(input);
@@ -103,5 +77,45 @@ export class AWSEventBridgeScheduler implements NudgeScheduler {
     } catch (err) {
       throw new InternalServerError(`Failed to delete recurring schedule: ${err}`);
     }
+  }
+
+  private async scheduleCommandInput(id: string, schedule: string, timezone: string, payload: unknown, disabled = ScheduleState.ENABLED): Promise<CreateScheduleCommandInput> {
+    const input = {
+      Name: id,
+      ScheduleExpression: schedule,
+      ScheduleExpressionTimezone: timezone,
+      State: disabled,
+      Target: {
+        Arn: await this.getLambdaArn(),
+        RoleArn: await this.getLambdaRoleArn(),
+        Input: JSON.stringify(payload),
+      },
+      FlexibleTimeWindow: undefined,
+    };
+
+    return input
+  }
+
+  private async getLambdaArn(): Promise<string> {
+    const lambdaResponse = await this.lambda.send(new GetFunctionCommand({ FunctionName: SEND_NUDGE_LAMBDA_NAME }))
+
+    const lambdaArn = lambdaResponse.Configuration?.FunctionArn;
+
+    if (!lambdaArn) {
+      throw new InternalServerError(`Failed to fetch lambda ARN.`);
+    }
+
+    return lambdaArn
+  }
+  private async getLambdaRoleArn(): Promise<string> {
+    const lambdaResponse = await this.lambda.send(new GetFunctionCommand({ FunctionName: SEND_NUDGE_LAMBDA_NAME }))
+
+    const lambdaArn = lambdaResponse.Configuration?.Role;
+
+    if (!lambdaArn) {
+      throw new InternalServerError(`Failed to fetch lambda ARN.`);
+    }
+
+    return lambdaArn
   }
 }
