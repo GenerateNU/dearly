@@ -382,6 +382,39 @@ components:
           format: date-time
           example: "2025-01-17T00:00:00Z"
           description: The date and time when the post was created.
+    CommentWithURL:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b11
+          description: A unique identifier for the comment item.
+        postId:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: The ID of the post to which the comment belongs.
+        userID:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: The ID of the user to which the comment belongs.
+        voiceMemo:
+          type: string
+          description: The pre-signed url from AWS S3
+          nullable: true
+        content:
+          type: string
+          minLength: 1
+          maxLength: 500
+          description: the text being commented 
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-01-17T00:00:00Z"
+          description: The date and time when the post was created.
     MediaWithURL:
       type: object
       properties:
@@ -2383,7 +2416,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Comment"
+                  $ref: "#/components/schemas/CommentWithURL"
         400:
           description: Malformed request
           content:
