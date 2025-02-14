@@ -37,16 +37,18 @@ export class SlackControllerImpl implements SlackController {
       const hash = `sha1=${hmac.digest("hex")}`;
 
       if (expoSignature !== hash) {
-        return ctx.json("Signatures didn't match", 500);
+        return ctx.json("Signatures didn't match", 403);
       }
 
-      const payload = JSON.parse(bodyText) as ExpoBuildWebhookPayload;
-
-      if (payload.status === "finished") {
-        await this.sendSlackMessage(payload);
-        return ctx.text("Successfully sent slack notification", 200);
+      try {
+        const payload = JSON.parse(bodyText) as ExpoBuildWebhookPayload;
+        if (payload.status === "finished") {
+          await this.sendSlackMessage(payload);
+          return ctx.text("Successfully sent slack notification", 200);
+        }
+      } catch {
+        return ctx.json({ error: "Invalid payload" }, 500);
       }
-
       return ctx.text("Build not finished, no notification sent", 200);
     };
     return await handleAppError(slackMessageImpl)(ctx);
