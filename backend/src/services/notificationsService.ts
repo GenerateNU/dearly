@@ -16,7 +16,7 @@ import {
 } from "../entities/schema";
 import { Like, likeValidate } from "../entities/likes/validator";
 import { Comment, commentValidate } from "../types/api/internal/comments";
-
+import { Notification } from "../types/api/internal/notification";
 
 /*
 Questions for our tech leads
@@ -63,17 +63,16 @@ export class ExpoNotificationService implements INotificationService {
 
   constructor(config: Configuration, db: PostgresJsDatabase) {
     this.supabaseClient = createClient(config.supabase.url, config.supabase.key);
-
-    const roomOne = this.supabaseClient.channel("posts_channel");
-    const roomTwo = this.supabaseClient.channel("comments");
-    const roomThree = this.supabaseClient.channel("likes");
-
     this.supabaseClient
       .channel("posts_channel")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "posts" }, (payload) => {
         console.log("New post created");
-        const post: Post = postValidate.parse(payload.new);
-        this.notifyPost(post);
+        const post = postValidate.parse(payload.new);
+        const postWithURL = {
+          ...post,
+          createdAt: new Date(post.createdAt),
+        }
+        this.notifyPost(postWithURL);
       })
       .subscribe();
 
@@ -136,7 +135,7 @@ export class ExpoNotificationService implements INotificationService {
         .from(postsTable)
         .innerJoin(usersTable, eq(usersTable.id, postsTable.userId))
         .innerJoin(groupsTable, eq(groupsTable.id, postsTable.groupId))
-        .where(eq(groupsTable.id, post.id));
+        .where(eq(groupsTable.id, post.groupId));
 
       if (posterGroupId === undefined) {
         throw new NotFoundError("Group");
@@ -171,6 +170,7 @@ export class ExpoNotificationService implements INotificationService {
         notifications.push(notif);
       }
 
+      // TODO: make this into one query
       // Get the list of push tokens for the group members
       const messages: ExpoPushMessage[] = await Promise.all(
         members

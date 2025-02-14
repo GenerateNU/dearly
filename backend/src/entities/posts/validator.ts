@@ -6,8 +6,6 @@ import {
   NAME_MAX_LIMIT,
   TEXT_MAX_LIMIT,
 } from "../../constants/database";
-import { createSelectSchema } from "drizzle-zod";
-import { postsTable } from "../schema";
 
 export const createPostValidate = z
   .object({
@@ -36,6 +34,13 @@ export const createPostValidate = z
   })
   .passthrough();
 
-export const postValidate = createSelectSchema(postsTable);
+export const postValidate = z.object({
+  id: z.string(),
+  groupId: z.string(),
+  userId: z.string(),
+  createdAt: z.string(),
+  caption: z.string().nullable(),
+  location: z.string().nullable(),
+});
 
 export const updatePostValidate = createPostValidate.partial();
