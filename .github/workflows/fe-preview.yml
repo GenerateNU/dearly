@@ -6,7 +6,7 @@ name: EAS Internal Preview Build
 on:
   push:
     branches:
-      - main
+      - fe-deployment
 
 permissions:
   issues: write
