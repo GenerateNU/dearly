@@ -75,7 +75,7 @@ export class SlackControllerImpl implements SlackController {
   }
 
   private async sendSlackMessage(payload: ExpoBuildWebhookPayload): Promise<void> {
-    const buildUrl = payload.artifacts?.buildUrl;
+    const buildUrl = payload.buildDetailsPageUrl;
 
     if (!buildUrl) {
       throw new Error("No build URL available in the payload");
