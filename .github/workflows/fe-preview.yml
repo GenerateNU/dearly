@@ -1,8 +1,12 @@
 name: EAS Internal Preview Build
 
+# on:
+#   issue_comment:
+#     types: [created]
 on:
-  issue_comment:
-    types: [created]
+  push:
+    branches:
+      - main
 
 permissions:
   issues: write
@@ -13,7 +17,7 @@ permissions:
 jobs:
   build:
     name: Internal Preview Build
-    if: github.event.issue.pull_request && contains(github.event.comment.body, '/preview-build')
+    # if: github.event.issue.pull_request && contains(github.event.comment.body, '/preview-build')
     runs-on: ubuntu-latest
 
     steps:
