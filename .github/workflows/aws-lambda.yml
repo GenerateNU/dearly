@@ -24,7 +24,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4         
         with:
           role-to-assume: ${{ secrets.LAMBDA_ARN }}
-          aws-region: aws-region-1
+          aws-region: ${{ secrets.AWS_REGION }} 
 
       - name: Login to Amazon ECR
         id: login-pf-aws-ecr
