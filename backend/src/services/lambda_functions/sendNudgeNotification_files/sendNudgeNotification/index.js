@@ -4,22 +4,22 @@ const expo = new Expo();
 
 export const handler = async (event) => {
   const notifications = formatExpoMessage(event.notifications) || [];
-  
+
   try {
     const receipts = await expo.sendPushNotificationsAsync(notifications);
     const failedToSend = receipts.filter((receipt) => receipt.status === "error");
     if (failedToSend.length > 0) {
-     throw new Error('Failed to send.');
+      throw new Error('Failed to send.');
     }
     const response = {
       statusCode: 200,
-      body: JSON.stringify({message: "Successfully sent notifications schedule"}),
+      body: JSON.stringify({ message: "Successfully sent notifications schedule" }),
     };
     return response;
   } catch (error) {
     const response = {
       statusCode: 500,
-      body: JSON.stringify({message: `Failed to send notifications: ${error}`}),
+      body: JSON.stringify({ message: `Failed to send notifications: ${error}` }),
     };
     return response;
   }
