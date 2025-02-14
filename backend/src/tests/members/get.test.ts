@@ -8,6 +8,7 @@ import {
   SEARCHED_ALICE,
   SEARCHED_BOB,
   SEARCHED_ANA,
+  POST_ID,
 } from "./../helpers/test-constants";
 import { Hono } from "hono";
 import { startTestApp } from "../helpers/test-app";
@@ -15,13 +16,18 @@ import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
 
-describe.only("GET /members", () => {
+describe.only("GET /groups/:id/members", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
 
   const ALICE_JWT = generateJWTFromID(USER_ALICE_ID);
   const BOB_JWT = generateJWTFromID(USER_BOB_ID);
   const ANA_JWT = generateJWTFromID(USER_ANA_ID);
+
+  const goodRequestBody = {
+    content: "i like this photo",
+    createdAt: "",
+  };
 
   beforeAll(async () => {
     app = await startTestApp();
@@ -198,6 +204,45 @@ describe.only("GET /members", () => {
             path: "page",
           },
         ]);
+    });
+
+    it.each([
+      ["1", "1", [SEARCHED_ALICE]],
+      ["1", "2", [SEARCHED_BOB]],
+      ["1", "3", []],
+      ["1", "4", []],
+      ["2", "1", [SEARCHED_ALICE, SEARCHED_BOB]],
+      ["2", "2", []],
+    ])("should return 200 with limit %s and page %s", async (limit, page, expectedBody) => {
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.POST,
+        route: `/api/v1/posts/${POST_ID}/comments`,
+        requestBody: {
+          ...goodRequestBody,
+        },
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${ANA_JWT}`,
+        },
+      });
+      (
+        await testBuilder.request({
+          app,
+          type: HTTPRequest.GET,
+          route: `/api/v1/groups/${DEARLY_GROUP_ID}/members`,
+          queryParams: {
+            limit,
+            page,
+          },
+          autoAuthorized: false,
+          headers: {
+            Authorization: `Bearer ${ALICE_JWT}`,
+          },
+        })
+      )
+        .assertStatusCode(Status.OK)
+        .assertBody(expectedBody);
     });
   });
 });

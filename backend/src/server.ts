@@ -4,7 +4,6 @@ import { connectDB } from "./database/connect";
 import { configureMiddlewares } from "./middlewares/init";
 import { setUpRoutes } from "./routes/init";
 import { automigrateDB } from "./database/migrate";
-import { generateJWTFromID } from "./tests/helpers/test-token";
 import { S3Impl } from "./services/s3Service";
 import { ExpoNotificationService } from "./services/notificationsService";
 
@@ -16,8 +15,6 @@ const config = getConfigurations();
   const s3ServiceProvider = new S3Impl(config.s3Config);
   try {
     const db = connectDB(config);
-
-    console.log("JWT for manual testing:", generateJWTFromID(), "\n");
 
     await automigrateDB(db, config);
 

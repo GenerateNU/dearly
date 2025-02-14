@@ -16,7 +16,7 @@ import {
 } from "../entities/schema";
 import { Like, likeValidate } from "../entities/likes/validator";
 import { Comment, commentValidate } from "../types/api/internal/comments";
-import { P } from "pino";
+
 
 /*
 Questions for our tech leads

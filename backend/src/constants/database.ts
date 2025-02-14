@@ -9,6 +9,16 @@ export enum MediaType {
   AUDIO = "AUDIO",
 }
 
+export enum Tag {
+  USER = "UserID",
+  GROUP = "GroupID",
+}
+
+export enum CommentType {
+  AUDIO = "AUDIO",
+  TEXT = "TEXT",
+}
+
 export enum MemberRole {
   MEMBER = "MEMBER",
   MANAGER = "MANAGER",

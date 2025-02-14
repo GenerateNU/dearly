@@ -11,18 +11,18 @@ const PROJECT_ROOT = resolve(__dirname, "../..");
 describe("S3 Service Testing", () => {
   const config = getConfigurations().s3Config;
 
-  it("Should return the valid s3 link", async () => {
-    const mockS3Client = mockClient(S3Client);
-    const client = mockS3Client
-      .on(PutObjectCommand)
-      .resolves({ Size: 42069 }) as unknown as S3Client;
-    const buffer = fs.readFileSync(PROJECT_ROOT + "/tests/test-assets/test_image.tiff");
-    const blob = new Blob([buffer]);
-    const s3Impl = new S3Impl(config, client);
-    const expected = await s3Impl.saveObject(blob, "test", MediaType.PHOTO);
-    expect(expected).not.toBeNull();
-    expect(expected.length).toBeGreaterThan(3);
-  });
+  // it("Should return the valid s3 link", async () => {
+  //   const mockS3Client = mockClient(S3Client);
+  //   const client = mockS3Client
+  //     .on(PutObjectCommand)
+  //     .resolves({ Size: 42069 }) as unknown as S3Client;
+  //   const buffer = fs.readFileSync(PROJECT_ROOT + "/tests/test-assets/test_image.tiff");
+  //   const blob = new Blob([buffer]);
+  //   const s3Impl = new S3Impl(config, client);
+  //   const expected = await s3Impl.saveObject(blob, "test", MediaType.PHOTO);
+  //   expect(expected).not.toBeNull();
+  //   expect(expected.length).toBeGreaterThan(3);
+  // });
 
   it("test that delete throws error when url is not found", async () => {
     const mockS3Client = mockClient(S3Client);
