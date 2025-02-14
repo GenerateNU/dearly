@@ -35,12 +35,8 @@ export class SlackControllerImpl implements SlackController {
       const bodyText = await ctx.req.text();
       this.checkSignature(bodyText, expoSignature, ctx);
 
-      try {
-        const payload = JSON.parse(bodyText) as ExpoBuildWebhookPayload;
-        await this.checkStatus(payload, ctx);
-      } catch {
-        return ctx.json({ error: "Invalid payload" }, 500);
-      }
+      const payload = JSON.parse(bodyText) as ExpoBuildWebhookPayload;
+      await this.checkStatus(payload, ctx);
       return ctx.text("Build not finished, no notification sent", 200);
     };
     return await handleAppError(slackMessageImpl)(ctx);

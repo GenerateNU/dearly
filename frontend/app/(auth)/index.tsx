@@ -2,7 +2,7 @@ import Box from "@/design-system/base/box";
 import Button from "@/design-system/components/ui/button";
 import { router } from "expo-router";
 
-const Index = () => {
+const Index = () => {  
   return (
     <Box backgroundColor="primary" gap="m" flex={1} justifyContent="center" alignItems="center">
       <Button label="Login" onPress={() => router.push("/(auth)/login")} />
