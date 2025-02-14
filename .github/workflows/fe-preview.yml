@@ -6,13 +6,13 @@ name: EAS Internal Preview Build
 on:
   push:
     branches:
-      - fe-deployment
+      - fe-deployment    
 
-permissions:
-  issues: write
-  pull-requests: write
-  contents: read
-  statuses: write
+# permissions:
+#   issues: write
+#   pull-requests: write
+#   contents: read
+#   statuses: write
 
 jobs:
   build:
@@ -30,22 +30,22 @@ jobs:
         with:
           ref: ${{ steps.comment-branch.outputs.head_ref }}
 
-      - name: Add comment to PR
-        uses: actions/github-script@v6
-        if: always()
-        with:
-          script: |
-            const name = '${{ github.workflow }}';
-            const url = '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}';
-            const success = '${{ job.status }}' === 'success';
-            const body = `${name}: ${success ? 'succeeded ✅' : 'failed ❌'}\n${url}`;
+      # - name: Add comment to PR
+      #   uses: actions/github-script@v6
+      #   if: always()
+      #   with:
+      #     script: |
+      #       const name = '${{ github.workflow }}';
+      #       const url = '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}';
+      #       const success = '${{ job.status }}' === 'success';
+      #       const body = `${name}: ${success ? 'succeeded ✅' : 'failed ❌'}\n${url}`;
 
-            await github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: body
-            })
+      #       await github.rest.issues.createComment({
+      #         issue_number: context.issue.number,
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo,
+      #         body: body
+      #       })
       
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
