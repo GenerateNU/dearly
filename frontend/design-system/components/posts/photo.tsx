@@ -1,5 +1,5 @@
 import Box from "@/design-system/base/box";
-import { Image } from "react-native";
+import { Image, TouchableOpacity } from "react-native";
 import { useState, useEffect } from "react";
 
 interface PhotoProps {
@@ -27,23 +27,25 @@ export const Photo: React.FC<PhotoProps> = ({ image }) => {
   }, [image]);
 
   return (
-    <Box
-      width="100%"
-      style={{
-        aspectRatio: aspectRatio ?? 1,
-      }}
-    >
-      <Image
+    <TouchableOpacity activeOpacity={0.7}>
+      <Box
+        width="100%"
         style={{
-          width: "100%",
-          flex: 1,
-          borderRadius: 12,
+          aspectRatio: aspectRatio ?? 1,
         }}
-        className="rounded-lg"
-        source={{
-          uri: image,
-        }}
-      />
-    </Box>
+      >
+        <Image
+          style={{
+            width: "100%",
+            flex: 1,
+            borderRadius: 12,
+          }}
+          className="rounded-lg"
+          source={{
+            uri: image,
+          }}
+        />
+      </Box>
+    </TouchableOpacity>
   );
 };

@@ -13,7 +13,7 @@ interface HeartProps {
 export const Heart: React.FC<HeartProps> = ({ like, onLike }) => {
   const theme = useTheme<Theme>();
 
-  const variantStyle = theme.heartIconVariants[like ? "filled" : "outlined"];
+  const variantStyle = theme.heartVariants[like ? "filled" : "outlined"];
 
   return (
     <Pressable onPress={onLike}>
