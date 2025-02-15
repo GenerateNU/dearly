@@ -1,4 +1,9 @@
-import { CreateScheduleCommandInput, GetScheduleCommand, SchedulerClient, ScheduleState } from "@aws-sdk/client-scheduler";
+import {
+  CreateScheduleCommandInput,
+  SchedulerClient,
+  ScheduleState,
+  GetScheduleCommand
+} from "@aws-sdk/client-scheduler";
 import {
   CreateScheduleCommand,
   DeleteScheduleCommand,
@@ -30,43 +35,46 @@ export class AWSEventBridgeScheduler implements NudgeScheduler {
       const command = new CreateScheduleCommand(input);
       const response = await this.scheduler.send(command);
       return response;
-    }
-    return await handleAWSServiceError(addScheduleImpl, "Failed to add recurring schedule.")()
+    };
+    return await handleAWSServiceError(addScheduleImpl, "Failed to add recurring schedule.")();
   }
-  
+
   async updateSchedule(id: string, payload: SchedulePayload): Promise<unknown> {
-    const updateScheduleImpl = async() => {
-      const input = await this.scheduleCommandInput(id, payload)
-      
+    const updateScheduleImpl = async () => {
+      const input = await this.scheduleCommandInput(id, payload);
+
       const command = new UpdateScheduleCommand(input);
       const response = await this.scheduler.send(command);
       return response;
     }
     return await handleAWSServiceError(updateScheduleImpl, "Failed to update recurring schedule")()
   }
-  
+
   // TODO: don't think this is correct though
   async disableSchedule(id: string): Promise<unknown> {
     const disableScheduleImpl = async() => {
-      const input = await this.scheduleCommandInput(id, null, ScheduleState.DISABLED); // TODO: unneeded params time and timezone
+      const input = await this.scheduleCommandInput(id, null, ScheduleState.DISABLED);
       const command = new UpdateScheduleCommand(input);
       const response = await this.scheduler.send(command);
-      
-      return response 
-    }
-    return await handleAWSServiceError(disableScheduleImpl, "Failed to disable recurring schedule")()
+
+      return response;
+    };
+    return await handleAWSServiceError(
+      disableScheduleImpl,
+      "Failed to disable recurring schedule",
+    )();
   }
-  
+
   async removeSchedule(id: string): Promise<unknown> {
-    const removeScheduleImpl = async() => {
+    const removeScheduleImpl = async () => {
       const input = {
         Name: id,
       };
       const command = new DeleteScheduleCommand(input);
       const response = await this.scheduler.send(command);
       return response;
-    }
-    return await handleAWSServiceError(removeScheduleImpl, "Failed to remove recurring schedule")()
+    };
+    return await handleAWSServiceError(removeScheduleImpl, "Failed to remove recurring schedule")();
   }
 
   private getCronExpression(payload: NudgeSchedulePayload): string {
@@ -76,9 +84,9 @@ export class AWSEventBridgeScheduler implements NudgeScheduler {
     const month = payload.month ?? "*"
     const dayOfWeek = payload.daysOfWeek?.join() ?? "*"
 
-    const cronExpression = `0 ${min} ${hour} ${dayOfMonth} ${month} ${dayOfWeek} *`
+    const cronExpression = `0 ${min} ${hour} ${dayOfMonth} ${month} ${dayOfWeek} *`;
 
-    return cronExpression
+    return cronExpression;
   }
 
   private async scheduleCommandInput(id: string, payload: SchedulePayload | null, disabled: ScheduleState = ScheduleState.ENABLED): Promise<CreateScheduleCommandInput> {

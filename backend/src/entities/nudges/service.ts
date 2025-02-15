@@ -4,10 +4,7 @@ import { ExpoPushMessage, Expo } from "expo-server-sdk";
 import logger from "../../utilities/logger";
 import { getNotificationBody } from "../../utilities/nudge";
 import { InternalServerError } from "../../utilities/errors/app-error";
-import {
-  NudgeSchedulePayload,
-  NotificationMetadata,
-} from "../../types/api/internal/nudges";
+import { NudgeSchedulePayload, NotificationMetadata } from "../../types/api/internal/nudges";
 import { AWSEventBridgeScheduler } from "../../services/nudgeScheduler";
 import { SchedulerClient } from "@aws-sdk/client-scheduler";
 
@@ -65,9 +62,9 @@ export class NudgeServiceImpl implements NudgeService {
       if (notificationMetadata.deviceTokens.length === 0) return;
       const schedulerPayload = {
         schedule: schedule,
-        notifications: this.formatPushNotifications(notificationMetadata)
-      }
-      
+        notifications: this.formatPushNotifications(notificationMetadata),
+      };
+
       // TODO: mechanism to update schedule
       await this.scheduler.addSchedule(payload.groupId, schedulerPayload);
 
