@@ -1,6 +1,11 @@
 import { SlackConfig } from "./../types/config";
 import { Context } from "hono";
-import { BadRequestError, ForbiddenError, handleAppError, InternalServerError } from "../utilities/errors/app-error";
+import {
+  BadRequestError,
+  ForbiddenError,
+  handleAppError,
+  InternalServerError,
+} from "../utilities/errors/app-error";
 import * as crypto from "crypto";
 import { getSlackMessage } from "../utilities/slack";
 import logger from "../utilities/logger";
