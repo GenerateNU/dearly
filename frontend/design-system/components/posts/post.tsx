@@ -26,7 +26,7 @@ export const ImagePost: React.FC<Post> = ({
 
   return (
     <Box flexDirection="column" gap="s">
-      {/* <PostHeader 
+          <PostHeader 
                 username={username} 
                 profilePhoto={profilePhoto} 
                 location={location} 
@@ -40,7 +40,7 @@ export const ImagePost: React.FC<Post> = ({
                 postId={id} 
                 likes={likes} 
                 comments={comments}
-            /> */}
+            />
     </Box>
   );
 };

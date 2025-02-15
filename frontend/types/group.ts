@@ -1,6 +1,6 @@
 import { components, paths } from "@/gen/openapi";
 
-export type Group = components["schemas"]["Group"];
+export type Group = Required<components["schemas"]["Group"]>;
 
 export type CreateGroupPayload =
   paths["/api/v1/groups"]["post"]["requestBody"]["content"]["application/json"];

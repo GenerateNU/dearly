@@ -1,6 +1,6 @@
 import { paths, components } from "@/gen/openapi";
 
-export type User = components["schemas"]["User"];
+export type User = Required<components["schemas"]["User"]>;
 
 export type SearchedUser = components["schemas"]["SearchedUser"];
 

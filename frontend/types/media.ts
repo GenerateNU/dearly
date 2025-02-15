@@ -1,6 +1,6 @@
 import { components, paths } from "@/gen/openapi";
 
-export type MediaUpload = components["schemas"]["MediaUpload"];
+export type MediaUpload = Required<components["schemas"]["MediaUpload"]>;
 
 export type UploadMediaPayload =
   paths["/api/v1/groups/{id}/media"]["post"]["requestBody"]["content"]["multipart/form-data"];
