@@ -1,6 +1,9 @@
 import Box from "@/design-system/base/box";
 import ImageCarousel from "./carousel";
 import { Post } from "@/types/post";
+import Text from "@/design-system/base/text";
+import { CommentLike } from "./comment-like";
+import { PostHeader } from "./header";
 
 export const ImagePost: React.FC<Post> = ({
   profilePhoto,
@@ -26,21 +29,16 @@ export const ImagePost: React.FC<Post> = ({
 
   return (
     <Box flexDirection="column" gap="s">
-          <PostHeader 
-                username={username} 
-                profilePhoto={profilePhoto} 
-                location={location} 
-                createdAt={createdAt}
-            />
-            <ImageCarousel 
-                like={isLiked}
-                data={data}
-            />
-            <CommentLike 
-                postId={id} 
-                likes={likes} 
-                comments={comments}
-            />
+      <PostHeader
+        name={name}
+        username={username}
+        profilePhoto={profilePhoto}
+        location={location}
+        createdAt={createdAt}
+      />
+      <ImageCarousel like={isLiked} data={data} />
+      <CommentLike postId={id} likes={likes} comments={comments} />
+      <Text>{caption}</Text>
     </Box>
   );
 };
