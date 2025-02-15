@@ -9,7 +9,7 @@ export const handler = async (event) => {
     const receipts = await expo.sendPushNotificationsAsync(notifications);
     const failedToSend = receipts.filter((receipt) => receipt.status === "error");
     if (failedToSend.length > 0) {
-      throw new Error('Failed to send.');
+      throw new Error("Failed to send.");
     }
     const response = {
       statusCode: 200,

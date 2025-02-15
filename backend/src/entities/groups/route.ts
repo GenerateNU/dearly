@@ -14,7 +14,7 @@ export const groupRoutes = (
   db: PostgresJsDatabase,
   mediaService: MediaService,
   expo: Expo,
-  scheduler: SchedulerClient
+  scheduler: SchedulerClient,
 ): Hono => {
   const group = new Hono();
 
