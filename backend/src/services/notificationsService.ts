@@ -75,7 +75,6 @@ export class ExpoNotificationService implements INotificationService {
     this.supabaseClient
       .channel("posts_channel")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "posts" }, (payload) => {
-        console.log("New post created");
         const post = postValidate.parse(payload.new);
         const postWithURL = {
           ...post,
@@ -134,7 +133,6 @@ export class ExpoNotificationService implements INotificationService {
    * @param post the new post that a user has made.
    */
   async notifyPost(post: Post): Promise<Notification[]> {
-    console.log("Notifying group members of new post");
     try {
       // Get the Group Id of the post maker
       const [posterGroupId] = await this.db
@@ -148,8 +146,8 @@ export class ExpoNotificationService implements INotificationService {
         .innerJoin(groupsTable, eq(groupsTable.id, postsTable.groupId))
         .where(eq(groupsTable.id, post.groupId));
 
-      if (posterGroupId === undefined) {
-        throw new NotFoundError("Group");
+      if (!posterGroupId) {
+        throw new NotFoundError("Unable to find the group!");
       }
 
       // get the list of members who are in the group
@@ -160,32 +158,32 @@ export class ExpoNotificationService implements INotificationService {
         .from(membersTable)
         .where(eq(membersTable.groupId, posterGroupId.groupId));
 
-      if (members === undefined) {
-        throw new NotFoundError("Group Members");
+      if (!members) {
+        throw new NotFoundError("Unable to find the other group memebers!");
       }
       let notifications: Notification[] = [];
 
       for (let member of members) {
         // Insert the notification into the database
-        const [notif] = await this.db.insert(notificationsTable).values({
+        const res = await this.db.insert(notificationsTable).values({
           actorId: post.userId,
           receiverId: member.userId,
           referenceType: "POST",
           postId: post.id,
           title: "New Post",
           description: `${posterGroupId.name} just posted in ${posterGroupId.groupName}`,
-        });
-        if (!notif) {
+        }).returning();
+        if (!res[0]) {
           throw new NotFoundError("Notification");
         }
-        notifications.push(notif);
+        notifications.push(res[0]);
       }
 
       // TODO: make this into one query
       // Get the list of push tokens for the group members
       const messages: ExpoPushMessage[] = await Promise.all(
         members
-          .filter((member) => this.getNotificationEnabled(member.userId))
+          .filter(async (member) => await this.getNotificationEnabled(member.userId))
           .map(async (member) => ({
             to: await this.getPushToken(member.userId),
             sound: "default",
@@ -195,14 +193,15 @@ export class ExpoNotificationService implements INotificationService {
       );
 
       // Send the notifications and if all notifications off, empty list and none will send
-      const chunks = this.expo.chunkPushNotifications(messages);
+      const chunks: ExpoPushMessage[][] = this.expo.chunkPushNotifications(messages);
       for (let chunk of chunks) {
+        console.log("chunkin")
         await this.expo.sendPushNotificationsAsync(chunk);
       }
 
       return notifications;
     } catch (Error) {
-      throw new NotFoundError("Supabase Issue"); // need to create this error
+      throw new NotFoundError("Supabase Issue");
     }
   }
 

@@ -30,6 +30,9 @@ import {
   USER_Josh_ID,
   SNAPPER_GROUP_ID,
   USER_Nubs_ID,
+  POST_EXAMPLE,
+  NUBS_DEVICE_TOKEN,
+  JOSH_DEVICE_TOKEN,
 } from "./test-constants";
 import { CreateGroupPayload } from "../../types/api/internal/groups";
 import { CreateUserPayload } from "../../types/api/internal/users";
@@ -48,7 +51,14 @@ export const seedDatabase = async (db: PostgresJsDatabase) => {
 };
 
 const seedUser = async (db: PostgresJsDatabase) => {
-  const seedData: CreateUserPayload[] = [USER_ALICE, USER_ANA, USER_BOB, USER_BILL, USER_JOSH, USER_NUBS];
+  const seedData: CreateUserPayload[] = [
+    USER_ALICE,
+    USER_ANA,
+    USER_BOB,
+    USER_BILL,
+    USER_JOSH,
+    USER_NUBS,
+  ];
   await db.insert(usersTable).values(seedData);
 };
 
@@ -96,6 +106,7 @@ const seedMember = async (db: PostgresJsDatabase) => {
 
 const seedPostAndMedia = async (db: PostgresJsDatabase) => {
   await db.insert(postsTable).values(POST_MOCK);
+  await db.insert(postsTable).values(POST_EXAMPLE);
   await db.insert(mediaTable).values(MEDIA_MOCK);
 };
 
@@ -108,6 +119,14 @@ const seedDeviceTokens = async (db: PostgresJsDatabase) => {
     {
       token: MOCK_EXPO_TOKEN,
       userId: USER_BOB_ID,
+    },
+    {
+      token: NUBS_DEVICE_TOKEN,
+      userId: USER_Nubs_ID,
+    },
+    {
+      token: JOSH_DEVICE_TOKEN,
+      userId: USER_Josh_ID,
     },
   ]);
 };

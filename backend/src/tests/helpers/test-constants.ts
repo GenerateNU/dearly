@@ -1,5 +1,6 @@
 import { commentsTable, groupsTable, mediaTable, postsTable } from "../../entities/schema";
 import { CreateGroupPayload } from "../../types/api/internal/groups";
+import { Post } from "../../types/api/internal/posts";
 import { CreateUserPayload, SearchedUser } from "../../types/api/internal/users";
 
 export const INVALID_ID_ARRAY = ["1", "%2", "123abc", "!!$$", "123 456", "@ID", null, undefined];
@@ -21,6 +22,9 @@ export const MOCK_EXPO_TOKEN = "ExponentPushToken[Z9Hfn6ZxWVXaAs7MG3Pya8]";
 export const USER_Josh_ID = "61111211-4c0d-44d9-b2b1-8d897207f111";
 export const USER_Nubs_ID = "99111219-4c0d-44d9-b2b1-8d897207f111";
 export const SNAPPER_GROUP_ID = "ab674eaf-9999-47c1-8a38-81079577880b";
+export const SNAPPER_POST = "ab674eaf-9999-47c1-8a38-811234567890"
+export const JOSH_DEVICE_TOKEN = "ab674eaf-9999-1234-8a38-811234561234"
+export const NUBS_DEVICE_TOKEN = "ab674eaf-0000-1234-8a38-811234561234"
 
 export const GROUP_EMPTY_FIELDS_ERRORS = [
   {
@@ -192,3 +196,14 @@ export const COMMENTS: (typeof commentsTable.$inferInsert)[] = [
     content: "amazing photos!",
   },
 ];
+
+
+
+export const POST_EXAMPLE: Post = {
+  id: "ab674eaf-9999-47c1-8a38-811234567890",
+  groupId: SNAPPER_GROUP_ID,
+  userId: USER_Josh_ID,
+  createdAt: new Date(),
+  caption: "what the sigma",
+  location: "Ur moms house",
+}
