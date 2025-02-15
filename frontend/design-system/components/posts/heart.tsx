@@ -4,6 +4,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { useTheme } from "@shopify/restyle";
 import { Theme } from "@/design-system/base/theme";
 import { Pressable } from "react-native";
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+
 
 interface HeartProps {
   like: boolean;
@@ -31,6 +33,7 @@ export const Heart: React.FC<HeartProps> = ({ like, onLike }) => {
           color={variantStyle.color}
           size={variantStyle.size}
         />
+        <MaterialCommunityIcons name="material-ui" size={24} color="black" />
       </Box>
     </Pressable>
   );

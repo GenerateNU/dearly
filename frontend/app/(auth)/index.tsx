@@ -9,7 +9,6 @@ import HomeMenu from "@/design-system/components/ui/home-menu";
 import { useState } from "react";
 
 const Index = () => {
-  console.log(process.env.NODE_ENV);
   const [menu, setMenu] = useState("Calendar");
   const data = [
     "https://jzoblog.wordpress.com/wp-content/uploads/2020/02/quokkasmile.jpg",
