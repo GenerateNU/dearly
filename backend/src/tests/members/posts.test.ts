@@ -25,6 +25,8 @@ describe("GET /groups/:id/members/:userId/posts", () => {
     likes: 0,
     location: null,
     profilePhoto: null,
+    username: "alice123",
+    name: "Alice",
   };
 
   beforeAll(async () => {

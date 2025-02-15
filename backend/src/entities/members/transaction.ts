@@ -179,6 +179,8 @@ export class MemberTransactionImpl implements MemberTransaction {
           postsTable.caption,
           postsTable.location,
           usersTable.profilePhoto,
+          usersTable.name,
+          usersTable.username,
         )
         .orderBy(desc(postsTable.createdAt))
         .limit(limit)

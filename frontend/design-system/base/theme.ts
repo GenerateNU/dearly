@@ -83,13 +83,13 @@ const getTheme = (ratio: number) => {
 
 const heartVariants = {
   filled: {
-    icon: filledHeart,
+    icon: "cards-heart",
     color: COLOR_PALETTE.black,
     size: 30,
     width: 55,
   },
   outlined: {
-    icon: outlinedHeart,
+    icon: "cards-heart-outline",
     color: COLOR_PALETTE.black,
     size: 30,
     width: 55,

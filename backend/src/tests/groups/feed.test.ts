@@ -26,6 +26,8 @@ describe("GET /groups/:id/feed", () => {
     likes: 0,
     location: null,
     profilePhoto: null,
+    username: "alice123",
+    name: "Alice",
   };
 
   beforeAll(async () => {

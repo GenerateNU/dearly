@@ -21,8 +21,8 @@ const Index = () => {
   return (
     <Box backgroundColor="primary" gap="m" flex={1} justifyContent="center" alignItems="center">
       <ScrollView className="flex-1 w-full p-5 mt-10">
-      <Button label="Login" onPress={() => router.push("/(auth)/login")} />
-      <Button label="Register" onPress={() => router.push("/(auth)/register")} />
+        <Button label="Login" onPress={() => router.push("/(auth)/login")} />
+        <Button label="Register" onPress={() => router.push("/(auth)/register")} />
         <Box gap="l" paddingBottom="l">
           <Box>
             <Text variant="body">Home Menu</Text>

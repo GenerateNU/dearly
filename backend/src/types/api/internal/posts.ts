@@ -27,6 +27,8 @@ export type PostMetadata = {
   likes: number;
   comments: number;
   isLiked: boolean;
+  name: string | null;
+  username: string;
   profilePhoto: string | null;
 };
 

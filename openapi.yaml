@@ -293,6 +293,13 @@ components:
           type: string
           nullable: true
           description: Profile photo url of user who made the post
+        name:
+          type: string
+          nullable: true
+          description: Display name of user who made the post
+        username:
+          type: string
+          description: Username of user who made the post
         location:
           type: string
           description: Location of where the post is made
