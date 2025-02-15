@@ -9,6 +9,7 @@ import { seedDatabase } from "./seed-db";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { mockClient } from "aws-sdk-client-mock";
 import { S3Impl } from "../../services/s3Service";
+import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 
 export const startTestApp = async (): Promise<Hono> => {
   const app = new Hono();
@@ -20,7 +21,7 @@ export const startTestApp = async (): Promise<Hono> => {
 
   const s3 = new S3Impl(config.s3Config, client);
 
-  const db = connectDB(config);
+  const db: PostgresJsDatabase = connectDB(config);
 
   await automigrateDB(db, config);
 
@@ -30,7 +31,7 @@ export const startTestApp = async (): Promise<Hono> => {
 
   configureMiddlewares(app, config);
 
-  setUpRoutes(app, db, s3);
+  setUpRoutes(app, db, config, s3);
 
   return app;
 };

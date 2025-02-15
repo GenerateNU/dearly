@@ -5,8 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z, ZodError } from "zod";
 import { router } from "expo-router";
 import { useAuthStore } from "@/auth/store";
-import Input from "@/design-system/components/input";
-import Button from "@/design-system/components/button";
+import Input from "@/design-system/components/ui/input";
+import Button from "@/design-system/components/ui/button";
 import { AuthRequest } from "@/types/auth";
 import Box from "@/design-system/base/box";
 
