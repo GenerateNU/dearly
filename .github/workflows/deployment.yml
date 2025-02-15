@@ -89,4 +89,5 @@ jobs:
             SLACK_WEBHOOK_URL=${{ secrets.SLACK_WEBHOOK_URL }}
             SLACK_CHANNEL_ID=${{ secrets.SLACK_CHANNEL_ID }} 
             SLACK_USER_GROUP_ID=${{ secrets.SLACK_USER_GROUP_ID }}
+            BUILD_QR_CODE_GENERATOR=${{ secrets.BUILD_QR_CODE_GENERATOR }}
           flags: --port=3000 --allow-unauthenticated
