@@ -22,9 +22,14 @@ tasks:
       - cd backend && bun lint:fix
 
   frontend:dev:
-    desc: "Run frontend development server"
+    desc: "Run frontend development server with backend development server"
     cmds:
-      - cd frontend && bun run start
+      - cd frontend && bun run dev
+
+  frontend:prod:
+    desc: "Run frontend development server with backend deployed server"
+    cmds:
+      - cd frontend && bun run prod
 
   backend:dev:
     desc: "Run backend development server with Docker database"
