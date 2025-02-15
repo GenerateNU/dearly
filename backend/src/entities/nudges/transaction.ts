@@ -15,9 +15,8 @@ import {
 import { ONE_DAY_COOLDOWN_SEC } from "../../constants/nudge";
 import { Transaction } from "../../types/api/internal/transaction";
 import {
-  AddNudgeSchedulePayload,
   NotificationMetadata,
-  NudgeSchedule,
+  NudgeSchedulePayload,
   NudgeTarget,
 } from "../../types/api/internal/nudges";
 
@@ -35,12 +34,12 @@ export interface NudgeTransaction {
 
   upsertSchedule(
     managerId: string,
-    payload: AddNudgeSchedulePayload,
-  ): Promise<NudgeSchedule | null>;
+    payload: NudgeSchedulePayload,
+  ): Promise<NudgeSchedulePayload | null>;
 
-  getNudgeSchedule(groupId: string, managerId: string): Promise<NudgeSchedule | null>;
+  getNudgeSchedule(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null>;
 
-  deactivateNudge(groupId: string, managerId: string): Promise<NudgeSchedule | null>;
+  deactivateNudge(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null>;
 }
 
 export class NudgeTransactionImpl implements NudgeTransaction {
@@ -52,8 +51,8 @@ export class NudgeTransactionImpl implements NudgeTransaction {
 
   async upsertSchedule(
     managerId: string,
-    payload: AddNudgeSchedulePayload,
-  ): Promise<NudgeSchedule | null> {
+    payload: NudgeSchedulePayload,
+  ): Promise<NudgeSchedulePayload | null> {
     return await this.db.transaction(async (tx) => {
       // validate group existence and manager permissions
       await this.validateGroup(tx, payload.groupId, managerId);
@@ -72,7 +71,7 @@ export class NudgeTransactionImpl implements NudgeTransaction {
     });
   }
 
-  async getNudgeSchedule(groupId: string, managerId: string): Promise<NudgeSchedule | null> {
+  async getNudgeSchedule(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null> {
     return await this.db.transaction(async (tx) => {
       // validate group existence and manager permissions
       await this.validateGroup(tx, groupId, managerId);
@@ -87,7 +86,7 @@ export class NudgeTransactionImpl implements NudgeTransaction {
     });
   }
 
-  async deactivateNudge(groupId: string, managerId: string): Promise<NudgeSchedule | null> {
+  async deactivateNudge(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null> {
     return await this.db.transaction(async (tx) => {
       // validate group existence and manager permissions
       await this.validateGroup(tx, groupId, managerId);

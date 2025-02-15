@@ -36,5 +36,5 @@ jobs:
           ECR_REPOSITORY: ${{ secrets.AWS_ECR_REPO }}
           IMAGE_TAG: latest
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG backend/src/services/lambda_functions/sendNudgeNotification_files/sendNudgeNotification
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG backend/src/services/lambda_functions/sendNudgeNotification
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
