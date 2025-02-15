@@ -33,6 +33,7 @@ export interface SlackConfig {
   slackWebhookUrl: string;
   slackUserID: string;
   slackChannelID: string;
+  qrCodeGenerator: string;
 }
 
 export interface Configuration {

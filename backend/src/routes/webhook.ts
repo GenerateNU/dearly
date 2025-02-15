@@ -24,6 +24,7 @@ export interface SlackController {
 
 export class SlackControllerImpl implements SlackController {
   private config: SlackConfig;
+  readonly QR_CODE_SIZE = 300;
 
   constructor(config: SlackConfig) {
     this.config = config;
@@ -67,7 +68,7 @@ export class SlackControllerImpl implements SlackController {
   }
 
   private async generateQRCodeUrl(buildUrl: string): Promise<string> {
-    return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(buildUrl)}`;
+    return `${this.config.qrCodeGenerator}/?size=${this.QR_CODE_SIZE}x${this.QR_CODE_SIZE}&data=${encodeURIComponent(buildUrl)}`;
   }
 
   private async sendSlackMessage(payload: ExpoBuildWebhookPayload): Promise<void> {

@@ -58,6 +58,7 @@ export const getConfigurations = (): Configuration => {
       slackWebhookUrl: parseEnv("SLACK_WEBHOOK_URL"),
       slackChannelID: parseEnv("SLACK_CHANNEL_ID"),
       slackUserID: parseEnv("SLACK_USER_GROUP_ID"),
+      qrCodeGenerator: parseEnv("BUILD_QR_CODE_GENERATOR"),
     },
     environment: nodeEnv,
   };
