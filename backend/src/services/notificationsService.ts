@@ -54,15 +54,24 @@ export interface INotificationService {
 }
 
 /**
- * A service that sends notifications to users when certain events occur.
+ * A service that sends notifications to users when certain events occur. Like when a user
+ * recieves a Like, Comment, Posts, or Nudges.
  */
 export class ExpoNotificationService implements INotificationService {
-  private expo = new Expo();
+  private expo: Expo;
   private supabaseClient: SupabaseClient;
   private db: PostgresJsDatabase;
 
   constructor(config: Configuration, db: PostgresJsDatabase) {
+    this.expo = new Expo();
     this.supabaseClient = createClient(config.supabase.url, config.supabase.key);
+    this.subscribeToPosts();
+    this.subscribeToComments();
+    this.subscribeToLikes();
+    this.db = db;
+  }
+
+  private subscribeToPosts() {
     this.supabaseClient
       .channel("posts_channel")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "posts" }, (payload) => {
@@ -71,11 +80,13 @@ export class ExpoNotificationService implements INotificationService {
         const postWithURL = {
           ...post,
           createdAt: new Date(post.createdAt),
-        }
+        };
         this.notifyPost(postWithURL);
       })
       .subscribe();
+  }
 
+  private subscribeToComments() {
     this.supabaseClient
       .channel("comments")
       .on(
@@ -87,7 +98,9 @@ export class ExpoNotificationService implements INotificationService {
         },
       )
       .subscribe();
+  }
 
+  private subscribeToLikes() {
     this.supabaseClient
       .channel("likes")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "likes" }, (payload) => {
@@ -95,8 +108,6 @@ export class ExpoNotificationService implements INotificationService {
         this.notifyComment(comment);
       })
       .subscribe();
-
-    this.db = db;
   }
 
   /**
@@ -114,7 +125,7 @@ export class ExpoNotificationService implements INotificationService {
         throw new NotFoundError("User");
       }
     } catch (error) {
-      throw new NotFoundError("User");
+      throw new NotFoundError("User", `Unable to find the following user ${userId}`);
     }
   }
 

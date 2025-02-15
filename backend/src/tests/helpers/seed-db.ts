@@ -24,6 +24,12 @@ import {
   USER_BILL,
   USER_BOB,
   USER_BOB_ID,
+  USER_JOSH,
+  USER_NUBS,
+  SNAPPER_GROUP,
+  USER_Josh_ID,
+  SNAPPER_GROUP_ID,
+  USER_Nubs_ID,
 } from "./test-constants";
 import { CreateGroupPayload } from "../../types/api/internal/groups";
 import { CreateUserPayload } from "../../types/api/internal/users";
@@ -42,12 +48,12 @@ export const seedDatabase = async (db: PostgresJsDatabase) => {
 };
 
 const seedUser = async (db: PostgresJsDatabase) => {
-  const seedData: CreateUserPayload[] = [USER_ALICE, USER_ANA, USER_BOB, USER_BILL];
+  const seedData: CreateUserPayload[] = [USER_ALICE, USER_ANA, USER_BOB, USER_BILL, USER_JOSH, USER_NUBS];
   await db.insert(usersTable).values(seedData);
 };
 
 const seedGroup = async (db: PostgresJsDatabase) => {
-  const seedData: CreateGroupPayload[] = [DEARLY_GROUP, ANOTHER_GROUP];
+  const seedData: CreateGroupPayload[] = [DEARLY_GROUP, ANOTHER_GROUP, SNAPPER_GROUP];
 
   await db.insert(groupsTable).values(seedData);
 };
@@ -72,6 +78,16 @@ const seedMember = async (db: PostgresJsDatabase) => {
     {
       userId: USER_ALICE_ID,
       groupId: ANOTHER_GROUP_ID,
+      role: "MEMBER",
+    },
+    {
+      userId: USER_Josh_ID,
+      groupId: SNAPPER_GROUP_ID,
+      role: "MANAGER",
+    },
+    {
+      userId: USER_Nubs_ID,
+      groupId: SNAPPER_GROUP_ID,
       role: "MEMBER",
     },
   ];

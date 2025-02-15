@@ -18,6 +18,9 @@ export const MOCK_SIGNED_URL = "https://mocked-url.com";
 export const MOCK_RANDOM_UUID = "fe01a74f-96b1-444a-b6c9-11e4d672946c";
 export const DEARLY_COMMENT_ID = "679c0331-2dfc-8002-b4a4-22b09d6c3c73";
 export const MOCK_EXPO_TOKEN = "ExponentPushToken[Z9Hfn6ZxWVXaAs7MG3Pya8]";
+export const USER_Josh_ID = "61111211-4c0d-44d9-b2b1-8d897207f111";
+export const USER_Nubs_ID = "99111219-4c0d-44d9-b2b1-8d897207f111";
+export const SNAPPER_GROUP_ID = "ab674eaf-9999-47c1-8a38-81079577880b";
 
 export const GROUP_EMPTY_FIELDS_ERRORS = [
   {
@@ -139,6 +142,20 @@ export const USER_BILL: CreateUserPayload = {
   id: USER_BILL_ID,
 };
 
+export const USER_JOSH: CreateUserPayload = {
+  name: "Josh",
+  username: "josh",
+  mode: "BASIC",
+  id: USER_Josh_ID
+}
+
+export const USER_NUBS: CreateUserPayload = {
+  name: "Nubs",
+  username: "nubs",
+  mode: "BASIC",
+  id: USER_Nubs_ID
+}
+
 export const DEARLY_GROUP: CreateGroupPayload = {
   name: "dearly",
   description: "dearly",
@@ -151,6 +168,13 @@ export const ANOTHER_GROUP: CreateGroupPayload = {
   description: "family",
   managerId: USER_ANA_ID,
   id: ANOTHER_GROUP_ID,
+};
+
+export const SNAPPER_GROUP: CreateGroupPayload = {
+  name: "snapper",
+  description: "snapper",
+  managerId: USER_Josh_ID,
+  id: SNAPPER_GROUP_ID,
 };
 
 export const MOCK_MEDIA_WITH_URL = MEDIA_MOCK.map((media) => ({
