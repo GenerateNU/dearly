@@ -3,8 +3,8 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "dev": "env=development expo start",
-    "prod": "env=production expo start",
+    "dev": "set NODE_ENV=development && expo start",
+    "prod": "set NODE_ENV=production && expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "lint": "eslint '**/*.ts' '**/*.tsx'",

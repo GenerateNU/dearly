@@ -4,7 +4,7 @@ import createFetchClient, { Middleware } from "openapi-fetch";
 import { handleHTTPStatusError } from "@/utilities/errors";
 
 const fetchClient = createFetchClient<paths>({
-  baseUrl: process.env.NODE_ENV === "development" ? API_BASE_URL : process.env.EXPO_API_BASE_URL,
+  baseUrl: process.env.EXPO_PUBLIC_API_BASE_URL,
 });
 
 const middleware: Middleware = {
@@ -13,6 +13,9 @@ const middleware: Middleware = {
       handleHTTPStatusError(response.status, `Error found ${response.statusText}`);
     }
   },
+  async onRequest({ request }) {
+    console.log(request);
+  }
 };
 
 fetchClient.use(middleware);

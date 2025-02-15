@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { LayoutChangeEvent } from "react-native";
+import { LayoutChangeEvent, Pressable } from "react-native";
 import {
   useSharedValue,
   withSpring,
@@ -26,6 +26,7 @@ const ImageCarousel: React.FC<CarouselProps> = ({ data, initialPage = 0, like })
   const [containerWidth, setContainerWidth] = useState<number>(0);
   const [isLiking, setLike] = useState<boolean>(like);
   const [page, setPage] = useState<number>(0);
+  const [lastTap, setLastTap] = useState(0);
   const [showFlyingHeart, setShowFlyingHeart] = useState(false);
   const scrollOffsetValue = useSharedValue<number>(0);
 

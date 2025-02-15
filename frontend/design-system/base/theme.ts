@@ -44,6 +44,7 @@ const BORDER_RADIUS = {
   m: 16,
   l: 24,
   xl: 40,
+  xxl: 1000,
 };
 
 const getFontConfig = (scaleRatio: number) => {
@@ -57,11 +58,11 @@ const getFontConfig = (scaleRatio: number) => {
       fontFamily: "ProximaNova-Medium",
     },
     body: {
-      fontSize: 16 * scaleRatio,
+      fontSize: 14 * scaleRatio,
       fontFamily: "ProximaNova-Bold",
     },
     defaults: {
-      fontSize: 16 * scaleRatio,
+      fontSize: 14 * scaleRatio,
       fontFamily: "ProximaNova-Regular",
     },
   };

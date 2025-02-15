@@ -62,9 +62,9 @@ const HomeMenu = <T extends string>({
       onLayout={handleLayout}
       flexDirection="row"
       alignItems="center"
-      borderRadius="l"
       borderWidth={1}
       borderColor="black"
+      borderRadius="xxl"
       paddingVertical="s"
     >
       <AnimatedBox
@@ -73,7 +73,7 @@ const HomeMenu = <T extends string>({
         justifyContent="center"
         alignItems="center"
         borderRadius="xl"
-        width={tabWidth * 0.99}
+        width={tabWidth}
         height="160%"
         style={[
           translateX,
@@ -85,7 +85,6 @@ const HomeMenu = <T extends string>({
             elevation: 0,
             borderWidth: 2,
             borderColor: "rgba(1,1,1,0.1)",
-            margin: 1,
           },
         ]}
       />
