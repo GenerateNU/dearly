@@ -1,4 +1,4 @@
-import { API_BASE_URL } from './../constants/api';
+import { API_BASE_URL } from "./../constants/api";
 import { paths } from "@/gen/openapi";
 import createFetchClient, { Middleware } from "openapi-fetch";
 import { handleHTTPStatusError } from "@/utilities/errors";
