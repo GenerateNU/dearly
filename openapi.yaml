@@ -448,7 +448,73 @@ components:
             - VIDEO
             - AUDIO
           description: The type of the media (e.g., photo, audio, video).
-
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: The ID of the specific notification delivered to a user.
+        actorId:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: The ID of the user that performed an action onto the current user.
+        receiverId:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: The ID of the user that receives the notification.
+        referenceType:
+          type: string
+          example: "POST"
+          enum: ["POST", "COMMENT", "LIKE", "NUDGE", "LIKE-COMMENT"]
+          description: The type of notification that occurred, either a new post or an interaction with user media.
+        postId:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: The ID of the post that the notification is associated with.
+          nullable: true
+        commentId:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: The ID of the comment that the notification is associated with.
+          nullable: true
+        likeId:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd-9fd4-799178870b10
+          description: The ID of the like that the notification is associated with.
+          nullable: true
+        title:
+          type: string
+          maxLength: 100
+          description: The header text of a notification.
+          example: "New post from @mom"
+        description:
+          type: string
+          maxLength: 300
+          description: The body text of a notification.
+          example: "@mom liked your post."
+        mediaURL:
+          type: string
+          description: The URL of the media associated with the notification.
+          nullable: true
+      required:
+        - actorId
+        - receiverId
+        - referenceType
+        - title
+      oneOf:
+        - required:
+            - postId
+        - required:
+            - commentId
+        - required:
+            - likeId
 paths:
   /healthcheck:
     get:

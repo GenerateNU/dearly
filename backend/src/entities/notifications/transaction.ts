@@ -1,12 +1,12 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { notificationsTable, usersTable, groupsTable, postsTable, mediaTable } from "../schema";
+import { notificationsTable, usersTable, mediaTable } from "../schema";
 import { Pagination } from "../../types/api/internal/users";
 import { and, eq, sql } from "drizzle-orm";
 import { MediaService } from "../media/service";
 import { Notification } from "../../types/api/internal/notification";
 
 export interface NotificationTransactions {
-  getNotifications(payload: Pagination, mediaService: MediaService): Promise<Notification[] | null>;
+  getNotifications(payload: Pagination, mediaService: MediaService): Promise<Notification[]>;
 }
 
 export class NotificationTransactionImpl implements NotificationTransactions {
@@ -18,7 +18,7 @@ export class NotificationTransactionImpl implements NotificationTransactions {
   async getNotifications(
     { id, limit, page }: Pagination,
     mediaService: MediaService,
-  ): Promise<Notification[] | null> {
+  ): Promise<Notification[]> {
     const notificationPlain = await this.db
       .select({
         id: notificationsTable.id,
@@ -32,7 +32,6 @@ export class NotificationTransactionImpl implements NotificationTransactions {
         groupId: notificationsTable.groupId,
         commentId: notificationsTable.commentId,
         likeId: notificationsTable.likeId,
-        likeCommentId: notificationsTable.likeCommentId,
         objectKey: sql<string>`
                 CASE 
                   WHEN ${notificationsTable.referenceType} = 'POST' THEN ${mediaTable.objectKey}
@@ -55,13 +54,16 @@ export class NotificationTransactionImpl implements NotificationTransactions {
       .offset(page - 1);
 
     if (!notificationPlain) {
-      return null;
+      return [];
     }
 
     const notificationWithMedia = await Promise.all(
-      notificationPlain.map(async (item) => {
-        const signedURL = await mediaService.getSignedUrl(item.objectKey);
-        return { ...item, media_url: signedURL };
+      notificationPlain.map(async ({ objectKey, ...rest }) => {
+        const signedURL = await mediaService.getSignedUrl(objectKey);
+        return {
+          ...rest,
+          mediaURL: signedURL,
+        };
       }),
     );
 
