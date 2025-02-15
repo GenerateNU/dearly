@@ -2,7 +2,7 @@ import {
   CreateScheduleCommandInput,
   SchedulerClient,
   ScheduleState,
-  GetScheduleCommand
+  GetScheduleCommand,
 } from "@aws-sdk/client-scheduler";
 import {
   CreateScheduleCommand,
@@ -30,7 +30,7 @@ export class AWSEventBridgeScheduler implements NudgeScheduler {
 
   // Add a new schedule
   async addSchedule(name: string, payload: SchedulePayload): Promise<unknown> {
-    const addScheduleImpl= async () => {
+    const addScheduleImpl = async () => {
       const input = await this.scheduleCommandInput(name, payload);
       const command = new CreateScheduleCommand(input);
       const response = await this.scheduler.send(command);
@@ -46,13 +46,13 @@ export class AWSEventBridgeScheduler implements NudgeScheduler {
       const command = new UpdateScheduleCommand(input);
       const response = await this.scheduler.send(command);
       return response;
-    }
-    return await handleAWSServiceError(updateScheduleImpl, "Failed to update recurring schedule")()
+    };
+    return await handleAWSServiceError(updateScheduleImpl, "Failed to update recurring schedule")();
   }
 
   // TODO: don't think this is correct though
   async disableSchedule(id: string): Promise<unknown> {
-    const disableScheduleImpl = async() => {
+    const disableScheduleImpl = async () => {
       const input = await this.scheduleCommandInput(id, null, ScheduleState.DISABLED);
       const command = new UpdateScheduleCommand(input);
       const response = await this.scheduler.send(command);
@@ -80,29 +80,33 @@ export class AWSEventBridgeScheduler implements NudgeScheduler {
   private getCronExpression(payload: NudgeSchedulePayload): string {
     const hour = payload.nudgeAt.getHours();
     const min = payload.nudgeAt.getMinutes();
-    const dayOfMonth = payload.day ?? "*"
-    const month = payload.month ?? "*"
-    const dayOfWeek = payload.daysOfWeek?.join() ?? "*"
+    const dayOfMonth = payload.day ?? "*";
+    const month = payload.month ?? "*";
+    const dayOfWeek = payload.daysOfWeek?.join() ?? "*";
 
     const cronExpression = `0 ${min} ${hour} ${dayOfMonth} ${month} ${dayOfWeek} *`;
 
     return cronExpression;
   }
 
-  private async scheduleCommandInput(id: string, payload: SchedulePayload | null, disabled: ScheduleState = ScheduleState.ENABLED): Promise<CreateScheduleCommandInput> {
+  private async scheduleCommandInput(
+    id: string,
+    payload: SchedulePayload | null,
+    disabled: ScheduleState = ScheduleState.ENABLED,
+  ): Promise<CreateScheduleCommandInput> {
     let schedule;
     let lambdaInput;
 
     if (!payload) {
-      const getInput = { Name: id }
+      const getInput = { Name: id };
       const getCommand = new GetScheduleCommand(getInput);
       const scheduleParams = await this.scheduler.send(getCommand);
-      schedule = scheduleParams.ScheduleExpression
-      lambdaInput = scheduleParams.Target?.Input
+      schedule = scheduleParams.ScheduleExpression;
+      lambdaInput = scheduleParams.Target?.Input;
     } else {
       schedule = this.getCronExpression(payload.schedule);
       lambdaInput = JSON.stringify(payload.expo);
-    } 
+    }
     const input = {
       Name: id,
       ScheduleExpression: schedule,
@@ -114,6 +118,6 @@ export class AWSEventBridgeScheduler implements NudgeScheduler {
       },
       FlexibleTimeWindow: undefined,
     };
-    return input
+    return input;
   }
 }
