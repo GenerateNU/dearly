@@ -1,4 +1,6 @@
 import { createTheme } from "@shopify/restyle";
+import { faHeart as filledHeart } from "@fortawesome/free-solid-svg-icons";
+import { faHeart as outlinedHeart } from "@fortawesome/free-regular-svg-icons";
 
 const COLOR_PALETTE = {
   primary: "#FFF5E1",
@@ -10,6 +12,8 @@ const COLOR_PALETTE = {
   warning: "#F39C12",
   black: "#000000",
   white: "#FFFFFF",
+  darkGray: "#757575",
+  gray: "#B0B0B0",
 };
 
 const ADVANCED_SPACING = {
@@ -21,6 +25,7 @@ const ADVANCED_SPACING = {
   xl: 40,
   xxl: 50,
   ps: 4,
+  none: 0,
 };
 
 // const BASIC_SPACING = {
@@ -69,8 +74,34 @@ const getTheme = (ratio: number) => {
     spacing: ADVANCED_SPACING,
     borderRadii: BORDER_RADIUS,
     textVariants: getFontConfig(ratio),
+    heartVariants: heartVariants,
+    avatarVariants: avatarVariants,
   });
   return theme;
+};
+
+const heartVariants = {
+  filled: {
+    icon: filledHeart,
+    color: COLOR_PALETTE.black,
+    size: 30,
+    width: 55,
+  },
+  outlined: {
+    icon: outlinedHeart,
+    color: COLOR_PALETTE.black,
+    size: 30,
+    width: 55,
+  },
+};
+
+const avatarVariants = {
+  big: {
+    size: 120,
+  },
+  small: {
+    size: 70,
+  },
 };
 
 type Theme = ReturnType<typeof getTheme>;

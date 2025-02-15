@@ -1,6 +1,6 @@
 import { useAuth } from "@/auth/provider";
 import Box from "@/design-system/base/box";
-import Button from "@/design-system/components/button";
+import Button from "@/design-system/components/ui/button";
 
 const Home = () => {
   const { logout } = useAuth();

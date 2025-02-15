@@ -13,17 +13,10 @@ import { AWSEventBridgeScheduler } from "./services/nudgeScheduler";
 const app = new Hono();
 
 const config = getConfigurations();
-const SEND_NUDGE_LAMBDA_NAME = "sendNudgeNotification";
-const SEND_NUDGE_FILE_PATH = "./services/lambda_functions/sendNudgeNotification_files/sendNudgeLambda_package.zip";
 
 (async function setUpServer() {
   const s3ServiceProvider = new S3Impl(config.s3Config);
   const schedulerClient = new SchedulerClient();
-  const lambdaClient = new LambdaClient();
-  const sendNudgeLambda = new AWSLambda(lambdaClient);
-  sendNudgeLambda.createSendNudgeFunction(SEND_NUDGE_LAMBDA_NAME, SEND_NUDGE_FILE_PATH);
-
-  const scheduler = new AWSEventBridgeScheduler(schedulerClient, sendNudgeLambda)
 
   try {
     const db = connectDB(config);
@@ -32,7 +25,7 @@ const SEND_NUDGE_FILE_PATH = "./services/lambda_functions/sendNudgeNotification_
 
     configureMiddlewares(app, config);
 
-    setUpRoutes(app, db, s3ServiceProvider, scheduler);
+    setUpRoutes(app, db, config, s3ServiceProvider, schedulerClient);
 
     console.log("Successfully initialize app");
   } catch (error) {
