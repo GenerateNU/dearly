@@ -41,7 +41,7 @@ export class SlackControllerImpl implements SlackController {
       const bodyText = await ctx.req.text();
 
       // verify whether it is valid payload from Expo
-      await this.checkSignature(bodyText, expoSignature);
+      this.checkSignature(bodyText, expoSignature);
       const payload = JSON.parse(bodyText) as ExpoBuildWebhookPayload;
 
       // check status of build
@@ -59,7 +59,7 @@ export class SlackControllerImpl implements SlackController {
     return await handleAppError(slackMessageImpl)(ctx);
   }
 
-  private async checkSignature(bodyText: string, expoSignature: string | undefined) {
+  private checkSignature(bodyText: string, expoSignature: string | undefined) {
     const hmac = crypto.createHmac(
       "sha1",
       this.config.expoSignature as crypto.BinaryLike | crypto.KeyObject,
