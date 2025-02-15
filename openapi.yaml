@@ -67,7 +67,7 @@ components:
           type: string
           nullable: true
           description: A bio for the user's profile.
-        birthday:
+        birthday: 
           type: string
           format: date
           nullable: true
@@ -76,7 +76,7 @@ components:
           type: string
           nullable: true
           description: Timezone that user is in for sending nudges.
-        postCount:
+        postCount: 
           type: number
           nullable: true
           description: Number of posts that a user made.
@@ -367,7 +367,7 @@ components:
           description: The ID of the user to which the comment belongs.
         voiceMemo:
           type: string
-          format: uuid
+          format: uuid 
           example: 5e91507e-5630-4efd-9fd4-799178870b10
           description: The unique object key associated with the audio in S3.
           nullable: true
@@ -375,7 +375,7 @@ components:
           type: string
           minLength: 1
           maxLength: 500
-          description: the text being commented
+          description: the text being commented 
           nullable: true
         createdAt:
           type: string
@@ -408,7 +408,7 @@ components:
           type: string
           minLength: 1
           maxLength: 500
-          description: The text being commented
+          description: The text being commented 
           nullable: true
         profilePhoto:
           type: string
@@ -1693,6 +1693,75 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /api/v1/groups/{id}/members/{userId}/posts:
+    get:
+      tags:
+        - Member Endpoints
+      summary: Gets all posts for user in a group
+      description: Gets all posts that a user posted in a group.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          description: The maximum number of posts to return.
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: page
+          in: query
+          description: The page number for pagination.
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: id
+          in: path
+          description: ID of the group
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+        - name: userId
+          in: path
+          description: ID of the user to get posts
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+      responses:
+        200:
+          description: Successfully retrieve posts user posted in a specific group
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PostWithURL"
+        400:
+          description: Malformed query params
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
   /api/v1/groups/{id}/posts:
     post:
       tags:
@@ -2618,6 +2687,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+      
 
   /api/v1/comments/{id}:
     delete:
@@ -2671,6 +2741,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+      
+
 
   /api/v1/users/media:
     post:
