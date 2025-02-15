@@ -4,9 +4,7 @@ import {
   DeleteScheduleCommand,
   UpdateScheduleCommand,
 } from "@aws-sdk/client-scheduler";
-import { InternalServerError } from "../utilities/errors/app-error";
-import { NudgeLambda } from "./lambda";
-
+import { handleAWSServiceError } from "../utilities/errors/aws-error";
 
 export interface NudgeScheduler {
   // TODO: think about I/O type of this & more debugging
@@ -18,75 +16,55 @@ export interface NudgeScheduler {
 
 export class AWSEventBridgeScheduler implements NudgeScheduler {
   private scheduler: SchedulerClient;
-  private lambda: NudgeLambda;
-  private lambdaARN: string;
-  private lambdaRoleARN: string;
 
-  constructor(scheduler: SchedulerClient, lambda: NudgeLambda) {
+  constructor(scheduler: SchedulerClient) {
     this.scheduler = scheduler;
-    this.lambda = lambda;
-
-    const lambdaARN = this.lambda.getLambdaArn();
-    const lambdaRoleARN = this.lambda.getLambdaRoleArn();
-    if (!lambdaARN || !lambdaRoleARN) {
-      throw new InternalServerError("Failed to fetch get Lambda ARN"); // TODO: update error
-    }
-
-    this.lambdaARN = lambdaARN;
-    this.lambdaRoleARN = lambdaRoleARN;
-
   }
 
   // Add a new schedule
   async addSchedule(name: string, payload: unknown): Promise<unknown> {
-    const input = await this.scheduleCommandInput(name, "", "", payload);
-
-    try {
+    const addScheduleImpl= async () => {
+      const input = await this.scheduleCommandInput(name, "", "", payload);
       const command = new CreateScheduleCommand(input);
       const response = await this.scheduler.send(command);
-      return response.$metadata.httpStatusCode ?? undefined;
-    } catch (err) {
-      throw new InternalServerError(`Failed to add recurring schedule: ${err}`);
+      return response;
     }
+    return await handleAWSServiceError(addScheduleImpl, "Failed to add recurring schedule.")()
   }
-
+  
   async updateSchedule(id: string, payload: unknown): Promise<unknown> {
-    const input = await this.scheduleCommandInput(id, "", "", payload)
-
-    try {
+    const updateScheduleImpl = async() => {
+      const input = await this.scheduleCommandInput(id, "", "", payload)
+      
       const command = new UpdateScheduleCommand(input);
       const response = await this.scheduler.send(command);
       return response.$metadata.httpStatusCode ?? undefined;
-    } catch (err) {
-      throw new InternalServerError(`Failed to update recurring schedule: ${err}`);
     }
+    return await handleAWSServiceError(updateScheduleImpl, "Failed to update recurring schedule")()
   }
-
+  
   // TODO: don't think this is correct though
   async disableSchedule(id: string): Promise<unknown> {
-    const input = await this.scheduleCommandInput(id, "", "", ScheduleState.DISABLED); // TODO: unneeded params time and timezone
-
-    try {
+    const disableScheduleImpl = async() => {
+      const input = await this.scheduleCommandInput(id, "", "", ScheduleState.DISABLED); // TODO: unneeded params time and timezone
       const command = new UpdateScheduleCommand(input);
       const response = await this.scheduler.send(command);
-      return response.$metadata.httpStatusCode ?? undefined;
-    } catch (err) {
-      throw new InternalServerError(`Failed to disable recurring schedule: ${err}`);
+      
+      return response 
     }
+    return await handleAWSServiceError(disableScheduleImpl, "Failed to disable recurring schedule")()
   }
-
+  
   async removeSchedule(id: string): Promise<unknown> {
-    const input = {
-      Name: id,
-    };
-
-    try {
+    const removeScheduleImpl = async() => {
+      const input = {
+        Name: id,
+      };
       const command = new DeleteScheduleCommand(input);
       const response = await this.scheduler.send(command);
-      return response.$metadata.httpStatusCode ?? undefined;
-    } catch (err) {
-      throw new InternalServerError(`Failed to delete recurring schedule: ${err}`);
+      return response;
     }
+    return await handleAWSServiceError(removeScheduleImpl, "Failed to remove recurring schedule")()
   }
 
   private async scheduleCommandInput(id: string, schedule: string, timezone: string, payload: unknown, disabled = ScheduleState.ENABLED): Promise<CreateScheduleCommandInput> {
@@ -96,8 +74,8 @@ export class AWSEventBridgeScheduler implements NudgeScheduler {
       ScheduleExpressionTimezone: timezone,
       State: disabled,
       Target: {
-        Arn: this.lambdaARN,
-        RoleArn: this.lambdaRoleARN,
+        Arn: "", // fetch arn with Lambda SDK
+        RoleArn: "",
         Input: JSON.stringify(payload),
       },
       FlexibleTimeWindow: undefined,

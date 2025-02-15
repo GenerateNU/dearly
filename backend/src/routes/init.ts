@@ -13,14 +13,14 @@ import { commentsRoutes } from "../entities/comments/route";
 import { Expo } from "expo-server-sdk";
 import { SlackController, SlackControllerImpl } from "./webhook";
 import { mediaRoutes } from "../entities/media/route";
-import { AWSEventBridgeScheduler } from "../services/nudgeScheduler";
+import { SchedulerClient } from "@aws-sdk/client-scheduler";
 
 export const setUpRoutes = (
   app: Hono,
   db: PostgresJsDatabase,
   config: Configuration,
   s3ServiceProvider: IS3Operations,
-  scheduler: AWSEventBridgeScheduler,
+  scheduler: SchedulerClient,
 ) => {
   // api documentation
   app.get(
@@ -51,14 +51,14 @@ export const setUpRoutes = (
 const apiRoutes = (
   db: PostgresJsDatabase,
   s3Service: IS3Operations,
-  scheduler: AWSEventBridgeScheduler,
+  schedulerClient: SchedulerClient,
 ): Hono => {
   const api = new Hono();
   const mediaService = new MediaServiceImpl(db, s3Service);
   const expo = new Expo();
 
   api.route("/users", userRoutes(db, mediaService));
-  api.route("/groups", groupRoutes(db, mediaService, expo, scheduler));
+  api.route("/groups", groupRoutes(db, mediaService, expo, schedulerClient));
   api.route("/", postRoutes(db, mediaService));
   api.route("/", commentsRoutes(db, mediaService));
   api.route("/", mediaRoutes(mediaService));

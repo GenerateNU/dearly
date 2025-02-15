@@ -6,9 +6,6 @@ import { setUpRoutes } from "./routes/init";
 import { automigrateDB } from "./database/migrate";
 import { S3Impl } from "./services/s3Service";
 import { SchedulerClient } from "@aws-sdk/client-scheduler";
-import { LambdaClient } from "@aws-sdk/client-lambda";
-import { AWSLambda } from "./services/lambda"
-import { AWSEventBridgeScheduler } from "./services/nudgeScheduler";
 
 const app = new Hono();
 
