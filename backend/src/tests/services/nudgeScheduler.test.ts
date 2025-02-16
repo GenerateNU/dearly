@@ -28,7 +28,7 @@ describe("Nudge Scheduler Testing", async () => {
   it("Should have no error, and return the testARN", async () => {
     const response = await scheduler.addSchedule("testSchedule", testPayload);
     expect(response).toBeDefined();
-    expect(response).toEqual({ ScheduleArn: "testARN" });
+    expect(response).toEqual(200);
   });
 
   it("Should have no error, and return the proper HTTPS response code", async () => {

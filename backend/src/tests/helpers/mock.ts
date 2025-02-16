@@ -22,7 +22,7 @@ mock.module("expo-server-sdk", () => {
       static isExpoPushToken = Expo.isExpoPushToken;
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      async sendPushNotificationsAsync(message: ExpoPushMessage[]): Promise<ExpoPushTicket[]> {
+      async sendPushNotificationsAsync(_: ExpoPushMessage[]): Promise<ExpoPushTicket[]> {
         return Promise.resolve([]);
       }
     },
@@ -34,7 +34,9 @@ export const sendPushNotificationsAsyncSpy = spyOn(Expo.prototype, "sendPushNoti
 export const mockSchedulerClient = () => {
   // todo: move to helpers
   const schedulerClient = mockClient(SchedulerClient);
-  schedulerClient.on(CreateScheduleCommand).resolves({ ScheduleArn: "testARN" });
+  schedulerClient
+    .on(CreateScheduleCommand)
+    .resolves({ $metadata: { httpStatusCode: 200 }, ScheduleArn: "testARN" });
   schedulerClient.on(DeleteScheduleCommand).resolves({ $metadata: { httpStatusCode: 200 } });
   schedulerClient.on(GetScheduleCommand).resolves({});
   schedulerClient.on(UpdateScheduleCommand).resolves({ $metadata: { httpStatusCode: 200 } });
