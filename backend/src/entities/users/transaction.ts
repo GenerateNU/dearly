@@ -160,7 +160,10 @@ export class UserTransactionImpl implements UserTransaction {
           lastNudgedAt: membersTable.lastManualNudge,
         })
         .from(usersTable)
-        .leftJoin(membersTable, eq(membersTable.userId, usersTable.id))
+        .leftJoin(
+          membersTable,
+          and(eq(membersTable.userId, usersTable.id), eq(membersTable.groupId, groupId)),
+        )
         .where(
           and(
             // exclude the user who is searching

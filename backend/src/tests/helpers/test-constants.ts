@@ -1,7 +1,6 @@
 import { Like } from "../../entities/likes/validator";
 import { Comment } from "../../types/api/internal/comments";
 import { groupsTable, mediaTable, postsTable } from "../../entities/schema";
-import { CreateCommentPayload } from "../../types/api/internal/comments";
 import { CreateGroupPayload } from "../../types/api/internal/groups";
 import { Post } from "../../types/api/internal/posts";
 import { CreateUserPayload, SearchedUser } from "../../types/api/internal/users";
