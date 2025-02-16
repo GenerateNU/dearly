@@ -25,7 +25,7 @@ describe("GET /users/search", () => {
     username: USER_ANA.username,
     name: USER_ANA.name,
     id: USER_ANA.id,
-    profilePhoto: null,
+    profilePhoto: "https://mocked-url.com",
     isMember: false,
     lastNudgedAt: null,
   };

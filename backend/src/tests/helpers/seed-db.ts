@@ -8,6 +8,8 @@ import {
   postsTable,
   scheduledNudgesTable,
   usersTable,
+  notificationsTable,
+  likesTable,
 } from "../../entities/schema";
 import {
   ANOTHER_GROUP,
@@ -17,9 +19,11 @@ import {
   DEARLY_GROUP_ID,
   GENERATE_GROUP,
   GENERATE_GROUP_ID,
+  LIKE_MOCK,
   MEDIA_MOCK,
   MOCK_EXPO_TOKEN,
   MOCK_SCHEDULE,
+  NOTIFICATIONS_MOCK,
   POST_MOCK,
   USER_ALICE,
   USER_ALICE_ID,
@@ -41,6 +45,8 @@ export const seedDatabase = async (db: PostgresJsDatabase) => {
     await seedMember(db);
     await seedPostAndMedia(db);
     await seedComments(db);
+    await seedLikes(db);
+    await seedNotifications(db);
     await seedSchedule(db);
   } catch (error) {
     console.error("Failed to seed database", error);
@@ -105,6 +111,14 @@ const seedDeviceTokens = async (db: PostgresJsDatabase) => {
       userId: USER_BOB_ID,
     },
   ]);
+};
+
+const seedNotifications = async (db: PostgresJsDatabase) => {
+  await db.insert(notificationsTable).values(NOTIFICATIONS_MOCK);
+};
+
+const seedLikes = async (db: PostgresJsDatabase) => {
+  await db.insert(likesTable).values(LIKE_MOCK);
 };
 
 const seedSchedule = async (db: PostgresJsDatabase) => {

@@ -4,6 +4,7 @@ import { UserTransaction, UserTransactionImpl } from "./transaction";
 import { UserService, UserServiceImpl } from "./service";
 import { UserController, UserControllerImpl } from "./controller";
 import { MediaService } from "../media/service";
+import { notificationRoutes } from "../notifications/route";
 
 export const userRoutes = (db: PostgresJsDatabase, mediaService: MediaService): Hono => {
   const user = new Hono();
@@ -13,6 +14,7 @@ export const userRoutes = (db: PostgresJsDatabase, mediaService: MediaService): 
   const userController: UserController = new UserControllerImpl(userService);
 
   user.get("/groups", (ctx) => userController.getGroups(ctx));
+  user.route("/", notificationRoutes(db, mediaService));
   user.get("/search", (ctx) => userController.searchByUsername(ctx));
   user.post("/", (ctx) => userController.createUser(ctx));
   user.get("/:id", (ctx) => userController.getUser(ctx));

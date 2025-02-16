@@ -67,7 +67,7 @@ components:
           type: string
           nullable: true
           description: A bio for the user's profile.
-        birthday: 
+        birthday:
           type: string
           format: date
           nullable: true
@@ -76,7 +76,7 @@ components:
           type: string
           nullable: true
           description: Timezone that user is in for sending nudges.
-        postCount: 
+        postCount:
           type: number
           nullable: true
           description: Number of posts that a user made.
@@ -222,15 +222,15 @@ components:
           example: "This is a sample caption for the post."
           description: A textual description or caption for the post.
           nullable: true
-        likes: 
+        likes:
           type: number
           example: 20
           description: Number of likes in a post
-        comments: 
+        comments:
           type: number
           example: 20
           description: Number of comments in a post
-        isLiked: 
+        isLiked:
           type: boolean
           example: true
           description: Return true if user liked the post
@@ -238,7 +238,7 @@ components:
           type: string
           nullable: true
           description: Profile photo url of user who made the post
-        location: 
+        location:
           type: string
           description: Location of where the post is made
           example: "home"
@@ -248,7 +248,7 @@ components:
           items:
             $ref: "#/components/schemas/Media"
           description: A list of media items attached to the post.
-    
+
     PostWithURL:
       type: object
       properties:
@@ -277,15 +277,15 @@ components:
           example: "This is a sample caption for the post."
           description: A textual description or caption for the post.
           nullable: true
-        likes: 
+        likes:
           type: number
           example: 20
           description: Number of likes in a post
-        comments: 
+        comments:
           type: number
           example: 20
           description: Number of comments in a post
-        isLiked: 
+        isLiked:
           type: boolean
           example: true
           description: Return true if user liked the post
@@ -293,7 +293,7 @@ components:
           type: string
           nullable: true
           description: Profile photo url of user who made the post
-        location: 
+        location:
           type: string
           description: Location of where the post is made
           example: "home"
@@ -304,7 +304,7 @@ components:
             $ref: "#/components/schemas/MediaWithURL"
           description: A list of media items attached to the post.
 
-    MediaUpload: 
+    MediaUpload:
       type: object
       properties:
         type:
@@ -367,7 +367,7 @@ components:
           description: The ID of the user to which the comment belongs.
         voiceMemo:
           type: string
-          format: uuid 
+          format: uuid
           example: 5e91507e-5630-4efd-9fd4-799178870b10
           description: The unique object key associated with the audio in S3.
           nullable: true
@@ -375,7 +375,7 @@ components:
           type: string
           minLength: 1
           maxLength: 500
-          description: the text being commented 
+          description: the text being commented
           nullable: true
         createdAt:
           type: string
@@ -408,7 +408,7 @@ components:
           type: string
           minLength: 1
           maxLength: 500
-          description: The text being commented 
+          description: The text being commented
           nullable: true
         profilePhoto:
           type: string
@@ -448,7 +448,73 @@ components:
             - VIDEO
             - AUDIO
           description: The type of the media (e.g., photo, audio, video).
-
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: The ID of the specific notification delivered to a user.
+        actorId:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: The ID of the user that performed an action onto the current user.
+        receiverId:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: The ID of the user that receives the notification.
+        referenceType:
+          type: string
+          example: "POST"
+          enum: ["POST", "COMMENT", "LIKE", "NUDGE", "LIKE-COMMENT"]
+          description: The type of notification that occurred, either a new post or an interaction with user media.
+        postId:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: The ID of the post that the notification is associated with.
+          nullable: true
+        commentId:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd4-799178870b10
+          description: The ID of the comment that the notification is associated with.
+          nullable: true
+        likeId:
+          type: string
+          format: uuid
+          example: 5e91507e-5630-4efd-9fd-9fd4-799178870b10
+          description: The ID of the like that the notification is associated with.
+          nullable: true
+        title:
+          type: string
+          maxLength: 100
+          description: The header text of a notification.
+          example: "New post from Mom"
+        description:
+          type: string
+          maxLength: 300
+          description: The body text of a notification.
+          example: "Mom liked your post."
+        mediaURL:
+          type: string
+          description: The URL of the media associated with the notification.
+          nullable: true
+      required:
+        - actorId
+        - receiverId
+        - referenceType
+        - title
+      oneOf:
+        - required:
+            - postId
+        - required:
+            - commentId
+        - required:
+            - likeId
 paths:
   /healthcheck:
     get:
@@ -911,7 +977,66 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-
+  /api/v1/users/notifications:
+    get:
+      tags:
+        - User Endpoints
+      summary: Gets a user's notifications
+      description: Gets any pending notifications for the current user, along with any associated media depending on the notification type.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          description: The maximum number of notifications to return.
+          required: false
+          schema:
+            type: integer
+            default: 5
+            example: 5
+        - name: page
+          in: query
+          description: The page number for pagination.
+          required: false
+          schema:
+            type: integer
+            default: 1
+            example: 1
+      responses:
+        200:
+          description: Successfully retrieved notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notification"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /api/v1/groups:
     post:
       tags:
@@ -1071,7 +1196,7 @@ paths:
                 name:
                   type: string
                   minLength: 1
-                  maxLengthh: 100
+                  maxLength: 100
                   description: The name of the group.
                 description:
                   type: string
@@ -1187,7 +1312,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-        
+
   /api/v1/groups/{groupId}/invites:
     get:
       tags:
@@ -1247,21 +1372,21 @@ paths:
   /api/v1/groups/{token}/verify:
     put:
       tags:
-        - Invite Endpoints 
+        - Invite Endpoints
       summary: Verifies invite token and adds member
-      description: Adds the user with the valid token into the group. 
+      description: Adds the user with the valid token into the group.
       security:
         - BearerAuth: []
       parameters:
-        - name: token 
-          in: path 
-          description: token to be invited to the group 
+        - name: token
+          in: path
+          description: token to be invited to the group
           required: true
           schema:
-            type: string 
+            type: string
       responses:
         200:
-          description: Successfully added to group 
+          description: Successfully added to group
           content:
             application/json:
               schema:
@@ -1296,7 +1421,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-      
+
   /api/v1/groups/{id}/members/{userId}:
     post:
       tags:
@@ -1626,7 +1751,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-
   /api/v1/groups/{id}/posts:
     post:
       tags:
@@ -2334,7 +2458,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-
   /api/v1/groups/{id}/media:
     post:
       tags:
@@ -2553,7 +2676,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-      
 
   /api/v1/comments/{id}:
     delete:
@@ -2607,8 +2729,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-      
-
 
   /api/v1/users/media:
     post:
