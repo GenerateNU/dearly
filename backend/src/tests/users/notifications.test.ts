@@ -15,6 +15,10 @@ describe("GET /users/notifications", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
   const bobJWT = generateJWTFromID(USER_BOB_ID);
+  const NOTIFICATIONS = NOTIFICATIONS_MOCK.map((notif) => ({
+    ...notif,
+    createdAt: notif.createdAt.toISOString()
+  }));
 
   beforeAll(async () => {
     app = await startTestApp();
@@ -36,7 +40,7 @@ describe("GET /users/notifications", () => {
         },
       })
     )
-      .assertBody(NOTIFICATIONS_MOCK[0])
+      .assertBody([NOTIFICATIONS[0]])
       .assertStatusCode(Status.OK);
   });
 
@@ -56,7 +60,7 @@ describe("GET /users/notifications", () => {
         },
       })
     )
-      .assertBody(NOTIFICATIONS_MOCK)
+      .assertBody(NOTIFICATIONS)
       .assertStatusCode(Status.OK);
   });
 
