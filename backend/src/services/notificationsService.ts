@@ -5,7 +5,7 @@ import { Configuration } from "../types/config";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { postValidate } from "../entities/posts/validator";
 import { Post } from "../types/api/internal/posts";
-import { eq } from "drizzle-orm";
+import { eq, and, ne } from "drizzle-orm";
 import {
   devicesTable,
   groupsTable,
@@ -55,21 +55,23 @@ export interface INotificationService {
 
 /**
  * A service that sends notifications to users when certain events occur. Like when a user
- * recieves a Like, Comment, Posts, or Nudges.
+ * recieves a Like, Comment, or Posts.
  */
 export class ExpoNotificationService implements INotificationService {
   private expo: Expo;
   private supabaseClient: SupabaseClient;
   private db: PostgresJsDatabase;
 
-  constructor(config: Configuration, db: PostgresJsDatabase) {
-    this.expo = new Expo();
+  constructor(config: Configuration, db: PostgresJsDatabase, expo: Expo) {
+    this.expo = expo;
     this.supabaseClient = createClient(config.supabase.url, config.supabase.key);
     this.subscribeToPosts();
     this.subscribeToComments();
     this.subscribeToLikes();
     this.db = db;
   }
+
+  //TODO: abstract the subscription
 
   private subscribeToPosts() {
     this.supabaseClient
@@ -147,7 +149,18 @@ export class ExpoNotificationService implements INotificationService {
         .where(eq(groupsTable.id, post.groupId));
 
       if (!posterGroupId) {
-        throw new NotFoundError("Unable to find the group!");
+        console.log(
+          await this.db
+            .select({
+              groupId: postsTable.groupId,
+              name: usersTable.name,
+              groupName: groupsTable.name,
+            })
+            .from(postsTable)
+            .innerJoin(usersTable, eq(usersTable.id, postsTable.userId))
+            .innerJoin(groupsTable, eq(groupsTable.id, postsTable.groupId)),
+        );
+        throw new NotFoundError("Unable to find the group! " + post.groupId);
       }
 
       // get the list of members who are in the group
@@ -156,7 +169,13 @@ export class ExpoNotificationService implements INotificationService {
           userId: membersTable.userId,
         })
         .from(membersTable)
-        .where(eq(membersTable.groupId, posterGroupId.groupId));
+        .where(
+          and(
+            //Check to make sure that the poster is not included
+            ne(membersTable.userId, post.userId),
+            eq(membersTable.groupId, posterGroupId.groupId),
+          ),
+        );
 
       if (!members) {
         throw new NotFoundError("Unable to find the other group memebers!");
@@ -165,14 +184,18 @@ export class ExpoNotificationService implements INotificationService {
 
       for (let member of members) {
         // Insert the notification into the database
-        const res = await this.db.insert(notificationsTable).values({
-          actorId: post.userId,
-          receiverId: member.userId,
-          referenceType: "POST",
-          postId: post.id,
-          title: "New Post",
-          description: `${posterGroupId.name} just posted in ${posterGroupId.groupName}`,
-        }).returning();
+        const res = await this.db
+          .insert(notificationsTable)
+          .values({
+            actorId: post.userId,
+            receiverId: member.userId,
+            referenceType: "POST",
+            groupId: post.groupId,
+            postId: post.id,
+            title: "New Post",
+            description: `${posterGroupId.name} just posted in ${posterGroupId.groupName}`,
+          })
+          .returning();
         if (!res[0]) {
           throw new NotFoundError("Notification");
         }
@@ -195,13 +218,12 @@ export class ExpoNotificationService implements INotificationService {
       // Send the notifications and if all notifications off, empty list and none will send
       const chunks: ExpoPushMessage[][] = this.expo.chunkPushNotifications(messages);
       for (let chunk of chunks) {
-        console.log("chunkin")
         await this.expo.sendPushNotificationsAsync(chunk);
       }
 
       return notifications;
-    } catch (Error) {
-      throw new NotFoundError("Supabase Issue");
+    } catch (error) {
+      throw error;
     }
   }
 
@@ -226,15 +248,18 @@ export class ExpoNotificationService implements INotificationService {
       }
 
       // Insert the notification into the database
-      const [notification] = await this.db.insert(notificationsTable).values({
-        actorId: like.userId,
-        receiverId: userId.userId,
-        referenceType: "LIKE",
-        likeId: like.id,
-        postId: like.postId,
-        title: "New Like",
-        description: `${userId.name} liked your post`,
-      });
+      const [notification] = await this.db
+        .insert(notificationsTable)
+        .values({
+          actorId: like.userId,
+          receiverId: userId.userId,
+          referenceType: "LIKE",
+          likeId: like.id,
+          postId: like.postId,
+          title: "New Like",
+          description: `${userId.name} liked your post`,
+        })
+        .returning();
 
       if (!notification) {
         throw new NotFoundError("Notification");
@@ -260,8 +285,8 @@ export class ExpoNotificationService implements INotificationService {
         await this.expo.sendPushNotificationsAsync(chunk);
       }
       return notification;
-    } catch (Error) {
-      throw new NotFoundError("Supabase Issue"); // need to create this error
+    } catch (error) {
+      throw error;
     }
   }
 
@@ -285,15 +310,18 @@ export class ExpoNotificationService implements INotificationService {
         throw new NotFoundError("UserId");
       }
 
-      const [notification] = await this.db.insert(notificationsTable).values({
-        actorId: comment.userId,
-        receiverId: userId.userId,
-        referenceType: "COMMENT",
-        commentId: comment.id,
-        postId: comment.postId,
-        title: "New Comment",
-        description: `${userId.name} commented on your post`,
-      });
+      const [notification] = await this.db
+        .insert(notificationsTable)
+        .values({
+          actorId: comment.userId,
+          receiverId: userId.userId,
+          referenceType: "COMMENT",
+          commentId: comment.id,
+          postId: comment.postId,
+          title: "New Comment",
+          description: `${userId.name} commented on your post`,
+        })
+        .returning();
 
       if (!notification) {
         throw new NotFoundError("Notification");
@@ -355,7 +383,7 @@ export class ExpoNotificationService implements INotificationService {
       }
       return token.token;
     } catch (Error) {
-      throw new NotFoundError("User");
+      throw Error;
     }
   }
 }

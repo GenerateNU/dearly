@@ -1,4 +1,7 @@
-import { commentsTable, groupsTable, mediaTable, postsTable } from "../../entities/schema";
+import { Like } from "../../entities/likes/validator";
+import { Comment } from "../../types/api/internal/comments";
+import { groupsTable, mediaTable, postsTable } from "../../entities/schema";
+import { CreateCommentPayload } from "../../types/api/internal/comments";
 import { CreateGroupPayload } from "../../types/api/internal/groups";
 import { Post } from "../../types/api/internal/posts";
 import { CreateUserPayload, SearchedUser } from "../../types/api/internal/users";
@@ -21,10 +24,16 @@ export const DEARLY_COMMENT_ID = "679c0331-2dfc-8002-b4a4-22b09d6c3c73";
 export const MOCK_EXPO_TOKEN = "ExponentPushToken[Z9Hfn6ZxWVXaAs7MG3Pya8]";
 export const USER_Josh_ID = "61111211-4c0d-44d9-b2b1-8d897207f111";
 export const USER_Nubs_ID = "99111219-4c0d-44d9-b2b1-8d897207f111";
+export const USER_MAI_ID = "6a1b095b-b2bd-4cc8-85ef-a28d24dd8577";
+export const USER_STONE_ID = "a19382b4-c050-49ea-ac60-c9ae423f2461";
+export const GROUP_FULL_SNAPPER_ID = "2df88233-47b3-432d-b032-b66ef7885cfb";
 export const SNAPPER_GROUP_ID = "ab674eaf-9999-47c1-8a38-81079577880b";
-export const SNAPPER_POST = "ab674eaf-9999-47c1-8a38-811234567890"
-export const JOSH_DEVICE_TOKEN = "ab674eaf-9999-1234-8a38-811234561234"
-export const NUBS_DEVICE_TOKEN = "ab674eaf-0000-1234-8a38-811234561234"
+export const SNAPPER_POST = "ab674eaf-9999-47c1-8a38-811234567890";
+export const JOSH_DEVICE_TOKEN = "ab674eaf-9999-1234-8a38-811234561234";
+export const NUBS_DEVICE_TOKEN = "ab674eaf-0000-1234-8a38-811234561234";
+export const POST_EXAMPLE_ID = "ab674eaf-9999-47c1-8a38-811234567890";
+export const SNAPPER_COMMENT_ID = "f46a2916-99e7-4ebb-a796-d1c29d6e4786";
+export const FULL_SNAPPER_POST_ID = "6bc21e8a-7a8e-4c66-8403-ab4259311795";
 
 export const GROUP_EMPTY_FIELDS_ERRORS = [
   {
@@ -150,15 +159,29 @@ export const USER_JOSH: CreateUserPayload = {
   name: "Josh",
   username: "josh",
   mode: "BASIC",
-  id: USER_Josh_ID
-}
+  id: USER_Josh_ID,
+};
 
 export const USER_NUBS: CreateUserPayload = {
   name: "Nubs",
   username: "nubs",
   mode: "BASIC",
-  id: USER_Nubs_ID
-}
+  id: USER_Nubs_ID,
+};
+
+export const USER_MAI: CreateUserPayload = {
+  name: "Mai",
+  username: "inMaiSpace",
+  mode: "ADVANCED",
+  id: USER_MAI_ID,
+};
+
+export const USER_STONE: CreateUserPayload = {
+  name: "Stone",
+  username: "theRock",
+  mode: "ADVANCED",
+  id: USER_STONE_ID,
+};
 
 export const DEARLY_GROUP: CreateGroupPayload = {
   name: "dearly",
@@ -181,6 +204,13 @@ export const SNAPPER_GROUP: CreateGroupPayload = {
   id: SNAPPER_GROUP_ID,
 };
 
+export const FULL_SNAPPER_GROUP: CreateGroupPayload = {
+  name: "eng snapper",
+  description: "Engineering team of snapper",
+  managerId: USER_STONE_ID,
+  id: GROUP_FULL_SNAPPER_ID,
+};
+
 export const MOCK_MEDIA_WITH_URL = MEDIA_MOCK.map((media) => ({
   id: media.id,
   postId: media.postId,
@@ -188,22 +218,47 @@ export const MOCK_MEDIA_WITH_URL = MEDIA_MOCK.map((media) => ({
   url: MOCK_SIGNED_URL,
 }));
 
-export const COMMENTS: (typeof commentsTable.$inferInsert)[] = [
+export const COMMENTS: Comment[] = [
   {
     id: DEARLY_COMMENT_ID,
     postId: POST_ID,
     userId: USER_BOB_ID,
     content: "amazing photos!",
+    voiceMemo: null,
+    createdAt: new Date(),
   },
 ];
 
-
+export const SINGLE_COMMENT: Comment = {
+  id: SNAPPER_COMMENT_ID,
+  userId: USER_Nubs_ID,
+  createdAt: new Date(),
+  postId: POST_EXAMPLE_ID,
+  content: "Look at da fishes!",
+  voiceMemo: null,
+};
 
 export const POST_EXAMPLE: Post = {
-  id: "ab674eaf-9999-47c1-8a38-811234567890",
+  id: POST_EXAMPLE_ID,
   groupId: SNAPPER_GROUP_ID,
   userId: USER_Josh_ID,
   createdAt: new Date(),
   caption: "what the sigma",
   location: "Ur moms house",
-}
+};
+
+export const FULL_SNAPPER_POST_EXAMPLE: Post = {
+  id: FULL_SNAPPER_POST_ID,
+  groupId: GROUP_FULL_SNAPPER_ID,
+  userId: USER_STONE_ID,
+  createdAt: new Date(),
+  caption: "CRACKED ENGINEERS",
+  location: "The sherm",
+};
+
+export const LIKE_EXAMPLE: Like = {
+  id: "ab674eaf-9999-aaaa-8a38-811234567890",
+  userId: USER_Nubs_ID,
+  postId: POST_EXAMPLE_ID,
+  createdAt: new Date(),
+};

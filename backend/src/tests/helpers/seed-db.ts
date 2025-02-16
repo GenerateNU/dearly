@@ -3,6 +3,7 @@ import {
   commentsTable,
   devicesTable,
   groupsTable,
+  likesTable,
   mediaTable,
   membersTable,
   postsTable,
@@ -33,9 +34,20 @@ import {
   POST_EXAMPLE,
   NUBS_DEVICE_TOKEN,
   JOSH_DEVICE_TOKEN,
+  LIKE_EXAMPLE,
+  SINGLE_COMMENT,
+  GROUP_FULL_SNAPPER_ID,
+  USER_MAI_ID,
+  USER_STONE_ID,
+  FULL_SNAPPER_GROUP,
+  USER_STONE,
+  USER_MAI,
+  FULL_SNAPPER_POST_EXAMPLE,
 } from "./test-constants";
 import { CreateGroupPayload } from "../../types/api/internal/groups";
 import { CreateUserPayload } from "../../types/api/internal/users";
+import { Comment } from "../../types/api/internal/comments";
+import { Like } from "../../entities/likes/validator";
 
 export const seedDatabase = async (db: PostgresJsDatabase) => {
   try {
@@ -45,6 +57,7 @@ export const seedDatabase = async (db: PostgresJsDatabase) => {
     await seedMember(db);
     await seedPostAndMedia(db);
     await seedComments(db);
+    await seedLikes(db);
   } catch (error) {
     console.error("Failed to seed database", error);
   }
@@ -58,12 +71,19 @@ const seedUser = async (db: PostgresJsDatabase) => {
     USER_BILL,
     USER_JOSH,
     USER_NUBS,
+    USER_STONE,
+    USER_MAI,
   ];
   await db.insert(usersTable).values(seedData);
 };
 
 const seedGroup = async (db: PostgresJsDatabase) => {
-  const seedData: CreateGroupPayload[] = [DEARLY_GROUP, ANOTHER_GROUP, SNAPPER_GROUP];
+  const seedData: CreateGroupPayload[] = [
+    DEARLY_GROUP,
+    ANOTHER_GROUP,
+    SNAPPER_GROUP,
+    FULL_SNAPPER_GROUP,
+  ];
 
   await db.insert(groupsTable).values(seedData);
 };
@@ -100,6 +120,26 @@ const seedMember = async (db: PostgresJsDatabase) => {
       groupId: SNAPPER_GROUP_ID,
       role: "MEMBER",
     },
+    {
+      userId: USER_Nubs_ID,
+      groupId: GROUP_FULL_SNAPPER_ID,
+      role: "MEMBER",
+    },
+    {
+      userId: USER_Josh_ID,
+      groupId: GROUP_FULL_SNAPPER_ID,
+      role: "MEMBER",
+    },
+    {
+      userId: USER_MAI_ID,
+      groupId: GROUP_FULL_SNAPPER_ID,
+      role: "MEMBER",
+    },
+    {
+      userId: USER_STONE_ID,
+      groupId: GROUP_FULL_SNAPPER_ID,
+      role: "MANAGER",
+    },
   ];
   await db.insert(membersTable).values(seedData);
 };
@@ -107,11 +147,13 @@ const seedMember = async (db: PostgresJsDatabase) => {
 const seedPostAndMedia = async (db: PostgresJsDatabase) => {
   await db.insert(postsTable).values(POST_MOCK);
   await db.insert(postsTable).values(POST_EXAMPLE);
+  await db.insert(postsTable).values(FULL_SNAPPER_POST_EXAMPLE);
   await db.insert(mediaTable).values(MEDIA_MOCK);
 };
 
 const seedComments = async (db: PostgresJsDatabase) => {
-  await db.insert(commentsTable).values(COMMENTS);
+  const seedData: Comment[] = [...COMMENTS, SINGLE_COMMENT];
+  await db.insert(commentsTable).values(seedData);
 };
 
 const seedDeviceTokens = async (db: PostgresJsDatabase) => {
@@ -128,5 +170,19 @@ const seedDeviceTokens = async (db: PostgresJsDatabase) => {
       token: JOSH_DEVICE_TOKEN,
       userId: USER_Josh_ID,
     },
+    {
+      token: "4dff72c9-afbc-49e5-b757-1de7d89d8234",
+      userId: USER_MAI_ID,
+    },
+    {
+      token: "1b1ceed3-d693-483a-89d2-46e6de8bea62",
+      userId: USER_STONE_ID,
+    },
   ]);
+};
+
+const seedLikes = async (db: PostgresJsDatabase) => {
+  const seedData: Like[] = [LIKE_EXAMPLE];
+
+  await db.insert(likesTable).values(seedData);
 };
