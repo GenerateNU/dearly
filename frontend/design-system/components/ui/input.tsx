@@ -3,8 +3,8 @@ import { TextInput, TextInputProps } from "react-native";
 
 import { BoxProps, createBox } from "@shopify/restyle";
 
-import Text from "@/design-system/base/text";
-import Box from "@/design-system/base/box";
+import { Box } from "@/design-system/base/box";
+import { Text } from "@/design-system/base/text";
 import { Theme } from "@/design-system/base/theme";
 
 type TextboxProps = {
@@ -52,7 +52,7 @@ const Input: React.FC<TextboxProps> = ({
         borderWidth={1}
         borderRadius="s"
         padding="s"
-        borderColor={error ? "error" : "secondaryDark"}
+        borderColor={error ? "error" : "honey"}
       />
       {error && (
         <Box gap="xxs" flexDirection="row" alignItems="center">

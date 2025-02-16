@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Animated } from "react-native";
-import Box from "../../base/box";
+import { Box } from "@/design-system/base/box";
 import { AnimatedBox } from "@/design-system/base/animated-box";
 
 interface ProgressBarProps {
@@ -19,7 +19,7 @@ const ProgressBar = ({ progress }: ProgressBarProps) => {
   }, [progress]); // runs when the progress changes
 
   return (
-    <Box backgroundColor="white" width="auto" borderRadius="m" overflow="hidden">
+    <Box backgroundColor="pearl" width="auto" borderRadius="m" overflow="hidden">
       <AnimatedBox
         height={2}
         backgroundColor="gray"

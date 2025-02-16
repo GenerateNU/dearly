@@ -1,6 +1,6 @@
 import React from "react";
 import { MasonryFlashList } from "@shopify/flash-list";
-import Box from "@/design-system/base/box";
+import { Box } from "@/design-system/base/box";
 import { Photo } from "./photo";
 
 interface MasonryFeedProps {

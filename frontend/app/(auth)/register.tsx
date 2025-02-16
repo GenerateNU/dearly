@@ -1,4 +1,4 @@
-import Box from "@/design-system/base/box";
+import { Box } from "@/design-system/base/box";
 import RegisterForm from "./components/register-form";
 import { Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback } from "react-native";
 
@@ -10,7 +10,7 @@ const Register = () => {
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <Box
-          backgroundColor="primary"
+          backgroundColor="pearl"
           className="w-full"
           flex={1}
           justifyContent="center"

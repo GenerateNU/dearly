@@ -22,6 +22,7 @@
     "@fortawesome/react-native-fontawesome": "^0.3.2",
     "@gorhom/bottom-sheet": "^5",
     "@hookform/resolvers": "^3.9.1",
+    "@mui/icons-material": "^6.4.4",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/cli": "^15.1.2",
     "@react-navigation/bottom-tabs": "^7.0.0",
@@ -52,6 +53,7 @@
     "expo-symbols": "~0.2.1",
     "expo-system-ui": "4.0.8",
     "expo-web-browser": "~14.0.2",
+    "horoscope": "^2.0.1",
     "nativewind": "^2.0.11",
     "openapi-fetch": "^0.13.4",
     "openapi-react-query": "^0.2.9",
@@ -69,6 +71,7 @@
     "react-native-web": "~0.19.13",
     "react-native-webview": "13.12.5",
     "zod": "^3.24.1",
+    "zodiac-signs": "^1.5.0",
     "zustand": "^5.0.1"
   },
   "devDependencies": {

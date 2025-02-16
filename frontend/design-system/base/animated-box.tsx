@@ -1,5 +1,5 @@
 import { ComponentProps, ReactNode } from "react";
-import Box from "./box";
+import { Box } from "@/design-system/base/box";
 import { ViewProps } from "react-native";
 import Animated from "react-native-reanimated";
 import {

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { TouchableOpacity, LayoutChangeEvent } from "react-native";
-import Box from "@/design-system/base/box";
-import Text from "@/design-system/base/text";
+import { Box } from "@/design-system/base/box";
+import { Text } from "@/design-system/base/text";
 import { AnimatedBox } from "@/design-system/base/animated-box";
 import { useAnimatedStyle, withTiming, Easing } from "react-native-reanimated";
 
@@ -19,7 +19,9 @@ const MenuTab = <T extends string>({
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
       <Box width={width} justifyContent="center" alignItems="center" paddingVertical="xxs">
-        <Text color={isSelected ? "black" : "gray"}>{label}</Text>
+        <Text variant="body" color={isSelected ? "ink" : "gray"}>
+          {label}
+        </Text>
       </Box>
     </TouchableOpacity>
   );
@@ -62,29 +64,28 @@ const HomeMenu = <T extends string>({
       onLayout={handleLayout}
       flexDirection="row"
       alignItems="center"
-      borderWidth={1}
-      borderColor="black"
-      borderRadius="xxl"
+      backgroundColor="blush"
+      borderRadius="full"
       paddingVertical="s"
     >
       <AnimatedBox
-        backgroundColor="secondaryDark"
+        backgroundColor="honey"
         position="absolute"
         justifyContent="center"
         alignItems="center"
         borderRadius="xl"
         width={tabWidth}
-        height="160%"
+        height="150%"
         style={[
           translateX,
           {
             shadowColor: "black",
             shadowOffset: { width: 0, height: 1 },
-            shadowOpacity: 0.1,
+            shadowOpacity: 0.05,
             shadowRadius: 8,
             elevation: 0,
             borderWidth: 2,
-            borderColor: "rgba(1,1,1,0.1)",
+            borderColor: "rgba(255, 243, 243, 0.48)",
           },
         ]}
       />

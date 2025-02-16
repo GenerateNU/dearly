@@ -1,14 +1,15 @@
 import React from "react";
-import { Alert, Text } from "react-native";
+import { Alert } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z, ZodError } from "zod";
 import { router } from "expo-router";
 import { useAuthStore } from "@/auth/store";
 import Input from "@/design-system/components/ui/input";
-import Button from "@/design-system/components/ui/button";
+import { TextButton } from "@/design-system/components/ui/text-button";
 import { AuthRequest } from "@/types/auth";
-import Box from "@/design-system/base/box";
+import { Box } from "@/design-system/base/box";
+import { Text } from "@/design-system/base/text";
 import { Mode } from "@/types/mode";
 
 type RegisterFormData = AuthRequest & {
@@ -71,7 +72,7 @@ const RegisterForm = () => {
 
   return (
     <Box gap="l" flexDirection="column" className="w-full">
-      {authError && <Text className="text-red-500">{authError}</Text>}
+      {authError && <Text color="error">{authError}</Text>}
       <Controller
         name="name"
         control={control}
@@ -138,7 +139,8 @@ const RegisterForm = () => {
         )}
       />
       <Box alignItems="center" className="w-full">
-        <Button
+        <TextButton
+          variant="fullHoneyRounded"
           disabled={isPending || !isValid}
           label={isPending ? "Signing up..." : "Sign Up"}
           onPress={handleSubmit(onSignUpPress)}

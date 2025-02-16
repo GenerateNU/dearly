@@ -1,9 +1,6 @@
-import Box from "@/design-system/base/box";
-
 import { useTheme } from "@shopify/restyle";
 import { Theme } from "@/design-system/base/theme";
-import { Pressable } from "react-native";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { IconButton } from "../ui/icon-button";
 
 interface HeartProps {
   like: boolean;
@@ -16,22 +13,11 @@ export const Heart: React.FC<HeartProps> = ({ like, onLike }) => {
   const variantStyle = theme.heartVariants[like ? "filled" : "outlined"];
 
   return (
-    <Pressable onPress={onLike}>
-      <Box
-        borderRadius="xl"
-        alignItems="center"
-        padding="s"
-        width={variantStyle.width}
-        aspectRatio={1}
-        justifyContent="center"
-        backgroundColor="secondaryDark"
-      >
-        <MaterialCommunityIcons
-          name={variantStyle.icon}
-          color={variantStyle.color}
-          size={variantStyle.size}
-        />
-      </Box>
-    </Pressable>
+    <IconButton
+      onPress={onLike}
+      icon={variantStyle.icon}
+      variant="iconHoney"
+      size={variantStyle.size}
+    />
   );
 };

@@ -10,7 +10,7 @@ import {
 } from "react-native-reanimated";
 import Carousel from "react-native-reanimated-carousel";
 import { Image } from "expo-image";
-import Box from "../../base/box";
+import { Box } from "@/design-system/base/box";
 import { AnimatedBox } from "../../base/animated-box";
 import { Heart } from "./heart";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -109,36 +109,42 @@ const ImageCarousel: React.FC<CarouselProps> = ({ data, initialPage = 0, like })
     <Box width="100%" justifyContent="center">
       <Box onLayout={handleLayout} className="w-full">
         {containerWidth > 0 && (
-          <Box flexDirection="column" gap="s">
-            <Box>
-              <Box position="absolute" zIndex={10} right={0} bottom={0} padding="m">
-                <Heart onLike={handleLike} like={isLiking} />
-              </Box>
-
-              {showFlyingHeart && (
-                <AnimatedBox position="absolute" zIndex={100} style={animatedStyle}>
-                  <Box width={40} height={40} justifyContent="center" alignItems="center">
-                    <FontAwesomeIcon icon={faHeart} size={100} />
-                  </Box>
-                </AnimatedBox>
-              )}
-
-              <Carousel
-                loop={false}
-                overscrollEnabled={false}
-                height={containerWidth}
-                width={containerWidth}
-                snapEnabled={true}
-                enabled={data.length !== 1}
-                defaultIndex={initialPage}
-                style={{ position: "relative", borderRadius: 12 }}
-                data={data}
-                onProgressChange={(_, index) => setPage(Math.round(index))}
-                defaultScrollOffsetValue={scrollOffsetValue}
-                renderItem={renderItem}
-              />
+          <>
+            <Box position="absolute" zIndex={10} right={0} bottom={0} padding="m">
+              <Heart onLike={handleLike} like={isLiking} />
             </Box>
-            <Box flexDirection="row" width="100%" justifyContent="center" alignItems="center">
+
+            {showFlyingHeart && (
+              <AnimatedBox position="absolute" zIndex={100} style={animatedStyle}>
+                <Box width={40} height={40} justifyContent="center" alignItems="center">
+                  <FontAwesomeIcon icon={faHeart} size={100} />
+                </Box>
+              </AnimatedBox>
+            )}
+
+            <Carousel
+              loop={false}
+              overscrollEnabled={false}
+              height={containerWidth}
+              width={containerWidth}
+              snapEnabled={true}
+              enabled={data.length !== 1}
+              defaultIndex={initialPage}
+              style={{ position: "relative", borderRadius: 12 }}
+              data={data}
+              onProgressChange={(_, index) => setPage(Math.round(index))}
+              defaultScrollOffsetValue={scrollOffsetValue}
+              renderItem={renderItem}
+            />
+
+            <Box
+              position="absolute"
+              flexDirection="row"
+              width="100%"
+              bottom="4%"
+              justifyContent="center"
+              alignItems="center"
+            >
               {data.map((_, index) => (
                 <Box
                   key={index}
@@ -150,7 +156,7 @@ const ImageCarousel: React.FC<CarouselProps> = ({ data, initialPage = 0, like })
                 />
               ))}
             </Box>
-          </Box>
+          </>
         )}
       </Box>
     </Box>
