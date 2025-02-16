@@ -3,12 +3,18 @@ import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
-import { USER_ALICE_ID, NOTIFICATIONS_MOCK } from "../helpers/test-constants";
+import {
+  NOTIFICATIONS_MOCK,
+  USER_ALICE,
+  USER_ANA_ID,
+  USER_BILL,
+  USER_BOB_ID,
+} from "../helpers/test-constants";
 
 describe("GET /users/notifications", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
-  const aliceJWT = generateJWTFromID(USER_ALICE_ID);
+  const bobJWT = generateJWTFromID(USER_BOB_ID);
 
   beforeAll(async () => {
     app = await startTestApp();
@@ -26,7 +32,7 @@ describe("GET /users/notifications", () => {
         },
         autoAuthorized: false,
         headers: {
-          Authorization: `Bearer ${aliceJWT}`,
+          Authorization: `Bearer ${generateJWTFromID(USER_BOB_ID)}`,
         },
       })
     )
@@ -42,7 +48,11 @@ describe("GET /users/notifications", () => {
         route: `/api/v1/users/notifications`,
         autoAuthorized: false,
         headers: {
-          Authorization: `Bearer ${aliceJWT}`,
+          Authorization: `Bearer ${generateJWTFromID(USER_BOB_ID)}`,
+        },
+        queryParams: {
+          limit: "10",
+          page: "1",
         },
       })
     )
@@ -50,7 +60,7 @@ describe("GET /users/notifications", () => {
       .assertStatusCode(Status.OK);
   });
 
-  // Failing tests for /users/notifications endpoint
+  // not OK tests for /users/notifications endpoint
   it("should return 401 when no Authorization header is provided", async () => {
     (
       await testBuilder.request({
@@ -82,7 +92,9 @@ describe("GET /users/notifications", () => {
           Authorization: "Bearer invalid.token",
         },
       })
-    ).assertStatusCode(Status.Unauthorized);
+    )
+      .assertStatusCode(Status.Unauthorized)
+      .assertError("Unauthorized");
   });
 
   it("should return 400 when query parameters are invalid", async () => {
@@ -96,9 +108,38 @@ describe("GET /users/notifications", () => {
         },
         autoAuthorized: false,
         headers: {
-          Authorization: `Bearer ${aliceJWT}`,
+          Authorization: `Bearer ${generateJWTFromID(USER_BOB_ID)}`,
         },
       })
     ).assertStatusCode(Status.BadRequest);
+  });
+
+  it("should return 400 when pagination params are invalid", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.GET,
+        route: `/api/v1/users/notifications`,
+        queryParams: {
+          page: "-1",
+          limit: "-1",
+        },
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${generateJWTFromID(USER_BOB_ID)}`,
+        },
+      })
+    )
+      .assertStatusCode(Status.BadRequest)
+      .assertError([
+        {
+          message: "Limit must be a positive number",
+          path: "limit",
+        },
+        {
+          message: "Page must be a positive number",
+          path: "page",
+        },
+      ]);
   });
 });

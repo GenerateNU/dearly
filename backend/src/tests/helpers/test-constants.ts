@@ -1,4 +1,10 @@
-import { commentsTable, groupsTable, mediaTable, postsTable } from "../../entities/schema";
+import {
+  commentsTable,
+  groupsTable,
+  likesTable,
+  mediaTable,
+  postsTable,
+} from "../../entities/schema";
 import { CreateGroupPayload } from "../../types/api/internal/groups";
 import { CreateUserPayload, SearchedUser } from "../../types/api/internal/users";
 import { Notification } from "../../types/api/internal/notification";
@@ -21,6 +27,7 @@ export const MOCK_LIKE_NOTIF_UUID = "31e51a64-1d5e-41ed-ace9-27b8e7c4de1c";
 export const MOCK_COMMENT_NOTIF_UUID = "8e3e964b-6696-4150-b4f3-09f66e7b74de";
 export const MOCK_POST_NOTIF_UUID = "601e8b6b-360a-4b53-8a15-aba8a9bdf027";
 export const DEARLY_COMMENT_ID = "679c0331-2dfc-8002-b4a4-22b09d6c3c73";
+export const NEW_COMMENT_ID = "4b789855-0c17-4aa0-8eb4-d8e2b20bc1bf";
 export const MOCK_EXPO_TOKEN = "ExponentPushToken[Z9Hfn6ZxWVXaAs7MG3Pya8]";
 
 export const GROUP_EMPTY_FIELDS_ERRORS = [
@@ -70,6 +77,13 @@ export const POST_MOCK: (typeof postsTable.$inferInsert)[] = [
     id: POST_ID,
     createdAt: new Date(-1),
     caption: "my first post",
+  },
+  {
+    userId: USER_BOB_ID,
+    groupId: ANOTHER_GROUP_ID,
+    id: NEW_POST_ID,
+    createdAt: new Date(),
+    caption: "having fun at the beach!",
   },
 ];
 
@@ -125,13 +139,14 @@ export const USER_ANA: CreateUserPayload = {
   username: "ana",
   mode: "BASIC",
   id: USER_ANA_ID,
+  profilePhoto: "https://mocked-url.com",
 };
 
 export const SEARCHED_ANA: SearchedUser = {
   id: USER_ANA_ID,
   name: USER_ANA["name"],
   username: USER_ANA["username"],
-  profilePhoto: "https://mockPhotoOfAna.com",
+  profilePhoto: "https://mocked-url.com",
   isMember: true,
   lastNudgedAt: null,
 };
@@ -171,20 +186,26 @@ export const COMMENTS: (typeof commentsTable.$inferInsert)[] = [
     userId: USER_BOB_ID,
     content: "amazing photos!",
   },
+  {
+    id: NEW_COMMENT_ID,
+    postId: NEW_POST_ID,
+    userId: USER_BILL_ID,
+    content: "looks like fun!",
+  },
 ];
 
 export const NOTIFICATIONS_MOCK: Notification[] = [
   {
     id: MOCK_COMMENT_NOTIF_UUID,
-    actorId: USER_ALICE_ID,
+    actorId: USER_BILL_ID,
     receiverId: USER_BOB_ID,
     postId: null,
     referenceType: "POST",
     title: "New Comment",
-    description: "Alice commented on your post",
+    description: "Bill commented on your post",
     createdAt: new Date(),
     groupId: DEARLY_GROUP_ID,
-    commentId: DEARLY_COMMENT_ID,
+    commentId: NEW_COMMENT_ID,
     likeId: null,
     mediaURL: MOCK_SIGNED_URL,
   },
@@ -215,5 +236,14 @@ export const NOTIFICATIONS_MOCK: Notification[] = [
     commentId: null,
     likeId: null,
     mediaURL: MOCK_MEDIA_WITH_URL[0]?.url ?? MOCK_SIGNED_URL,
+  },
+];
+
+export const LIKE_MOCK: (typeof likesTable.$inferInsert)[] = [
+  {
+    id: MOCK_RANDOM_UUID,
+    postId: NEW_POST_ID,
+    userId: USER_ANA_ID,
+    createdAt: new Date(),
   },
 ];

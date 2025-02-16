@@ -24,9 +24,13 @@ export class NotificationControllerImpl implements NotificationController {
   async getNotifications(ctx: Context): Promise<NOTIFICATIONS> {
     const getNotifications = async () => {
       const { limit, page } = ctx.req.query();
-      const queryParams = paginationSchema.parse({ limit, page });
-      const id = parseUUID(ctx.get("userId"));
-      const notifications = await this.notifService.getNotifications({ id, ...queryParams });
+      const queryParams = paginationSchema.parse({ limit: limit ?? 10, page: page ?? 1 });
+      const receiverId = parseUUID(ctx.get("userId"));
+      // bruhh even removing parseUUID from here will not work -- keep getting "Invalid ID format" somehow
+      const notifications = await this.notifService.getNotifications({
+        id: receiverId,
+        ...queryParams,
+      });
       return ctx.json(notifications, Status.OK);
     };
     return await handleAppError(getNotifications)(ctx);
