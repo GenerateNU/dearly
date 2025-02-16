@@ -71,8 +71,6 @@ export class ExpoNotificationService implements INotificationService {
     this.db = db;
   }
 
-  //TODO: abstract the subscription
-
   private subscribeToPosts() {
     this.supabaseClient
       .channel("posts_channel")
@@ -111,22 +109,35 @@ export class ExpoNotificationService implements INotificationService {
       .subscribe();
   }
 
+  // Will retry some thunk up to the given number of times
+  retryOnError = async <T>(func: () => T, tries: number): Promise<T> => {
+    if (tries <= 1) {
+      return await func();
+    } else {
+      try {
+        return await func();
+      } catch (error) {
+        return await this.retryOnError(func, tries - 1);
+      }
+    }
+  };
+
   /**
    * Unsubscribe a user from notifications by setting their notificationsEnabled to false
    * @param userId the id of the user to unsubscribe
    */
   async unsubscribe(userId: string): Promise<void> {
-    try {
-      const user = await this.db
-        .update(membersTable)
-        .set({ notificationsEnabled: false })
-        .where(eq(membersTable.userId, userId));
+    return this.retryOnError(async () => await this.unsubscriber(userId), 3);
+  }
 
-      if (!user) {
-        throw new NotFoundError("User");
-      }
-    } catch (error) {
-      throw new NotFoundError("User", `Unable to find the following user ${userId}`);
+  private async unsubscriber(userId: string): Promise<void> {
+    const user = await this.db
+      .update(membersTable)
+      .set({ notificationsEnabled: false })
+      .where(eq(membersTable.userId, userId));
+
+    if (!user) {
+      throw new NotFoundError("User");
     }
   }
 
@@ -135,96 +146,96 @@ export class ExpoNotificationService implements INotificationService {
    * @param post the new post that a user has made.
    */
   async notifyPost(post: Post): Promise<Notification[]> {
-    try {
-      // Get the Group Id of the post maker
-      const [posterGroupId] = await this.db
-        .select({
-          groupId: postsTable.groupId,
-          name: usersTable.name,
-          groupName: groupsTable.name,
-        })
-        .from(postsTable)
-        .innerJoin(usersTable, eq(usersTable.id, postsTable.userId))
-        .innerJoin(groupsTable, eq(groupsTable.id, postsTable.groupId))
-        .where(eq(groupsTable.id, post.groupId));
+    return this.retryOnError(async () => await this.postNotifyer(post), 3);
+  }
 
-      if (!posterGroupId) {
-        console.log(
-          await this.db
-            .select({
-              groupId: postsTable.groupId,
-              name: usersTable.name,
-              groupName: groupsTable.name,
-            })
-            .from(postsTable)
-            .innerJoin(usersTable, eq(usersTable.id, postsTable.userId))
-            .innerJoin(groupsTable, eq(groupsTable.id, postsTable.groupId)),
-        );
-        throw new NotFoundError("Unable to find the group! " + post.groupId);
-      }
+  private async postNotifyer(post: Post): Promise<Notification[]> {
+    // Get the Group Id of the post maker
+    const [posterGroupId] = await this.db
+      .select({
+        groupId: postsTable.groupId,
+        name: usersTable.name,
+        groupName: groupsTable.name,
+      })
+      .from(postsTable)
+      .innerJoin(usersTable, eq(usersTable.id, postsTable.userId))
+      .innerJoin(groupsTable, eq(groupsTable.id, postsTable.groupId))
+      .where(eq(groupsTable.id, post.groupId));
 
-      // get the list of members who are in the group
-      const members = await this.db
-        .select({
-          userId: membersTable.userId,
-        })
-        .from(membersTable)
-        .where(
-          and(
-            //Check to make sure that the poster is not included
-            ne(membersTable.userId, post.userId),
-            eq(membersTable.groupId, posterGroupId.groupId),
-          ),
-        );
-
-      if (!members) {
-        throw new NotFoundError("Unable to find the other group memebers!");
-      }
-      let notifications: Notification[] = [];
-
-      for (let member of members) {
-        // Insert the notification into the database
-        const res = await this.db
-          .insert(notificationsTable)
-          .values({
-            actorId: post.userId,
-            receiverId: member.userId,
-            referenceType: "POST",
-            groupId: post.groupId,
-            postId: post.id,
-            title: "New Post",
-            description: `${posterGroupId.name} just posted in ${posterGroupId.groupName}`,
+    if (!posterGroupId) {
+      console.log(
+        await this.db
+          .select({
+            groupId: postsTable.groupId,
+            name: usersTable.name,
+            groupName: groupsTable.name,
           })
-          .returning();
-        if (!res[0]) {
-          throw new NotFoundError("Notification");
-        }
-        notifications.push(res[0]);
-      }
+          .from(postsTable)
+          .innerJoin(usersTable, eq(usersTable.id, postsTable.userId))
+          .innerJoin(groupsTable, eq(groupsTable.id, postsTable.groupId)),
+      );
+      throw new NotFoundError("Unable to find the group! " + post.groupId);
+    }
 
-      // TODO: make this into one query
-      // Get the list of push tokens for the group members
-      const messages: ExpoPushMessage[] = await Promise.all(
-        members
-          .filter(async (member) => await this.getNotificationEnabled(member.userId))
-          .map(async (member) => ({
-            to: await this.getPushToken(member.userId),
-            sound: "default",
-            body: "GET HYPE new group post",
-            data: { post },
-          })),
+    // get the list of members who are in the group
+    const members = await this.db
+      .select({
+        userId: membersTable.userId,
+      })
+      .from(membersTable)
+      .where(
+        and(
+          //Check to make sure that the poster is not included
+          ne(membersTable.userId, post.userId),
+          eq(membersTable.groupId, posterGroupId.groupId),
+        ),
       );
 
-      // Send the notifications and if all notifications off, empty list and none will send
-      const chunks: ExpoPushMessage[][] = this.expo.chunkPushNotifications(messages);
-      for (let chunk of chunks) {
-        await this.expo.sendPushNotificationsAsync(chunk);
-      }
-
-      return notifications;
-    } catch (error) {
-      throw error;
+    if (!members) {
+      throw new NotFoundError("Unable to find the other group memebers!");
     }
+    let notifications: Notification[] = [];
+
+    for (let member of members) {
+      // Insert the notification into the database
+      const res = await this.db
+        .insert(notificationsTable)
+        .values({
+          actorId: post.userId,
+          receiverId: member.userId,
+          referenceType: "POST",
+          groupId: post.groupId,
+          postId: post.id,
+          title: "New Post",
+          description: `${posterGroupId.name} just posted in ${posterGroupId.groupName}`,
+        })
+        .returning();
+      if (!res[0]) {
+        throw new NotFoundError("Notification");
+      }
+      notifications.push(res[0]);
+    }
+
+    // TODO: make this into one query
+    // Get the list of push tokens for the group members
+    const messages: ExpoPushMessage[] = await Promise.all(
+      members
+        .filter(async (member) => await this.getNotificationEnabled(member.userId))
+        .map(async (member) => ({
+          to: await this.getPushToken(member.userId),
+          sound: "default",
+          body: "GET HYPE new group post",
+          data: { post },
+        })),
+    );
+
+    // Send the notifications and if all notifications off, empty list and none will send
+    const chunks: ExpoPushMessage[][] = this.expo.chunkPushNotifications(messages);
+    for (let chunk of chunks) {
+      await this.expo.sendPushNotificationsAsync(chunk);
+    }
+
+    return notifications;
   }
 
   /**
@@ -232,62 +243,62 @@ export class ExpoNotificationService implements INotificationService {
    * @param like a user liking a post
    */
   async notifyLike(like: Like): Promise<Notification> {
-    try {
-      // Get the userId of the post maker
-      const [userId] = await this.db
-        .select({
-          userId: postsTable.userId,
-          name: usersTable.name,
-        })
-        .from(postsTable)
-        .innerJoin(usersTable, eq(usersTable.id, postsTable.userId))
-        .where(eq(postsTable.id, like.postId));
+    return this.retryOnError(async () => await this.likeNotifyer(like), 3);
+  }
 
-      if (userId === undefined) {
-        throw new NotFoundError("UserId");
-      }
+  private async likeNotifyer(like: Like): Promise<Notification> {
+    // Get the userId of the post maker
+    const [userId] = await this.db
+      .select({
+        userId: postsTable.userId,
+        name: usersTable.name,
+      })
+      .from(postsTable)
+      .innerJoin(usersTable, eq(usersTable.id, postsTable.userId))
+      .where(eq(postsTable.id, like.postId));
 
-      // Insert the notification into the database
-      const [notification] = await this.db
-        .insert(notificationsTable)
-        .values({
-          actorId: like.userId,
-          receiverId: userId.userId,
-          referenceType: "LIKE",
-          likeId: like.id,
-          postId: like.postId,
-          title: "New Like",
-          description: `${userId.name} liked your post`,
-        })
-        .returning();
-
-      if (!notification) {
-        throw new NotFoundError("Notification");
-      }
-      if (!this.getNotificationEnabled(userId.userId)) {
-        return notification;
-      }
-
-      const token = await this.getPushToken(userId.userId);
-
-      // TODO: CHANGE SCHEMA TO STORE PUSH TOKEN.
-      const messages: ExpoPushMessage[] = [
-        {
-          to: token,
-          sound: "default",
-          body: "OOOHHHHH someone loved your post <3",
-          data: { like },
-        },
-      ];
-
-      const chunks = this.expo.chunkPushNotifications(messages);
-      for (let chunk of chunks) {
-        await this.expo.sendPushNotificationsAsync(chunk);
-      }
-      return notification;
-    } catch (error) {
-      throw error;
+    if (userId === undefined) {
+      throw new NotFoundError("UserId");
     }
+
+    // Insert the notification into the database
+    const [notification] = await this.db
+      .insert(notificationsTable)
+      .values({
+        actorId: like.userId,
+        receiverId: userId.userId,
+        referenceType: "LIKE",
+        likeId: like.id,
+        postId: like.postId,
+        title: "New Like",
+        description: `${userId.name} liked your post`,
+      })
+      .returning();
+
+    if (!notification) {
+      throw new NotFoundError("Notification");
+    }
+    if (!this.getNotificationEnabled(userId.userId)) {
+      return notification;
+    }
+
+    const token = await this.getPushToken(userId.userId);
+
+    // TODO: CHANGE SCHEMA TO STORE PUSH TOKEN.
+    const messages: ExpoPushMessage[] = [
+      {
+        to: token,
+        sound: "default",
+        body: "OOOHHHHH someone loved your post <3",
+        data: { like },
+      },
+    ];
+
+    const chunks = this.expo.chunkPushNotifications(messages);
+    for (let chunk of chunks) {
+      await this.expo.sendPushNotificationsAsync(chunk);
+    }
+    return notification;
   }
 
   /**
@@ -295,95 +306,87 @@ export class ExpoNotificationService implements INotificationService {
    * @param comment a user commenting on a post
    */
   async notifyComment(comment: Comment): Promise<Notification> {
-    try {
-      // Get the userId of person whose post was commented on
-      const [userId] = await this.db
-        .select({
-          userId: postsTable.userId,
-          name: usersTable.name,
-        })
-        .from(postsTable)
-        .innerJoin(usersTable, eq(usersTable.id, postsTable.userId))
-        .where(eq(postsTable.id, comment.postId));
+    return this.retryOnError(async () => await this.commentNotifyer(comment), 3);
+  }
 
-      if (userId === undefined) {
-        throw new NotFoundError("UserId");
-      }
+  private async commentNotifyer(comment: Comment): Promise<Notification> {
+    // Get the userId of person whose post was commented on
+    const [userId] = await this.db
+      .select({
+        userId: postsTable.userId,
+        name: usersTable.name,
+      })
+      .from(postsTable)
+      .innerJoin(usersTable, eq(usersTable.id, postsTable.userId))
+      .where(eq(postsTable.id, comment.postId));
 
-      const [notification] = await this.db
-        .insert(notificationsTable)
-        .values({
-          actorId: comment.userId,
-          receiverId: userId.userId,
-          referenceType: "COMMENT",
-          commentId: comment.id,
-          postId: comment.postId,
-          title: "New Comment",
-          description: `${userId.name} commented on your post`,
-        })
-        .returning();
-
-      if (!notification) {
-        throw new NotFoundError("Notification");
-      }
-
-      if (!this.getNotificationEnabled(userId.userId)) {
-        return notification;
-      }
-
-      const token = await this.getPushToken(userId.userId);
-
-      const messages: ExpoPushMessage[] = [
-        {
-          to: token,
-          sound: "default",
-          body: "TALK TALK",
-          data: { comment },
-        },
-      ];
-
-      // Send the notification
-      const chunks = this.expo.chunkPushNotifications(messages);
-      for (let chunk of chunks) {
-        await this.expo.sendPushNotificationsAsync(chunk);
-      }
-      return notification;
-    } catch (Error) {
-      throw new NotFoundError("Supabase Issue"); // need to create this error
+    if (userId === undefined) {
+      throw new NotFoundError("UserId");
     }
+
+    const [notification] = await this.db
+      .insert(notificationsTable)
+      .values({
+        actorId: comment.userId,
+        receiverId: userId.userId,
+        referenceType: "COMMENT",
+        commentId: comment.id,
+        postId: comment.postId,
+        title: "New Comment",
+        description: `${userId.name} commented on your post`,
+      })
+      .returning();
+
+    if (!notification) {
+      throw new NotFoundError("Notification");
+    }
+
+    if (!this.getNotificationEnabled(userId.userId)) {
+      return notification;
+    }
+
+    const token = await this.getPushToken(userId.userId);
+
+    const messages: ExpoPushMessage[] = [
+      {
+        to: token,
+        sound: "default",
+        body: "TALK TALK",
+        data: { comment },
+      },
+    ];
+
+    // Send the notification
+    const chunks = this.expo.chunkPushNotifications(messages);
+    for (let chunk of chunks) {
+      await this.expo.sendPushNotificationsAsync(chunk);
+    }
+    return notification;
   }
 
   private async getNotificationEnabled(userId: string): Promise<boolean> {
-    try {
-      const [notificationsEnabled] = await this.db
-        .select({
-          notificationsEnabled: membersTable.notificationsEnabled,
-        })
-        .from(membersTable)
-        .where(eq(membersTable.userId, userId));
-      if (!notificationsEnabled) {
-        throw new NotFoundError("Notifications Enabled");
-      }
-      return notificationsEnabled.notificationsEnabled;
-    } catch (Error) {
-      throw new NotFoundError("User");
+    const [notificationsEnabled] = await this.db
+      .select({
+        notificationsEnabled: membersTable.notificationsEnabled,
+      })
+      .from(membersTable)
+      .where(eq(membersTable.userId, userId));
+    if (!notificationsEnabled) {
+      throw new NotFoundError("Notifications Enabled");
     }
+    return notificationsEnabled.notificationsEnabled;
   }
 
   private async getPushToken(userId: string): Promise<string> {
-    try {
-      const [token] = await this.db
-        .select({
-          token: devicesTable.token,
-        })
-        .from(devicesTable)
-        .where(eq(devicesTable.userId, userId));
-      if (!token) {
-        throw new NotFoundError("Token");
-      }
-      return token.token;
-    } catch (Error) {
-      throw Error;
+    const [token] = await this.db
+      .select({
+        token: devicesTable.token,
+      })
+      .from(devicesTable)
+      .where(eq(devicesTable.userId, userId));
+    if (!token) {
+      throw new NotFoundError("Token");
     }
+    return token.token;
   }
 }
