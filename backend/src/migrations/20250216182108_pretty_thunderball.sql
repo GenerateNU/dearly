@@ -27,4 +27,6 @@ CREATE TABLE "scheduledNudges" (
       )
 );
 --> statement-breakpoint
-ALTER TABLE "scheduledNudges" ADD CONSTRAINT "scheduledNudges_groupId_groups_id_fk" FOREIGN KEY ("groupId") REFERENCES "public"."groups"("id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "comments" 
+ALTER COLUMN "voiceMemo" 
+SET DATA TYPE uuid USING "voiceMemo"::uuid;

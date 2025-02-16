@@ -6,6 +6,7 @@ import { HTTPRequest, Status } from "../../constants/http";
 import {
   ANOTHER_GROUP,
   DEARLY_GROUP,
+  GENERATE_GROUP,
   USER_ALICE_ID,
   USER_ANA_ID,
   USER_BILL_ID,
@@ -27,6 +28,11 @@ describe("GET /users/groups", () => {
 
   const DEARLY_GROUP_WITH_NOTIFICATION = {
     ...DEARLY_GROUP,
+    notificationEnabled: true,
+  };
+
+  const GENERATE_GROUP_WITH_NOTIFICATION = {
+    ...GENERATE_GROUP,
     notificationEnabled: true,
   };
 
@@ -53,7 +59,7 @@ describe("GET /users/groups", () => {
   it.each([
     [USER_ANA_ID, [ANOTHER_GROUP_WITH_NOTIFICATION]],
     [USER_BOB_ID, [DEARLY_GROUP_WITH_NOTIFICATION]],
-    [USER_BILL_ID, []],
+    [USER_BILL_ID, [GENERATE_GROUP_WITH_NOTIFICATION]],
     [USER_ALICE_ID, [DEARLY_GROUP_WITH_NOTIFICATION, ANOTHER_GROUP_WITH_NOTIFICATION]],
   ])("should return 200 if for user with ID %s", async (id, expectedGroups) => {
     (

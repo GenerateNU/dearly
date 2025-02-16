@@ -33,10 +33,7 @@ export interface NudgeTransaction {
     managerId: string,
   ): Promise<NotificationMetadata>;
 
-  upsertSchedule(
-    managerId: string,
-    payload: NudgeSchedulePayload,
-  ): Promise<NudgeSchedule | null>;
+  upsertSchedule(managerId: string, payload: NudgeSchedulePayload): Promise<NudgeSchedule | null>;
 
   getNudgeSchedule(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null>;
 
@@ -80,8 +77,7 @@ export class NudgeTransactionImpl implements NudgeTransaction {
       const [nudgeSchedule] = await this.db
         .select()
         .from(scheduledNudgesTable)
-        .where(eq(scheduledNudgesTable.groupId, groupId))
-        .limit(1);
+        .where(eq(scheduledNudgesTable.groupId, groupId));
 
       return nudgeSchedule ?? null;
     });

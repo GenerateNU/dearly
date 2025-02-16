@@ -6,6 +6,7 @@ import {
   mediaTable,
   membersTable,
   postsTable,
+  scheduledNudgesTable,
   usersTable,
 } from "../../entities/schema";
 import {
@@ -14,14 +15,18 @@ import {
   COMMENTS,
   DEARLY_GROUP,
   DEARLY_GROUP_ID,
+  GENERATE_GROUP,
+  GENERATE_GROUP_ID,
   MEDIA_MOCK,
   MOCK_EXPO_TOKEN,
+  MOCK_SCHEDULE,
   POST_MOCK,
   USER_ALICE,
   USER_ALICE_ID,
   USER_ANA,
   USER_ANA_ID,
   USER_BILL,
+  USER_BILL_ID,
   USER_BOB,
   USER_BOB_ID,
 } from "./test-constants";
@@ -36,6 +41,7 @@ export const seedDatabase = async (db: PostgresJsDatabase) => {
     await seedMember(db);
     await seedPostAndMedia(db);
     await seedComments(db);
+    await seedSchedule(db);
   } catch (error) {
     console.error("Failed to seed database", error);
   }
@@ -47,7 +53,7 @@ const seedUser = async (db: PostgresJsDatabase) => {
 };
 
 const seedGroup = async (db: PostgresJsDatabase) => {
-  const seedData: CreateGroupPayload[] = [DEARLY_GROUP, ANOTHER_GROUP];
+  const seedData: CreateGroupPayload[] = [DEARLY_GROUP, ANOTHER_GROUP, GENERATE_GROUP];
 
   await db.insert(groupsTable).values(seedData);
 };
@@ -67,6 +73,11 @@ const seedMember = async (db: PostgresJsDatabase) => {
     {
       userId: USER_ANA_ID,
       groupId: ANOTHER_GROUP_ID,
+      role: "MANAGER",
+    },
+    {
+      userId: USER_BILL_ID,
+      groupId: GENERATE_GROUP_ID,
       role: "MANAGER",
     },
     {
@@ -94,4 +105,8 @@ const seedDeviceTokens = async (db: PostgresJsDatabase) => {
       userId: USER_BOB_ID,
     },
   ]);
+};
+
+const seedSchedule = async (db: PostgresJsDatabase) => {
+  await db.insert(scheduledNudgesTable).values(MOCK_SCHEDULE).returning();
 };

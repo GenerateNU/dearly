@@ -1,10 +1,9 @@
-
 import { AWSEventBridgeScheduler } from "../../services/nudgeScheduler";
 import { SchedulePayload } from "../../types/api/internal/nudges";
 import { ExpoPushMessage } from "expo-server-sdk";
 import { mockSchedulerClient } from "../helpers/mock";
 
-const schedulerClient = mockSchedulerClient()
+const schedulerClient = mockSchedulerClient();
 
 const scheduler = new AWSEventBridgeScheduler(schedulerClient);
 

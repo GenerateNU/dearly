@@ -43,34 +43,23 @@ const hasValidMonthlyDay = (data: NudgeScheduleInput): boolean =>
 const hasValidYearlyDate = (data: NudgeScheduleInput): boolean =>
   data.month !== undefined && data.month !== null && data.day !== undefined && data.day !== null;
 
-const validateFrequencyRequirements = (data: NudgeScheduleInput): boolean => {
-  switch (data.frequency) {
-    case "DAILY":
-      return !data.daysOfWeek && !data.day && !data.month;
-    case "WEEKLY":
-    case "BIWEEKLY":
-      return hasValidDaysOfWeek(data);
-    case "MONTHLY":
-      return hasValidMonthlyDay(data);
-    case "YEARLY":
-      return hasValidYearlyDate(data);
-    default:
-      return false;
-  }
-};
-
 const addFrequencyError = (ctx: z.RefinementCtx, frequency: string) => {
   const messages = {
     DAILY: "For DAILY schedules, no additional fields (daysOfWeek, day, month) should be specified",
-    WEEKLY: "For WEEKLY/BIWEEKLY schedules, at least one day of the week must be selected",
-    BIWEEKLY: "For WEEKLY/BIWEEKLY schedules, at least one day of the week must be selected",
-    MONTHLY: "For MONTHLY schedules, a day of the month (1-31) must be specified",
-    YEARLY: "For YEARLY schedules, both month (1-12) and day (1-31) must be specified",
+    WEEKLY:
+      "For WEEKLY/BIWEEKLY schedules, at least one day of the week must be selected. No other fields (day, month) should be specified.",
+    BIWEEKLY:
+      "For WEEKLY/BIWEEKLY schedules, at least one day of the week must be selected. No other fields (day, month) should be specified.",
+    MONTHLY:
+      "For MONTHLY schedules, a day of the month (1-31) must be specified. No other field (daysOfWeek, month) should be specified.",
+    YEARLY:
+      "For YEARLY schedules, both month (1-12) and day (1-31) must be specified. No other field (daysOfWeek) should be specified.",
   };
 
   ctx.addIssue({
     code: z.ZodIssueCode.custom,
     message: messages[frequency as keyof typeof messages],
+    path: ["frequency"],
   });
 };
 
@@ -93,7 +82,6 @@ export {
   hasValidMonthlyDay,
   hasValidYearlyDate,
   getDaysInMonth,
-  validateFrequencyRequirements,
   addFrequencyError,
   validateYearlyMonthDay,
 };

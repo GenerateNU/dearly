@@ -4,7 +4,12 @@ import { ExpoPushMessage, Expo } from "expo-server-sdk";
 import logger from "../../utilities/logger";
 import { getNotificationBody } from "../../utilities/nudge";
 import { InternalServerError } from "../../utilities/errors/app-error";
-import { NudgeSchedulePayload, NotificationMetadata, NudgeSchedule, SchedulePayload } from "../../types/api/internal/nudges";
+import {
+  NudgeSchedulePayload,
+  NotificationMetadata,
+  NudgeSchedule,
+  SchedulePayload,
+} from "../../types/api/internal/nudges";
 import { AWSEventBridgeScheduler } from "../../services/nudgeScheduler";
 import { SchedulerClient } from "@aws-sdk/client-scheduler";
 
@@ -60,13 +65,13 @@ export class NudgeServiceImpl implements NudgeService {
         schedule.groupId,
         managerId,
       );
-  
+
       if (notificationMetadata.deviceTokens.length === 0) return;
       const schedulePayload = {
         schedule: schedule,
         expo: {
           notifications: this.formatPushNotifications(notificationMetadata),
-        }
+        },
       };
 
       // Add to EventBridge Scheduler
@@ -78,7 +83,7 @@ export class NudgeServiceImpl implements NudgeService {
       }
 
       if (response != 200) {
-        throw new InternalServerError("Failed to add/update schedule in EventBridge")
+        throw new InternalServerError("Failed to add/update schedule in EventBridge");
       }
 
       return schedule;
@@ -100,7 +105,7 @@ export class NudgeServiceImpl implements NudgeService {
       schedule: schedule,
       expo: {
         notifications: this.formatPushNotifications(notificationMetadata),
-      }
+      },
     };
 
     return schedulePayload;
@@ -116,7 +121,9 @@ export class NudgeServiceImpl implements NudgeService {
   async deactivateNudge(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null> {
     const deactivateNudgeImpl = async () => {
       const nudge = await this.nudgeTransaction.deactivateNudge(groupId, managerId);
-      await this.scheduler.disableSchedule(groupId);
+      if (nudge) {
+        await this.scheduler.disableSchedule(groupId);
+      }
       return nudge;
     };
     return handleServiceError(deactivateNudgeImpl)();

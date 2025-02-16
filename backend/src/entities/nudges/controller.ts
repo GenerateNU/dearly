@@ -45,8 +45,8 @@ export class NudgeControllerImpl implements NudgeController {
         groupId: groupId,
         ...payload,
       };
-      await this.nudgeService.upsertSchedule(managerId, payloadWithIds);
-      return ctx.json({ message: "Successfully updated automatic nudge schedule" }, 200);
+      const schedule = await this.nudgeService.upsertSchedule(managerId, payloadWithIds);
+      return ctx.json(schedule, 200);
     };
     return await handleAppError(upsertScheduleImpl)(ctx);
   }

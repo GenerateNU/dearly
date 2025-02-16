@@ -1,5 +1,5 @@
 {
-  "id": "2d6f7ae3-6779-42d5-8d57-38d1df9ee6e2",
+  "id": "b5ed9746-f939-4c30-a6ca-4fa7a114bc99",
   "prevId": "3b0b89df-bd2a-489a-9a28-2a9cc27b1118",
   "version": "7",
   "dialect": "postgresql",
@@ -35,7 +35,7 @@
         },
         "voiceMemo": {
           "name": "voiceMemo",
-          "type": "varchar",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },

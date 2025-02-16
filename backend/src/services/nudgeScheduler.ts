@@ -39,7 +39,7 @@ export class AWSEventBridgeScheduler implements NudgeScheduler {
     return await handleAWSServiceError(addScheduleImpl, "Failed to add recurring schedule.")();
   }
 
-  async updateSchedule(id: string, payload: SchedulePayload): Promise<number| null> {
+  async updateSchedule(id: string, payload: SchedulePayload): Promise<number | null> {
     const updateScheduleImpl = async () => {
       const input = await this.scheduleCommandInput(id, payload);
 
