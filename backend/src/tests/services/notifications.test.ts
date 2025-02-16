@@ -4,28 +4,21 @@ import { ExpoNotificationService, INotificationService } from "../../services/no
 import { connectDB } from "../../database/connect";
 import { POST_EXAMPLE, USER_Josh_ID } from "./../helpers/test-constants";
 import { eq } from "drizzle-orm";
-import { sendPushNotificationsAsyncSpy } from "../helpers/mock";
 import { membersTable, notificationsTable } from "../../entities/schema";
 import { resetDB } from "../../database/reset";
 import { seedDatabase } from "../helpers/seed-db";
-import Expo from "expo-server-sdk";
-import { describe, expect, beforeEach, it, spyOn } from "bun:test";
+import { chunkPushNotificationsSpy, expo, sendPushNotificationsAsyncSpy } from "../helpers/test-app";
 
 describe("Notification server test", () => {
   const config = getConfigurations();
   const db = connectDB(config);
-
-  // create spy on expo service
-  const expo = new Expo();
-  const sendPushNotificationSpy = spyOn(expo, "sendPushNotificationsAsync");
-  const chunkPushNotificationSpy = spyOn(expo, "chunkPushNotifications");
   const notifService: INotificationService = new ExpoNotificationService(config, db, expo);
 
   beforeEach(async () => {
     await resetDB(db);
     await seedDatabase(db);
     sendPushNotificationsAsyncSpy.mockClear();
-    chunkPushNotificationSpy.mockClear();
+    chunkPushNotificationsSpy.mockClear();
   });
 
   it("Unsubscribe: Should throw error for invalid userID", async () => {
@@ -61,8 +54,8 @@ describe("Notification server test", () => {
       .from(notificationsTable)
       .where(eq(notificationsTable.actorId, POST_EXAMPLE.userId));
 
-    expect(await sendPushNotificationSpy).toHaveBeenCalledTimes(1);
-    expect(await chunkPushNotificationSpy).toHaveBeenCalledTimes(1);
+    expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledTimes(1);
+    expect(await chunkPushNotificationsSpy).toHaveBeenCalledTimes(1);
 
     // expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledWith({
     //   id: "0465c9df-7832-4fbb-be79-5d1aaf670bcd",

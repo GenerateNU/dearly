@@ -6,13 +6,15 @@ import { setUpRoutes } from "./routes/init";
 import { automigrateDB } from "./database/migrate";
 import { S3Impl } from "./services/s3Service";
 import { ExpoNotificationService } from "./services/notificationsService";
+import Expo from "expo-server-sdk";
 
 const app = new Hono();
-
 const config = getConfigurations();
 
 (async function setUpServer() {
   const s3ServiceProvider = new S3Impl(config.s3Config);
+  const expo = new Expo();
+
   try {
     const db = connectDB(config);
 
@@ -20,9 +22,9 @@ const config = getConfigurations();
 
     configureMiddlewares(app, config);
 
-    setUpRoutes(app, db, s3ServiceProvider);
+    new ExpoNotificationService(config, db, expo);
 
-    new ExpoNotificationService(config, db);
+    setUpRoutes(app, db, s3ServiceProvider, expo);
 
     console.log("Successfully initialize app");
   } catch (error) {
