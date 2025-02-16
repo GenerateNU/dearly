@@ -9,6 +9,7 @@ import { IconButton } from "@/design-system/components/ui/icon-button";
 import { TextButton } from "@/design-system/components/ui/text-button";
 import { Profile } from "@/design-system/components/ui/profile";
 import { RefreshControl } from "react-native";
+import { Dropdown } from "@/design-system/components/ui/dropdown";
 
 const Index = () => {
   const [menu1, setMenu1] = useState("Home");
@@ -75,6 +76,11 @@ const Index = () => {
               onPress={() => null}
             />
           </Box>
+        </Box>
+
+        <Box>
+          <Text variant="body">dropdown menu</Text>
+          <Dropdown />
         </Box>
 
         <Box gap="s">

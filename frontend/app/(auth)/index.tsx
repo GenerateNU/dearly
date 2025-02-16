@@ -26,7 +26,6 @@ const Index = () => {
         onPress={() => sheetRef.current?.snapToIndex(0)}
         label="Popup"
       />
-
       <CommentPopUp id="" ref={sheetRef} />
     </Box>
   );

@@ -29,7 +29,7 @@ export const Profile: React.FC<ProfileProps> = ({
       <Box gap="xs" flexDirection="column" justifyContent="flex-start" alignItems="flex-start">
         <Text variant="body">{name ? name : username}</Text>
         {bio && (
-          <Box width="85%">
+          <Box width="83%">
             <Text>{bio}</Text>
           </Box>
         )}
