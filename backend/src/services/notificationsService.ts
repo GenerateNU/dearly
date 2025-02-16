@@ -1,11 +1,11 @@
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { createClient, PostgrestError, SupabaseClient } from "@supabase/supabase-js";
 import Expo, { ExpoPushMessage } from "expo-server-sdk";
 import { NotFoundError } from "../utilities/errors/app-error";
 import { Configuration } from "../types/config";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { postValidate } from "../entities/posts/validator";
 import { Post } from "../types/api/internal/posts";
-import { eq, and, ne } from "drizzle-orm";
+import { eq, and, ne, arrayContains, inArray, not } from "drizzle-orm";
 import {
   devicesTable,
   groupsTable,
@@ -110,6 +110,8 @@ export class ExpoNotificationService implements INotificationService {
   }
 
   // Will retry some thunk up to the given number of times
+  //TODO: This is just an idea, this will not work however because these methods have side effects on the DB
+  // We should only wrap the atempt to send a message.
   retryOnError = async <T>(func: () => T, tries: number): Promise<T> => {
     if (tries <= 1) {
       return await func();
@@ -216,18 +218,22 @@ export class ExpoNotificationService implements INotificationService {
       notifications.push(res[0]);
     }
 
-    // TODO: make this into one query
+    const posterName = (
+      await this.db.select().from(usersTable).where(eq(usersTable.id, post.userId))
+    ).at(0)?.name;
+    const groupName = (
+      await this.db.select().from(groupsTable).where(eq(groupsTable.id, post.groupId))
+    ).at(0)?.name;
+
     // Get the list of push tokens for the group members
-    const messages: ExpoPushMessage[] = await Promise.all(
-      members
-        .filter(async (member) => await this.getNotificationEnabled(member.userId))
-        .map(async (member) => ({
-          to: await this.getPushToken(member.userId),
-          sound: "default",
-          body: "GET HYPE new group post",
-          data: { post },
-        })),
-    );
+    const messages: ExpoPushMessage[] = (
+      await this.getNotificationEnabled(members.map((curr) => curr.userId))
+    ).map((member: { userID: string; token: string }) => ({
+      to: member.token,
+      sound: "default",
+      body: `${posterName} just posted a new post in ${groupName}!`,
+      data: { post },
+    }));
 
     // Send the notifications and if all notifications off, empty list and none will send
     const chunks: ExpoPushMessage[][] = this.expo.chunkPushNotifications(messages);
@@ -278,18 +284,24 @@ export class ExpoNotificationService implements INotificationService {
     if (!notification) {
       throw new NotFoundError("Notification");
     }
-    if (!this.getNotificationEnabled(userId.userId)) {
-      return notification;
-    }
 
-    const token = await this.getPushToken(userId.userId);
+    const userInfo = await this.getNotificationEnabled([userId.userId]);
+    const nameLiked = await this.db
+      .select({ name: usersTable.name })
+      .from(usersTable)
+      .where(eq(usersTable.id, like.userId));
 
-    // TODO: CHANGE SCHEMA TO STORE PUSH TOKEN.
+    const groupName = await this.db
+    .select({ groupName: groupsTable.name })
+    .from(groupsTable)
+    .leftJoin(postsTable, eq(groupsTable.id, postsTable.groupId))
+    .where(eq(postsTable.id, like.postId));
+
     const messages: ExpoPushMessage[] = [
       {
-        to: token,
+        to: userInfo[0]!.token,
         sound: "default",
-        body: "OOOHHHHH someone loved your post <3",
+        body: `${nameLiked[0]?.name} just liked your post in ${groupName[0]?.groupName}!`,
         data: { like },
       },
     ];
@@ -341,17 +353,25 @@ export class ExpoNotificationService implements INotificationService {
       throw new NotFoundError("Notification");
     }
 
-    if (!this.getNotificationEnabled(userId.userId)) {
-      return notification;
-    }
+    const userInfo = await this.getNotificationEnabled([userId.userId]);
+    const nameCommented = await this.db
+      .select({ name: usersTable.name })
+      .from(usersTable)
+      .where(eq(usersTable.id, comment.userId));
 
-    const token = await this.getPushToken(userId.userId);
+    const groupName = await this.db
+    .select({ groupName: groupsTable.name }) 
+    .from(groupsTable)
+    .leftJoin(postsTable, eq(groupsTable.id, postsTable.groupId))
+    .where(eq(postsTable.id, comment.postId));
+
+    console.log(`${nameCommented[0]?.name} just commented on your post in ${groupName[0]?.groupName}!`)
 
     const messages: ExpoPushMessage[] = [
       {
-        to: token,
+        to: userInfo[0]!.token,
         sound: "default",
-        body: "TALK TALK",
+        body: `${nameCommented[0]?.name} just commented on your post in ${groupName[0]?.groupName}!`,
         data: { comment },
       },
     ];
@@ -364,29 +384,26 @@ export class ExpoNotificationService implements INotificationService {
     return notification;
   }
 
-  private async getNotificationEnabled(userId: string): Promise<boolean> {
-    const [notificationsEnabled] = await this.db
+  //Returns any userIDs in the given list of members that have notifications enabled
+  private async getNotificationEnabled(
+    memberIDs: string[],
+  ): Promise<{ userID: string; token: string }[]> {
+    const notificationsEnabled = await this.db
       .select({
         notificationsEnabled: membersTable.notificationsEnabled,
+        userId: membersTable.userId,
+        token: devicesTable.token,
       })
       .from(membersTable)
-      .where(eq(membersTable.userId, userId));
+      .leftJoin(devicesTable, eq(membersTable.userId, devicesTable.userId))
+      .where(
+        and(inArray(membersTable.userId, memberIDs), eq(membersTable.notificationsEnabled, true)),
+      );
     if (!notificationsEnabled) {
       throw new NotFoundError("Notifications Enabled");
     }
-    return notificationsEnabled.notificationsEnabled;
-  }
-
-  private async getPushToken(userId: string): Promise<string> {
-    const [token] = await this.db
-      .select({
-        token: devicesTable.token,
-      })
-      .from(devicesTable)
-      .where(eq(devicesTable.userId, userId));
-    if (!token) {
-      throw new NotFoundError("Token");
-    }
-    return token.token;
+    return notificationsEnabled.map((current) => {
+      return { userID: current.userId, token: current.token ? current.token : "" };
+    });
   }
 }
