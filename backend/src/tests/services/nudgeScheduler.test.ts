@@ -1,21 +1,12 @@
-import {
-  CreateScheduleCommand,
-  DeleteScheduleCommand,
-  SchedulerClient,
-  UpdateScheduleCommand,
-} from "@aws-sdk/client-scheduler";
+
 import { AWSEventBridgeScheduler } from "../../services/nudgeScheduler";
-import { mockClient } from "aws-sdk-client-mock";
 import { SchedulePayload } from "../../types/api/internal/nudges";
 import { ExpoPushMessage } from "expo-server-sdk";
+import { mockSchedulerClient } from "../helpers/mock";
 
-const schedulerClient = mockClient(SchedulerClient);
-schedulerClient.on(CreateScheduleCommand).resolves({ ScheduleArn: "testARN" });
-schedulerClient.on(DeleteScheduleCommand).resolves({ $metadata: { httpStatusCode: 200 } });
-schedulerClient.on(UpdateScheduleCommand).resolves({ $metadata: { httpStatusCode: 200 } });
-const castSchedulerClient: SchedulerClient = schedulerClient as unknown as SchedulerClient;
+const schedulerClient = mockSchedulerClient()
 
-const scheduler = new AWSEventBridgeScheduler(castSchedulerClient);
+const scheduler = new AWSEventBridgeScheduler(schedulerClient);
 
 describe("Nudge Scheduler Testing", async () => {
   const expoPushMessages: ExpoPushMessage[] = [];

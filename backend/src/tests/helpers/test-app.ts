@@ -9,14 +9,13 @@ import { seedDatabase } from "./seed-db";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { mockClient } from "aws-sdk-client-mock";
 import { S3Impl } from "../../services/s3Service";
-import { SchedulerClient } from "@aws-sdk/client-scheduler";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import { mockSchedulerClient } from "./mock";
 
 export const startTestApp = async (): Promise<Hono> => {
   const app = new Hono();
 
-  // TODO: mock this later
-  const schedulerClient = new SchedulerClient();
+  const schedulerClient = mockSchedulerClient();
 
   const config = getConfigurations();
 

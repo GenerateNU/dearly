@@ -45,7 +45,7 @@ export class AWSEventBridgeScheduler implements NudgeScheduler {
 
       const command = new UpdateScheduleCommand(input);
       const response = await this.scheduler.send(command);
-      return response;
+      return response.$metadata.httpStatusCode ?? null;
     };
     return await handleAWSServiceError(updateScheduleImpl, "Failed to update recurring schedule")();
   }
@@ -57,7 +57,7 @@ export class AWSEventBridgeScheduler implements NudgeScheduler {
       const command = new UpdateScheduleCommand(input);
       const response = await this.scheduler.send(command);
 
-      return response;
+      return response.$metadata.httpStatusCode ?? null;
     };
     return await handleAWSServiceError(
       disableScheduleImpl,
@@ -72,7 +72,7 @@ export class AWSEventBridgeScheduler implements NudgeScheduler {
       };
       const command = new DeleteScheduleCommand(input);
       const response = await this.scheduler.send(command);
-      return response;
+      return response.$metadata.httpStatusCode ?? null;
     };
     return await handleAWSServiceError(removeScheduleImpl, "Failed to remove recurring schedule")();
   }

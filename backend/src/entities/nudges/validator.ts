@@ -33,6 +33,10 @@ export const nudgeScheduleValidate = nudgeScheduleBase
       .nullable(),
     day: z.number().min(1).max(31).optional().nullable(),
     month: z.number().min(1).max(12).optional().nullable(),
+    nudgeAt: z.preprocess(
+      (time) => (typeof time === "string" ? new Date(time) : time),
+      z.date()
+    )
   })
   .refine(validateFrequencyRequirements, {
     message: "Invalid schedule configuration. Check frequency-specific requirements.",
