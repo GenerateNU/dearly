@@ -10,11 +10,7 @@ import { SchedulerClient } from "@aws-sdk/client-scheduler";
 
 export interface NudgeService {
   manualNudge(userIds: string[], groupId: string, managerId: string): Promise<void>;
-  addSchedule(
-    managerId: string,
-    payload: NudgeSchedulePayload,
-  ): Promise<NudgeSchedulePayload | undefined>;
-  updateSchedule(
+  upsertSchedule(
     managerId: string,
     payload: NudgeSchedulePayload,
   ): Promise<NudgeSchedulePayload | undefined>;
@@ -47,53 +43,64 @@ export class NudgeServiceImpl implements NudgeService {
     return await handleServiceError(manualNudgeImpl)();
   }
 
-  async addSchedule(
+  async upsertSchedule(
     managerId: string,
     payload: NudgeSchedulePayload,
   ): Promise<NudgeSchedule | undefined> {
-
-    const addScheduleImp = async () => {
+    const upsertScheduleImpl = async () => {
+      // check if in database already
+      const update = !(await this.nudgeTransaction.getNudgeSchedule(payload.groupId, managerId)); // TODO: create own method to check existence
       // upsert schedule into database
       const schedule = await this.nudgeTransaction.upsertSchedule(managerId, payload);
       if (!schedule) {
         throw new InternalServerError("Failed to add schedule");
       }
+
+      const notificationMetadata = await this.nudgeTransaction.getAutoNudgeNotificationMetadata(
+        schedule.groupId,
+        managerId,
+      );
   
-      const notificationMetadata = await this.getNotificationMetaData(managerId, schedule);
-      if (!notificationMetadata) return;
-  
-      await this.scheduler.addSchedule(schedule?.groupId, notificationMetadata)
+      if (notificationMetadata.deviceTokens.length === 0) return;
+      const schedulePayload = {
+        schedule: schedule,
+        expo: {
+          notifications: this.formatPushNotifications(notificationMetadata),
+        }
+      };
 
-      return schedule;
-    }
-    
-    return await handleServiceError(addScheduleImp)();
-  };
-
-  async updateSchedule(
-    managerId: string,
-    payload: NudgeSchedulePayload,
-  ): Promise<NudgeSchedule | undefined> {
-
-    const updateScheduleImp = async () => {
-      // upsert schedule into database
-      const schedule = await this.nudgeTransaction.upsertSchedule(managerId, payload);
-      if (!schedule) {
-        throw new InternalServerError("Failed to add schedule");
+      // Add to EventBridge Scheduler
+      if (update) {
+        this.scheduler.updateSchedule(managerId, schedulePayload);
+      } else {
+        this.scheduler.addSchedule(managerId, schedulePayload);
       }
-  
-      const notificationMetadata = await this.getNotificationMetaData(managerId, schedule);
-      if (!notificationMetadata) return;
-  
-      await this.scheduler.updateSchedule(schedule?.groupId, notificationMetadata)
 
       return schedule;
-    }
-    
-    return await handleServiceError(updateScheduleImp)();
-  };
+    };
+    return await handleServiceError(upsertScheduleImpl)();
+  }
 
-  
+  async getNotificationMetaData(
+    managerId: string,
+    schedule: NudgeSchedule,
+  ): Promise<SchedulePayload | undefined> {
+    const notificationMetadata = await this.nudgeTransaction.getAutoNudgeNotificationMetadata(
+      schedule.groupId,
+      managerId,
+    );
+
+    if (notificationMetadata.deviceTokens.length === 0) return;
+    const schedulePayload = {
+      schedule: schedule,
+      expo: {
+        notifications: this.formatPushNotifications(notificationMetadata),
+      }
+    };
+
+    return schedulePayload;
+  }
+
   async getSchedule(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null> {
     const getScheduleImpl = async () => {
       return await this.nudgeTransaction.getNudgeSchedule(groupId, managerId);
@@ -110,26 +117,6 @@ export class NudgeServiceImpl implements NudgeService {
     return handleServiceError(deactivateNudgeImpl)();
   }
 
-  async getNotificationMetaData(
-    managerId: string,
-    schedule: NudgeSchedule,
-  ): Promise<SchedulePayload | undefined> {
-    const notificationMetadata = await this.nudgeTransaction.getAutoNudgeNotificationMetadata(
-      schedule.groupId,
-      managerId,
-    );
-  
-    if (notificationMetadata.deviceTokens.length === 0) return;
-    const schedulePayload = {
-      schedule: schedule,
-      expo: {
-        notifications: this.formatPushNotifications(notificationMetadata),
-      }
-    };
-  
-    return schedulePayload;
-  }
-  
   private async sendPushNotifications(notifications: ExpoPushMessage[]): Promise<void> {
     try {
       const receipts = await this.expoService.sendPushNotificationsAsync(notifications);
