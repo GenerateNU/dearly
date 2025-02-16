@@ -70,10 +70,15 @@ export class NudgeServiceImpl implements NudgeService {
       };
 
       // Add to EventBridge Scheduler
+      let response;
       if (update) {
-        this.scheduler.updateSchedule(managerId, schedulePayload);
+        response = await this.scheduler.updateSchedule(managerId, schedulePayload);
       } else {
-        this.scheduler.addSchedule(managerId, schedulePayload);
+        response = await this.scheduler.addSchedule(managerId, schedulePayload);
+      }
+
+      if (response != 200) {
+        throw new InternalServerError("Failed to add/update schedule in EventBridge")
       }
 
       return schedule;

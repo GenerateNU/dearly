@@ -15,10 +15,10 @@ import { NudgeSchedulePayload, SchedulePayload } from "../types/api/internal/nud
 
 export interface NudgeScheduler {
   // TODO: think about I/O type of this & more debugging
-  addSchedule(id: string, payload: SchedulePayload): Promise<unknown>;
-  updateSchedule(id: string, payload: SchedulePayload, isActive: boolean): Promise<unknown>;
-  disableSchedule(id: string): Promise<unknown>;
-  removeSchedule(id: string): Promise<unknown>;
+  addSchedule(id: string, payload: SchedulePayload): Promise<number | null>;
+  updateSchedule(id: string, payload: SchedulePayload, isActive: boolean): Promise<number | null>;
+  disableSchedule(id: string): Promise<number | null>;
+  removeSchedule(id: string): Promise<number | null>;
 }
 
 export class AWSEventBridgeScheduler implements NudgeScheduler {
@@ -29,17 +29,17 @@ export class AWSEventBridgeScheduler implements NudgeScheduler {
   }
 
   // Add a new schedule
-  async addSchedule(name: string, payload: SchedulePayload): Promise<unknown> {
+  async addSchedule(name: string, payload: SchedulePayload): Promise<number | null> {
     const addScheduleImpl = async () => {
       const input = await this.scheduleCommandInput(name, payload);
       const command = new CreateScheduleCommand(input);
       const response = await this.scheduler.send(command);
-      return response;
+      return response.$metadata.httpStatusCode ?? null;
     };
     return await handleAWSServiceError(addScheduleImpl, "Failed to add recurring schedule.")();
   }
 
-  async updateSchedule(id: string, payload: SchedulePayload): Promise<unknown> {
+  async updateSchedule(id: string, payload: SchedulePayload): Promise<number| null> {
     const updateScheduleImpl = async () => {
       const input = await this.scheduleCommandInput(id, payload);
 
@@ -51,7 +51,7 @@ export class AWSEventBridgeScheduler implements NudgeScheduler {
   }
 
   // TODO: don't think this is correct though
-  async disableSchedule(id: string): Promise<unknown> {
+  async disableSchedule(id: string): Promise<number | null> {
     const disableScheduleImpl = async () => {
       const input = await this.scheduleCommandInput(id, null, ScheduleState.DISABLED);
       const command = new UpdateScheduleCommand(input);
@@ -65,7 +65,7 @@ export class AWSEventBridgeScheduler implements NudgeScheduler {
     )();
   }
 
-  async removeSchedule(id: string): Promise<unknown> {
+  async removeSchedule(id: string): Promise<number | null> {
     const removeScheduleImpl = async () => {
       const input = {
         Name: id,
