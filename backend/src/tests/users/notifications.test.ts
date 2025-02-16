@@ -3,47 +3,102 @@ import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
-import { USER_ANA, USER_BOB, USER_ALICE, USER_BILL } from "../helpers/test-constants";
+import { USER_ALICE_ID, NOTIFICATIONS_MOCK } from "../helpers/test-constants";
 
 describe("GET /users/notifications", () => {
-    let app: Hono;
-    const testBuilder = new TestBuilder();
-  
-    beforeAll(async () => {
-      app = await startTestApp();
-    });
-    const ANA = {
-      username: USER_ANA.username,
-      name: USER_ANA.name,
-      id: USER_ANA.id,
-      profilePhoto: null,
-      isMember: false,
-      lastNudgedAt: null,
-    };
-  
-    const BOB = {
-      username: USER_BOB.username,
-      name: USER_BOB.name,
-      id: USER_BOB.id,
-      profilePhoto: null,
-      isMember: true,
-      lastNudgedAt: null,
-    };
-  
-    const BILL = {
-      username: USER_BILL.username,
-      name: USER_BILL.name,
-      id: USER_BILL.id,
-      profilePhoto: null,
-      isMember: false,
-      lastNudgedAt: null,
-    };
-  
-    it.each([
-      ["bob", [BOB, ANA, BILL]],
-      ["ana", [ANA, BOB, BILL]],
-      ["bill", [BILL, BOB, ANA]],
-    ])("should return 200 if is manager with query param %s", async (username, expectedBody) => {
+  let app: Hono;
+  const testBuilder = new TestBuilder();
+  const aliceJWT = generateJWTFromID(USER_ALICE_ID);
 
+  beforeAll(async () => {
+    app = await startTestApp();
+  });
 
-    });
+  it("should return 200 with one notification", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.GET,
+        route: `/api/v1/users/notifications`,
+        queryParams: {
+          limit: "1",
+          page: "1",
+        },
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${aliceJWT}`,
+        },
+      })
+    )
+      .assertBody(NOTIFICATIONS_MOCK[0])
+      .assertStatusCode(Status.OK);
+  });
+
+  it("should return 200 with all notifications", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.GET,
+        route: `/api/v1/users/notifications`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${aliceJWT}`,
+        },
+      })
+    )
+      .assertBody(NOTIFICATIONS_MOCK)
+      .assertStatusCode(Status.OK);
+  });
+
+  // Failing tests for /users/notifications endpoint
+  it("should return 401 when no Authorization header is provided", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.GET,
+        route: `/api/v1/users/notifications`,
+        queryParams: {
+          limit: "1",
+          page: "1",
+        },
+        autoAuthorized: false,
+        // no authorization header
+      })
+    ).assertStatusCode(Status.Unauthorized);
+  });
+
+  it("should return 401 when an invalid Authorization token is provided", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.GET,
+        route: `/api/v1/users/notifications`,
+        queryParams: {
+          limit: "1",
+          page: "1",
+        },
+        autoAuthorized: false,
+        headers: {
+          Authorization: "Bearer invalid.token",
+        },
+      })
+    ).assertStatusCode(Status.Unauthorized);
+  });
+
+  it("should return 400 when query parameters are invalid", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.GET,
+        route: `/api/v1/users/notifications`,
+        queryParams: {
+          limit: "not-a-number",
+        },
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${aliceJWT}`,
+        },
+      })
+    ).assertStatusCode(Status.BadRequest);
+  });
+});
