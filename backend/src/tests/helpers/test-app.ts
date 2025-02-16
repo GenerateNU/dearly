@@ -15,6 +15,7 @@ import { spyOn } from "bun:test";
 export const expo = new Expo();
 export const sendPushNotificationsAsyncSpy = spyOn(expo, "sendPushNotificationsAsync");
 export const chunkPushNotificationsSpy = spyOn(expo, "chunkPushNotifications");
+import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 
 export const startTestApp = async (): Promise<Hono> => {
   const app = new Hono();
@@ -26,7 +27,7 @@ export const startTestApp = async (): Promise<Hono> => {
 
   const s3 = new S3Impl(config.s3Config, client);
 
-  const db = connectDB(config);
+  const db: PostgresJsDatabase = connectDB(config);
 
   await automigrateDB(db, config);
 
@@ -36,7 +37,7 @@ export const startTestApp = async (): Promise<Hono> => {
 
   configureMiddlewares(app, config);
 
-  setUpRoutes(app, db, s3, expo);
-
+  setUpRoutes(app, db, config, s3, expo);
+  
   return app;
 };

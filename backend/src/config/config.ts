@@ -53,6 +53,13 @@ export const getConfigurations = (): Configuration => {
       region: parseEnv("AWS_REGION"),
       name: parseEnv("AWS_BUCKET_NAME"),
     },
+    slackConfig: {
+      expoSignature: parseEnv("SECRET_WEBHOOK_KEY"),
+      slackWebhookUrl: parseEnv("SLACK_WEBHOOK_URL"),
+      slackChannelID: parseEnv("SLACK_CHANNEL_ID"),
+      slackUserID: parseEnv("SLACK_USER_GROUP_ID"),
+      qrCodeGenerator: parseEnv("BUILD_QR_CODE_GENERATOR"),
+    },
     environment: nodeEnv,
     supabase: {
       url: parseEnv("SUPABASE_URL"),

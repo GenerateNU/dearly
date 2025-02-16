@@ -1,0 +1,58 @@
+name: EAS Internal Preview Build
+
+on:
+  issue_comment:
+    types: [created] 
+
+permissions:
+  issues: write
+  pull-requests: write
+  contents: read
+  statuses: write
+
+jobs:
+  build:
+    name: Internal Preview Build
+    if: github.event.issue.pull_request && contains(github.event.comment.body, '/preview-build')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get branch of PR
+        uses: xt0rted/pull-request-comment-branch@v1
+        id: comment-branch
+
+      - name: Checkout PR branch ${{ steps.comment-branch.outputs.head_ref }}
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ steps.comment-branch.outputs.head_ref }}
+      
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+      
+      - name: Install dependencies
+        run: cd frontend && bun install
+      
+      - name: Setup Expo and EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      
+      - name: Start EAS Build
+        run: cd frontend && eas build --platform ios --non-interactive --no-wait --profile preview
+
+      - name: Add comment to PR
+        uses: actions/github-script@v6
+        if: always()
+        with:
+          script: |
+            const url = '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}';
+            const success = '${{ job.status }}' === 'success';
+            const body = `PR preview build started: ${success ? 'succeeded ✅' : 'failed ❌'}\n${url}`;
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            })

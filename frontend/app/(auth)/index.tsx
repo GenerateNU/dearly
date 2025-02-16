@@ -1,5 +1,5 @@
 import Box from "@/design-system/base/box";
-import Button from "@/design-system/components/button";
+import Button from "@/design-system/components/ui/button";
 import { router } from "expo-router";
 
 const Index = () => {

@@ -24,7 +24,7 @@ const config = getConfigurations();
 
     new ExpoNotificationService(config, db, expo);
 
-    setUpRoutes(app, db, s3ServiceProvider, expo);
+    setUpRoutes(app, db, config, s3ServiceProvider, expo);
 
     console.log("Successfully initialize app");
   } catch (error) {
