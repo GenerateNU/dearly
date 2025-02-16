@@ -9,6 +9,12 @@ import { seedDatabase } from "./seed-db";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { mockClient } from "aws-sdk-client-mock";
 import { S3Impl } from "../../services/s3Service";
+import Expo from "expo-server-sdk";
+import { spyOn } from "bun:test";
+
+export const expo = new Expo();
+export const sendPushNotificationsAsyncSpy = spyOn(expo, "sendPushNotificationsAsync");
+export const chunkPushNotificationsSpy = spyOn(expo, "chunkPushNotifications");
 
 export const startTestApp = async (): Promise<Hono> => {
   const app = new Hono();
@@ -30,7 +36,7 @@ export const startTestApp = async (): Promise<Hono> => {
 
   configureMiddlewares(app, config);
 
-  setUpRoutes(app, db, s3);
+  setUpRoutes(app, db, s3, expo);
 
   return app;
 };

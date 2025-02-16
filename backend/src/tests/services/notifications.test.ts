@@ -13,16 +13,16 @@ import {
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { startTestApp } from "../helpers/test-app";
+import Expo from "expo-server-sdk";
+import { spyOn, describe, expect, it, beforeAll, beforeEach } from "bun:test";
 import { membersTable, notificationsTable } from "../../entities/schema";
 import { resetDB } from "../../database/reset";
 import { seedDatabase } from "../helpers/seed-db";
-import Expo from "expo-server-sdk";
-import { spyOn, describe, expect, it, beforeAll, beforeEach } from "bun:test";
+import { chunkPushNotificationsSpy, expo, sendPushNotificationsAsyncSpy } from "../helpers/test-app";
 
-describe("S3 Notifications Service Testing", () => {
+describe("Notification server test", () => {
   const config = getConfigurations();
   const db = connectDB(config);
-  const expo = new Expo();
   const notifService: INotificationService = new ExpoNotificationService(config, db, expo);
   const pushNotiSpy = spyOn(expo, "sendPushNotificationsAsync");
   const chunkNotificationsSpy = spyOn(expo, "chunkPushNotifications");
@@ -38,8 +38,9 @@ describe("S3 Notifications Service Testing", () => {
     chunkNotificationsSpy.mockClear();
 
     await resetDB(db);
-
     await seedDatabase(db);
+    sendPushNotificationsAsyncSpy.mockClear();
+    chunkPushNotificationsSpy.mockClear();
   });
 
   it("Unsubscribe: Should throw error for invalid userID", async () => {
@@ -67,7 +68,7 @@ describe("S3 Notifications Service Testing", () => {
     expect(expectedAfter).toBe(false);
   });
 
-  it("notifyPost: Should insert and notifiy", async () => {
+  it("notifyPost: Should insert and notify", async () => {
     await notifService.notifyPost(POST_EXAMPLE);
 
     const results = await db
@@ -78,9 +79,8 @@ describe("S3 Notifications Service Testing", () => {
     expect(results[0]?.receiverId).toBe(USER_Nubs_ID);
     expect(results[0]?.receiverId).not.toBe(POST_EXAMPLE.userId);
 
-    //Check expo
-    expect(await pushNotiSpy).toHaveBeenCalledTimes(1);
-    expect(await chunkNotificationsSpy).toHaveBeenCalledTimes(1);
+    expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledTimes(1);
+    expect(await chunkPushNotificationsSpy).toHaveBeenCalledTimes(1);
   });
 
   it("notifyPost: Should insert and notifiy for a larger group", async () => {
@@ -92,9 +92,8 @@ describe("S3 Notifications Service Testing", () => {
       .where(eq(notificationsTable.actorId, FULL_SNAPPER_POST_EXAMPLE.userId));
     expect(results.length).toBe(3);
 
-    // Check expo
-    expect(await pushNotiSpy).toHaveBeenCalledTimes(1);
-    expect(await chunkNotificationsSpy).toHaveBeenCalledTimes(1);
+    expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledTimes(1);
+    expect(await chunkPushNotificationsSpy).toHaveBeenCalledTimes(1);
   });
 
   it("notifyLike: Should insert and notifiy", async () => {
@@ -109,9 +108,9 @@ describe("S3 Notifications Service Testing", () => {
     expect(results[0]?.actorId).toBe(LIKE_EXAMPLE.userId);
     expect(results[0]?.receiverId).toBe(POST_EXAMPLE.userId);
 
-    //Check expo
-    expect(await pushNotiSpy).toHaveBeenCalledTimes(1);
-    expect(await chunkNotificationsSpy).toHaveBeenCalledTimes(1);
+
+    expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledTimes(1);
+    expect(await chunkPushNotificationsSpy).toHaveBeenCalledTimes(1);
   });
 
   it("notifyComment: Should insert and notifiy", async () => {
@@ -125,8 +124,8 @@ describe("S3 Notifications Service Testing", () => {
     expect(results[0]?.receiverId).toBe(POST_EXAMPLE.userId);
     expect(results[0]?.actorId).toBe(SINGLE_COMMENT.userId);
 
-    //Check expo
-    expect(pushNotiSpy).toHaveBeenCalledTimes(1);
-    expect(chunkNotificationsSpy).toHaveBeenCalledTimes(1);
+
+    expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledTimes(1);
+    expect(await chunkPushNotificationsSpy).toHaveBeenCalledTimes(1);
   });
 });

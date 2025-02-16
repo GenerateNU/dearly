@@ -17,6 +17,7 @@ import {
 import { Like, likeValidate } from "../entities/likes/validator";
 import { Comment, commentValidate } from "../types/api/internal/comments";
 import { Notification } from "../types/api/internal/notification";
+import logger from "../utilities/logger";
 
 /*
 Questions for our tech leads
