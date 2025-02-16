@@ -13,12 +13,15 @@ import {
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { startTestApp } from "../helpers/test-app";
-import Expo from "expo-server-sdk";
 import { spyOn, describe, expect, it, beforeAll, beforeEach } from "bun:test";
 import { membersTable, notificationsTable } from "../../entities/schema";
 import { resetDB } from "../../database/reset";
 import { seedDatabase } from "../helpers/seed-db";
-import { chunkPushNotificationsSpy, expo, sendPushNotificationsAsyncSpy } from "../helpers/test-app";
+import {
+  chunkPushNotificationsSpy,
+  expo,
+  sendPushNotificationsAsyncSpy,
+} from "../helpers/test-app";
 
 describe("Notification server test", () => {
   const config = getConfigurations();
@@ -108,7 +111,6 @@ describe("Notification server test", () => {
     expect(results[0]?.actorId).toBe(LIKE_EXAMPLE.userId);
     expect(results[0]?.receiverId).toBe(POST_EXAMPLE.userId);
 
-
     expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledTimes(1);
     expect(await chunkPushNotificationsSpy).toHaveBeenCalledTimes(1);
   });
@@ -123,7 +125,6 @@ describe("Notification server test", () => {
     expect(results.length).toBe(1);
     expect(results[0]?.receiverId).toBe(POST_EXAMPLE.userId);
     expect(results[0]?.actorId).toBe(SINGLE_COMMENT.userId);
-
 
     expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledTimes(1);
     expect(await chunkPushNotificationsSpy).toHaveBeenCalledTimes(1);

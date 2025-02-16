@@ -38,6 +38,6 @@ export const startTestApp = async (): Promise<Hono> => {
   configureMiddlewares(app, config);
 
   setUpRoutes(app, db, config, s3, expo);
-  
+
   return app;
 };

@@ -166,17 +166,6 @@ export class ExpoNotificationService implements INotificationService {
       .where(eq(groupsTable.id, post.groupId));
 
     if (!posterGroupId) {
-      console.log(
-        await this.db
-          .select({
-            groupId: postsTable.groupId,
-            name: usersTable.name,
-            groupName: groupsTable.name,
-          })
-          .from(postsTable)
-          .innerJoin(usersTable, eq(usersTable.id, postsTable.userId))
-          .innerJoin(groupsTable, eq(groupsTable.id, postsTable.groupId)),
-      );
       throw new NotFoundError("Unable to find the group! " + post.groupId);
     }
 
@@ -293,10 +282,10 @@ export class ExpoNotificationService implements INotificationService {
       .where(eq(usersTable.id, like.userId));
 
     const groupName = await this.db
-    .select({ groupName: groupsTable.name })
-    .from(groupsTable)
-    .leftJoin(postsTable, eq(groupsTable.id, postsTable.groupId))
-    .where(eq(postsTable.id, like.postId));
+      .select({ groupName: groupsTable.name })
+      .from(groupsTable)
+      .leftJoin(postsTable, eq(groupsTable.id, postsTable.groupId))
+      .where(eq(postsTable.id, like.postId));
 
     const messages: ExpoPushMessage[] = [
       {
@@ -361,12 +350,10 @@ export class ExpoNotificationService implements INotificationService {
       .where(eq(usersTable.id, comment.userId));
 
     const groupName = await this.db
-    .select({ groupName: groupsTable.name }) 
-    .from(groupsTable)
-    .leftJoin(postsTable, eq(groupsTable.id, postsTable.groupId))
-    .where(eq(postsTable.id, comment.postId));
-
-    console.log(`${nameCommented[0]?.name} just commented on your post in ${groupName[0]?.groupName}!`)
+      .select({ groupName: groupsTable.name })
+      .from(groupsTable)
+      .leftJoin(postsTable, eq(groupsTable.id, postsTable.groupId))
+      .where(eq(postsTable.id, comment.postId));
 
     const messages: ExpoPushMessage[] = [
       {
