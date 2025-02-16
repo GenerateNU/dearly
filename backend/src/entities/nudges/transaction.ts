@@ -16,6 +16,7 @@ import { ONE_DAY_COOLDOWN_SEC } from "../../constants/nudge";
 import { Transaction } from "../../types/api/internal/transaction";
 import {
   NotificationMetadata,
+  NudgeSchedule,
   NudgeSchedulePayload,
   NudgeTarget,
 } from "../../types/api/internal/nudges";
@@ -35,7 +36,7 @@ export interface NudgeTransaction {
   upsertSchedule(
     managerId: string,
     payload: NudgeSchedulePayload,
-  ): Promise<NudgeSchedulePayload | null>;
+  ): Promise<NudgeSchedule | null>;
 
   getNudgeSchedule(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null>;
 
@@ -52,7 +53,7 @@ export class NudgeTransactionImpl implements NudgeTransaction {
   async upsertSchedule(
     managerId: string,
     payload: NudgeSchedulePayload,
-  ): Promise<NudgeSchedulePayload | null> {
+  ): Promise<NudgeSchedule | null> {
     return await this.db.transaction(async (tx) => {
       // validate group existence and manager permissions
       await this.validateGroup(tx, payload.groupId, managerId);

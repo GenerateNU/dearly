@@ -1,9 +1,15 @@
+import { z } from "zod";
 import { ExpoPushMessage } from "expo-server-sdk";
 import { scheduledNudgesTable } from "../../../entities/schema";
+import { nudgeScheduleValidate } from "../../../entities/nudges/validator";
 
-export type NudgeSchedulePayload = typeof scheduledNudgesTable.$inferSelect;
+
+export type NudgeSchedule = typeof scheduledNudgesTable.$inferSelect;
+export type NudgeSchedulePayload = z.infer<typeof nudgeScheduleValidate> & {
+  groupId: string
+};
 export type SchedulePayload = {
-  schedule: NudgeSchedulePayload;
+  schedule: NudgeSchedule;
   expo: {
     notifications: ExpoPushMessage[];
   };
