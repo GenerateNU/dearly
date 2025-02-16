@@ -51,7 +51,7 @@ export class NotificationTransactionImpl implements NotificationTransactions {
       .leftJoin(usersTable, eq(usersTable.id, notificationsTable.actorId))
       .where(eq(notificationsTable.receiverId, id))
       .limit(limit)
-      .offset(page - 1);
+      .offset((page - 1) * limit);
 
     if (!notificationPlain) {
       return [];

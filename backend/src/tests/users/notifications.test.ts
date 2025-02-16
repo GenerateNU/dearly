@@ -3,13 +3,7 @@ import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
-import {
-  NOTIFICATIONS_MOCK,
-  USER_ALICE,
-  USER_ANA_ID,
-  USER_BILL,
-  USER_BOB_ID,
-} from "../helpers/test-constants";
+import { NOTIFICATIONS_MOCK, USER_BOB_ID } from "../helpers/test-constants";
 
 describe("GET /users/notifications", () => {
   let app: Hono;
@@ -17,7 +11,7 @@ describe("GET /users/notifications", () => {
   const bobJWT = generateJWTFromID(USER_BOB_ID);
   const NOTIFICATIONS = NOTIFICATIONS_MOCK.map((notif) => ({
     ...notif,
-    createdAt: notif.createdAt.toISOString()
+    createdAt: notif.createdAt.toISOString(),
   }));
 
   beforeAll(async () => {
@@ -36,7 +30,7 @@ describe("GET /users/notifications", () => {
         },
         autoAuthorized: false,
         headers: {
-          Authorization: `Bearer ${generateJWTFromID(USER_BOB_ID)}`,
+          Authorization: `Bearer ${bobJWT}`,
         },
       })
     )
@@ -52,7 +46,7 @@ describe("GET /users/notifications", () => {
         route: `/api/v1/users/notifications`,
         autoAuthorized: false,
         headers: {
-          Authorization: `Bearer ${generateJWTFromID(USER_BOB_ID)}`,
+          Authorization: `Bearer ${bobJWT}`,
         },
         queryParams: {
           limit: "10",
@@ -112,7 +106,7 @@ describe("GET /users/notifications", () => {
         },
         autoAuthorized: false,
         headers: {
-          Authorization: `Bearer ${generateJWTFromID(USER_BOB_ID)}`,
+          Authorization: `Bearer ${bobJWT}`,
         },
       })
     ).assertStatusCode(Status.BadRequest);
@@ -130,7 +124,7 @@ describe("GET /users/notifications", () => {
         },
         autoAuthorized: false,
         headers: {
-          Authorization: `Bearer ${generateJWTFromID(USER_BOB_ID)}`,
+          Authorization: `Bearer ${bobJWT}`,
         },
       })
     )
@@ -145,5 +139,32 @@ describe("GET /users/notifications", () => {
           path: "page",
         },
       ]);
+  });
+
+  it.each([
+    ["1", "1", [NOTIFICATIONS[0]]],
+    ["1", "2", [NOTIFICATIONS[1]]],
+    ["1", "3", [NOTIFICATIONS[2]]],
+    ["2", "1", [NOTIFICATIONS[0], NOTIFICATIONS[1]]],
+    ["3", "1", [NOTIFICATIONS[0], NOTIFICATIONS[1], NOTIFICATIONS[2]]],
+    ["2", "2", [NOTIFICATIONS[2]]],
+  ])("should return 200 with limit %s and page %s", async (limit, page, expectedBody) => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.GET,
+        route: `/api/v1/users/notifications`,
+        queryParams: {
+          limit,
+          page,
+        },
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${bobJWT}`,
+        },
+      })
+    )
+      .assertStatusCode(Status.OK)
+      .assertBody(expectedBody);
   });
 });

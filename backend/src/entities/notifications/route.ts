@@ -9,8 +9,13 @@ export const notificationRoutes = (db: PostgresJsDatabase, mediaService: MediaSe
   const notification = new Hono();
 
   const notificationTransaction: NotificationTransactions = new NotificationTransactionImpl(db);
-  const notificationService: NotificationService = new NotificationServiceImpl(notificationTransaction, mediaService);
-  const notificationController: NotificationController = new NotificationControllerImpl(notificationService);
+  const notificationService: NotificationService = new NotificationServiceImpl(
+    notificationTransaction,
+    mediaService,
+  );
+  const notificationController: NotificationController = new NotificationControllerImpl(
+    notificationService,
+  );
 
   notification.get("/notifications", (ctx) => notificationController.getNotifications(ctx));
 
