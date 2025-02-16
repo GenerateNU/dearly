@@ -4,29 +4,28 @@ import { ExpoNotificationService, INotificationService } from "../../services/no
 import { connectDB } from "../../database/connect";
 import { POST_EXAMPLE, USER_Josh_ID } from "./../helpers/test-constants";
 import { eq } from "drizzle-orm";
-import { Hono } from "hono";
-import { startTestApp } from "../helpers/test-app";
 import { sendPushNotificationsAsyncSpy } from "../helpers/mock";
 import { membersTable, notificationsTable } from "../../entities/schema";
 import { resetDB } from "../../database/reset";
 import { seedDatabase } from "../helpers/seed-db";
+import Expo from "expo-server-sdk";
+import { describe, expect, beforeEach, it, spyOn } from "bun:test";
 
-describe("S3 Notifications Service Testing", () => {
+describe("Notification server test", () => {
   const config = getConfigurations();
   const db = connectDB(config);
-  const notifService: INotificationService = new ExpoNotificationService(config, db);
-  let app: Hono;
 
-  beforeAll(async () => {
-    app = await startTestApp();
-    // to reset number of times its method gets called
-    sendPushNotificationsAsyncSpy.mockClear();
-  });
+  // create spy on expo service
+  const expo = new Expo();
+  const sendPushNotificationSpy = spyOn(expo, "sendPushNotificationsAsync");
+  const chunkPushNotificationSpy = spyOn(expo, "chunkPushNotifications");
+  const notifService: INotificationService = new ExpoNotificationService(config, db, expo);
 
   beforeEach(async () => {
     await resetDB(db);
-
     await seedDatabase(db);
+    sendPushNotificationsAsyncSpy.mockClear();
+    chunkPushNotificationSpy.mockClear();
   });
 
   it("Unsubscribe: Should throw error for invalid userID", async () => {
@@ -54,7 +53,7 @@ describe("S3 Notifications Service Testing", () => {
     expect(expectedAfter).toBe(false);
   });
 
-  it("notifyPost: Should insert and notifiy", async () => {
+  it("notifyPost: Should insert and notify", async () => {
     await notifService.notifyPost(POST_EXAMPLE);
 
     const results = await db
@@ -62,9 +61,8 @@ describe("S3 Notifications Service Testing", () => {
       .from(notificationsTable)
       .where(eq(notificationsTable.actorId, POST_EXAMPLE.userId));
 
-    expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledTimes(1);
-
-
+    expect(await sendPushNotificationSpy).toHaveBeenCalledTimes(1);
+    expect(await chunkPushNotificationSpy).toHaveBeenCalledTimes(1);
 
     // expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledWith({
     //   id: "0465c9df-7832-4fbb-be79-5d1aaf670bcd",

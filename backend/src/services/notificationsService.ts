@@ -17,6 +17,7 @@ import {
 import { Like, likeValidate } from "../entities/likes/validator";
 import { Comment, commentValidate } from "../types/api/internal/comments";
 import { Notification } from "../types/api/internal/notification";
+import logger from "../utilities/logger";
 
 /*
 Questions for our tech leads
@@ -62,8 +63,8 @@ export class ExpoNotificationService implements INotificationService {
   private supabaseClient: SupabaseClient;
   private db: PostgresJsDatabase;
 
-  constructor(config: Configuration, db: PostgresJsDatabase) {
-    this.expo = new Expo();
+  constructor(config: Configuration, db: PostgresJsDatabase, expo: Expo) {
+    this.expo = expo;
     this.supabaseClient = createClient(config.supabase.url, config.supabase.key);
     this.subscribeToPosts();
     this.subscribeToComments();
@@ -124,6 +125,7 @@ export class ExpoNotificationService implements INotificationService {
         throw new NotFoundError("User");
       }
     } catch (error) {
+      logger.error(error);
       throw new NotFoundError("User", `Unable to find the following user ${userId}`);
     }
   }
@@ -161,18 +163,21 @@ export class ExpoNotificationService implements INotificationService {
       if (!members) {
         throw new NotFoundError("Unable to find the other group memebers!");
       }
-      let notifications: Notification[] = [];
+      const notifications: Notification[] = [];
 
-      for (let member of members) {
+      for (const member of members) {
         // Insert the notification into the database
-        const res = await this.db.insert(notificationsTable).values({
-          actorId: post.userId,
-          receiverId: member.userId,
-          referenceType: "POST",
-          postId: post.id,
-          title: "New Post",
-          description: `${posterGroupId.name} just posted in ${posterGroupId.groupName}`,
-        }).returning();
+        const res = await this.db
+          .insert(notificationsTable)
+          .values({
+            actorId: post.userId,
+            receiverId: member.userId,
+            referenceType: "POST",
+            postId: post.id,
+            title: "New Post",
+            description: `${posterGroupId.name} just posted in ${posterGroupId.groupName}`,
+          })
+          .returning();
         if (!res[0]) {
           throw new NotFoundError("Notification");
         }
@@ -194,13 +199,13 @@ export class ExpoNotificationService implements INotificationService {
 
       // Send the notifications and if all notifications off, empty list and none will send
       const chunks: ExpoPushMessage[][] = this.expo.chunkPushNotifications(messages);
-      for (let chunk of chunks) {
-        console.log("chunkin")
+      for (const chunk of chunks) {
         await this.expo.sendPushNotificationsAsync(chunk);
       }
 
       return notifications;
-    } catch (Error) {
+    } catch (error) {
+      logger.error(error);
       throw new NotFoundError("Supabase Issue");
     }
   }
@@ -256,11 +261,12 @@ export class ExpoNotificationService implements INotificationService {
       ];
 
       const chunks = this.expo.chunkPushNotifications(messages);
-      for (let chunk of chunks) {
+      for (const chunk of chunks) {
         await this.expo.sendPushNotificationsAsync(chunk);
       }
       return notification;
-    } catch (Error) {
+    } catch (error) {
+      logger.error(error);
       throw new NotFoundError("Supabase Issue"); // need to create this error
     }
   }
@@ -316,11 +322,12 @@ export class ExpoNotificationService implements INotificationService {
 
       // Send the notification
       const chunks = this.expo.chunkPushNotifications(messages);
-      for (let chunk of chunks) {
+      for (const chunk of chunks) {
         await this.expo.sendPushNotificationsAsync(chunk);
       }
       return notification;
-    } catch (Error) {
+    } catch (error) {
+      logger.error(error);
       throw new NotFoundError("Supabase Issue"); // need to create this error
     }
   }
@@ -337,7 +344,8 @@ export class ExpoNotificationService implements INotificationService {
         throw new NotFoundError("Notifications Enabled");
       }
       return notificationsEnabled.notificationsEnabled;
-    } catch (Error) {
+    } catch (error) {
+      logger.error(error);
       throw new NotFoundError("User");
     }
   }
@@ -354,7 +362,8 @@ export class ExpoNotificationService implements INotificationService {
         throw new NotFoundError("Token");
       }
       return token.token;
-    } catch (Error) {
+    } catch (error) {
+      logger.error(error);
       throw new NotFoundError("User");
     }
   }

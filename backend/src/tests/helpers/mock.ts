@@ -15,6 +15,7 @@ mock.module("expo-server-sdk", () => {
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       async sendPushNotificationsAsync(message: ExpoPushMessage[]): Promise<ExpoPushTicket[]> {
+        console.log("message");
         return Promise.resolve([]);
       }
 

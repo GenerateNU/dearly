@@ -22,9 +22,9 @@ export const MOCK_EXPO_TOKEN = "ExponentPushToken[Z9Hfn6ZxWVXaAs7MG3Pya8]";
 export const USER_Josh_ID = "61111211-4c0d-44d9-b2b1-8d897207f111";
 export const USER_Nubs_ID = "99111219-4c0d-44d9-b2b1-8d897207f111";
 export const SNAPPER_GROUP_ID = "ab674eaf-9999-47c1-8a38-81079577880b";
-export const SNAPPER_POST = "ab674eaf-9999-47c1-8a38-811234567890"
-export const JOSH_DEVICE_TOKEN = "ab674eaf-9999-1234-8a38-811234561234"
-export const NUBS_DEVICE_TOKEN = "ab674eaf-0000-1234-8a38-811234561234"
+export const SNAPPER_POST = "ab674eaf-9999-47c1-8a38-811234567890";
+export const JOSH_DEVICE_TOKEN = "ab674eaf-9999-1234-8a38-811234561234";
+export const NUBS_DEVICE_TOKEN = "ab674eaf-0000-1234-8a38-811234561234";
 
 export const GROUP_EMPTY_FIELDS_ERRORS = [
   {
@@ -150,15 +150,15 @@ export const USER_JOSH: CreateUserPayload = {
   name: "Josh",
   username: "josh",
   mode: "BASIC",
-  id: USER_Josh_ID
-}
+  id: USER_Josh_ID,
+};
 
 export const USER_NUBS: CreateUserPayload = {
   name: "Nubs",
   username: "nubs",
   mode: "BASIC",
-  id: USER_Nubs_ID
-}
+  id: USER_Nubs_ID,
+};
 
 export const DEARLY_GROUP: CreateGroupPayload = {
   name: "dearly",
@@ -197,8 +197,6 @@ export const COMMENTS: (typeof commentsTable.$inferInsert)[] = [
   },
 ];
 
-
-
 export const POST_EXAMPLE: Post = {
   id: "ab674eaf-9999-47c1-8a38-811234567890",
   groupId: SNAPPER_GROUP_ID,
@@ -206,4 +204,4 @@ export const POST_EXAMPLE: Post = {
   createdAt: new Date(),
   caption: "what the sigma",
   location: "Ur moms house",
-}
+};
