@@ -28,7 +28,14 @@ describe("PUT /groups/:id/nudges/auto", () => {
     nudgeAt: new Date(Date.now()),
   };
 
-  it("should return a 200 if the user is a manager of the group and request was successful", async () => {
+  const UPDATED_SCHEDULE = {
+    frequency: "YEARLY",
+    day: 14,
+    month: 3,
+    nudgeAt: new Date(Date.now()),
+  };
+
+  it("should return a 200 if the user is a manager and initial insert succeeded", async () => {
     (
       await testBuilder.request({
         app,
@@ -38,11 +45,37 @@ describe("PUT /groups/:id/nudges/auto", () => {
         headers: {
           Authorization: `Bearer ${ALICE_JWT}`,
         },
-        requestBody: {
-          ...EXAMPLE_SCHEDULE,
-        },
+        requestBody: EXAMPLE_SCHEDULE,
       })
-    ).assertStatusCode(Status.OK);
+    )
+      .assertStatusCode(Status.OK)
+      .assertFields({
+        nudgeAt: EXAMPLE_SCHEDULE.nudgeAt.toISOString(),
+        frequency: EXAMPLE_SCHEDULE.frequency,
+        daysOfWeek: EXAMPLE_SCHEDULE.daysOfWeek,
+      });
+  });
+
+  it("should return a 200 if the user is a manager and update succeeded", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.PUT,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${ALICE_JWT}`,
+        },
+        requestBody: UPDATED_SCHEDULE,
+      })
+    )
+      .assertStatusCode(Status.OK)
+      .assertFields({
+        nudgeAt: UPDATED_SCHEDULE.nudgeAt.toISOString(),
+        frequency: UPDATED_SCHEDULE.frequency,
+        month: UPDATED_SCHEDULE.month,
+        day: UPDATED_SCHEDULE.day,
+      });
   });
 
   it("should return 400 if no required fields", async () => {
