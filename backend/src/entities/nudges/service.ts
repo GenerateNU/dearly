@@ -54,7 +54,7 @@ export class NudgeServiceImpl implements NudgeService {
   ): Promise<NudgeSchedule | undefined> {
     const upsertScheduleImpl = async () => {
       // check if in database already
-      const update = !(await this.nudgeTransaction.getNudgeSchedule(payload.groupId, managerId)); // TODO: create own method to check existence
+      const update = !(await this.nudgeTransaction.getNudgeSchedule(payload.groupId, managerId));
       // upsert schedule into database
       const schedule = await this.nudgeTransaction.upsertSchedule(managerId, payload);
       if (!schedule) {
@@ -115,7 +115,7 @@ export class NudgeServiceImpl implements NudgeService {
     const getScheduleImpl = async () => {
       return await this.nudgeTransaction.getNudgeSchedule(groupId, managerId);
     };
-    return handleServiceError(getScheduleImpl)();
+    return await handleServiceError(getScheduleImpl)();
   }
 
   async deactivateNudge(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null> {
@@ -126,7 +126,7 @@ export class NudgeServiceImpl implements NudgeService {
       }
       return nudge;
     };
-    return handleServiceError(deactivateNudgeImpl)();
+    return await handleServiceError(deactivateNudgeImpl)();
   }
 
   private async sendPushNotifications(notifications: ExpoPushMessage[]): Promise<void> {
