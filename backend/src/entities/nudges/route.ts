@@ -17,9 +17,9 @@ export const nudgeRoutes = (
   const nudgeController: NudgeController = new NudgeControllerImpl(nudgeService);
 
   nudge.post("/manual", (ctx) => nudgeController.manualNudge(ctx));
-  nudge.post("/auto", (ctx) => nudgeController.upsertSchedule(ctx));
+  nudge.put("/auto", (ctx) => nudgeController.upsertSchedule(ctx));
   nudge.get("/auto", (ctx) => nudgeController.getSchedule(ctx));
-  nudge.put("/auto", (ctx) => nudgeController.deactivateSchedule(ctx));
+  nudge.put("/auto/off", (ctx) => nudgeController.deactivateSchedule(ctx));
 
   return nudge;
 };

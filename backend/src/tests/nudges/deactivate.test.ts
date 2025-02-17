@@ -15,7 +15,7 @@ import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
 
-describe("PUT /groups/:id/nudges/auto", () => {
+describe("PUT /groups/:id/nudges/auto/off", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
 
@@ -30,7 +30,7 @@ describe("PUT /groups/:id/nudges/auto", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.PUT,
-        route: `/api/v1/groups/${GENERATE_GROUP_ID}/nudges/auto`,
+        route: `/api/v1/groups/${GENERATE_GROUP_ID}/nudges/auto/off`,
         autoAuthorized: false,
         headers: {
           Authorization: `Bearer ${generateJWTFromID(USER_BILL_ID)}`,
@@ -46,7 +46,7 @@ describe("PUT /groups/:id/nudges/auto", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.PUT,
-        route: `/api/v1/groups/${ANOTHER_GROUP_ID}/nudges/auto`,
+        route: `/api/v1/groups/${ANOTHER_GROUP_ID}/nudges/auto/off`,
         autoAuthorized: false,
         headers: {
           Authorization: `Bearer ${generateJWTFromID(USER_ANA_ID)}`,
@@ -66,7 +66,7 @@ describe("PUT /groups/:id/nudges/auto", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.PUT,
-        route: `/api/v1/groups/${generateUUID()}/nudges/auto`,
+        route: `/api/v1/groups/${generateUUID()}/nudges/auto/off`,
         autoAuthorized: false,
         headers: {
           Authorization: `Bearer ${ALICE_JWT}`,
@@ -82,7 +82,7 @@ describe("PUT /groups/:id/nudges/auto", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.PUT,
-        route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto/off`,
         autoAuthorized: false,
         headers: {
           Authorization: `Bearer ${generateJWTFromID(USER_ANA_ID)}`,
@@ -96,7 +96,7 @@ describe("PUT /groups/:id/nudges/auto", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.PUT,
-        route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto/off`,
         autoAuthorized: false,
         headers: {
           Authorization: `Bearer ${generateJWTFromID(USER_BOB_ID)}`,
@@ -112,7 +112,7 @@ describe("PUT /groups/:id/nudges/auto", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.PUT,
-        route: `/api/v1/groups/${id}/nudges/auto`,
+        route: `/api/v1/groups/${id}/nudges/auto/off`,
       })
     )
       .assertStatusCode(Status.BadRequest)

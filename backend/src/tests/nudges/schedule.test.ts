@@ -12,7 +12,7 @@ import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
 
-describe("POST /groups/:id/nudges/auto", () => {
+describe("PUT /groups/:id/nudges/auto", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
 
@@ -28,11 +28,11 @@ describe("POST /groups/:id/nudges/auto", () => {
     nudgeAt: new Date(Date.now()),
   };
 
-  it.skip("should return a 201 if the user is a manager of the group and request was successful", async () => {
+  it("should return a 200 if the user is a manager of the group and request was successful", async () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.POST,
+        type: HTTPRequest.PUT,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
         autoAuthorized: false,
         headers: {
@@ -42,14 +42,14 @@ describe("POST /groups/:id/nudges/auto", () => {
           ...EXAMPLE_SCHEDULE,
         },
       })
-    ).assertStatusCode(Status.Created);
+    ).assertStatusCode(Status.OK);
   });
 
   it("should return 400 if no required fields", async () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.POST,
+        type: HTTPRequest.PUT,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
         autoAuthorized: false,
         headers: {
@@ -75,7 +75,7 @@ describe("POST /groups/:id/nudges/auto", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.POST,
+        type: HTTPRequest.PUT,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
         autoAuthorized: false,
         headers: {
@@ -102,7 +102,7 @@ describe("POST /groups/:id/nudges/auto", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.POST,
+        type: HTTPRequest.PUT,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
         autoAuthorized: false,
         headers: {
@@ -128,7 +128,7 @@ describe("POST /groups/:id/nudges/auto", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.POST,
+        type: HTTPRequest.PUT,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
         autoAuthorized: false,
         headers: {
@@ -156,7 +156,7 @@ describe("POST /groups/:id/nudges/auto", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.POST,
+        type: HTTPRequest.PUT,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
         autoAuthorized: false,
         headers: {
@@ -183,7 +183,7 @@ describe("POST /groups/:id/nudges/auto", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.POST,
+        type: HTTPRequest.PUT,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
         autoAuthorized: false,
         headers: {
@@ -209,7 +209,7 @@ describe("POST /groups/:id/nudges/auto", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.POST,
+        type: HTTPRequest.PUT,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
         autoAuthorized: false,
         headers: {
@@ -237,7 +237,7 @@ describe("POST /groups/:id/nudges/auto", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.POST,
+        type: HTTPRequest.PUT,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
         autoAuthorized: false,
         headers: {
@@ -263,7 +263,7 @@ describe("POST /groups/:id/nudges/auto", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.POST,
+        type: HTTPRequest.PUT,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
         autoAuthorized: false,
         headers: {
@@ -289,7 +289,7 @@ describe("POST /groups/:id/nudges/auto", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.POST,
+        type: HTTPRequest.PUT,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
         autoAuthorized: false,
         headers: {
@@ -315,7 +315,7 @@ describe("POST /groups/:id/nudges/auto", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.POST,
+        type: HTTPRequest.PUT,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
         autoAuthorized: false,
         headers: {
@@ -344,7 +344,7 @@ describe("POST /groups/:id/nudges/auto", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.POST,
+        type: HTTPRequest.PUT,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
         autoAuthorized: false,
         headers: {
@@ -371,7 +371,7 @@ describe("POST /groups/:id/nudges/auto", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.POST,
+        type: HTTPRequest.PUT,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
         autoAuthorized: false,
         headers: {
@@ -398,7 +398,7 @@ describe("POST /groups/:id/nudges/auto", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.POST,
+        type: HTTPRequest.PUT,
         route: `/api/v1/groups/${generateUUID()}/nudges/auto`,
         autoAuthorized: false,
         headers: {
@@ -415,7 +415,7 @@ describe("POST /groups/:id/nudges/auto", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.POST,
+        type: HTTPRequest.PUT,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
         autoAuthorized: false,
         headers: {
@@ -430,7 +430,7 @@ describe("POST /groups/:id/nudges/auto", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.POST,
+        type: HTTPRequest.PUT,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
         autoAuthorized: false,
         headers: {
@@ -447,7 +447,7 @@ describe("POST /groups/:id/nudges/auto", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.POST,
+        type: HTTPRequest.PUT,
         route: `/api/v1/groups/${id}/nudges/auto`,
       })
     )
