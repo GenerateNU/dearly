@@ -27,10 +27,10 @@ describe("PUT /groups/:id/nudges/auto/off", () => {
 
   beforeAll(async () => {
     schedulerClient = getMockSchedulerClient();
-    scheduleCommandSpy = jest.spyOn(schedulerClient, "send")
+    scheduleCommandSpy = jest.spyOn(schedulerClient, "send");
     app = await startTestApp(schedulerClient);
   });
-  
+
   it("should return 404 if group does not exist", async () => {
     (
       await testBuilder.request({
@@ -46,10 +46,9 @@ describe("PUT /groups/:id/nudges/auto/off", () => {
       .assertStatusCode(Status.NotFound)
       .assertError("Group does not exist.");
 
-      
     expect(await scheduleCommandSpy).not.toHaveBeenCalled();
   });
-  
+
   it("should return 403 if user not member of group", async () => {
     (
       await testBuilder.request({
@@ -63,7 +62,7 @@ describe("PUT /groups/:id/nudges/auto/off", () => {
       })
     ).assertStatusCode(Status.Forbidden);
   });
-  
+
   it("should return 403 if user not manager of group", async () => {
     (
       await testBuilder.request({
@@ -77,7 +76,7 @@ describe("PUT /groups/:id/nudges/auto/off", () => {
       })
     ).assertStatusCode(Status.Forbidden);
   });
-  
+
   it.each(
     INVALID_ID_ARRAY.map((id) => [id === null ? "null" : id === undefined ? "undefined" : id, id]),
   )("should return 400 if invalid ID %s", async (id) => {
@@ -88,48 +87,47 @@ describe("PUT /groups/:id/nudges/auto/off", () => {
         route: `/api/v1/groups/${id}/nudges/auto/off`,
       })
     )
-    .assertStatusCode(Status.BadRequest)
-    .assertError("Invalid ID format");
+      .assertStatusCode(Status.BadRequest)
+      .assertError("Invalid ID format");
   });
-  
-    it("should return 200 if group schedule not configured", async () => {
-      (
-        await testBuilder.request({
-          app,
-          type: HTTPRequest.PUT,
-          route: `/api/v1/groups/${GENERATE_GROUP_ID}/nudges/auto/off`,
-          autoAuthorized: false,
-          headers: {
-            Authorization: `Bearer ${generateJWTFromID(USER_BILL_ID)}`,
-          },
-        })
-      )
-        .assertStatusCode(Status.OK)
-        .assertMessage("Nudge schedule not configured for deactivation");
 
-        
-        expect(await scheduleCommandSpy).not.toHaveBeenCalled();
-    });
-  
-    it("should return 200 if group schedule configured", async () => {
-      (
-        await testBuilder.request({
-          app,
-          type: HTTPRequest.PUT,
-          route: `/api/v1/groups/${ANOTHER_GROUP_ID}/nudges/auto/off`,
-          autoAuthorized: false,
-          headers: {
-            Authorization: `Bearer ${generateJWTFromID(USER_ANA_ID)}`,
-          },
-        })
-      )
-        .assertStatusCode(Status.OK)
-        .assertFields({
-          ...MOCK_SCHEDULE,
-          nudgeAt: MOCK_SCHEDULE.nudgeAt.toISOString(),
-          isActive: false,
-        });
-  
-        expect(await scheduleCommandSpy).toHaveBeenCalled();
-    });
+  it("should return 200 if group schedule not configured", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.PUT,
+        route: `/api/v1/groups/${GENERATE_GROUP_ID}/nudges/auto/off`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${generateJWTFromID(USER_BILL_ID)}`,
+        },
+      })
+    )
+      .assertStatusCode(Status.OK)
+      .assertMessage("Nudge schedule not configured for deactivation");
+
+    expect(await scheduleCommandSpy).not.toHaveBeenCalled();
+  });
+
+  it("should return 200 if group schedule configured", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.PUT,
+        route: `/api/v1/groups/${ANOTHER_GROUP_ID}/nudges/auto/off`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${generateJWTFromID(USER_ANA_ID)}`,
+        },
+      })
+    )
+      .assertStatusCode(Status.OK)
+      .assertFields({
+        ...MOCK_SCHEDULE,
+        nudgeAt: MOCK_SCHEDULE.nudgeAt.toISOString(),
+        isActive: false,
+      });
+
+    expect(await scheduleCommandSpy).toHaveBeenCalled();
+  });
 });

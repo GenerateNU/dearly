@@ -55,7 +55,7 @@ export const getConfigurations = (): Configuration => {
     },
     lambdaConfig: {
       lambdaARN: parseEnv("NUDGE_LAMBDA_ARN"),
-      lambdaRoleARN: parseEnv("NUDGE_LAMBDA_ROLE_ARN")
+      lambdaRoleARN: parseEnv("NUDGE_LAMBDA_ROLE_ARN"),
     },
     slackConfig: {
       expoSignature: parseEnv("SECRET_WEBHOOK_KEY"),

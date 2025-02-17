@@ -13,7 +13,9 @@ import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { mockSchedulerClient } from "./mock";
 import { SchedulerClient } from "@aws-sdk/client-scheduler";
 
-export const startTestApp = async (mockedSchedulerClient: SchedulerClient = mockSchedulerClient): Promise<Hono> => {
+export const startTestApp = async (
+  mockedSchedulerClient: SchedulerClient = mockSchedulerClient,
+): Promise<Hono> => {
   const app = new Hono();
 
   const config = getConfigurations();

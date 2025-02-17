@@ -10,7 +10,6 @@ import {
 } from "@aws-sdk/client-scheduler";
 import { mockClient } from "aws-sdk-client-mock";
 
-
 mock.module("@aws-sdk/s3-request-presigner", () => {
   return {
     getSignedUrl: jest.fn().mockResolvedValue(MOCK_SIGNED_URL),
@@ -30,7 +29,6 @@ mock.module("expo-server-sdk", () => {
   };
 });
 
-
 export const sendPushNotificationsAsyncSpy = spyOn(Expo.prototype, "sendPushNotificationsAsync");
 
 export const getMockSchedulerClient = () => {
@@ -47,4 +45,4 @@ export const getMockSchedulerClient = () => {
 
 export const mockSchedulerClient = getMockSchedulerClient();
 
-export const scheduleCommandSpy = spyOn(mockSchedulerClient, "send")
+export const scheduleCommandSpy = spyOn(mockSchedulerClient, "send");

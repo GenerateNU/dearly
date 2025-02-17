@@ -24,7 +24,7 @@ describe("PUT /groups/:id/nudges/auto", () => {
 
   beforeAll(async () => {
     schedulerClient = getMockSchedulerClient();
-    scheduleCommandSpy = jest.spyOn(schedulerClient, "send")
+    scheduleCommandSpy = jest.spyOn(schedulerClient, "send");
     app = await startTestApp(schedulerClient);
   });
 
@@ -41,7 +41,6 @@ describe("PUT /groups/:id/nudges/auto", () => {
     nudgeAt: new Date(Date.now()),
   };
 
-  
   it("should return 400 if no required fields", async () => {
     (
       await testBuilder.request({
@@ -55,9 +54,9 @@ describe("PUT /groups/:id/nudges/auto", () => {
         requestBody: {},
       })
     )
-    .assertStatusCode(Status.BadRequest)
-    .assertError([
-      {
+      .assertStatusCode(Status.BadRequest)
+      .assertError([
+        {
           path: "frequency",
           message: "Required",
         },
@@ -66,10 +65,10 @@ describe("PUT /groups/:id/nudges/auto", () => {
           message: "Required",
         },
       ]);
-      
-      expect(await scheduleCommandSpy).not.toHaveBeenCalled();
+
+    expect(await scheduleCommandSpy).not.toHaveBeenCalled();
   });
-  
+
   it("should return 400 if bad daily request", async () => {
     (
       await testBuilder.request({
@@ -92,7 +91,7 @@ describe("PUT /groups/:id/nudges/auto", () => {
         {
           path: "frequency",
           message:
-          "For DAILY schedules, no additional fields (daysOfWeek, day, month) should be specified",
+            "For DAILY schedules, no additional fields (daysOfWeek, day, month) should be specified",
         },
       ]);
   });
@@ -113,19 +112,19 @@ describe("PUT /groups/:id/nudges/auto", () => {
         },
       })
     )
-    .assertStatusCode(Status.BadRequest)
-    .assertError([
-      {
+      .assertStatusCode(Status.BadRequest)
+      .assertError([
+        {
           path: "frequency",
           message:
             "For WEEKLY/BIWEEKLY schedules, at least one day of the week must be selected. No other fields (day, month) should be specified.",
-          },
+        },
       ]);
-    });
+  });
 
-    it("should return 400 if weekly extra month field", async () => {
-      (
-        await testBuilder.request({
+  it("should return 400 if weekly extra month field", async () => {
+    (
+      await testBuilder.request({
         app,
         type: HTTPRequest.PUT,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
@@ -141,19 +140,19 @@ describe("PUT /groups/:id/nudges/auto", () => {
         },
       })
     )
-    .assertStatusCode(Status.BadRequest)
-    .assertError([
-      {
+      .assertStatusCode(Status.BadRequest)
+      .assertError([
+        {
           path: "frequency",
           message:
-          "For WEEKLY/BIWEEKLY schedules, at least one day of the week must be selected. No other fields (day, month) should be specified.",
+            "For WEEKLY/BIWEEKLY schedules, at least one day of the week must be selected. No other fields (day, month) should be specified.",
         },
       ]);
-    });
-    
-    it("should return 400 if weekly invalid weekday", async () => {
-      (
-        await testBuilder.request({
+  });
+
+  it("should return 400 if weekly invalid weekday", async () => {
+    (
+      await testBuilder.request({
         app,
         type: HTTPRequest.PUT,
         route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
@@ -172,12 +171,12 @@ describe("PUT /groups/:id/nudges/auto", () => {
       .assertError([
         {
           message:
-          "Invalid enum value. Expected 'MON' | 'TUE' | 'WED' | 'THU' | 'FRI' | 'SAT' | 'SUN', received 'HELLO'",
+            "Invalid enum value. Expected 'MON' | 'TUE' | 'WED' | 'THU' | 'FRI' | 'SAT' | 'SUN', received 'HELLO'",
           path: "daysOfWeek.0",
         },
       ]);
   });
-  
+
   it("should return 400 if monthly missing fields", async () => {
     (
       await testBuilder.request({
@@ -198,7 +197,7 @@ describe("PUT /groups/:id/nudges/auto", () => {
       .assertError([
         {
           message:
-          "For MONTHLY schedules, a day of the month (1-31) must be specified. No other field (daysOfWeek, month) should be specified.",
+            "For MONTHLY schedules, a day of the month (1-31) must be specified. No other field (daysOfWeek, month) should be specified.",
           path: "frequency",
         },
       ]);
@@ -222,13 +221,13 @@ describe("PUT /groups/:id/nudges/auto", () => {
         },
       })
     )
-    .assertStatusCode(Status.BadRequest)
+      .assertStatusCode(Status.BadRequest)
       .assertError([
         {
           message:
             "For MONTHLY schedules, a day of the month (1-31) must be specified. No other field (daysOfWeek, month) should be specified.",
-            path: "frequency",
-          },
+          path: "frequency",
+        },
       ]);
   });
 
@@ -249,13 +248,13 @@ describe("PUT /groups/:id/nudges/auto", () => {
         },
       })
     )
-    .assertStatusCode(Status.BadRequest)
-    .assertError([
-      {
-        message: "Number must be less than or equal to 31",
-        path: "day",
-      },
-    ]);
+      .assertStatusCode(Status.BadRequest)
+      .assertError([
+        {
+          message: "Number must be less than or equal to 31",
+          path: "day",
+        },
+      ]);
   });
 
   it("should return 400 if monthly bad day value", async () => {
@@ -275,7 +274,7 @@ describe("PUT /groups/:id/nudges/auto", () => {
         },
       })
     )
-    .assertStatusCode(Status.BadRequest)
+      .assertStatusCode(Status.BadRequest)
       .assertError([
         {
           message: "Number must be greater than or equal to 1",
@@ -309,7 +308,7 @@ describe("PUT /groups/:id/nudges/auto", () => {
         },
       ]);
   });
-  
+
   it("should return 400 if yearly extra fields", async () => {
     (
       await testBuilder.request({
@@ -337,10 +336,10 @@ describe("PUT /groups/:id/nudges/auto", () => {
           path: "frequency",
         },
       ]);
-    });
-    
-    it("should return 400 if yearly bad month value", async () => {
-      (
+  });
+
+  it("should return 400 if yearly bad month value", async () => {
+    (
       await testBuilder.request({
         app,
         type: HTTPRequest.PUT,
@@ -357,16 +356,16 @@ describe("PUT /groups/:id/nudges/auto", () => {
         },
       })
     )
-    .assertStatusCode(Status.BadRequest)
-    .assertError([
-      {
-        message: "Number must be less than or equal to 12",
-        path: "month",
+      .assertStatusCode(Status.BadRequest)
+      .assertError([
+        {
+          message: "Number must be less than or equal to 12",
+          path: "month",
         },
       ]);
-    });
+  });
 
-    it("should return 400 if yearly negative month value", async () => {
+  it("should return 400 if yearly negative month value", async () => {
     (
       await testBuilder.request({
         app,
@@ -391,11 +390,11 @@ describe("PUT /groups/:id/nudges/auto", () => {
           path: "month",
         },
       ]);
-    });
-    
-    it("should return 404 if group does not exist", async () => {
-      (
-        await testBuilder.request({
+  });
+
+  it("should return 404 if group does not exist", async () => {
+    (
+      await testBuilder.request({
         app,
         type: HTTPRequest.PUT,
         route: `/api/v1/groups/${generateUUID()}/nudges/auto`,
@@ -408,7 +407,7 @@ describe("PUT /groups/:id/nudges/auto", () => {
     )
       .assertStatusCode(Status.NotFound)
       .assertError("Group does not exist.");
-    });
+  });
 
   it("should return 403 if user not member of group", async () => {
     (
@@ -452,52 +451,52 @@ describe("PUT /groups/:id/nudges/auto", () => {
     )
       .assertStatusCode(Status.BadRequest)
       .assertError("Invalid ID format");
-    });
+  });
 
-    it("should return a 200 if the user is a manager and initial insert succeeded", async () => {
-      (
-        await testBuilder.request({
-          app,
-          type: HTTPRequest.PUT,
-          route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
-          autoAuthorized: false,
-          headers: {
-            Authorization: `Bearer ${ALICE_JWT}`,
-          },
-          requestBody: EXAMPLE_SCHEDULE,
-        })
-      )
-        .assertStatusCode(Status.OK)
-        .assertFields({
-          nudgeAt: EXAMPLE_SCHEDULE.nudgeAt.toISOString(),
-          frequency: EXAMPLE_SCHEDULE.frequency,
-          daysOfWeek: EXAMPLE_SCHEDULE.daysOfWeek,
-        });
-    
-        expect(await scheduleCommandSpy).toHaveBeenCalled();
-    });
-    
-    it("should return a 200 if the user is a manager and update succeeded", async () => {
-      (
-        await testBuilder.request({
-          app,
-          type: HTTPRequest.PUT,
-          route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
-          autoAuthorized: false,
-          headers: {
-            Authorization: `Bearer ${ALICE_JWT}`,
-          },
-          requestBody: UPDATED_SCHEDULE,
-        })
-      )
-        .assertStatusCode(Status.OK)
-        .assertFields({
-          nudgeAt: UPDATED_SCHEDULE.nudgeAt.toISOString(),
-          frequency: UPDATED_SCHEDULE.frequency,
-          month: UPDATED_SCHEDULE.month,
-          day: UPDATED_SCHEDULE.day,
-        });
-    
-        expect(await scheduleCommandSpy).toHaveBeenCalled();
-    });
+  it("should return a 200 if the user is a manager and initial insert succeeded", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.PUT,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${ALICE_JWT}`,
+        },
+        requestBody: EXAMPLE_SCHEDULE,
+      })
+    )
+      .assertStatusCode(Status.OK)
+      .assertFields({
+        nudgeAt: EXAMPLE_SCHEDULE.nudgeAt.toISOString(),
+        frequency: EXAMPLE_SCHEDULE.frequency,
+        daysOfWeek: EXAMPLE_SCHEDULE.daysOfWeek,
+      });
+
+    expect(await scheduleCommandSpy).toHaveBeenCalled();
+  });
+
+  it("should return a 200 if the user is a manager and update succeeded", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.PUT,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${ALICE_JWT}`,
+        },
+        requestBody: UPDATED_SCHEDULE,
+      })
+    )
+      .assertStatusCode(Status.OK)
+      .assertFields({
+        nudgeAt: UPDATED_SCHEDULE.nudgeAt.toISOString(),
+        frequency: UPDATED_SCHEDULE.frequency,
+        month: UPDATED_SCHEDULE.month,
+        day: UPDATED_SCHEDULE.day,
+      });
+
+    expect(await scheduleCommandSpy).toHaveBeenCalled();
+  });
 });

@@ -50,7 +50,7 @@ export interface Configuration {
     migrationsFolder: string;
   };
   s3Config: S3Config;
-  lambdaConfig: LambdaConfig
+  lambdaConfig: LambdaConfig;
   slackConfig: SlackConfig;
   environment: string;
 }
