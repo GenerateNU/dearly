@@ -5,11 +5,10 @@ import { ScrollView } from "react-native-gesture-handler";
 import HomeMenu from "@/design-system/components/ui/home-menu";
 import { useState } from "react";
 import { ImagePost } from "@/design-system/components/posts/post";
-import { IconButton } from "@/design-system/components/ui/icon-button";
 import { TextButton } from "@/design-system/components/ui/text-button";
 import { Profile } from "@/design-system/components/ui/profile";
 import { RefreshControl } from "react-native";
-import { Dropdown } from "@/design-system/components/ui/dropdown";
+import { Heart } from "@/design-system/components/posts/heart";
 
 const Index = () => {
   const [menu1, setMenu1] = useState("Home");
@@ -37,17 +36,12 @@ const Index = () => {
     >
       <Box gap="l" paddingBottom="l">
         <Box gap="s" alignItems="flex-start" flexDirection="column">
-          <Text variant="body">design system</Text>
-
+          <Text variant="bodyLargeBold">design system</Text>
+          <Box width="100%" flexDirection="row"></Box>
           <Box flexDirection="row" justifyContent="space-evenly">
             <Box width="50%" flexDirection="row" gap="s">
-              <IconButton
-                size={30}
-                onPress={() => null}
-                icon="cards-heart-outline"
-                variant="iconBlush"
-              />
-              <IconButton size={30} onPress={() => null} icon="cards-heart" variant="iconHoney" />
+              <Heart like={false} onLike={() => null} variant="iconBlush" />
+              <Heart like={true} onLike={() => null} variant="iconHoney" />
             </Box>
 
             <Box width="100%" gap="s">
@@ -79,12 +73,17 @@ const Index = () => {
         </Box>
 
         <Box>
-          <Text variant="body">dropdown menu</Text>
-          <Dropdown />
+          <Text variant="h1">h1</Text>
+          <Text variant="h2">h2</Text>
+          <Text variant="bodyLargeBold">body large bold</Text>
+          <Text variant="bodyLarge">body large</Text>
+          <Text variant="button">button</Text>
+          <Text variant="body">body</Text>
+          <Text variant="caption">caption</Text>
         </Box>
 
         <Box gap="s">
-          <Text variant="body">home menu</Text>
+          <Text variant="bodyLargeBold">home menu</Text>
           <HomeMenu categories={["Home", "Calendar"]} selected={menu1} setSelected={setMenu1} />
           <HomeMenu
             categories={["Home", "Calendar", "Album"]}
@@ -94,7 +93,7 @@ const Index = () => {
         </Box>
 
         <Box>
-          <Text variant="body">a post</Text>
+          <Text variant="bodyLargeBold">a post</Text>
           <ImagePost
             id=""
             groupId=""
@@ -118,12 +117,12 @@ const Index = () => {
         </Box>
 
         <Box>
-          <Text variant="body">masonry feed</Text>
+          <Text variant="bodyLargeBold">masonry feed</Text>
           <MasonryList data={data} />
         </Box>
 
         <Box>
-          <Text variant="body">user profile</Text>
+          <Text variant="bodyLargeBold">user profile</Text>
           <Profile
             profilePhoto="https://i.pinimg.com/736x/f9/fe/de/f9fedee21e1fb9ff8c0522a2756180bd.jpg"
             bio="quokka the cutest animal with the cutest smile"

@@ -25,7 +25,7 @@ export const TextButton: React.FC<TextButtonProps> = ({
       variant={variant}
       onPress={onPress}
     >
-      <Text variant="body" color="ink">
+      <Text variant="button" color="ink">
         {label}
       </Text>
     </BaseButton>

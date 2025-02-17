@@ -30,8 +30,7 @@ export const Dropdown: React.FC<DropdownProps> = ({ multiple = false, loading = 
       setValue={setValue}
       setItems={setItems}
       style={{ borderWidth: 0 }}
-      dropDownContainerStyle={{ borderWidth: 0 }} 
+      dropDownContainerStyle={{ borderWidth: 0 }}
     />
   );
 };
-

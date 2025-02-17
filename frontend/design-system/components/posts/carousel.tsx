@@ -111,7 +111,7 @@ const ImageCarousel: React.FC<CarouselProps> = ({ data, initialPage = 0, like })
         {containerWidth > 0 && (
           <>
             <Box position="absolute" zIndex={10} right={0} bottom={0} padding="m">
-              <Heart onLike={handleLike} like={isLiking} />
+              <Heart variant="iconHoney" onLike={handleLike} like={isLiking} />
             </Box>
 
             {showFlyingHeart && (

@@ -27,7 +27,7 @@ export const Profile: React.FC<ProfileProps> = ({
         <Avatar variant="medium" profilePhoto={profile} />
       </Box>
       <Box gap="xs" flexDirection="column" justifyContent="flex-start" alignItems="flex-start">
-        <Text variant="body">{name ? name : username}</Text>
+        <Text variant="bodyLargeBold">{name ? name : username}</Text>
         {bio && (
           <Box width="83%">
             <Text>{bio}</Text>

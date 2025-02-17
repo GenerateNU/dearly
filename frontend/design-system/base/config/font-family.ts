@@ -1,20 +1,36 @@
 export const getFontConfig = (scaleRatio: number) => {
   const config = {
-    primary: {
-      fontSize: 43 * scaleRatio,
-      fontFamily: "ProximaNova-Bold",
+    h1: {
+      fontSize: 28 * scaleRatio,
+      fontFamily: "Bold",
     },
-    secondary: {
-      fontSize: 32 * scaleRatio,
-      fontFamily: "ProximaNova-Medium",
+    h2: {
+      fontSize: 22 * scaleRatio,
+      fontFamily: "Bold",
+    },
+    bodyLargeBold: {
+      fontSize: 16 * scaleRatio,
+      fontFamily: "Bold",
+    },
+    bodyLarge: {
+      fontSize: 16 * scaleRatio,
+      fontFamily: "Regular",
+    },
+    button: {
+      fontSize: 16 * scaleRatio,
+      fontFamily: "Regular",
     },
     body: {
       fontSize: 14 * scaleRatio,
-      fontFamily: "ProximaNova-Bold",
+      fontFamily: "Regular",
+    },
+    caption: {
+      fontSize: 11 * scaleRatio,
+      fontFamily: "Regular",
     },
     defaults: {
-      fontSize: 11 * scaleRatio,
-      fontFamily: "ProximaNova-Regular",
+      fontSize: 14 * scaleRatio,
+      fontFamily: "Regular",
     },
   };
   return config;
