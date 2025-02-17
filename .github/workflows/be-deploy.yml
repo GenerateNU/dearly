@@ -91,4 +91,3 @@ jobs:
             SLACK_USER_GROUP_ID=${{ secrets.SLACK_USER_GROUP_ID }}
             BUILD_QR_CODE_GENERATOR=${{ secrets.BUILD_QR_CODE_GENERATOR }}
           flags: --port=3000 --allow-unauthenticated
-
