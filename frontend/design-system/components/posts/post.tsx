@@ -6,7 +6,7 @@ import { Media } from "@/types/media";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 
-export const ImagePost: React.FC<Post> = ({
+export const ImagePost: React.FC<Required<Post>> = ({
   profilePhoto,
   username,
   name,

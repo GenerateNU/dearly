@@ -1,6 +1,6 @@
 import { paths, components } from "@/gen/openapi";
 
-export type User = Required<components["schemas"]["User"]>;
+export type User = components["schemas"]["User"];
 
 export type SearchedUser = components["schemas"]["SearchedUser"];
 
@@ -15,3 +15,6 @@ export type AgeGroup =
 
 export type UserGroups =
   paths["/api/v1/users/groups"]["get"]["responses"]["200"]["content"]["application/json"];
+
+export type Notifications =
+  paths["/api/v1/users/notifications"]["get"]["responses"]["200"]["content"]["application/json"];

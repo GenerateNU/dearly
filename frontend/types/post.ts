@@ -1,7 +1,7 @@
 import { components, paths } from "@/gen/openapi";
 
-export type Post = Required<components["schemas"]["PostWithURL"]>;
-export type Comment = Required<components["schemas"]["CommentWithURL"]>;
+export type Post = components["schemas"]["PostWithURL"];
+export type Comment = components["schemas"]["CommentWithURL"];
 
 export type CreatePostPayload =
   paths["/api/v1/groups/{id}/posts"]["post"]["requestBody"]["content"]["application/json"];
