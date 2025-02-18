@@ -7,14 +7,13 @@ import {
   LIKE_EXAMPLE,
   POST_EXAMPLE,
   SINGLE_COMMENT,
-  USER_Josh_ID,
   USER_Nubs_ID,
 } from "./../helpers/test-constants";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { startTestApp } from "../helpers/test-app";
 import { spyOn, describe, expect, it, beforeAll, beforeEach } from "bun:test";
-import { membersTable, notificationsTable } from "../../entities/schema";
+import { notificationsTable } from "../../entities/schema";
 import { resetDB } from "../../database/reset";
 import { seedDatabase } from "../helpers/seed-db";
 import {
@@ -44,31 +43,6 @@ describe("Notification server test", () => {
     await seedDatabase(db);
     sendPushNotificationsAsyncSpy.mockClear();
     chunkPushNotificationsSpy.mockClear();
-  });
-
-  it("Unsubscribe: Should throw error for invalid userID", async () => {
-    expect(async () => {
-      await notifService.unsubscribe("123456");
-    }).toThrow();
-  });
-
-  it("Unsubscribe: Should unsubscribe user from notifications", async () => {
-    const [preResult] = await db
-      .select()
-      .from(membersTable)
-      .where(eq(membersTable.userId, USER_Josh_ID));
-    const expected = preResult?.notificationsEnabled;
-    expect(expected).toBe(true);
-
-    await notifService.unsubscribe(USER_Josh_ID);
-
-    const [endResult] = await db
-      .select()
-      .from(membersTable)
-      .where(eq(membersTable.userId, USER_Josh_ID));
-    const expectedAfter = endResult?.notificationsEnabled;
-    expect(expectedAfter).not.toBe(NotFoundError);
-    expect(expectedAfter).toBe(false);
   });
 
   it("notifyPost: Should insert and notify", async () => {

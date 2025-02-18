@@ -157,7 +157,6 @@ export const notificationsTable = pgTable("notifications", {
   postId: uuid().references(() => postsTable.id, { onDelete: "cascade" }),
   commentId: uuid().references(() => commentsTable.id, { onDelete: "cascade" }),
   likeId: uuid().references(() => likesTable.id, { onDelete: "cascade" }),
-  likeCommentId: uuid().references(() => likeCommentsTable.id, { onDelete: "cascade" }),
   title: varchar({ length: NAME_MAX_LIMIT }).notNull(),
   description: varchar({ length: NOTIFICATION_BODY_MAX_LIMIT }).notNull(),
 });
@@ -308,10 +307,6 @@ export const notificationRelations = relations(notificationsTable, ({ one }) => 
   like: one(likesTable, {
     fields: [notificationsTable.likeId],
     references: [likesTable.id],
-  }),
-  likeComment: one(likeCommentsTable, {
-    fields: [notificationsTable.likeCommentId],
-    references: [likeCommentsTable.id],
   }),
 }));
 
