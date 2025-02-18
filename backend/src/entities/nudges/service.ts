@@ -14,10 +14,7 @@ import { SchedulerClient } from "@aws-sdk/client-scheduler";
 
 export interface NudgeService {
   manualNudge(userIds: string[], groupId: string, managerId: string): Promise<void>;
-  upsertSchedule(
-    managerId: string,
-    payload: NudgeSchedulePayload,
-  ): Promise<NudgeSchedulePayload>;
+  upsertSchedule(managerId: string, payload: NudgeSchedulePayload): Promise<NudgeSchedulePayload>;
   getSchedule(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null>;
   deactivateNudge(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null>;
 }
@@ -47,10 +44,7 @@ export class NudgeServiceImpl implements NudgeService {
     return await handleServiceError(manualNudgeImpl)();
   }
 
-  async upsertSchedule(
-    managerId: string,
-    payload: NudgeSchedulePayload,
-  ): Promise<NudgeSchedule> {
+  async upsertSchedule(managerId: string, payload: NudgeSchedulePayload): Promise<NudgeSchedule> {
     const upsertScheduleImpl = async () => {
       // check if in database already
       const update = !(await this.nudgeTransaction.getNudgeSchedule(payload.groupId, managerId));
@@ -72,7 +66,7 @@ export class NudgeServiceImpl implements NudgeService {
             notifications: this.formatPushNotifications(notificationMetadata),
           },
         };
-  
+
         // Add to EventBridge Scheduler
         let response;
         if (update) {
@@ -84,7 +78,7 @@ export class NudgeServiceImpl implements NudgeService {
         if (response != 200) {
           throw new InternalServerError("Failed to add/update schedule in EventBridge");
         }
-      };
+      }
 
       return schedule;
     };
