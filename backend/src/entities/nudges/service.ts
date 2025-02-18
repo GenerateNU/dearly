@@ -8,7 +8,6 @@ import {
   NudgeSchedulePayload,
   NotificationMetadata,
   NudgeSchedule,
-  SchedulePayload,
 } from "../../types/api/internal/nudges";
 import { AWSEventBridgeScheduler } from "../../services/nudgeScheduler";
 import { SchedulerClient } from "@aws-sdk/client-scheduler";
@@ -18,7 +17,7 @@ export interface NudgeService {
   upsertSchedule(
     managerId: string,
     payload: NudgeSchedulePayload,
-  ): Promise<NudgeSchedulePayload | undefined>;
+  ): Promise<NudgeSchedulePayload>;
   getSchedule(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null>;
   deactivateNudge(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null>;
 }
@@ -51,7 +50,7 @@ export class NudgeServiceImpl implements NudgeService {
   async upsertSchedule(
     managerId: string,
     payload: NudgeSchedulePayload,
-  ): Promise<NudgeSchedule | undefined> {
+  ): Promise<NudgeSchedule> {
     const upsertScheduleImpl = async () => {
       // check if in database already
       const update = !(await this.nudgeTransaction.getNudgeSchedule(payload.groupId, managerId));
@@ -66,49 +65,30 @@ export class NudgeServiceImpl implements NudgeService {
         managerId,
       );
 
-      if (notificationMetadata.deviceTokens.length === 0) return;
-      const schedulePayload = {
-        schedule: schedule,
-        expo: {
-          notifications: this.formatPushNotifications(notificationMetadata),
-        },
+      if (notificationMetadata.deviceTokens.length !== 0) {
+        const schedulePayload = {
+          schedule: schedule,
+          expo: {
+            notifications: this.formatPushNotifications(notificationMetadata),
+          },
+        };
+  
+        // Add to EventBridge Scheduler
+        let response;
+        if (update) {
+          response = await this.scheduler.updateSchedule(managerId, schedulePayload);
+        } else {
+          response = await this.scheduler.addSchedule(managerId, schedulePayload);
+        }
+
+        if (response != 200) {
+          throw new InternalServerError("Failed to add/update schedule in EventBridge");
+        }
       };
-
-      // Add to EventBridge Scheduler
-      let response;
-      if (update) {
-        response = await this.scheduler.updateSchedule(managerId, schedulePayload);
-      } else {
-        response = await this.scheduler.addSchedule(managerId, schedulePayload);
-      }
-
-      if (response != 200) {
-        throw new InternalServerError("Failed to add/update schedule in EventBridge");
-      }
 
       return schedule;
     };
     return await handleServiceError(upsertScheduleImpl)();
-  }
-
-  async getNotificationMetaData(
-    managerId: string,
-    schedule: NudgeSchedule,
-  ): Promise<SchedulePayload | undefined> {
-    const notificationMetadata = await this.nudgeTransaction.getAutoNudgeNotificationMetadata(
-      schedule.groupId,
-      managerId,
-    );
-
-    if (notificationMetadata.deviceTokens.length === 0) return;
-    const schedulePayload = {
-      schedule: schedule,
-      expo: {
-        notifications: this.formatPushNotifications(notificationMetadata),
-      },
-    };
-
-    return schedulePayload;
   }
 
   async getSchedule(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null> {
