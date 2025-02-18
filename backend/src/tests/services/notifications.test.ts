@@ -24,24 +24,18 @@ import {
   expo,
   sendPushNotificationsAsyncSpy,
 } from "../helpers/test-app";
+import { automigrateDB } from "../../database/migrate";
 
 describe("Notification server test", () => {
   const config = getConfigurations();
   const db = connectDB(config);
   const notifService: INotificationService = new ExpoNotificationService(config, db, expo);
-  const pushNotiSpy = spyOn(expo, "sendPushNotificationsAsync");
-  const chunkNotificationsSpy = spyOn(expo, "chunkPushNotifications");
-  let app: Hono;
 
   beforeAll(async () => {
-    app = await startTestApp();
+    await automigrateDB(db, config);
   });
 
   beforeEach(async () => {
-    // to reset number of times its method gets called
-    pushNotiSpy.mockClear();
-    chunkNotificationsSpy.mockClear();
-
     await resetDB(db);
     await seedDatabase(db);
     sendPushNotificationsAsyncSpy.mockClear();
@@ -61,9 +55,10 @@ describe("Notification server test", () => {
 
     expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledTimes(1);
     expect(await chunkPushNotificationsSpy).toHaveBeenCalledTimes(1);
+    expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledWith([]);
   });
 
-  it("notifyPost: Should insert and notifiy for a larger group", async () => {
+  it("notifyPost: Should insert and notify for a larger group", async () => {
     await notifService.notifyPost(FULL_SNAPPER_POST_EXAMPLE);
 
     const results = await db
@@ -74,9 +69,10 @@ describe("Notification server test", () => {
 
     expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledTimes(1);
     expect(await chunkPushNotificationsSpy).toHaveBeenCalledTimes(1);
+    expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledWith([]);
   });
 
-  it("notifyLike: Should insert and notifiy", async () => {
+  it("notifyLike: Should insert and notify - like another user's post", async () => {
     await notifService.notifyLike(LIKE_EXAMPLE);
 
     const results = await db
@@ -90,9 +86,40 @@ describe("Notification server test", () => {
 
     expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledTimes(1);
     expect(await chunkPushNotificationsSpy).toHaveBeenCalledTimes(1);
+    expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledWith([]);
   });
 
-  it("notifyComment: Should insert and notifiy", async () => {
+  it("notifyLike: Should insert and notify - like their own post", async () => {
+    // await notifService.notifyLike(LIKE_EXAMPLE);
+    // const results = await db
+    //   .select()
+    //   .from(notificationsTable)
+    //   .where(eq(notificationsTable.actorId, LIKE_EXAMPLE.userId));
+    // expect(results.length).toBe(1);
+    // expect(results[0]?.actorId).toBe(LIKE_EXAMPLE.userId);
+    // expect(results[0]?.receiverId).toBe(POST_EXAMPLE.userId);
+    // expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledTimes(1);
+    // expect(await chunkPushNotificationsSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("notifyComment: Should insert and notify - comment on another user's post", async () => {
+    await notifService.notifyComment(SINGLE_COMMENT);
+
+    const results = await db
+      .select()
+      .from(notificationsTable)
+      .where(eq(notificationsTable.actorId, SINGLE_COMMENT.userId));
+
+    expect(results.length).toBe(1);
+    expect(results[0]?.receiverId).toBe(POST_EXAMPLE.userId);
+    expect(results[0]?.actorId).toBe(SINGLE_COMMENT.userId);
+
+    expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledTimes(1);
+    expect(await chunkPushNotificationsSpy).toHaveBeenCalledTimes(1);
+    expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledWith([]);
+  });
+
+  it("notifyComment: Should insert and notify - comment on their own post", async () => {
     await notifService.notifyComment(SINGLE_COMMENT);
 
     const results = await db
@@ -105,5 +132,6 @@ describe("Notification server test", () => {
 
     expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledTimes(1);
     expect(await chunkPushNotificationsSpy).toHaveBeenCalledTimes(1);
+    expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledWith([]);
   });
 });
