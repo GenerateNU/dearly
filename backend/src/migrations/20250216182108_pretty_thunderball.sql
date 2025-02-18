@@ -26,6 +26,9 @@ CREATE TABLE "scheduledNudges" (
         ("scheduledNudges"."day" IS NOT NULL AND "scheduledNudges"."month" IS NOT NULL)
       )
 );
+
+ALTER TABLE "scheduledNudges" ADD CONSTRAINT "nudges_groupId_groups_id_fk" FOREIGN KEY ("groupId") REFERENCES "public"."groups"("id") ON DELETE cascade ON UPDATE no action;
+
 --> statement-breakpoint
 ALTER TABLE "comments" 
 ALTER COLUMN "voiceMemo" 
