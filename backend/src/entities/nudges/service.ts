@@ -111,10 +111,14 @@ export class NudgeServiceImpl implements NudgeService {
 
   private async sendPushNotifications(notifications: ExpoPushMessage[]): Promise<void> {
     try {
-      const receipts = await this.expoService.sendPushNotificationsAsync(notifications);
-      const failedToSend = receipts.filter((receipt) => receipt.status === "error");
-      if (failedToSend.length > 0) {
-        logger.error(failedToSend);
+      const chunks: ExpoPushMessage[][] =
+        await this.expoService.chunkPushNotifications(notifications);
+      for (const chunk of chunks) {
+        const receipts = await this.expoService.sendPushNotificationsAsync(chunk);
+        const failedToSend = receipts.filter((receipt) => receipt.status === "error");
+        if (failedToSend.length > 0) {
+          logger.error(failedToSend);
+        }
       }
     } catch (error) {
       logger.error(error);
@@ -127,15 +131,13 @@ export class NudgeServiceImpl implements NudgeService {
     groupId,
     groupName,
   }: NotificationMetadata): ExpoPushMessage[] {
-    return [
-      {
-        to: deviceTokens,
-        data: {
-          groupId,
-          groupName,
-        },
-        ...getNotificationBody(groupName),
+    return deviceTokens.map((token) => ({
+      to: token,
+      data: {
+        groupId,
+        groupName,
       },
-    ];
+      ...getNotificationBody(groupName),
+    }));
   }
 }

@@ -25,6 +25,11 @@ mock.module("expo-server-sdk", () => {
       async sendPushNotificationsAsync(_: ExpoPushMessage[]): Promise<ExpoPushTicket[]> {
         return Promise.resolve([]);
       }
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      async chunkPushNotifications(message: ExpoPushMessage[]): Promise<ExpoPushMessage[][]> {
+        return Promise.resolve([message]);
+      }
     },
   };
 });
