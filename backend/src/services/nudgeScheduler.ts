@@ -8,8 +8,8 @@ import {
   GetScheduleCommand,
 } from "@aws-sdk/client-scheduler";
 import { handleAWSServiceError } from "../utilities/errors/aws-error";
-import { NUDGE_LAMBDA_ARN, NUDGE_LAMBDA_ROLE_ARN } from "../constants/nudge";
 import { NudgeSchedulePayload, SchedulePayload } from "../types/api/internal/nudges";
+import { getConfigurations } from "../config/config";
 
 export interface NudgeScheduler {
   // TODO: think about I/O type of this & more debugging
@@ -104,13 +104,15 @@ export class AWSEventBridgeScheduler implements NudgeScheduler {
       schedule = this.getCronExpression(payload.schedule);
       lambdaInput = JSON.stringify(payload.expo);
     }
+    const lambda_config = getConfigurations().lambdaConfig;
+
     const input = {
       Name: id,
       ScheduleExpression: schedule,
       State: disabled,
       Target: {
-        Arn: NUDGE_LAMBDA_ARN,
-        RoleArn: NUDGE_LAMBDA_ROLE_ARN,
+        Arn: lambda_config.lambdaARN,
+        RoleArn: lambda_config.lambdaRoleARN,
         Input: lambdaInput,
       },
       FlexibleTimeWindow: undefined,
