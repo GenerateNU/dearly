@@ -1,12 +1,19 @@
 import { Like } from "../../entities/likes/validator";
 import { Comment } from "../../types/api/internal/comments";
 import { groupsTable, mediaTable, postsTable } from "../../entities/schema";
-import { CreateGroupPayload } from "../../types/api/internal/groups";
+import { CreateGroupPayload, Group } from "../../types/api/internal/groups";
 import { Post } from "../../types/api/internal/posts";
-import { CreateUserPayload, SearchedUser } from "../../types/api/internal/users";
+import { CreateUserPayload, SearchedUser, User } from "../../types/api/internal/users";
+import { Member } from "../../types/api/internal/members";
+import e from "express";
 
 export const INVALID_ID_ARRAY = ["1", "%2", "123abc", "!!$$", "123 456", "@ID", null, undefined];
 export const USER_ALICE_ID = "00000000-0000-0000-0000-000000000000";
+export const ADRIENNE_COMMENT_ID = "ab674eaf-9999-aaaa-8a38-811234567000";
+export const USER_ADRIENNE_ID = "ab674eaf-9999-aaaa-8a38-811258295746";
+export const BIG_THEIF_GROUP_ID = "ab674eaf-9999-1111-8a38-811234567890";
+export const USER_BUCK_ID = "ab674eaf-9999-abcd-4444-811234567890";
+export const BUCK_POST_ID = "ab674eaf-9999-abcd-8a38-811234567890";
 export const USER_BOB_ID = "ae6be85f-157c-40db-afd2-2f388d8ff7b5";
 export const USER_ANA_ID = "6d56421d-4c0d-44d9-b2b1-8d897207fc5b";
 export const USER_BILL_ID = "e8f8a2d1-57c7-4b71-9c8b-9b5f09a9db49";
@@ -33,6 +40,7 @@ export const NUBS_DEVICE_TOKEN = "ab674eaf-0000-1234-8a38-811234561234";
 export const POST_EXAMPLE_ID = "ab674eaf-9999-47c1-8a38-811234567890";
 export const SNAPPER_COMMENT_ID = "f46a2916-99e7-4ebb-a796-d1c29d6e4786";
 export const FULL_SNAPPER_POST_ID = "6bc21e8a-7a8e-4c66-8403-ab4259311795";
+export const MEMBER_ID = "ab674eaf-9999-aaaa-8a38-811234567890";
 
 export const GROUP_EMPTY_FIELDS_ERRORS = [
   {
@@ -235,6 +243,62 @@ export const SINGLE_COMMENT: Comment = {
   postId: POST_EXAMPLE_ID,
   content: "Look at da fishes!",
   voiceMemo: null,
+};
+
+export const ADRIENNE_COMMENTS_BUCKPOST: Comment = {
+  id: ADRIENNE_COMMENT_ID,
+  userId: USER_ADRIENNE_ID,
+  createdAt: new Date(),
+  postId: BUCK_POST_ID,
+  content: "yur!",
+  voiceMemo: null,
+};
+
+export const BUCK_POST: Post = {
+  id: BUCK_POST_ID,
+  groupId: BIG_THEIF_GROUP_ID,
+  userId: USER_BUCK_ID,
+  createdAt: new Date(),
+  caption: null,
+  location: null,
+};
+
+export const BIG_THEIF_GROUP: Group = {
+  name: "big thief",
+  id: BIG_THEIF_GROUP_ID,
+  description: null,
+  managerId: USER_BUCK_ID,
+};
+
+export const ADRIENNE_MEMBER: Member = {
+  userId: USER_ADRIENNE_ID,
+  groupId: BIG_THEIF_GROUP_ID,
+  joinedAt: new Date(),
+  role: "MEMBER",
+  notificationsEnabled: false,
+  lastManualNudge: null,
+};
+
+export const USER_BUCK: User = {
+  name: "Buck",
+  id: USER_BUCK_ID,
+  username: "bucky",
+  mode: "BASIC",
+  profilePhoto: null,
+  timezone: null,
+  bio: null,
+  birthday: null,
+};
+
+export const ADRIENNE_USER: User = {
+  name: "Adrienne",
+  id: USER_ADRIENNE_ID,
+  username: "adrizzy",
+  mode: "ADVANCED",
+  profilePhoto: null,
+  timezone: null,
+  bio: null,
+  birthday: null,
 };
 
 export const POST_EXAMPLE: Post = {

@@ -1,11 +1,11 @@
-import { createClient, PostgrestError, SupabaseClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import Expo, { ExpoPushMessage } from "expo-server-sdk";
 import { NotFoundError } from "../utilities/errors/app-error";
 import { Configuration } from "../types/config";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { postValidate } from "../entities/posts/validator";
 import { Post } from "../types/api/internal/posts";
-import { eq, and, ne, arrayContains, inArray, not } from "drizzle-orm";
+import { eq, and, ne } from "drizzle-orm";
 import {
   commentsTable,
   devicesTable,
@@ -18,11 +18,7 @@ import {
 } from "../entities/schema";
 import { Like, likeValidate } from "../entities/likes/validator";
 import { Comment, commentValidate } from "../types/api/internal/comments";
-import {
-  Notification,
-  notificationValidate,
-  partialNotification,
-} from "../types/api/internal/notification";
+import { Notification, partialNotification } from "../types/api/internal/notification";
 
 export interface INotificationService {
   /**
@@ -154,17 +150,15 @@ export class ExpoNotificationService implements INotificationService {
       .select({
         userId: membersTable.userId,
         token: devicesTable.token,
+        notificationsEnabled: membersTable.notificationsEnabled,
       })
       .from(membersTable)
       .innerJoin(devicesTable, eq(membersTable.userId, devicesTable.userId))
       .where(
         and(
-          eq(membersTable.notificationsEnabled, true),
-          and(
-            //Check to make sure that the poster is not included
-            ne(membersTable.userId, post.userId),
-            eq(membersTable.groupId, posterGroupId.groupId),
-          ),
+          //Check to make sure that the poster is not included
+          ne(membersTable.userId, post.userId),
+          eq(membersTable.groupId, posterGroupId.groupId),
         ),
       );
 
@@ -196,14 +190,14 @@ export class ExpoNotificationService implements INotificationService {
     const notifs = await this.db.insert(notificationsTable).values(notifications).returning();
 
     // Get the list of push tokens for the group members
-    const messages: ExpoPushMessage[] = members.map(
-      (member: { userId: string; token: string }) => ({
+    const messages: ExpoPushMessage[] = members
+      .filter((member) => member.notificationsEnabled)
+      .map((member: { userId: string; token: string }) => ({
         to: member.token,
         sound: "default",
         body: `${posterGroupId.name} just posted a new post in ${posterGroupId.groupName}!`,
         data: { post },
-      }),
-    );
+      }));
 
     this.chunkPushNotifications(messages);
 
@@ -255,7 +249,6 @@ export class ExpoNotificationService implements INotificationService {
       })
       .returning();
 
-    console.log(notification);
     if (!notification) {
       throw new NotFoundError("Notification");
     }
