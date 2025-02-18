@@ -16,6 +16,7 @@ export const expo = new Expo();
 export const sendPushNotificationsAsyncSpy = spyOn(expo, "sendPushNotificationsAsync");
 export const chunkPushNotificationsSpy = spyOn(expo, "chunkPushNotifications");
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import { ExpoPushService } from "../../services/notification/expo";
 
 export const startTestApp = async (): Promise<Hono> => {
   const app = new Hono();
@@ -30,6 +31,7 @@ export const startTestApp = async (): Promise<Hono> => {
   const db: PostgresJsDatabase = connectDB(config);
 
   await automigrateDB(db, config);
+  const expoService = new ExpoPushService(expo);
 
   await resetDB(db);
 
@@ -37,7 +39,7 @@ export const startTestApp = async (): Promise<Hono> => {
 
   configureMiddlewares(app, config);
 
-  setUpRoutes(app, db, config, s3, expo);
+  setUpRoutes(app, db, config, s3, expoService);
 
   return app;
 };

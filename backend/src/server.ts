@@ -24,13 +24,10 @@ const config = getConfigurations();
 
     configureMiddlewares(app, config);
 
-    new ExpoNotificationService(
-      config,
-      new NotificationTransactionImpl(db),
-      new ExpoPushService(expo),
-    );
+    const expoService = new ExpoPushService(expo);
+    new ExpoNotificationService(config, new NotificationTransactionImpl(db), expoService);
 
-    setUpRoutes(app, db, config, s3ServiceProvider, expo);
+    setUpRoutes(app, db, config, s3ServiceProvider, expoService);
 
     console.log("Successfully initialize app");
   } catch (error) {

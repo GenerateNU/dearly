@@ -10,16 +10,16 @@ import { postRoutes } from "../entities/posts/route";
 import { IS3Operations } from "../services/s3Service";
 import { MediaServiceImpl } from "../entities/media/service";
 import { commentsRoutes } from "../entities/comments/route";
-import { Expo } from "expo-server-sdk";
 import { SlackController, SlackControllerImpl } from "./webhook";
 import { mediaRoutes } from "../entities/media/route";
+import { ExpoPushService } from "../services/notification/expo";
 
 export const setUpRoutes = (
   app: Hono,
   db: PostgresJsDatabase,
   config: Configuration,
   s3ServiceProvider: IS3Operations,
-  expo: Expo,
+  expo: ExpoPushService,
 ) => {
   // api documentation
   app.get(
@@ -49,7 +49,11 @@ export const setUpRoutes = (
   });
 };
 
-const apiRoutes = (db: PostgresJsDatabase, s3Service: IS3Operations, expo: Expo): Hono => {
+const apiRoutes = (
+  db: PostgresJsDatabase,
+  s3Service: IS3Operations,
+  expo: ExpoPushService,
+): Hono => {
   const api = new Hono();
   const mediaService = new MediaServiceImpl(db, s3Service);
 

@@ -1,12 +1,8 @@
 import Expo, { ExpoPushMessage } from "expo-server-sdk";
-import { NotificationData } from "../../types/api/internal/notification";
+import { NotificationData, SendNotificationPayload } from "../../types/api/internal/notification";
 
 export interface PushNotificationService {
-  sendPushNotifications(
-    deviceTokens: string[],
-    message: string,
-    data: NotificationData,
-  ): Promise<void>;
+  sendPushNotifications(payload: SendNotificationPayload): Promise<void>;
 }
 
 export class ExpoPushService implements PushNotificationService {
@@ -16,8 +12,8 @@ export class ExpoPushService implements PushNotificationService {
     this.expo = expo;
   }
 
-  async sendPushNotifications(deviceTokens: string[], message: string, data?: NotificationData) {
-    const messages = this.formatExpoPushMessage(deviceTokens, message, data);
+  async sendPushNotifications({ deviceTokens, message, title, data }: SendNotificationPayload) {
+    const messages = this.formatExpoPushMessage(deviceTokens, message, title, data);
     const chunks = this.expo.chunkPushNotifications(messages);
 
     for (const chunk of chunks) {
@@ -28,11 +24,12 @@ export class ExpoPushService implements PushNotificationService {
   private formatExpoPushMessage(
     deviceTokens: string[],
     message: string,
+    title?: string,
     data?: NotificationData,
   ): ExpoPushMessage[] {
     return deviceTokens.map((token) => ({
       to: token,
-      title: "✨ You got a new notification ✨",
+      title: title ? title : "✨ You got a new notification ✨",
       body: message,
       data,
       sound: "default",

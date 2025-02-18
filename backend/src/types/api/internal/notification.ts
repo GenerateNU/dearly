@@ -29,8 +29,15 @@ export type LikeCommentNotificationMetadata = {
   userId: string;
   username: string;
   groupName: string;
-  token: string[];
+  deviceTokens: string[];
   isEnabled: boolean;
 };
 
 export type NotificationData = Comment | Like | Post;
+
+export type SendNotificationPayload = {
+  deviceTokens: string[];
+  message: string;
+  title?: string;
+  data?: NotificationData;
+};
