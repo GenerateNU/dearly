@@ -11,15 +11,21 @@ import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
+import { getMockSchedulerClient } from "../helpers/mock";
+import { SchedulerClient } from "@aws-sdk/client-scheduler";
 
 describe("PUT /groups/:id/nudges/auto", () => {
   let app: Hono;
+  let schedulerClient: SchedulerClient;
+  let scheduleCommandSpy: jest.SpyInstance;
   const testBuilder = new TestBuilder();
 
   const ALICE_JWT = generateJWTFromID(USER_ALICE_ID);
 
   beforeAll(async () => {
-    app = await startTestApp();
+    schedulerClient = getMockSchedulerClient();
+    scheduleCommandSpy = jest.spyOn(schedulerClient, "send");
+    app = await startTestApp(schedulerClient);
   });
 
   const EXAMPLE_SCHEDULE = {
@@ -34,49 +40,6 @@ describe("PUT /groups/:id/nudges/auto", () => {
     month: 3,
     nudgeAt: new Date(Date.now()),
   };
-
-  it("should return a 200 if the user is a manager and initial insert succeeded", async () => {
-    (
-      await testBuilder.request({
-        app,
-        type: HTTPRequest.PUT,
-        route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
-        autoAuthorized: false,
-        headers: {
-          Authorization: `Bearer ${ALICE_JWT}`,
-        },
-        requestBody: EXAMPLE_SCHEDULE,
-      })
-    )
-      .assertStatusCode(Status.OK)
-      .assertFields({
-        nudgeAt: EXAMPLE_SCHEDULE.nudgeAt.toISOString(),
-        frequency: EXAMPLE_SCHEDULE.frequency,
-        daysOfWeek: EXAMPLE_SCHEDULE.daysOfWeek,
-      });
-  });
-
-  it("should return a 200 if the user is a manager and update succeeded", async () => {
-    (
-      await testBuilder.request({
-        app,
-        type: HTTPRequest.PUT,
-        route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
-        autoAuthorized: false,
-        headers: {
-          Authorization: `Bearer ${ALICE_JWT}`,
-        },
-        requestBody: UPDATED_SCHEDULE,
-      })
-    )
-      .assertStatusCode(Status.OK)
-      .assertFields({
-        nudgeAt: UPDATED_SCHEDULE.nudgeAt.toISOString(),
-        frequency: UPDATED_SCHEDULE.frequency,
-        month: UPDATED_SCHEDULE.month,
-        day: UPDATED_SCHEDULE.day,
-      });
-  });
 
   it("should return 400 if no required fields", async () => {
     (
@@ -102,6 +65,8 @@ describe("PUT /groups/:id/nudges/auto", () => {
           message: "Required",
         },
       ]);
+
+    expect(await scheduleCommandSpy).not.toHaveBeenCalled();
   });
 
   it("should return 400 if bad daily request", async () => {
@@ -486,5 +451,52 @@ describe("PUT /groups/:id/nudges/auto", () => {
     )
       .assertStatusCode(Status.BadRequest)
       .assertError("Invalid ID format");
+  });
+
+  it("should return a 200 if the user is a manager and initial insert succeeded", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.PUT,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${ALICE_JWT}`,
+        },
+        requestBody: EXAMPLE_SCHEDULE,
+      })
+    )
+      .assertStatusCode(Status.OK)
+      .assertFields({
+        nudgeAt: EXAMPLE_SCHEDULE.nudgeAt.toISOString(),
+        frequency: EXAMPLE_SCHEDULE.frequency,
+        daysOfWeek: EXAMPLE_SCHEDULE.daysOfWeek,
+      });
+
+    expect(await scheduleCommandSpy).toHaveBeenCalled();
+  });
+
+  it("should return a 200 if the user is a manager and update succeeded", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.PUT,
+        route: `/api/v1/groups/${DEARLY_GROUP_ID}/nudges/auto`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${ALICE_JWT}`,
+        },
+        requestBody: UPDATED_SCHEDULE,
+      })
+    )
+      .assertStatusCode(Status.OK)
+      .assertFields({
+        nudgeAt: UPDATED_SCHEDULE.nudgeAt.toISOString(),
+        frequency: UPDATED_SCHEDULE.frequency,
+        month: UPDATED_SCHEDULE.month,
+        day: UPDATED_SCHEDULE.day,
+      });
+
+    expect(await scheduleCommandSpy).toHaveBeenCalled();
   });
 });

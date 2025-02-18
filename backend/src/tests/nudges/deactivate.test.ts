@@ -14,51 +14,21 @@ import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
+import { getMockSchedulerClient } from "../helpers/mock";
+import { SchedulerClient } from "@aws-sdk/client-scheduler";
 
 describe("PUT /groups/:id/nudges/auto/off", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
+  let schedulerClient: SchedulerClient;
+  let scheduleCommandSpy: jest.SpyInstance;
 
   const ALICE_JWT = generateJWTFromID(USER_ALICE_ID);
 
   beforeAll(async () => {
-    app = await startTestApp();
-  });
-
-  it("should return 200 if group schedule not configured", async () => {
-    (
-      await testBuilder.request({
-        app,
-        type: HTTPRequest.PUT,
-        route: `/api/v1/groups/${GENERATE_GROUP_ID}/nudges/auto/off`,
-        autoAuthorized: false,
-        headers: {
-          Authorization: `Bearer ${generateJWTFromID(USER_BILL_ID)}`,
-        },
-      })
-    )
-      .assertStatusCode(Status.OK)
-      .assertMessage("Nudge schedule not configured for deactivation");
-  });
-
-  it("should return 200 if group schedule configured", async () => {
-    (
-      await testBuilder.request({
-        app,
-        type: HTTPRequest.PUT,
-        route: `/api/v1/groups/${ANOTHER_GROUP_ID}/nudges/auto/off`,
-        autoAuthorized: false,
-        headers: {
-          Authorization: `Bearer ${generateJWTFromID(USER_ANA_ID)}`,
-        },
-      })
-    )
-      .assertStatusCode(Status.OK)
-      .assertFields({
-        ...MOCK_SCHEDULE,
-        nudgeAt: MOCK_SCHEDULE.nudgeAt.toISOString(),
-        isActive: false,
-      });
+    schedulerClient = getMockSchedulerClient();
+    scheduleCommandSpy = jest.spyOn(schedulerClient, "send");
+    app = await startTestApp(schedulerClient);
   });
 
   it("should return 404 if group does not exist", async () => {
@@ -75,6 +45,8 @@ describe("PUT /groups/:id/nudges/auto/off", () => {
     )
       .assertStatusCode(Status.NotFound)
       .assertError("Group does not exist.");
+
+    expect(await scheduleCommandSpy).not.toHaveBeenCalled();
   });
 
   it("should return 403 if user not member of group", async () => {
@@ -117,5 +89,45 @@ describe("PUT /groups/:id/nudges/auto/off", () => {
     )
       .assertStatusCode(Status.BadRequest)
       .assertError("Invalid ID format");
+  });
+
+  it("should return 200 if group schedule not configured", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.PUT,
+        route: `/api/v1/groups/${GENERATE_GROUP_ID}/nudges/auto/off`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${generateJWTFromID(USER_BILL_ID)}`,
+        },
+      })
+    )
+      .assertStatusCode(Status.OK)
+      .assertMessage("Nudge schedule not configured for deactivation");
+
+    expect(await scheduleCommandSpy).not.toHaveBeenCalled();
+  });
+
+  it("should return 200 if group schedule configured", async () => {
+    (
+      await testBuilder.request({
+        app,
+        type: HTTPRequest.PUT,
+        route: `/api/v1/groups/${ANOTHER_GROUP_ID}/nudges/auto/off`,
+        autoAuthorized: false,
+        headers: {
+          Authorization: `Bearer ${generateJWTFromID(USER_ANA_ID)}`,
+        },
+      })
+    )
+      .assertStatusCode(Status.OK)
+      .assertFields({
+        ...MOCK_SCHEDULE,
+        nudgeAt: MOCK_SCHEDULE.nudgeAt.toISOString(),
+        isActive: false,
+      });
+
+    expect(await scheduleCommandSpy).toHaveBeenCalled();
   });
 });

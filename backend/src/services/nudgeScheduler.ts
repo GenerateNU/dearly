@@ -1,13 +1,11 @@
 import {
   CreateScheduleCommandInput,
-  SchedulerClient,
-  ScheduleState,
-  GetScheduleCommand,
-} from "@aws-sdk/client-scheduler";
-import {
   CreateScheduleCommand,
   DeleteScheduleCommand,
   UpdateScheduleCommand,
+  SchedulerClient,
+  ScheduleState,
+  GetScheduleCommand,
 } from "@aws-sdk/client-scheduler";
 import { handleAWSServiceError } from "../utilities/errors/aws-error";
 import { NUDGE_LAMBDA_ARN, NUDGE_LAMBDA_ROLE_ARN } from "../constants/nudge";
@@ -50,7 +48,6 @@ export class AWSEventBridgeScheduler implements NudgeScheduler {
     return await handleAWSServiceError(updateScheduleImpl, "Failed to update recurring schedule")();
   }
 
-  // TODO: don't think this is correct though
   async disableSchedule(id: string): Promise<number | null> {
     const disableScheduleImpl = async () => {
       const input = await this.scheduleCommandInput(id, null, ScheduleState.DISABLED);

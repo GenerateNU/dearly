@@ -36,8 +36,7 @@ mock.module("expo-server-sdk", () => {
 
 export const sendPushNotificationsAsyncSpy = spyOn(Expo.prototype, "sendPushNotificationsAsync");
 
-export const mockSchedulerClient = () => {
-  // todo: move to helpers
+export const getMockSchedulerClient = () => {
   const schedulerClient = mockClient(SchedulerClient);
   schedulerClient
     .on(CreateScheduleCommand)
@@ -48,3 +47,7 @@ export const mockSchedulerClient = () => {
   const castSchedulerClient: SchedulerClient = schedulerClient as unknown as SchedulerClient;
   return castSchedulerClient;
 };
+
+export const mockSchedulerClient = getMockSchedulerClient();
+
+export const scheduleCommandSpy = spyOn(mockSchedulerClient, "send");

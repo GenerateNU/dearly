@@ -11,8 +11,11 @@ import { mockClient } from "aws-sdk-client-mock";
 import { S3Impl } from "../../services/s3Service";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { mockSchedulerClient } from "./mock";
+import { SchedulerClient } from "@aws-sdk/client-scheduler";
 
-export const startTestApp = async (): Promise<Hono> => {
+export const startTestApp = async (
+  mockedSchedulerClient: SchedulerClient = mockSchedulerClient,
+): Promise<Hono> => {
   const app = new Hono();
 
   const config = getConfigurations();
@@ -24,7 +27,7 @@ export const startTestApp = async (): Promise<Hono> => {
   await seedDatabase(db);
 
   // mock AWS EventBridge
-  const schedulerClient = mockSchedulerClient();
+  const schedulerClient = mockedSchedulerClient;
 
   // mock AWS S3
   const mockS3Client = mockClient(S3Client);
