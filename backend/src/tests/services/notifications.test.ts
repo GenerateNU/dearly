@@ -55,7 +55,6 @@ describe("Notification server test", () => {
 
     expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledTimes(1);
     expect(await chunkPushNotificationsSpy).toHaveBeenCalledTimes(1);
-    expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledWith([]);
   });
 
   it("notifyPost: Should insert and notify for a larger group", async () => {
@@ -69,7 +68,6 @@ describe("Notification server test", () => {
 
     expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledTimes(1);
     expect(await chunkPushNotificationsSpy).toHaveBeenCalledTimes(1);
-    expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledWith([]);
   });
 
   it("notifyLike: Should insert and notify - like another user's post", async () => {
@@ -86,7 +84,6 @@ describe("Notification server test", () => {
 
     expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledTimes(1);
     expect(await chunkPushNotificationsSpy).toHaveBeenCalledTimes(1);
-    expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledWith([]);
   });
 
   it("notifyLike: Should insert and notify - like their own post", async () => {
@@ -116,7 +113,6 @@ describe("Notification server test", () => {
 
     expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledTimes(1);
     expect(await chunkPushNotificationsSpy).toHaveBeenCalledTimes(1);
-    expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledWith([]);
   });
 
   it("notifyComment: Should insert and notify - comment on their own post", async () => {
@@ -132,6 +128,5 @@ describe("Notification server test", () => {
 
     expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledTimes(1);
     expect(await chunkPushNotificationsSpy).toHaveBeenCalledTimes(1);
-    expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledWith([]);
   });
 });

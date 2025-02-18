@@ -166,7 +166,7 @@ export class ExpoNotificationService implements INotificationService {
           memberIDs: sql<string[]>`ARRAY_AGG(DISTINCT ${membersTable.userId})`,
           deviceTokens: sql<
             string[]
-          >`ARRAY_AGG(DISTINCT CASE WHEN ${membersTable.notificationsEnabled}) THEN ${devicesTable.token} ELSE NULL END`,
+          >`ARRAY_AGG(DISTINCT CASE WHEN ${membersTable.notificationsEnabled} THEN ${devicesTable.token} ELSE NULL END)`,
         })
         .from(postsTable)
         .innerJoin(usersTable, eq(usersTable.id, post.userId))
@@ -233,7 +233,13 @@ export class ExpoNotificationService implements INotificationService {
         .innerJoin(groupsTable, eq(groupsTable.id, postsTable.groupId))
         .innerJoin(likesTable, eq(likesTable.id, like.id))
         .where(and(eq(postsTable.id, like.postId), ne(postsTable.userId, like.userId)))
-        .groupBy(likesTable.id, postsTable.userId, usersTable.username, groupsTable.name);
+        .groupBy(
+          likesTable.id,
+          postsTable.userId,
+          usersTable.username,
+          groupsTable.name,
+          membersTable.notificationsEnabled,
+        );
 
       if (!result) {
         throw new InternalServerError("Failed to retrieve like metadata");
