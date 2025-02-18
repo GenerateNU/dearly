@@ -6,12 +6,11 @@ interface HeartProps {
   like: boolean;
   onLike: () => void;
   label?: boolean;
-  variant: "iconHoney" | "iconBlush" | "oneThirdHoneyRounded" | "oneThirdBlushRounded";
+  variant: "iconHoney" | "iconBlush";
 }
 
 export const Heart: React.FC<HeartProps> = ({ like, onLike, variant, label }) => {
   const theme = useTheme<Theme>();
-  const textLabel = !label ? "" : "Like";
 
   const variantStyle = theme.heartVariants[like ? "filled" : "outlined"];
 
@@ -21,7 +20,6 @@ export const Heart: React.FC<HeartProps> = ({ like, onLike, variant, label }) =>
       icon={variantStyle.icon}
       variant={variant}
       size={variantStyle.size}
-      label={textLabel}
     />
   );
 };
