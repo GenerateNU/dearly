@@ -222,6 +222,13 @@ components:
           example: "This is a sample caption for the post."
           description: A textual description or caption for the post.
           nullable: true
+        name:
+          type: string
+          description: Display name of user who makes the post.
+          nullable: true
+        username:
+          type: string
+          description: Username of user who makes the post.
         likes:
           type: number
           example: 20
