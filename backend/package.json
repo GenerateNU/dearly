@@ -18,6 +18,7 @@
   "type": "module",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.731.1",
+    "@aws-sdk/client-scheduler": "^3.744.0",
     "@aws-sdk/s3-request-presigner": "^3.733.0",
     "@blgc/openapi-router": "^0.1.0",
     "@breezystack/lamejs": "^1.2.7",
@@ -26,6 +27,7 @@
     "@hono/zod-validator": "^0.4.2",
     "@jest/globals": "^29.7.0",
     "@scalar/hono-api-reference": "^0.5.165",
+    "@types/aws-lambda": "^8.10.147",
     "@types/crypto-js": "^4.2.2",
     "@types/fluent-ffmpeg": "^2.1.27",
     "@types/jest": "^29.5.14",

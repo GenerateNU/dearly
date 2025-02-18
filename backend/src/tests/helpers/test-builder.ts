@@ -267,8 +267,15 @@ export class TestBuilder {
     if (!this.body) {
       throw new Error("Response is not defined.");
     }
+
     Object.entries(expectedFields).forEach(([fieldName, expectedValue]) => {
-      expect(this.body![fieldName]).toBe(expectedValue);
+      const actualValue = this.body![fieldName];
+
+      if (Array.isArray(expectedValue)) {
+        expect(actualValue).toEqual(expect.arrayContaining(expectedValue)); // Matches if the array contains the expected elements
+      } else {
+        expect(actualValue).toBe(expectedValue);
+      }
     });
     return this;
   }

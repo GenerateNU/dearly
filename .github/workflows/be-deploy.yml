@@ -2,21 +2,21 @@ name: Deployment
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: liusto258/dearly 
-  SERVICE: dearly 
+  IMAGE_NAME: liusto258/dearly
+  SERVICE: dearly
 on:
   push:
     branches:
-      - main 
+      - main
 
 jobs:
   push_to_registry:
-    name: Push Docker image to DockerHub and Deploy on Google Cloud Run. 
+    name: Push Docker image to DockerHub and Deploy on Google Cloud Run.
     runs-on: ubuntu-latest
 
     permissions:
-      packages: write 
-      contents: read 
+      packages: write
+      contents: read
       attestations: write
       id-token: write
 
@@ -34,7 +34,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: liusto258/dearly 
+          images: liusto258/dearly
 
       - name: Build and push Docker image
         id: push
@@ -53,14 +53,14 @@ jobs:
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
 
-      - name: Google Auth 
-        id: Auth 
-        uses: 'google-github-actions/auth@v2'
+      - name: Google Auth
+        id: Auth
+        uses: "google-github-actions/auth@v2"
         with:
-          token_format: 'access_token'
+          token_format: "access_token"
           project_id: ${{ secrets.PROJECT_ID }}
           credentials_json: ${{ secrets.CREDENTIALS_JSON }}
-          service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'
+          service_account: "${{ secrets.WIF_SERVICE_ACCOUNT }}"
 
       - name: Deploy to Cloud Run
         id: deploy
@@ -90,4 +90,6 @@ jobs:
             SLACK_CHANNEL_ID=${{ secrets.SLACK_CHANNEL_ID }} 
             SLACK_USER_GROUP_ID=${{ secrets.SLACK_USER_GROUP_ID }}
             BUILD_QR_CODE_GENERATOR=${{ secrets.BUILD_QR_CODE_GENERATOR }}
+            NUDGE_LAMBDA_ARN=${{ secrets.NUDGE_LAMBDA_ARN }}
+            NUDGE_LAMBDA_ROLE_ARN=${{ secrets.NUDGE_LAMBDA_ROLE_ARN }}
           flags: --port=3000 --allow-unauthenticated

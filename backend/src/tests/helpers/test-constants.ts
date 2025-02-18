@@ -1,9 +1,10 @@
 import {
   commentsTable,
   groupsTable,
-  likesTable,
   mediaTable,
   postsTable,
+  scheduledNudgesTable,
+  likesTable,
 } from "../../entities/schema";
 import { CreateGroupPayload } from "../../types/api/internal/groups";
 import { CreateUserPayload, SearchedUser } from "../../types/api/internal/users";
@@ -29,6 +30,12 @@ export const MOCK_POST_NOTIF_UUID = "601e8b6b-360a-4b53-8a15-aba8a9bdf027";
 export const DEARLY_COMMENT_ID = "679c0331-2dfc-8002-b4a4-22b09d6c3c73";
 export const NEW_COMMENT_ID = "4b789855-0c17-4aa0-8eb4-d8e2b20bc1bf";
 export const MOCK_EXPO_TOKEN = "ExponentPushToken[Z9Hfn6ZxWVXaAs7MG3Pya8]";
+export const MOCK_SCHEDULE_ID = "fc9385e1-7602-48f6-b69f-1753decac9a6";
+export const GENERATE_GROUP_ID = "bbf9ff5f-2035-417f-af88-420166c7059b";
+export const USER_JAKE_ID = "3e001806-e91d-409d-a960-3ffdd396cee6";
+
+const NUDGE_AT_TIME = new Date();
+NUDGE_AT_TIME.setUTCHours(9, 0, 0, 0);
 
 export const GROUP_EMPTY_FIELDS_ERRORS = [
   {
@@ -172,6 +179,13 @@ export const ANOTHER_GROUP: CreateGroupPayload = {
   id: ANOTHER_GROUP_ID,
 };
 
+export const GENERATE_GROUP: CreateGroupPayload = {
+  name: "generate",
+  description: "degenerate",
+  managerId: USER_BILL_ID,
+  id: GENERATE_GROUP_ID,
+};
+
 export const MOCK_MEDIA_WITH_URL = MEDIA_MOCK.map((media) => ({
   id: media.id,
   postId: media.postId,
@@ -247,3 +261,13 @@ export const LIKE_MOCK: (typeof likesTable.$inferInsert)[] = [
     createdAt: new Date(),
   },
 ];
+
+export const MOCK_SCHEDULE: typeof scheduledNudgesTable.$inferInsert = {
+  groupId: ANOTHER_GROUP_ID,
+  frequency: "WEEKLY",
+  daysOfWeek: ["MON", "FRI"],
+  day: null,
+  month: null,
+  nudgeAt: NUDGE_AT_TIME,
+  isActive: true,
+};
