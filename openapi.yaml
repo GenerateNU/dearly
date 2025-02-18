@@ -515,6 +515,77 @@ components:
             - commentId
         - required:
             - likeId
+    Schedule:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: ID of nudge schedule
+          example: "3a6e07ab-9b7b-4e0d-b10f-c7fe945f8476"
+        groupId:
+          type: string
+          format: uuid
+          description: ID of group
+          example: "d0c41d3f-dc80-4a62-a3b2-6e057c0f9981"
+        frequency:
+          type: string
+          description: Frequency of nudge
+          enum:
+            - DAILY
+            - WEEKLY
+            - BIWEEKLY
+            - MONTHLY
+            - YEARLY
+        daysOfWeek:
+          type: array
+          nullable: true
+          description: Days of week to send nudge (use with WEEKLY/BIWEEKLY)
+          items:
+            type: string
+            enum:
+              - MON
+              - TUE
+              - WED
+              - THU
+              - FRI
+              - SAT
+              - SUN
+        day:
+          type: integer
+          description: Day to send nudge (use with MONTHLY/YEARLY)
+          minimum: 1
+          maximum: 31
+          nullable: true
+        month:
+          type: integer
+          description: Month to send nudge (use with YEARLY)
+          minimum: 1
+          maximum: 12
+          nullable: true
+        nudgeAt:
+          type: string
+          format: date-time
+          description: Time with timezone to send nudge
+          example: "2025-02-16T08:30:00+00:00"
+        isActive:
+          type: boolean
+          default: true
+          description: Status of nudge (active or inactive)
+        createdAt:
+          type: string
+          format: date-time
+          description: Time when nudge schedule is initialized
+          example: "2025-02-16T08:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Time when nudge schedule is updated
+          example: "2025-02-16T08:30:00Z"
+      required:
+        - frequency
+        - nudgeAt
+
 paths:
   /healthcheck:
     get:
@@ -2373,6 +2444,232 @@ paths:
                 $ref: "#/components/schemas/Error"
         429:
           description: Cannot nudge during cooldown period to prevent spamming
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/v1/groups/{id}/nudges/auto:
+    put:
+      tags:
+        - Nudge Endpoints
+      summary: Upsert nudge schedule for group
+      description: Insert or update nudge schedule for a group
+      parameters:
+        - name: id
+          in: path
+          description: ID of the group to nudge members
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              frequency:
+                type: string
+                description: Frequency of nudge
+                enum:
+                  - DAILY
+                  - WEEKLY
+                  - MONTHLY
+              daysOfWeek:
+                type: array
+                description: Days of week to send nudge (use with WEEKLY/BIWEEKLY)
+                items:
+                  type: string
+                  enum:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+              day:
+                type: integer
+                description: Day to send nudge (use with MONTHLY/YEARLY)
+                minimum: 1
+                maximum: 31
+              month:
+                type: integer
+                description: Month to send nudge (use with YEARLY)
+                minimum: 1
+                maximum: 12
+              nudgeAt:
+                type: string
+                format: date-time
+                description: Time with timezone to send nudge
+                example: "2025-02-16T08:30:00+00:00"
+      responses:
+        200:
+          description: Successfully get nudge schedule of group
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Schedule"
+                  - type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Group did not have schedule configured"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: User not manager of the group
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Group not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    get:
+      tags:
+        - Nudge Endpoints
+      summary: Get group nudge schedule configuration
+      description: Retrieve the nudge schedule of a group
+      parameters:
+        - name: id
+          in: path
+          description: ID of the group to nudge members
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Successfully get nudge schedule of group
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Schedule"
+                  - type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Group did not have schedule configured"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: User not manager of the group
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Group not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/groups/{id}/nudges/auto/off:
+    put:
+      tags:
+        - Nudge Endpoints
+      summary: Turn nudge to inactive
+      description: Deactivate nudge schedule for a group to stop sending nudges
+      parameters:
+        - name: id
+          in: path
+          description: ID of the group to nudge members
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 5e91507e-5630-4efd-9fd4-799178870b10
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Successfully deactivate and turn off nudge
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Schedule"
+                  - type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Nudge schedule not configured for deactivation"
+        400:
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Error"
+                  - $ref: "#/components/schemas/ValidationError"
+        401:
+          description: Unauthorized due to invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: User not manager of the group
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: Group not found
           content:
             application/json:
               schema:

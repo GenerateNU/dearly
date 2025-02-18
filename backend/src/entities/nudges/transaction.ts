@@ -1,7 +1,12 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { NotificationMetadata, NudgeTarget } from "./validator";
-import { devicesTable, groupsTable, membersTable, usersTable } from "../schema";
-import { eq, inArray, and, isNotNull, gt, not } from "drizzle-orm";
+import {
+  devicesTable,
+  groupsTable,
+  membersTable,
+  scheduledNudgesTable,
+  usersTable,
+} from "../schema";
+import { eq, inArray, and, isNotNull, gt, not, sql } from "drizzle-orm";
 import {
   ForbiddenError,
   NotFoundError,
@@ -9,23 +14,91 @@ import {
 } from "../../utilities/errors/app-error";
 import { ONE_DAY_COOLDOWN_SEC } from "../../constants/nudge";
 import { Transaction } from "../../types/api/internal/transaction";
+import {
+  NotificationMetadata,
+  NudgeSchedule,
+  NudgeSchedulePayload,
+  NudgeTarget,
+} from "../../types/api/internal/nudges";
 
 export interface NudgeTransaction {
-  getNotificationMetadata(
+  getManualNudgeNotificationMetadata(
     userIds: string[],
     groupId: string,
     managerId: string,
   ): Promise<NotificationMetadata>;
+
+  getAutoNudgeNotificationMetadata(
+    groupId: string,
+    managerId: string,
+  ): Promise<NotificationMetadata>;
+
+  upsertSchedule(managerId: string, payload: NudgeSchedulePayload): Promise<NudgeSchedule | null>;
+
+  getNudgeSchedule(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null>;
+
+  deactivateNudge(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null>;
 }
 
-export class NudgeTransactionImpl {
+export class NudgeTransactionImpl implements NudgeTransaction {
   private db: PostgresJsDatabase;
 
   constructor(db: PostgresJsDatabase) {
     this.db = db;
   }
 
-  async getNotificationMetadata(
+  async upsertSchedule(
+    managerId: string,
+    payload: NudgeSchedulePayload,
+  ): Promise<NudgeSchedule | null> {
+    return await this.db.transaction(async (tx) => {
+      // validate group existence and manager permissions
+      await this.validateGroup(tx, payload.groupId, managerId);
+
+      // insert the value into the database
+      const [nudgeSchedule] = await tx
+        .insert(scheduledNudgesTable)
+        .values(payload)
+        .onConflictDoUpdate({
+          target: [scheduledNudgesTable.id, groupsTable.id],
+          set: { ...payload, updatedAt: new Date() },
+        })
+        .returning();
+
+      return nudgeSchedule ?? null;
+    });
+  }
+
+  async getNudgeSchedule(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null> {
+    return await this.db.transaction(async (tx) => {
+      // validate group existence and manager permissions
+      await this.validateGroup(tx, groupId, managerId);
+
+      const [nudgeSchedule] = await this.db
+        .select()
+        .from(scheduledNudgesTable)
+        .where(eq(scheduledNudgesTable.groupId, groupId));
+
+      return nudgeSchedule ?? null;
+    });
+  }
+
+  async deactivateNudge(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null> {
+    return await this.db.transaction(async (tx) => {
+      // validate group existence and manager permissions
+      await this.validateGroup(tx, groupId, managerId);
+
+      const [nudgeSchedule] = await this.db
+        .update(scheduledNudgesTable)
+        .set({ isActive: false, updatedAt: new Date() })
+        .where(eq(scheduledNudgesTable.groupId, groupId))
+        .returning();
+
+      return nudgeSchedule ?? null;
+    });
+  }
+
+  async getManualNudgeNotificationMetadata(
     userIds: string[],
     groupId: string,
     managerId: string,
@@ -42,7 +115,7 @@ export class NudgeTransactionImpl {
         groupId,
         managerId,
       );
-      // check whether any selected users are in cooldown period
+
       await this.checkAndUpdateNudgeCooldown(tx, validNudgeTargets, groupId);
 
       return {
@@ -50,6 +123,31 @@ export class NudgeTransactionImpl {
         groupId,
         groupName: group.name,
       };
+    });
+  }
+
+  async getAutoNudgeNotificationMetadata(
+    groupId: string,
+    managerId: string,
+  ): Promise<NotificationMetadata> {
+    return await this.db.transaction(async (tx) => {
+      // validate group existence and check manager's permission
+      await this.validateGroup(tx, groupId, managerId);
+
+      // retrieve members' device tokens if they have notification enabled
+      const [deviceTokens] = await tx
+        .select({
+          groupId: groupsTable.id,
+          groupName: groupsTable.name,
+          deviceTokens: sql`ARRAY_AGG(${devicesTable.token})`,
+        })
+        .from(membersTable)
+        .innerJoin(groupsTable, eq(membersTable.groupId, groupsTable.id))
+        .innerJoin(devicesTable, eq(membersTable.userId, devicesTable.userId))
+        .where(and(eq(membersTable.notificationsEnabled, true), eq(groupsTable.id, groupId)))
+        .groupBy(groupsTable.id, groupsTable.name);
+
+      return deviceTokens as NotificationMetadata;
     });
   }
 
@@ -119,7 +217,6 @@ export class NudgeTransactionImpl {
           inArray(membersTable.userId, userIds),
           eq(membersTable.groupId, groupId),
           eq(membersTable.notificationsEnabled, true),
-          isNotNull(devicesTable.token),
         ),
       );
   }

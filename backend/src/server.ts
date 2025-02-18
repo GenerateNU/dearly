@@ -5,6 +5,7 @@ import { configureMiddlewares } from "./middlewares/init";
 import { setUpRoutes } from "./routes/init";
 import { automigrateDB } from "./database/migrate";
 import { S3Impl } from "./services/s3Service";
+import { SchedulerClient } from "@aws-sdk/client-scheduler";
 
 const app = new Hono();
 
@@ -12,6 +13,8 @@ const config = getConfigurations();
 
 (async function setUpServer() {
   const s3ServiceProvider = new S3Impl(config.s3Config);
+  const schedulerClient = new SchedulerClient();
+
   try {
     const db = connectDB(config);
 
@@ -19,7 +22,7 @@ const config = getConfigurations();
 
     configureMiddlewares(app, config);
 
-    setUpRoutes(app, db, config, s3ServiceProvider);
+    setUpRoutes(app, db, config, s3ServiceProvider, schedulerClient);
 
     console.log("Successfully initialize app");
   } catch (error) {

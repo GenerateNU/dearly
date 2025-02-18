@@ -71,7 +71,7 @@ describe("POST /groups/:id/nudges/manual", () => {
       {
         title: "Time to Connect! 🚀",
         body: `✨ Share a post with your dearly group now! ✨`,
-        to: [MOCK_EXPO_TOKEN],
+        to: MOCK_EXPO_TOKEN,
         data: {
           groupId: DEARLY_GROUP_ID,
           groupName: "dearly",
@@ -161,7 +161,7 @@ describe("POST /groups/:id/nudges/manual", () => {
       {
         title: "Time to Connect! 🚀",
         body: `✨ Share a post with your dearly group now! ✨`,
-        to: [MOCK_EXPO_TOKEN],
+        to: MOCK_EXPO_TOKEN,
         data: {
           groupId: DEARLY_GROUP_ID,
           groupName: "dearly",
