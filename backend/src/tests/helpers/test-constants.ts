@@ -1,17 +1,16 @@
-import { Like } from "../../entities/likes/validator";
 import { Comment } from "../../types/api/internal/comments";
 import { groupsTable, mediaTable, postsTable } from "../../entities/schema";
 import { CreateGroupPayload, Group } from "../../types/api/internal/groups";
 import { Post } from "../../types/api/internal/posts";
 import { CreateUserPayload, SearchedUser, User } from "../../types/api/internal/users";
 import { Member } from "../../types/api/internal/members";
-import e from "express";
+import { Like } from "../../types/api/internal/like";
 
 export const INVALID_ID_ARRAY = ["1", "%2", "123abc", "!!$$", "123 456", "@ID", null, undefined];
 export const USER_ALICE_ID = "00000000-0000-0000-0000-000000000000";
 export const ADRIENNE_COMMENT_ID = "ab674eaf-9999-aaaa-8a38-811234567000";
 export const USER_ADRIENNE_ID = "ab674eaf-9999-aaaa-8a38-811258295746";
-export const BIG_THEIF_GROUP_ID = "ab674eaf-9999-1111-8a38-811234567890";
+export const BIG_THIEF_GROUP_ID = "ab674eaf-9999-1111-8a38-811234567890";
 export const USER_BUCK_ID = "ab674eaf-9999-abcd-4444-811234567890";
 export const BUCK_POST_ID = "ab674eaf-9999-abcd-8a38-811234567890";
 export const USER_BOB_ID = "ae6be85f-157c-40db-afd2-2f388d8ff7b5";
@@ -41,6 +40,7 @@ export const POST_EXAMPLE_ID = "ab674eaf-9999-47c1-8a38-811234567890";
 export const SNAPPER_COMMENT_ID = "f46a2916-99e7-4ebb-a796-d1c29d6e4786";
 export const FULL_SNAPPER_POST_ID = "6bc21e8a-7a8e-4c66-8403-ab4259311795";
 export const MEMBER_ID = "ab674eaf-9999-aaaa-8a38-811234567890";
+export const MAI_DEVICE_TOKEN = "4dff72c9-afbc-49e5-b757-1de7d89d8234";
 
 export const GROUP_EMPTY_FIELDS_ERRORS = [
   {
@@ -256,7 +256,7 @@ export const ADRIENNE_COMMENTS_BUCKPOST: Comment = {
 
 export const BUCK_POST: Post = {
   id: BUCK_POST_ID,
-  groupId: BIG_THEIF_GROUP_ID,
+  groupId: BIG_THIEF_GROUP_ID,
   userId: USER_BUCK_ID,
   createdAt: new Date(),
   caption: null,
@@ -265,14 +265,14 @@ export const BUCK_POST: Post = {
 
 export const BIG_THEIF_GROUP: Group = {
   name: "big thief",
-  id: BIG_THEIF_GROUP_ID,
+  id: BIG_THIEF_GROUP_ID,
   description: null,
   managerId: USER_BUCK_ID,
 };
 
 export const ADRIENNE_MEMBER: Member = {
   userId: USER_ADRIENNE_ID,
-  groupId: BIG_THEIF_GROUP_ID,
+  groupId: BIG_THIEF_GROUP_ID,
   joinedAt: new Date(),
   role: "MEMBER",
   notificationsEnabled: false,
@@ -290,7 +290,7 @@ export const USER_BUCK: User = {
   birthday: null,
 };
 
-export const ADRIENNE_USER: User = {
+export const USER_ADRIENNE: User = {
   name: "Adrienne",
   id: USER_ADRIENNE_ID,
   username: "adrizzy",
@@ -324,4 +324,20 @@ export const LIKE_EXAMPLE: Like = {
   userId: USER_Nubs_ID,
   postId: POST_EXAMPLE_ID,
   createdAt: new Date(),
+};
+
+export const JOSH_LIKE_POST: Like = {
+  id: "ab674eaf-9999-bbbb-8a38-811234567890",
+  userId: USER_Josh_ID,
+  postId: POST_EXAMPLE_ID,
+  createdAt: new Date(),
+};
+
+export const JOSH_COMMENT_POST: Comment = {
+  id: "ab674eaf-9999-aaaa-8b38-811234567890",
+  userId: USER_Josh_ID,
+  postId: POST_EXAMPLE_ID,
+  createdAt: new Date(),
+  content: "Look at da fishes!",
+  voiceMemo: null,
 };

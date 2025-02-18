@@ -43,6 +43,7 @@ import {
   USER_STONE,
   USER_MAI,
   FULL_SNAPPER_POST_EXAMPLE,
+  MAI_DEVICE_TOKEN,
 } from "./test-constants";
 import { CreateGroupPayload } from "../../types/api/internal/groups";
 import { CreateUserPayload } from "../../types/api/internal/users";
@@ -171,7 +172,7 @@ const seedDeviceTokens = async (db: PostgresJsDatabase) => {
       userId: USER_Josh_ID,
     },
     {
-      token: "4dff72c9-afbc-49e5-b757-1de7d89d8234",
+      token: MAI_DEVICE_TOKEN,
       userId: USER_MAI_ID,
     },
     {

@@ -42,9 +42,12 @@ export class NotificationTransactionImpl implements NotificationTransaction {
           username: usersTable.username,
           groupName: groupsTable.name,
           memberIDs: sql<string[]>`ARRAY_AGG(DISTINCT ${membersTable.userId})`,
-          deviceTokens: sql<
-            string[]
-          >`ARRAY_AGG(DISTINCT CASE WHEN ${membersTable.notificationsEnabled} THEN ${devicesTable.token} ELSE NULL END)`,
+          deviceTokens: sql<string[]>`ARRAY_REMOVE(ARRAY_AGG(DISTINCT 
+            CASE 
+              WHEN ${membersTable.notificationsEnabled} IS TRUE 
+              THEN ${devicesTable.token} 
+            END
+          ), NULL)`,
         })
         .from(postsTable)
         .innerJoin(usersTable, eq(usersTable.id, post.userId))
