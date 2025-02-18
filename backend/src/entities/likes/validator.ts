@@ -1,5 +1,3 @@
-import { createSelectSchema } from "drizzle-zod";
-import { likesTable } from "../schema";
 import { z } from "zod";
 
 export const likeValidate = z.object({
@@ -8,5 +6,3 @@ export const likeValidate = z.object({
   postId: z.string(),
   createdAt: z.string(),
 });
-
-export type Like = typeof likesTable.$inferSelect;

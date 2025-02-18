@@ -5,8 +5,10 @@ import { configureMiddlewares } from "./middlewares/init";
 import { setUpRoutes } from "./routes/init";
 import { automigrateDB } from "./database/migrate";
 import { S3Impl } from "./services/s3Service";
-import { ExpoNotificationService } from "./services/notificationsService";
 import Expo from "expo-server-sdk";
+import { NotificationTransactionImpl } from "./services/notification/transaction";
+import { ExpoPushService } from "./services/notification/expo";
+import { ExpoNotificationService } from "./services/notification/service";
 
 const app = new Hono();
 const config = getConfigurations();
@@ -22,7 +24,11 @@ const config = getConfigurations();
 
     configureMiddlewares(app, config);
 
-    new ExpoNotificationService(config, db, expo);
+    new ExpoNotificationService(
+      config,
+      new NotificationTransactionImpl(db),
+      new ExpoPushService(expo),
+    );
 
     setUpRoutes(app, db, config, s3ServiceProvider, expo);
 

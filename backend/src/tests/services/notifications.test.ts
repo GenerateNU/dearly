@@ -1,6 +1,5 @@
 import { getConfigurations } from "./../../config/config";
 import { NotFoundError } from "../../utilities/errors/app-error";
-import { ExpoNotificationService, INotificationService } from "../../services/notificationsService";
 import { connectDB } from "../../database/connect";
 import {
   ADRIENNE_COMMENTS_BUCKPOST,
@@ -13,9 +12,7 @@ import {
   USER_Nubs_ID,
 } from "./../helpers/test-constants";
 import { eq } from "drizzle-orm";
-import { Hono } from "hono";
-import { startTestApp } from "../helpers/test-app";
-import { spyOn, describe, expect, it, beforeAll, beforeEach } from "bun:test";
+import { describe, expect, it, beforeAll, beforeEach } from "bun:test";
 import { notificationsTable } from "../../entities/schema";
 import { resetDB } from "../../database/reset";
 import { seedDatabase } from "../helpers/seed-db";
@@ -25,11 +22,18 @@ import {
   sendPushNotificationsAsyncSpy,
 } from "../helpers/test-app";
 import { automigrateDB } from "../../database/migrate";
+import { ExpoNotificationService } from "../../services/notification/service";
+import { NotificationTransactionImpl } from "../../services/notification/transaction";
+import { ExpoPushService } from "../../services/notification/expo";
 
 describe("Notification server test", () => {
   const config = getConfigurations();
   const db = connectDB(config);
-  const notifService: INotificationService = new ExpoNotificationService(config, db, expo);
+  const notifService = new ExpoNotificationService(
+    config,
+    new NotificationTransactionImpl(db),
+    new ExpoPushService(expo),
+  );
 
   beforeAll(async () => {
     await automigrateDB(db, config);
@@ -49,6 +53,7 @@ describe("Notification server test", () => {
       .select()
       .from(notificationsTable)
       .where(eq(notificationsTable.actorId, POST_EXAMPLE.userId));
+
     expect(results.length).toBe(1);
     expect(results[0]?.receiverId).toBe(USER_Nubs_ID);
     expect(results[0]?.receiverId).not.toBe(POST_EXAMPLE.userId);

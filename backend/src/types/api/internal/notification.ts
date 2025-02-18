@@ -1,5 +1,8 @@
 import { createSelectSchema } from "drizzle-zod";
 import { notificationsTable } from "../../../entities/schema";
+import { Post } from "./posts";
+import { Like } from "./like";
+import { Comment } from "./comments";
 
 export const notificationValidate = createSelectSchema(notificationsTable);
 
@@ -29,3 +32,5 @@ export type LikeCommentNotificationMetadata = {
   token: string[];
   isEnabled: boolean;
 };
+
+export type NotificationData = Comment | Like | Post;
