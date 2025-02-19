@@ -28,7 +28,6 @@ export const Icon: React.FC<IconProps> = ({ name, color, size, labelPosition, la
 
   return (
     <Box
-      width="100%"
       justifyContent="center"
       alignItems="center"
       gap="xs"

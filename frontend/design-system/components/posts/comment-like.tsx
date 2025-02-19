@@ -23,7 +23,7 @@ export const CommentLike: React.FC<CommentLikeProps> = ({
 }) => {
   return (
     <>
-      <Box flexDirection="row" gap="m" alignItems="center">
+      <Box gap="m" flexDirection="row" alignItems="center">
         <BaseButton variant="text" onPress={onCommentClicked}>
           <Box gap="xs" flexDirection="row" justifyContent="center" alignItems="center">
             <MaterialIcons name="chat-bubble-outline" size={30} color="ink" />
