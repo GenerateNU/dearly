@@ -15,7 +15,7 @@ import logger from "../utilities/logger";
 import { PassThrough, Readable } from "stream";
 import ffmpegInstaller from "@ffmpeg-installer/ffmpeg";
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);
-export interface IS3Operations {
+export interface S3Service {
   // group is the uuid of the group this photo is being sent to (used as tagging number) -> make public group id number
 
   /**
@@ -42,27 +42,13 @@ export interface IS3Operations {
   getObjectURL(objectKey: string): Promise<string>;
 }
 
-export class S3Impl implements IS3Operations {
+export class S3ServiceImpl implements S3Service {
   private client;
   private bucketName;
 
-  public constructor(config: Configuration["s3Config"], client?: S3Client) {
-    const region = config.region;
-    const secretKey = config.secretKey;
-    const publicKey = config.publicKey;
+  public constructor(config: Configuration["s3Config"], client: S3Client) {
     this.bucketName = config.name;
-
-    if (!client) {
-      this.client = new S3Client({
-        region: region,
-        credentials: {
-          accessKeyId: publicKey,
-          secretAccessKey: secretKey,
-        },
-      });
-    } else {
-      this.client = client;
-    }
+    this.client = client;
   }
 
   /**

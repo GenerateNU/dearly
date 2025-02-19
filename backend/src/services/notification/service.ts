@@ -1,5 +1,4 @@
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
-import { Configuration } from "../../types/config";
+import { RealtimeChannel, SupabaseClient } from "@supabase/supabase-js";
 import { postValidate } from "../../entities/posts/validator";
 import { Post } from "../../types/api/internal/posts";
 import { Comment, commentValidate } from "../../types/api/internal/comments";
@@ -28,6 +27,16 @@ export interface NotificationService {
    * @param comment a user commenting on a post
    */
   notifyComment(comment: Comment): Promise<Notification[]>;
+
+  /**
+   * Subscribe to supabase event
+   */
+  subscribeToSupabaseRealtime(): void;
+
+  /**
+   * Unsubscribe to supabase event
+   */
+  unsubscribeSupabaseRealtime(): void;
 }
 
 /**
@@ -38,12 +47,17 @@ export class ExpoNotificationService implements NotificationService {
   private expoService: PushNotificationService;
   private supabaseClient: SupabaseClient;
   private transaction: NotificationTransaction;
+  private postChannel: RealtimeChannel | null;
+  private likeChannel: RealtimeChannel | null;
+  private commentChannel: RealtimeChannel | null;
 
-  constructor(config: Configuration, transaction: NotificationTransaction, expo: ExpoPushService) {
+  constructor(client: SupabaseClient, transaction: NotificationTransaction, expo: ExpoPushService) {
     this.expoService = expo;
-    this.supabaseClient = createClient(config.supabase.url, config.supabase.key);
-    this.subscribeToSupabaseRealtime();
+    this.supabaseClient = client;
     this.transaction = transaction;
+    this.postChannel = null;
+    this.likeChannel = null;
+    this.commentChannel = null;
   }
 
   async notifyPost(post: Post): Promise<Notification[]> {
@@ -149,14 +163,26 @@ export class ExpoNotificationService implements NotificationService {
     return message;
   }
 
-  private subscribeToSupabaseRealtime() {
+  public subscribeToSupabaseRealtime() {
     this.subscribeToPosts();
     this.subscribeToComments();
     this.subscribeToLikes();
   }
 
+  public unsubscribeSupabaseRealtime() {
+    if (this.postChannel) {
+      this.postChannel.unsubscribe();
+    }
+    if (this.likeChannel) {
+      this.likeChannel.unsubscribe();
+    }
+    if (this.commentChannel) {
+      this.commentChannel.unsubscribe();
+    }
+  }
+
   private subscribeToPosts() {
-    this.supabaseClient
+    this.postChannel = this.supabaseClient
       .channel("posts_channel")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "posts" }, (payload) => {
         const post = postValidate.parse(payload.new);
@@ -170,7 +196,7 @@ export class ExpoNotificationService implements NotificationService {
   }
 
   private subscribeToComments() {
-    this.supabaseClient
+    this.commentChannel = this.supabaseClient
       .channel("likes")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "likes" }, (payload) => {
         const like = likeValidate.parse(payload.new);
@@ -184,7 +210,7 @@ export class ExpoNotificationService implements NotificationService {
   }
 
   private subscribeToLikes() {
-    this.supabaseClient
+    this.likeChannel = this.supabaseClient
       .channel("comment")
       .on(
         "postgres_changes",

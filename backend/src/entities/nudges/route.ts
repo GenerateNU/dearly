@@ -4,12 +4,12 @@ import { NudgeController, NudgeControllerImpl } from "./controller";
 import { NudgeTransaction, NudgeTransactionImpl } from "./transaction";
 import { NudgeService, NudgeServiceImpl } from "./service";
 import { ExpoPushService } from "../../services/notification/expo";
-import { SchedulerClient } from "@aws-sdk/client-scheduler";
+import { NudgeScheduler } from "../../services/nudgeScheduler";
 
 export const nudgeRoutes = (
   db: PostgresJsDatabase,
   expoService: ExpoPushService,
-  scheduler: SchedulerClient,
+  scheduler: NudgeScheduler,
 ): Hono => {
   const nudge = new Hono();
   const nudgeTransaction: NudgeTransaction = new NudgeTransactionImpl(db);
