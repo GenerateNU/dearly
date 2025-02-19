@@ -42,14 +42,10 @@ export class ExpoNotificationService implements NotificationService {
   constructor(config: Configuration, transaction: NotificationTransaction, expo: ExpoPushService) {
     this.expoService = expo;
     this.supabaseClient = createClient(config.supabase.url, config.supabase.key);
-    this.subscribeToSupabaseRealTime();
+    this.subscribeToSupabaseRealtime();
     this.transaction = transaction;
   }
 
-  /**
-   * Notifies all group members of a new post.
-   * @param post the new post that a user has made.
-   */
   async notifyPost(post: Post): Promise<Notification[]> {
     const { username, groupName, deviceTokens, memberIDs } =
       await this.transaction.getPostMetadata(post);
@@ -153,7 +149,7 @@ export class ExpoNotificationService implements NotificationService {
     return message;
   }
 
-  private subscribeToSupabaseRealTime() {
+  private subscribeToSupabaseRealtime() {
     this.subscribeToPosts();
     this.subscribeToComments();
     this.subscribeToLikes();
