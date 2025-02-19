@@ -18,7 +18,7 @@ import {
 } from "./../helpers/test-constants";
 import { eq } from "drizzle-orm";
 import { describe, expect, it, beforeAll, beforeEach } from "bun:test";
-import { notificationsTable, postsTable } from "../../entities/schema";
+import { notificationsTable } from "../../entities/schema";
 import { resetDB } from "../../database/reset";
 import { seedDatabase } from "../helpers/seed-db";
 import {

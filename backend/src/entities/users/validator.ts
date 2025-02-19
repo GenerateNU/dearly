@@ -1,5 +1,5 @@
 import { usersTable } from "../schema";
-import { createInsertSchema, createUpdateSchema, createSelectSchema } from "drizzle-zod";
+import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
 import z from "zod";
 import { Expo } from "expo-server-sdk";
 import { MIN_LIMIT } from "../../constants/database";

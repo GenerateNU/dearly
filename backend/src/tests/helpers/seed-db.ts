@@ -3,7 +3,6 @@ import {
   commentsTable,
   devicesTable,
   groupsTable,
-  likesTable,
   mediaTable,
   membersTable,
   postsTable,
@@ -57,7 +56,6 @@ import {
 import { CreateGroupPayload } from "../../types/api/internal/groups";
 import { CreateUserPayload } from "../../types/api/internal/users";
 import { Comment } from "../../types/api/internal/comments";
-import { Like } from "../../types/api/internal/like";
 
 export const seedDatabase = async (db: PostgresJsDatabase) => {
   try {
