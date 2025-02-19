@@ -7,8 +7,9 @@ import {
   likesTable,
   commentsTable,
   mediaTable,
+  notificationsTable,
 } from "../schema";
-import { eq, and, sql, desc } from "drizzle-orm";
+import { eq, and, sql, desc, or } from "drizzle-orm";
 import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
 import { AddMemberPayload, Member } from "../../types/api/internal/members";
 import { IDPayload } from "../../types/id";
@@ -62,11 +63,69 @@ export class MemberTransactionImpl implements MemberTransaction {
       throw new ForbiddenError("You do not have the rights to remove this member.");
     }
 
-    const [memberAdded] = await this.db
-      .delete(membersTable)
-      .where(and(eq(membersTable.userId, userId), eq(membersTable.groupId, groupId)))
+    const memberRemoved = await this.db.transaction(async (tx) => {
+      const [memberRemoved] = await tx
+        .delete(membersTable)
+        .where(and(eq(membersTable.userId, userId), eq(membersTable.groupId, groupId)))
+        .returning();
+
+      // delete post, comment, like and notification associated with user
+      await this.deleteMemberData(groupId, userId, tx);
+
+      return memberRemoved;
+    });
+
+    return memberRemoved ?? null;
+  }
+
+  private async deleteMemberData(groupId: string, userId: string, tx: Transaction) {
+    // delete post
+    await tx
+      .delete(postsTable)
+      .where(and(eq(postsTable.userId, userId), eq(postsTable.groupId, groupId)))
       .returning();
-    return memberAdded ?? null;
+
+    // delete comment
+    const comments = tx
+      .$with("comments")
+      .as(
+        tx
+          .select()
+          .from(commentsTable)
+          .innerJoin(postsTable, eq(postsTable.id, commentsTable.postId))
+          .where(eq(postsTable.groupId, groupId)),
+      );
+    await tx.with(comments).delete(commentsTable);
+
+    // delete like
+    const likes = tx
+      .$with("likes")
+      .as(
+        tx
+          .select()
+          .from(likesTable)
+          .innerJoin(postsTable, eq(postsTable.id, likesTable.postId))
+          .where(eq(postsTable.groupId, groupId)),
+      );
+    await tx.with(likes).delete(likesTable);
+
+    // delete notifications
+    const notifications = tx.$with("notifications").as(
+      tx
+        .select()
+        .from(notificationsTable)
+        .innerJoin(postsTable, eq(notificationsTable.postId, postsTable.id))
+        .innerJoin(commentsTable, eq(notificationsTable.commentId, commentsTable.id))
+        .innerJoin(likesTable, eq(notificationsTable.likeId, likesTable.id))
+        .innerJoin(groupsTable, eq(postsTable.groupId, groupsTable.id))
+        .where(
+          and(
+            or(eq(notificationsTable.actorId, userId), eq(notificationsTable.receiverId, userId)),
+            eq(groupsTable.id, groupId),
+          ),
+        ),
+    );
+    await tx.with(notifications).delete(notificationsTable);
   }
 
   async getMembers(
