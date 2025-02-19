@@ -1,12 +1,13 @@
 import { useTheme } from "@shopify/restyle";
 import { Theme } from "@/design-system/base/theme";
 import { IconButton } from "../ui/icon-button";
+import { ButtonVariant } from "@/design-system/base/variants/button";
 
 interface HeartProps {
   like: boolean;
   onLike: () => void;
   label?: boolean;
-  variant: "iconHoney" | "iconBlush";
+  variant: ButtonVariant;
 }
 
 export const Heart: React.FC<HeartProps> = ({ like, onLike, variant, label }) => {
@@ -16,6 +17,7 @@ export const Heart: React.FC<HeartProps> = ({ like, onLike, variant, label }) =>
 
   return (
     <IconButton
+      label={label ? "Like" : undefined}
       onPress={onLike}
       icon={variantStyle.icon}
       variant={variant}

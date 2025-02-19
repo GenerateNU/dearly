@@ -20,11 +20,11 @@ interface CarouselProps {
   data: string[];
   initialPage?: number;
   like: boolean;
+  setLike: () => void;
 }
 
-const ImageCarousel: React.FC<CarouselProps> = ({ data, initialPage = 0, like }) => {
+const ImageCarousel: React.FC<CarouselProps> = ({ data, initialPage = 0, like, setLike }) => {
   const [containerWidth, setContainerWidth] = useState<number>(0);
-  const [isLiking, setLike] = useState<boolean>(like);
   const [page, setPage] = useState<number>(0);
   const [showFlyingHeart, setShowFlyingHeart] = useState(false);
   const scrollOffsetValue = useSharedValue<number>(0);
@@ -75,11 +75,11 @@ const ImageCarousel: React.FC<CarouselProps> = ({ data, initialPage = 0, like })
   }, [containerWidth]);
 
   const handleLike = useCallback(() => {
-    setLike(!isLiking);
-    if (!isLiking) {
+    setLike();
+    if (!like) {
       animateHeart();
     }
-  }, [isLiking, animateHeart]);
+  }, [like, animateHeart]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
@@ -106,60 +106,54 @@ const ImageCarousel: React.FC<CarouselProps> = ({ data, initialPage = 0, like })
   );
 
   return (
-    <Box width="100%" justifyContent="center">
-      <Box onLayout={handleLayout} className="w-full">
-        {containerWidth > 0 && (
-          <>
-            <Box position="absolute" zIndex={10} right={0} bottom={0} padding="m">
-              <Heart variant="iconHoney" onLike={handleLike} like={isLiking} />
-            </Box>
+    <>
+      <Box width="100%" justifyContent="center">
+        <Box onLayout={handleLayout} className="w-full">
+          {containerWidth > 0 && (
+            <>
+              <Box position="absolute" zIndex={10} right={0} bottom={0} padding="m">
+                <Heart variant="iconBlush" onLike={handleLike} like={like} />
+              </Box>
 
-            {showFlyingHeart && (
-              <AnimatedBox position="absolute" zIndex={100} style={animatedStyle}>
-                <Box width={40} height={40} justifyContent="center" alignItems="center">
-                  <FontAwesomeIcon icon={faHeart} size={100} />
-                </Box>
-              </AnimatedBox>
-            )}
+              {showFlyingHeart && (
+                <AnimatedBox position="absolute" zIndex={100} style={animatedStyle}>
+                  <Box width={40} height={40} justifyContent="center" alignItems="center">
+                    <FontAwesomeIcon icon={faHeart} size={100} />
+                  </Box>
+                </AnimatedBox>
+              )}
 
-            <Carousel
-              loop={false}
-              overscrollEnabled={false}
-              height={containerWidth}
-              width={containerWidth}
-              snapEnabled={true}
-              enabled={data.length !== 1}
-              defaultIndex={initialPage}
-              style={{ position: "relative", borderRadius: 12 }}
-              data={data}
-              onProgressChange={(_, index) => setPage(Math.round(index))}
-              defaultScrollOffsetValue={scrollOffsetValue}
-              renderItem={renderItem}
-            />
-
-            <Box
-              position="absolute"
-              flexDirection="row"
-              width="100%"
-              bottom="4%"
-              justifyContent="center"
-              alignItems="center"
-            >
-              {data.map((_, index) => (
-                <Box
-                  key={index}
-                  width={8}
-                  height={8}
-                  borderRadius="s"
-                  margin="xs"
-                  backgroundColor={index === page ? "darkGray" : "gray"}
-                />
-              ))}
-            </Box>
-          </>
-        )}
+              <Carousel
+                loop={false}
+                overscrollEnabled={false}
+                height={containerWidth}
+                width={containerWidth}
+                snapEnabled={true}
+                enabled={data.length !== 1}
+                defaultIndex={initialPage}
+                style={{ position: "relative", borderRadius: 12 }}
+                data={data}
+                onProgressChange={(_, index) => setPage(Math.round(index))}
+                defaultScrollOffsetValue={scrollOffsetValue}
+                renderItem={renderItem}
+              />
+            </>
+          )}
+        </Box>
       </Box>
-    </Box>
+      <Box flexDirection="row" width="100%" justifyContent="center" alignItems="center">
+        {data.map((_, index) => (
+          <Box
+            key={index}
+            width={8}
+            height={8}
+            borderRadius="s"
+            margin="xs"
+            backgroundColor={index === page ? "ink" : "honey"}
+          />
+        ))}
+      </Box>
+    </>
   );
 };
 

@@ -43,7 +43,7 @@ const HomeMenu = <T extends string>({
     setContainerWidth(width);
   };
 
-  const tabWidth = (containerWidth / categories.length) * 0.995;
+  const tabWidth = (containerWidth / categories.length) * 0.999;
 
   const translateX = useAnimatedStyle(() => {
     const selectedIndex = categories.indexOf(selected);
@@ -75,7 +75,7 @@ const HomeMenu = <T extends string>({
         alignItems="center"
         borderRadius="xl"
         width={tabWidth}
-        height="150%"
+        height="160%"
         style={[
           translateX,
           {

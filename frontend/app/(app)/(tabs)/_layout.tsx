@@ -25,6 +25,22 @@ const Layout = () => {
             headerTransparent: true,
           }}
         />
+        <Tabs.Screen
+          name="post"
+          options={{
+            title: "Post",
+            headerShown: false,
+            headerTransparent: true,
+          }}
+        />
+        <Tabs.Screen
+          name="profile"
+          options={{
+            title: "Profile",
+            headerShown: false,
+            headerTransparent: true,
+          }}
+        />
       </Tabs>
     </>
   );

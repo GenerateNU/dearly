@@ -11,11 +11,16 @@ import { useNotificationPermission } from "@/hooks/permission/notification";
 import { useRequestDevicePermission } from "@/hooks/permission/device";
 import { useFonts } from "expo-font";
 import { useAccessibility } from "@/hooks/component/accessibility";
+import { Dimensions } from "react-native";
+import { BIGGER_PHONE_SCALE_RATIO, BIGGER_PHONE_SCREEN } from "@/constants/scale";
 
 const queryClient = new QueryClient();
 
 const InitialLayout = () => {
   const { isAuthenticated } = useAuth();
+
+  const { width } = Dimensions.get("window");
+  const scaleFactor = width >= BIGGER_PHONE_SCREEN ? BIGGER_PHONE_SCALE_RATIO : 1;
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -35,7 +40,7 @@ const InitialLayout = () => {
   const scaleRatio = useAccessibility();
 
   return (
-    <ThemeProvider theme={getTheme(scaleRatio)}>
+    <ThemeProvider theme={getTheme(scaleRatio * scaleFactor)}>
       <Stack screenOptions={{ gestureEnabled: false }}>
         <Stack.Screen name="(auth)" options={{ headerShown: false, gestureEnabled: false }} />
         <Stack.Screen name="(app)" options={{ headerShown: false, gestureEnabled: false }} />
