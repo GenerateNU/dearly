@@ -21,6 +21,9 @@ interface ExpoBuildWebhookPayload {
     message?: string;
     errorCode?: string;
   };
+  metadata: {
+    buildProfile: "production" | "preview" | "development";
+  };
 }
 
 export interface SlackController {
@@ -43,6 +46,10 @@ export class SlackControllerImpl implements SlackController {
       // verify whether it is valid payload from Expo
       this.checkSignature(bodyText, expoSignature);
       const payload = JSON.parse(bodyText) as ExpoBuildWebhookPayload;
+
+      if (payload.metadata.buildProfile === "production") {
+        return ctx.text("New production build, message not send to Slack", 200);
+      }
 
       // check status of build
       if (payload.status === "finished") {
