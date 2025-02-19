@@ -7,9 +7,8 @@ import {
   likesTable,
   commentsTable,
   mediaTable,
-  notificationsTable,
 } from "../schema";
-import { eq, and, sql, desc, or } from "drizzle-orm";
+import { eq, and, sql, desc } from "drizzle-orm";
 import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
 import { AddMemberPayload, Member } from "../../types/api/internal/members";
 import { IDPayload } from "../../types/id";
@@ -108,24 +107,6 @@ export class MemberTransactionImpl implements MemberTransaction {
           .where(eq(postsTable.groupId, groupId)),
       );
     await tx.with(likes).delete(likesTable);
-
-    // delete notifications
-    const notifications = tx.$with("notifications").as(
-      tx
-        .select()
-        .from(notificationsTable)
-        .innerJoin(postsTable, eq(notificationsTable.postId, postsTable.id))
-        .innerJoin(commentsTable, eq(notificationsTable.commentId, commentsTable.id))
-        .innerJoin(likesTable, eq(notificationsTable.likeId, likesTable.id))
-        .innerJoin(groupsTable, eq(postsTable.groupId, groupsTable.id))
-        .where(
-          and(
-            or(eq(notificationsTable.actorId, userId), eq(notificationsTable.receiverId, userId)),
-            eq(groupsTable.id, groupId),
-          ),
-        ),
-    );
-    await tx.with(notifications).delete(notificationsTable);
   }
 
   async getMembers(
