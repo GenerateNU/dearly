@@ -39,6 +39,7 @@ export const startTestApp = async (
   const mockS3Client = mockClient(S3Client);
   const s3Client = mockS3Client.on(PutObjectCommand).resolves({}) as unknown as S3Client;
 
+  // setup integrations and services
   const integrations = initIntegration(config, s3Client, expo, schedulerClient);
   const { mediaService, expoService, nudgeSchedulerService } = initService(
     integrations,
@@ -46,8 +47,8 @@ export const startTestApp = async (
     config,
   );
 
+  // setup app
   configureMiddlewares(app, config);
-
   setUpRoutes(app, db, config, {
     mediaService,
     expoService,

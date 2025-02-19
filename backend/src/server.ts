@@ -16,14 +16,17 @@ const config = getConfigurations();
     const db = connectDB(config);
     await automigrateDB(db, config);
 
-    // set up integration and service
+    // set up external integrations and services
     const integrations = initIntegration(config);
+
     const { pushNotificationService, mediaService, expoService, nudgeSchedulerService } =
       initService(integrations, db, config);
+
     pushNotificationService.subscribeToSupabaseRealtime();
 
     // set up app
     configureMiddlewares(app, config);
+
     setUpRoutes(app, db, config, {
       mediaService,
       expoService,
