@@ -3,7 +3,7 @@ import { NotFoundError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
 import { MediaService } from "../media/service";
 import { NotificationTransactions } from "./transaction";
-import { Notification } from "../../types/api/internal/notification";
+import { NotificationWithMedia as Notification } from "../../types/api/internal/notification";
 
 export interface NotificationService {
   /**

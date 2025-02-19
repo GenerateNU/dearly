@@ -65,6 +65,10 @@ export const getConfigurations = (): Configuration => {
       qrCodeGenerator: parseEnv("BUILD_QR_CODE_GENERATOR"),
     },
     environment: nodeEnv,
+    supabase: {
+      url: parseEnv("SUPABASE_URL"),
+      key: parseEnv("SUPABASE_KEY"),
+    },
   };
   return config;
 };

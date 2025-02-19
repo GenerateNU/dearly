@@ -3,7 +3,7 @@ import { notificationsTable, usersTable, mediaTable } from "../schema";
 import { Pagination } from "../../types/api/internal/users";
 import { and, eq, sql } from "drizzle-orm";
 import { MediaService } from "../media/service";
-import { Notification } from "../../types/api/internal/notification";
+import { NotificationWithMedia as Notification } from "../../types/api/internal/notification";
 
 export interface NotificationTransactions {
   getNotifications(payload: Pagination, mediaService: MediaService): Promise<Notification[]>;

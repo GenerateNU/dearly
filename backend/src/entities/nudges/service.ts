@@ -1,14 +1,9 @@
 import { NudgeTransaction } from "./transaction";
 import { handleServiceError } from "../../utilities/errors/service-error";
-import { ExpoPushMessage, Expo } from "expo-server-sdk";
-import logger from "../../utilities/logger";
+import { ExpoPushService } from "../../services/notification/expo";
 import { getNotificationBody } from "../../utilities/nudge";
 import { InternalServerError } from "../../utilities/errors/app-error";
-import {
-  NudgeSchedulePayload,
-  NotificationMetadata,
-  NudgeSchedule,
-} from "../../types/api/internal/nudges";
+import { NudgeSchedulePayload, NudgeSchedule } from "../../types/api/internal/nudges";
 import { AWSEventBridgeScheduler } from "../../services/nudgeScheduler";
 import { SchedulerClient } from "@aws-sdk/client-scheduler";
 
@@ -21,10 +16,14 @@ export interface NudgeService {
 
 export class NudgeServiceImpl implements NudgeService {
   private nudgeTransaction: NudgeTransaction;
-  private expoService: Expo;
+  private expoService: ExpoPushService;
   private scheduler: AWSEventBridgeScheduler;
 
-  constructor(nudgeTransaction: NudgeTransaction, expoService: Expo, scheduler: SchedulerClient) {
+  constructor(
+    nudgeTransaction: NudgeTransaction,
+    expoService: ExpoPushService,
+    scheduler: SchedulerClient,
+  ) {
     this.nudgeTransaction = nudgeTransaction;
     this.expoService = expoService;
     this.scheduler = new AWSEventBridgeScheduler(scheduler);
@@ -38,8 +37,15 @@ export class NudgeServiceImpl implements NudgeService {
         managerId,
       );
       if (notificationMetadata.deviceTokens.length === 0) return;
-      const notificationTickets = this.formatPushNotifications(notificationMetadata);
-      await this.sendPushNotifications(notificationTickets);
+
+      const { groupName, deviceTokens } = notificationMetadata;
+      const message = getNotificationBody(groupName);
+
+      await this.expoService.sendPushNotifications({
+        deviceTokens,
+        message: message.body,
+        title: message.title,
+      });
     };
     return await handleServiceError(manualNudgeImpl)();
   }
@@ -60,10 +66,16 @@ export class NudgeServiceImpl implements NudgeService {
       );
 
       if (notificationMetadata.deviceTokens.length !== 0) {
+        const { deviceTokens, groupName } = notificationMetadata;
+        const { title, body } = getNotificationBody(groupName);
         const schedulePayload = {
           schedule: schedule,
           expo: {
-            notifications: this.formatPushNotifications(notificationMetadata),
+            notifications: this.expoService.formatExpoPushMessage({
+              deviceTokens,
+              message: body,
+              title,
+            }),
           },
         };
 
@@ -101,37 +113,5 @@ export class NudgeServiceImpl implements NudgeService {
       return nudge;
     };
     return await handleServiceError(deactivateNudgeImpl)();
-  }
-
-  private async sendPushNotifications(notifications: ExpoPushMessage[]): Promise<void> {
-    try {
-      const chunks: ExpoPushMessage[][] =
-        await this.expoService.chunkPushNotifications(notifications);
-      for (const chunk of chunks) {
-        const receipts = await this.expoService.sendPushNotificationsAsync(chunk);
-        const failedToSend = receipts.filter((receipt) => receipt.status === "error");
-        if (failedToSend.length > 0) {
-          logger.error(failedToSend);
-        }
-      }
-    } catch (error) {
-      logger.error(error);
-      throw new InternalServerError("Failed to send nudge to users");
-    }
-  }
-
-  private formatPushNotifications({
-    deviceTokens,
-    groupId,
-    groupName,
-  }: NotificationMetadata): ExpoPushMessage[] {
-    return deviceTokens.map((token) => ({
-      to: token,
-      data: {
-        groupId,
-        groupName,
-      },
-      ...getNotificationBody(groupName),
-    }));
   }
 }

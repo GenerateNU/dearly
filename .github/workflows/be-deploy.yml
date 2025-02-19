@@ -92,4 +92,6 @@ jobs:
             BUILD_QR_CODE_GENERATOR=${{ secrets.BUILD_QR_CODE_GENERATOR }}
             NUDGE_LAMBDA_ARN=${{ secrets.NUDGE_LAMBDA_ARN }}
             NUDGE_LAMBDA_ROLE_ARN=${{ secrets.NUDGE_LAMBDA_ROLE_ARN }}
+            SUPABASE_URL=${{ secrets.SUPABASE_URL }}
+            SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}
           flags: --port=3000 --allow-unauthenticated

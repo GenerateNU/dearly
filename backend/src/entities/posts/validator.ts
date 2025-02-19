@@ -34,4 +34,13 @@ export const createPostValidate = z
   })
   .passthrough();
 
+export const postValidate = z.object({
+  id: z.string(),
+  groupId: z.string(),
+  userId: z.string(),
+  createdAt: z.string(),
+  caption: z.string().nullable(),
+  location: z.string().nullable(),
+});
+
 export const updatePostValidate = createPostValidate.partial();

@@ -10,9 +10,9 @@ import { postRoutes } from "../entities/posts/route";
 import { IS3Operations } from "../services/s3Service";
 import { MediaServiceImpl } from "../entities/media/service";
 import { commentsRoutes } from "../entities/comments/route";
-import { Expo } from "expo-server-sdk";
 import { SlackController, SlackControllerImpl } from "./webhook";
 import { mediaRoutes } from "../entities/media/route";
+import { ExpoPushService } from "../services/notification/expo";
 import { SchedulerClient } from "@aws-sdk/client-scheduler";
 
 export const setUpRoutes = (
@@ -20,6 +20,7 @@ export const setUpRoutes = (
   db: PostgresJsDatabase,
   config: Configuration,
   s3ServiceProvider: IS3Operations,
+  expo: ExpoPushService,
   scheduler: SchedulerClient,
 ) => {
   // api documentation
@@ -40,7 +41,7 @@ export const setUpRoutes = (
   // webhook to send to slack channel for CI message
   const slackController: SlackController = new SlackControllerImpl(config.slackConfig);
   app.post("/slack", (ctx: Context) => slackController.receiveBuildEvent(ctx));
-  app.route("/api/v1", apiRoutes(db, s3ServiceProvider, scheduler));
+  app.route("/api/v1", apiRoutes(db, s3ServiceProvider, expo, scheduler));
 
   // unsupported route
   app.notFound((ctx: Context) => {
@@ -51,11 +52,11 @@ export const setUpRoutes = (
 const apiRoutes = (
   db: PostgresJsDatabase,
   s3Service: IS3Operations,
+  expo: ExpoPushService,
   schedulerClient: SchedulerClient,
 ): Hono => {
   const api = new Hono();
   const mediaService = new MediaServiceImpl(db, s3Service);
-  const expo = new Expo();
 
   api.route("/users", userRoutes(db, mediaService));
   api.route("/groups", groupRoutes(db, mediaService, expo, schedulerClient));

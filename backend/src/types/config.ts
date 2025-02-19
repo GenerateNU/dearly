@@ -28,6 +28,11 @@ export interface S3Config {
   name: string;
 }
 
+export interface SupabaseInfo {
+  key: string;
+  url: string;
+}
+
 export interface LambdaConfig {
   lambdaARN: string;
   lambdaRoleARN: string;
@@ -53,4 +58,5 @@ export interface Configuration {
   lambdaConfig: LambdaConfig;
   slackConfig: SlackConfig;
   environment: string;
+  supabase: SupabaseInfo;
 }

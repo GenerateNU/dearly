@@ -7,11 +7,10 @@ import {
   USER_ANA_ID,
 } from "../helpers/test-constants";
 import { Hono } from "hono";
-import { startTestApp } from "../helpers/test-app";
+import { sendPushNotificationsAsyncSpy, startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
-import { sendPushNotificationsAsyncSpy } from "../helpers/mock";
 import { ONE_DAY_COOLDOWN_SEC } from "../../constants/nudge";
 
 describe("POST /groups/:id/nudges/manual", () => {
@@ -72,10 +71,7 @@ describe("POST /groups/:id/nudges/manual", () => {
         title: "Time to Connect! 🚀",
         body: `✨ Share a post with your dearly group now! ✨`,
         to: MOCK_EXPO_TOKEN,
-        data: {
-          groupId: DEARLY_GROUP_ID,
-          groupName: "dearly",
-        },
+        sound: "default",
       },
     ]);
   });
@@ -162,10 +158,7 @@ describe("POST /groups/:id/nudges/manual", () => {
         title: "Time to Connect! 🚀",
         body: `✨ Share a post with your dearly group now! ✨`,
         to: MOCK_EXPO_TOKEN,
-        data: {
-          groupId: DEARLY_GROUP_ID,
-          groupName: "dearly",
-        },
+        sound: "default",
       },
     ]);
   });

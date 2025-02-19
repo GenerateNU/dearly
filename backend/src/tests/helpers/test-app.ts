@@ -9,7 +9,14 @@ import { seedDatabase } from "./seed-db";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { mockClient } from "aws-sdk-client-mock";
 import { S3Impl } from "../../services/s3Service";
+import Expo from "expo-server-sdk";
+import { spyOn } from "bun:test";
+
+export const expo = new Expo();
+export const sendPushNotificationsAsyncSpy = spyOn(expo, "sendPushNotificationsAsync");
+export const chunkPushNotificationsSpy = spyOn(expo, "chunkPushNotifications");
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import { ExpoPushService } from "../../services/notification/expo";
 import { mockSchedulerClient } from "./mock";
 import { SchedulerClient } from "@aws-sdk/client-scheduler";
 
@@ -35,9 +42,10 @@ export const startTestApp = async (
 
   const s3 = new S3Impl(config.s3Config, client);
 
+  const expoService = new ExpoPushService(expo);
+
   configureMiddlewares(app, config);
 
-  setUpRoutes(app, db, config, s3, schedulerClient);
-
+  setUpRoutes(app, db, config, s3, expoService, schedulerClient);
   return app;
 };

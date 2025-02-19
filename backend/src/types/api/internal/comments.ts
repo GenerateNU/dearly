@@ -8,6 +8,15 @@ export type CreateCommentPayload = z.infer<typeof createCommentValidate> & {
   postId: string;
 };
 
+export const commentValidate = z.object({
+  id: z.string(),
+  userId: z.string(),
+  postId: z.string(),
+  content: z.string().nullable(),
+  voiceMemo: z.string().nullable(),
+  createdAt: z.string(),
+});
+
 export type Comment = typeof commentsTable.$inferSelect;
 
 export type CommentWithMetadata = Comment & {

@@ -5,14 +5,18 @@ import { configureMiddlewares } from "./middlewares/init";
 import { setUpRoutes } from "./routes/init";
 import { automigrateDB } from "./database/migrate";
 import { S3Impl } from "./services/s3Service";
+import Expo from "expo-server-sdk";
+import { NotificationTransactionImpl } from "./services/notification/transaction";
+import { ExpoPushService } from "./services/notification/expo";
+import { ExpoNotificationService } from "./services/notification/service";
 import { SchedulerClient } from "@aws-sdk/client-scheduler";
 
 const app = new Hono();
-
 const config = getConfigurations();
 
 (async function setUpServer() {
   const s3ServiceProvider = new S3Impl(config.s3Config);
+  const expo = new Expo();
   const schedulerClient = new SchedulerClient();
 
   try {
@@ -22,7 +26,10 @@ const config = getConfigurations();
 
     configureMiddlewares(app, config);
 
-    setUpRoutes(app, db, config, s3ServiceProvider, schedulerClient);
+    const expoService = new ExpoPushService(expo);
+    new ExpoNotificationService(config, new NotificationTransactionImpl(db), expoService);
+
+    setUpRoutes(app, db, config, s3ServiceProvider, expoService, schedulerClient);
 
     console.log("Successfully initialize app");
   } catch (error) {
