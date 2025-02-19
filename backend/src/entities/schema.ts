@@ -14,13 +14,22 @@ import {
   integer,
   unique,
   date,
+  check,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import { NAME_MAX_LIMIT } from "../constants/database";
 
 export const userModeEnum = pgEnum("mode", ["BASIC", "ADVANCED"]);
 export const postMediaEnum = pgEnum("mediaType", ["VIDEO", "PHOTO"]);
 export const memberRoleEnum = pgEnum("role", ["MEMBER", "MANAGER"]);
+export const nudgeFrequencyEnum = pgEnum("frequency", [
+  "DAILY",
+  "WEEKLY",
+  "BIWEEKLY",
+  "MONTHLY",
+  "YEARLY",
+]);
+export const dayOfWeekEnum = pgEnum("dayOfWeek", ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]);
 export const referenceTypeEnum = pgEnum("referenceType", [
   "POST",
   "COMMENT",
@@ -184,6 +193,60 @@ export const invitationsTable = pgTable("invitations", {
   createdAt: timestamp().notNull().defaultNow(),
 });
 
+export const scheduledNudgesTable = pgTable(
+  "scheduledNudges",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    groupId: uuid()
+      .notNull()
+      .references(() => groupsTable.id, { onDelete: "cascade" }),
+    frequency: nudgeFrequencyEnum().notNull().default("WEEKLY"),
+    daysOfWeek: dayOfWeekEnum().array(), // MON-SUN
+    day: integer("day"), // 1-31
+    month: integer("month"), // 1-12
+    nudgeAt: timestamp("nudgeAt", { withTimezone: true }).notNull(),
+    isActive: boolean().notNull().default(true),
+    createdAt: timestamp("createdAt").notNull().defaultNow(),
+    updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+  },
+  (table) => [
+    unique().on(table.groupId, table.id),
+    // Ensure day is within range when provided
+    check("day_check", sql`${table.day} IS NULL OR (${table.day} > 0 AND ${table.day} <= 31)`),
+    // Ensure month is within range when provided
+    check(
+      "month_check",
+      sql`${table.month} IS NULL OR (${table.month} > 0 AND ${table.month} <= 12)`,
+    ),
+
+    // For WEEKLY and BIWEEKLY, at least one day of the week must be selected
+    check(
+      "weekly_biweekly_day_check",
+      sql`
+        (${table.frequency} NOT IN ('WEEKLY', 'BIWEEKLY')) OR
+        (array_length(${table.daysOfWeek}, 1) > 0)
+      `,
+    ),
+
+    // For MONTHLY, day needs to be provided
+    check(
+      "monthly_day_check",
+      sql`
+        ${table.frequency} != 'MONTHLY' OR ${table.day} IS NOT NULL
+      `,
+    ),
+
+    // For YEARLY, both day and month must be provided
+    check(
+      "yearly_day_month_check",
+      sql`
+        ${table.frequency} != 'YEARLY' OR
+        (${table.day} IS NOT NULL AND ${table.month} IS NOT NULL)
+      `,
+    ),
+  ],
+);
+
 export const likeCommentRelations = relations(likeCommentsTable, ({ one }) => ({
   user: one(usersTable, {
     fields: [likeCommentsTable.userId],
@@ -316,6 +379,13 @@ export const linkRelations = relations(linksTable, ({ one, many }) => ({
     references: [groupsTable.id],
   }),
   invitations: many(invitationsTable),
+}));
+
+export const scheduledNudgeRelations = relations(scheduledNudgesTable, ({ one }) => ({
+  group: one(groupsTable, {
+    fields: [scheduledNudgesTable.groupId],
+    references: [groupsTable.id],
+  }),
 }));
 
 export const invitationRelations = relations(invitationsTable, ({ one, many }) => ({

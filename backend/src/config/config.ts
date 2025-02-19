@@ -53,6 +53,10 @@ export const getConfigurations = (): Configuration => {
       region: parseEnv("AWS_REGION"),
       name: parseEnv("AWS_BUCKET_NAME"),
     },
+    lambdaConfig: {
+      lambdaARN: parseEnv("NUDGE_LAMBDA_ARN"),
+      lambdaRoleARN: parseEnv("NUDGE_LAMBDA_ROLE_ARN"),
+    },
     slackConfig: {
       expoSignature: parseEnv("SECRET_WEBHOOK_KEY"),
       slackWebhookUrl: parseEnv("SLACK_WEBHOOK_URL"),

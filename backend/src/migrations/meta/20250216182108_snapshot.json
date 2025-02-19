@@ -1,5 +1,5 @@
 {
-  "id": "37ad6fd5-29dc-40c2-b3e7-d6dda5207f86",
+  "id": "b5ed9746-f939-4c30-a6ca-4fa7a114bc99",
   "prevId": "3b0b89df-bd2a-489a-9a28-2a9cc27b1118",
   "version": "7",
   "dialect": "postgresql",
@@ -771,6 +771,122 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.scheduledNudges": {
+      "name": "scheduledNudges",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "groupId": {
+          "name": "groupId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "frequency": {
+          "name": "frequency",
+          "type": "frequency",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'WEEKLY'"
+        },
+        "daysOfWeek": {
+          "name": "daysOfWeek",
+          "type": "dayOfWeek[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "day": {
+          "name": "day",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "month": {
+          "name": "month",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nudgeAt": {
+          "name": "nudgeAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "isActive": {
+          "name": "isActive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "scheduledNudges_groupId_groups_id_fk": {
+          "name": "scheduledNudges_groupId_groups_id_fk",
+          "tableFrom": "scheduledNudges",
+          "tableTo": "groups",
+          "columnsFrom": ["groupId"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "scheduledNudges_groupId_id_unique": {
+          "name": "scheduledNudges_groupId_id_unique",
+          "nullsNotDistinct": false,
+          "columns": ["groupId", "id"]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "day_check": {
+          "name": "day_check",
+          "value": "\"scheduledNudges\".\"day\" IS NULL OR (\"scheduledNudges\".\"day\" > 0 AND \"scheduledNudges\".\"day\" <= 31)"
+        },
+        "month_check": {
+          "name": "month_check",
+          "value": "\"scheduledNudges\".\"month\" IS NULL OR (\"scheduledNudges\".\"month\" > 0 AND \"scheduledNudges\".\"month\" <= 12)"
+        },
+        "weekly_biweekly_day_check": {
+          "name": "weekly_biweekly_day_check",
+          "value": "\n        (\"scheduledNudges\".\"frequency\" NOT IN ('WEEKLY', 'BIWEEKLY')) OR\n        (array_length(\"scheduledNudges\".\"daysOfWeek\", 1) > 0)\n      "
+        },
+        "monthly_day_check": {
+          "name": "monthly_day_check",
+          "value": "\n        \"scheduledNudges\".\"frequency\" != 'MONTHLY' OR \"scheduledNudges\".\"day\" IS NOT NULL\n      "
+        },
+        "yearly_day_month_check": {
+          "name": "yearly_day_month_check",
+          "value": "\n        \"scheduledNudges\".\"frequency\" != 'YEARLY' OR\n        (\"scheduledNudges\".\"day\" IS NOT NULL AND \"scheduledNudges\".\"month\" IS NOT NULL)\n      "
+        }
+      },
+      "isRLSEnabled": false
+    },
     "public.users": {
       "name": "users",
       "schema": "",
@@ -843,6 +959,11 @@
     }
   },
   "enums": {
+    "public.dayOfWeek": {
+      "name": "dayOfWeek",
+      "schema": "public",
+      "values": ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
+    },
     "public.status": {
       "name": "status",
       "schema": "public",
@@ -852,6 +973,11 @@
       "name": "role",
       "schema": "public",
       "values": ["MEMBER", "MANAGER"]
+    },
+    "public.frequency": {
+      "name": "frequency",
+      "schema": "public",
+      "values": ["DAILY", "WEEKLY", "BIWEEKLY", "MONTHLY", "YEARLY"]
     },
     "public.mediaType": {
       "name": "mediaType",

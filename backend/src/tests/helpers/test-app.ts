@@ -17,29 +17,35 @@ export const sendPushNotificationsAsyncSpy = spyOn(expo, "sendPushNotificationsA
 export const chunkPushNotificationsSpy = spyOn(expo, "chunkPushNotifications");
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { ExpoPushService } from "../../services/notification/expo";
+import { mockSchedulerClient } from "./mock";
+import { SchedulerClient } from "@aws-sdk/client-scheduler";
 
-export const startTestApp = async (): Promise<Hono> => {
+export const startTestApp = async (
+  mockedSchedulerClient: SchedulerClient = mockSchedulerClient,
+): Promise<Hono> => {
   const app = new Hono();
 
   const config = getConfigurations();
 
+  // set up database for testing
+  const db: PostgresJsDatabase = connectDB(config);
+  await automigrateDB(db, config);
+  await resetDB(db);
+  await seedDatabase(db);
+
+  // mock AWS EventBridge
+  const schedulerClient = mockedSchedulerClient;
+
+  // mock AWS S3
   const mockS3Client = mockClient(S3Client);
   const client = mockS3Client.on(PutObjectCommand).resolves({}) as unknown as S3Client;
 
   const s3 = new S3Impl(config.s3Config, client);
 
-  const db: PostgresJsDatabase = connectDB(config);
-
-  await automigrateDB(db, config);
   const expoService = new ExpoPushService(expo);
-
-  await resetDB(db);
-
-  await seedDatabase(db);
 
   configureMiddlewares(app, config);
 
-  setUpRoutes(app, db, config, s3, expoService);
-
+  setUpRoutes(app, db, config, s3, expoService, schedulerClient);
   return app;
 };

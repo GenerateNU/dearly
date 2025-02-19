@@ -1,10 +1,17 @@
 import { Comment } from "../../types/api/internal/comments";
-import { groupsTable, mediaTable, postsTable } from "../../entities/schema";
 import { CreateGroupPayload, Group } from "../../types/api/internal/groups";
 import { Post } from "../../types/api/internal/posts";
 import { CreateUserPayload, SearchedUser, User } from "../../types/api/internal/users";
 import { Member } from "../../types/api/internal/members";
 import { Like } from "../../types/api/internal/like";
+import {
+  groupsTable,
+  mediaTable,
+  postsTable,
+  scheduledNudgesTable,
+  likesTable,
+} from "../../entities/schema";
+import { NotificationWithMedia } from "../../types/api/internal/notification";
 
 export const INVALID_ID_ARRAY = ["1", "%2", "123abc", "!!$$", "123 456", "@ID", null, undefined];
 export const USER_ALICE_ID = "00000000-0000-0000-0000-000000000000";
@@ -25,7 +32,11 @@ export const ANOTHER_GROUP_ID = "678d8ff3-c24c-8002-ad06-052ae4f44075";
 export const NEW_POST_ID = "e3f4b2c1-8d67-4f9b-90a4-6b1f3d2e5c78";
 export const MOCK_SIGNED_URL = "https://mocked-url.com";
 export const MOCK_RANDOM_UUID = "fe01a74f-96b1-444a-b6c9-11e4d672946c";
+export const MOCK_LIKE_NOTIF_UUID = "31e51a64-1d5e-41ed-ace9-27b8e7c4de1c";
+export const MOCK_COMMENT_NOTIF_UUID = "8e3e964b-6696-4150-b4f3-09f66e7b74de";
+export const MOCK_POST_NOTIF_UUID = "601e8b6b-360a-4b53-8a15-aba8a9bdf027";
 export const DEARLY_COMMENT_ID = "679c0331-2dfc-8002-b4a4-22b09d6c3c73";
+export const NEW_COMMENT_ID = "4b789855-0c17-4aa0-8eb4-d8e2b20bc1bf";
 export const MOCK_EXPO_TOKEN = "ExponentPushToken[Z9Hfn6ZxWVXaAs7MG3Pya8]";
 export const USER_Josh_ID = "61111211-4c0d-44d9-b2b1-8d897207f111";
 export const USER_Nubs_ID = "99111219-4c0d-44d9-b2b1-8d897207f111";
@@ -41,6 +52,11 @@ export const SNAPPER_COMMENT_ID = "f46a2916-99e7-4ebb-a796-d1c29d6e4786";
 export const FULL_SNAPPER_POST_ID = "6bc21e8a-7a8e-4c66-8403-ab4259311795";
 export const MEMBER_ID = "ab674eaf-9999-aaaa-8a38-811234567890";
 export const MAI_DEVICE_TOKEN = "4dff72c9-afbc-49e5-b757-1de7d89d8234";
+export const MOCK_SCHEDULE_ID = "fc9385e1-7602-48f6-b69f-1753decac9a6";
+export const GENERATE_GROUP_ID = "bbf9ff5f-2035-417f-af88-420166c7059b";
+export const USER_JAKE_ID = "3e001806-e91d-409d-a960-3ffdd396cee6";
+const NUDGE_AT_TIME = new Date();
+NUDGE_AT_TIME.setUTCHours(9, 0, 0, 0);
 
 export const GROUP_EMPTY_FIELDS_ERRORS = [
   {
@@ -89,6 +105,13 @@ export const POST_MOCK: (typeof postsTable.$inferInsert)[] = [
     id: POST_ID,
     createdAt: new Date(-1),
     caption: "my first post",
+  },
+  {
+    userId: USER_BOB_ID,
+    groupId: ANOTHER_GROUP_ID,
+    id: NEW_POST_ID,
+    createdAt: new Date(),
+    caption: "having fun at the beach!",
   },
 ];
 
@@ -144,13 +167,14 @@ export const USER_ANA: CreateUserPayload = {
   username: "ana",
   mode: "BASIC",
   id: USER_ANA_ID,
+  profilePhoto: "https://mocked-url.com",
 };
 
 export const SEARCHED_ANA: SearchedUser = {
   id: USER_ANA_ID,
   name: USER_ANA["name"],
   username: USER_ANA["username"],
-  profilePhoto: null,
+  profilePhoto: "https://mocked-url.com",
   isMember: true,
   lastNudgedAt: null,
 };
@@ -218,6 +242,13 @@ export const FULL_SNAPPER_GROUP: CreateGroupPayload = {
   id: GROUP_FULL_SNAPPER_ID,
 };
 
+export const GENERATE_GROUP: CreateGroupPayload = {
+  name: "generate",
+  description: "degenerate",
+  managerId: USER_BILL_ID,
+  id: GENERATE_GROUP_ID,
+};
+
 export const MOCK_MEDIA_WITH_URL = MEDIA_MOCK.map((media) => ({
   id: media.id,
   postId: media.postId,
@@ -231,6 +262,14 @@ export const COMMENTS: Comment[] = [
     postId: POST_ID,
     userId: USER_BOB_ID,
     content: "amazing photos!",
+    voiceMemo: null,
+    createdAt: new Date(),
+  },
+  {
+    id: NEW_COMMENT_ID,
+    postId: NEW_POST_ID,
+    userId: USER_BILL_ID,
+    content: "looks like fun!",
     voiceMemo: null,
     createdAt: new Date(),
   },
@@ -340,4 +379,68 @@ export const JOSH_COMMENT_POST: Comment = {
   createdAt: new Date(),
   content: "Look at da fishes!",
   voiceMemo: null,
+};
+
+export const NOTIFICATIONS_MOCK: NotificationWithMedia[] = [
+  {
+    id: MOCK_COMMENT_NOTIF_UUID,
+    actorId: USER_BILL_ID,
+    receiverId: USER_BOB_ID,
+    postId: null,
+    referenceType: "POST",
+    title: "New Comment",
+    description: "Bill commented on your post",
+    createdAt: new Date(),
+    groupId: DEARLY_GROUP_ID,
+    commentId: NEW_COMMENT_ID,
+    likeId: null,
+    mediaURL: MOCK_SIGNED_URL,
+  },
+  {
+    id: MOCK_LIKE_NOTIF_UUID,
+    actorId: USER_ANA_ID,
+    receiverId: USER_BOB_ID,
+    postId: null,
+    referenceType: "LIKE",
+    title: "New Like",
+    description: "Ana liked your post",
+    createdAt: new Date(),
+    groupId: DEARLY_GROUP_ID,
+    commentId: null,
+    likeId: MOCK_RANDOM_UUID,
+    mediaURL: SEARCHED_ANA["profilePhoto"],
+  },
+  {
+    id: MOCK_POST_NOTIF_UUID,
+    actorId: USER_ALICE_ID,
+    receiverId: USER_BOB_ID,
+    postId: POST_ID,
+    referenceType: "POST",
+    title: "New Post",
+    description: "Alice posted in your group",
+    createdAt: new Date(),
+    groupId: DEARLY_GROUP_ID,
+    commentId: null,
+    likeId: null,
+    mediaURL: MOCK_MEDIA_WITH_URL[0]?.url ?? MOCK_SIGNED_URL,
+  },
+];
+
+export const LIKE_MOCK: (typeof likesTable.$inferInsert)[] = [
+  {
+    id: MOCK_RANDOM_UUID,
+    postId: NEW_POST_ID,
+    userId: USER_ANA_ID,
+    createdAt: new Date(),
+  },
+];
+
+export const MOCK_SCHEDULE: typeof scheduledNudgesTable.$inferInsert = {
+  groupId: ANOTHER_GROUP_ID,
+  frequency: "WEEKLY",
+  daysOfWeek: ["MON", "FRI"],
+  day: null,
+  month: null,
+  nudgeAt: NUDGE_AT_TIME,
+  isActive: true,
 };

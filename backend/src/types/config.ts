@@ -33,6 +33,11 @@ export interface SupabaseInfo {
   url: string;
 }
 
+export interface LambdaConfig {
+  lambdaARN: string;
+  lambdaRoleARN: string;
+}
+
 export interface SlackConfig {
   expoSignature: string;
   slackWebhookUrl: string;
@@ -50,6 +55,7 @@ export interface Configuration {
     migrationsFolder: string;
   };
   s3Config: S3Config;
+  lambdaConfig: LambdaConfig;
   slackConfig: SlackConfig;
   environment: string;
   supabase: SupabaseInfo;
