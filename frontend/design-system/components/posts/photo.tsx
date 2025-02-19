@@ -1,4 +1,4 @@
-import Box from "@/design-system/base/box";
+import { Box } from "@/design-system/base/box";
 import { Image, TouchableOpacity } from "react-native";
 import { useState, useEffect } from "react";
 

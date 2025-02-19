@@ -1,17 +1,18 @@
-import Box from "@/design-system/base/box";
+import { DEFAULT_PROFILE_PHOTO } from "@/constants/photo";
+import { Box } from "@/design-system/base/box";
 import { Theme } from "@/design-system/base/theme";
 import { useTheme } from "@shopify/restyle";
 import { Image } from "expo-image";
 
 interface AvatarProps {
-  profilePhoto: string;
-  variant?: "small" | "big";
+  profilePhoto: string | null;
+  variant: "small" | "medium" | "big";
 }
 
-// TODO: figure out how to create variants of a component
 export const Avatar: React.FC<AvatarProps> = ({ profilePhoto, variant = "small" }) => {
   const theme = useTheme<Theme>();
   const variantStyle = theme.avatarVariants[variant];
+  const profile = profilePhoto ? profilePhoto : DEFAULT_PROFILE_PHOTO;
 
   return (
     <Box width={variantStyle.size}>
@@ -22,7 +23,7 @@ export const Avatar: React.FC<AvatarProps> = ({ profilePhoto, variant = "small" 
           borderRadius: "100%",
         }}
         source={{
-          uri: profilePhoto,
+          uri: profile,
         }}
       />
     </Box>

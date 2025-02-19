@@ -46,9 +46,11 @@ const InitialLayout = () => {
 
 const RootLayout = () => {
   const [fontsLoaded] = useFonts({
-    "ProximaNova-Bold": require("../assets/fonts/proximanova-medium.otf"),
-    "ProximaNova-Medium": require("../assets/fonts/proximanova-medium.otf"),
-    "ProximaNova-Regular": require("../assets/fonts/proximanova-regular.otf"),
+    Black: require("../assets/fonts/proximanova_black.ttf"),
+    ExtraBold: require("../assets/fonts/proximanova_extrabold.otf"),
+    Bold: require("../assets/fonts/proximanova_bold.otf"),
+    Regular: require("../assets/fonts/proximanova_regular.ttf"),
+    Light: require("../assets/fonts/proximanova_light.otf"),
   });
 
   if (!fontsLoaded) {

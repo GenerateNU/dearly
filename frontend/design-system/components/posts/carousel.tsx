@@ -10,7 +10,7 @@ import {
 } from "react-native-reanimated";
 import Carousel from "react-native-reanimated-carousel";
 import { Image } from "expo-image";
-import Box from "../../base/box";
+import { Box } from "@/design-system/base/box";
 import { AnimatedBox } from "../../base/animated-box";
 import { Heart } from "./heart";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -111,7 +111,7 @@ const ImageCarousel: React.FC<CarouselProps> = ({ data, initialPage = 0, like })
         {containerWidth > 0 && (
           <>
             <Box position="absolute" zIndex={10} right={0} bottom={0} padding="m">
-              <Heart onLike={handleLike} like={isLiking} />
+              <Heart variant="iconHoney" onLike={handleLike} like={isLiking} />
             </Box>
 
             {showFlyingHeart && (

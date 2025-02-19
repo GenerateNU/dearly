@@ -1,4 +1,10 @@
-import { CreateUserPayload, UpdateUserPayload, User, UserGroups } from "@/types/user";
+import {
+  CreateUserPayload,
+  Notifications,
+  UpdateUserPayload,
+  User,
+  UserGroups,
+} from "@/types/user";
 import fetchClient from "./client";
 import { authWrapper, getHeaders } from "@/utilities/auth-token";
 
@@ -62,4 +68,20 @@ export const getUserGroups = async (limit: number, page: number): Promise<UserGr
     return data!;
   };
   return authWrapper<UserGroups>()(req);
+};
+
+export const getNotifications = async (limit: number, page: number): Promise<Notifications> => {
+  const req = async (token: string): Promise<Notifications> => {
+    const { data } = await fetchClient.GET("/api/v1/users/notifications", {
+      headers: getHeaders(token),
+      params: {
+        query: {
+          limit,
+          page,
+        },
+      },
+    });
+    return data!;
+  };
+  return authWrapper<Notifications>()(req);
 };

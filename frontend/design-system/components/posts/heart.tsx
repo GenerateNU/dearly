@@ -1,37 +1,25 @@
-import Box from "@/design-system/base/box";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-
 import { useTheme } from "@shopify/restyle";
 import { Theme } from "@/design-system/base/theme";
-import { Pressable } from "react-native";
+import { IconButton } from "../ui/icon-button";
 
 interface HeartProps {
   like: boolean;
   onLike: () => void;
+  label?: boolean;
+  variant: "iconHoney" | "iconBlush";
 }
 
-export const Heart: React.FC<HeartProps> = ({ like, onLike }) => {
+export const Heart: React.FC<HeartProps> = ({ like, onLike, variant, label }) => {
   const theme = useTheme<Theme>();
 
   const variantStyle = theme.heartVariants[like ? "filled" : "outlined"];
 
   return (
-    <Pressable onPress={onLike}>
-      <Box
-        borderRadius="xl"
-        alignItems="center"
-        padding="s"
-        width={variantStyle.width}
-        aspectRatio={1}
-        justifyContent="center"
-        backgroundColor="secondaryDark"
-      >
-        <FontAwesomeIcon
-          icon={variantStyle.icon}
-          color={variantStyle.color}
-          size={variantStyle.size}
-        />
-      </Box>
-    </Pressable>
+    <IconButton
+      onPress={onLike}
+      icon={variantStyle.icon}
+      variant={variant}
+      size={variantStyle.size}
+    />
   );
 };

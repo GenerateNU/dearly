@@ -222,6 +222,13 @@ components:
           example: "This is a sample caption for the post."
           description: A textual description or caption for the post.
           nullable: true
+        name:
+          type: string
+          description: Display name of user who makes the post.
+          nullable: true
+        username:
+          type: string
+          description: Username of user who makes the post.
         likes:
           type: number
           example: 20
@@ -293,6 +300,13 @@ components:
           type: string
           nullable: true
           description: Profile photo url of user who made the post
+        name:
+          type: string
+          nullable: true
+          description: Display name of user who made the post
+        username:
+          type: string
+          description: Username of user who made the post
         location:
           type: string
           description: Location of where the post is made
@@ -360,7 +374,7 @@ components:
           format: uuid
           example: 5e91507e-5630-4efd-9fd4-799178870b10
           description: The ID of the post to which the comment belongs.
-        userID:
+        userId:
           type: string
           format: uuid
           example: 5e91507e-5630-4efd-9fd4-799178870b10
@@ -395,7 +409,7 @@ components:
           format: uuid
           example: 5e91507e-5630-4efd-9fd4-799178870b10
           description: The ID of the post to which the comment belongs.
-        userID:
+        userId:
           type: string
           format: uuid
           example: 5e91507e-5630-4efd-9fd4-799178870b10
@@ -1209,7 +1223,7 @@ paths:
             format: uuid
             example: 5e91507e-5630-4efd-9fd4-799178870b10
       responses:
-        201:
+        200:
           description: Succesfully returned a group
           content:
             application/json:

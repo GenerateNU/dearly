@@ -19,6 +19,8 @@ export const getPostMetadata = (userId: string) => {
     caption: postsTable.caption,
     location: postsTable.location,
     profilePhoto: usersTable.profilePhoto,
+    username: usersTable.username,
+    name: usersTable.name,
     comments: sql<number>`COUNT(DISTINCT ${commentsTable.id})`.mapWith(Number),
     likes: sql<number>`COUNT(DISTINCT ${likesTable.id})`.mapWith(Number),
     isLiked: sql<boolean>`BOOL_OR(CASE WHEN ${likesTable.userId} = ${userId} THEN true ELSE false END)`,

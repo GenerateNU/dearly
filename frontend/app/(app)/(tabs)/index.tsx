@@ -1,12 +1,12 @@
 import { useAuth } from "@/auth/provider";
-import Box from "@/design-system/base/box";
-import Button from "@/design-system/components/ui/button";
+import { Box } from "@/design-system/base/box";
+import { TextButton } from "@/design-system/components/ui/text-button";
 
 const Home = () => {
   const { logout } = useAuth();
   return (
-    <Box gap="xl" alignItems="center" justifyContent="center" backgroundColor="primary" flex={1}>
-      <Button label="Logout" onPress={logout} />
+    <Box gap="xl" alignItems="center" justifyContent="center" backgroundColor="pearl" flex={1}>
+      <TextButton variant="halfHoney" label="Logout" onPress={logout} />
     </Box>
   );
 };

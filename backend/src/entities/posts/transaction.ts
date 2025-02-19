@@ -16,7 +16,7 @@ import {
   PostWithMedia,
   UpdatePostPayload,
 } from "../../types/api/internal/posts";
-import { Media } from "../../types/api/internal/media";
+import { getPostMetadata } from "../../utilities/query";
 
 export interface PostTransaction {
   createPost(post: CreatePostPayload): Promise<PostWithMedia | null>;
@@ -72,9 +72,17 @@ export class PostTransactionImpl implements PostTransaction {
 
       // fetch user profile photo using JOIN
       const [user] = await tx
-        .select({ profilePhoto: usersTable.profilePhoto })
+        .select({
+          profilePhoto: usersTable.profilePhoto,
+          name: usersTable.name,
+          username: usersTable.username,
+        })
         .from(usersTable)
         .where(eq(usersTable.id, newPost.userId));
+
+      if (!user) {
+        return null;
+      }
 
       return {
         id: newPost.id,
@@ -82,6 +90,8 @@ export class PostTransactionImpl implements PostTransaction {
         groupId: newPost.groupId,
         caption: newPost.caption,
         createdAt: newPost.createdAt,
+        name: user.name,
+        username: user.username,
         media: insertedMedia.sort((a, b) => a.order - b.order), // Ensure order is correct
         comments: 0,
         likes: 0,
@@ -96,26 +106,7 @@ export class PostTransactionImpl implements PostTransaction {
 
   async getPost({ id, userId }: IDPayload): Promise<PostWithMedia | null> {
     const [result] = await this.db
-      .select({
-        id: postsTable.id,
-        userId: postsTable.userId,
-        groupId: postsTable.groupId,
-        createdAt: postsTable.createdAt,
-        caption: postsTable.caption,
-        location: postsTable.location,
-        profilePhoto: usersTable.profilePhoto,
-        comments: sql<number>`COUNT(DISTINCT ${commentsTable.id})`.mapWith(Number),
-        likes: sql<number>`COUNT(DISTINCT ${likesTable.id})`.mapWith(Number),
-        isLiked: sql<boolean>`BOOL_OR(CASE WHEN ${likesTable.userId} = ${userId} THEN true ELSE false END)`,
-        media: sql<Media[]>`ARRAY_AGG(
-          JSON_BUILD_OBJECT(
-            'id', ${mediaTable.id},
-            'type', ${mediaTable.type},
-            'postId', ${mediaTable.postId},
-            'objectKey', ${mediaTable.objectKey}
-          ) ORDER BY ${mediaTable.order} ASC
-        )`,
-      })
+      .select(getPostMetadata(userId))
       .from(postsTable)
       .innerJoin(usersTable, eq(postsTable.userId, usersTable.id))
       .leftJoin(mediaTable, eq(postsTable.id, mediaTable.postId))
@@ -134,6 +125,8 @@ export class PostTransactionImpl implements PostTransaction {
         postsTable.caption,
         postsTable.location,
         usersTable.profilePhoto,
+        usersTable.name,
+        usersTable.username,
       )
       .where(eq(postsTable.id, id));
 
@@ -192,13 +185,15 @@ export class PostTransactionImpl implements PostTransaction {
           likes: count(likesTable.id),
           isLiked: sql<boolean>`BOOL_OR(CASE WHEN ${likesTable.userId} = ${userId} THEN true ELSE false END)`,
           profilePhoto: usersTable.profilePhoto,
+          name: usersTable.name,
+          username: usersTable.username,
         })
         .from(postsTable)
         .innerJoin(usersTable, eq(postsTable.userId, usersTable.id))
         .leftJoin(commentsTable, eq(commentsTable.postId, postsTable.id))
         .leftJoin(likesTable, eq(likesTable.postId, postsTable.id))
         .where(eq(postsTable.id, id))
-        .groupBy(postsTable.id, usersTable.profilePhoto);
+        .groupBy(postsTable.id, usersTable.profilePhoto, usersTable.name, usersTable.username);
 
       if (!post) return null;
 
@@ -214,6 +209,8 @@ export class PostTransactionImpl implements PostTransaction {
         likes: post.likes,
         isLiked: post.isLiked,
         profilePhoto: post.profilePhoto,
+        name: post.name,
+        username: post.username,
       };
     });
 

@@ -57,6 +57,8 @@ describe("GET /posts/:id", () => {
       .assertStatusCode(Status.Created)
       .assertFieldExists("id")
       .assertFieldExists("createdAt")
+      .assertFieldExists("username")
+      .assertFieldExists("name")
       .assertField("comments", 0)
       .assertField("likes", 0)
       .assertField("location", null)
@@ -116,6 +118,8 @@ describe("GET /posts/:id", () => {
         comments: 1,
         likes: 0,
         isLiked: false,
+        username: "alice123",
+        name: "Alice",
         location: null,
         profilePhoto: null,
       });

@@ -31,6 +31,14 @@ const Layout = () => {
           gestureEnabled: false,
         }}
       />
+      <Stack.Screen
+        name="demo"
+        options={{
+          headerShown: true,
+          headerTitle: "All Hands Demo",
+          gestureEnabled: false,
+        }}
+      />
     </Stack>
   );
 };

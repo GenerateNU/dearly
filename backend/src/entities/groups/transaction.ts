@@ -96,6 +96,8 @@ export class GroupTransactionImpl implements GroupTransaction {
         postsTable.caption,
         postsTable.location,
         usersTable.profilePhoto,
+        usersTable.name,
+        usersTable.username,
       )
       // most recent to less recent
       .orderBy(desc(postsTable.createdAt))
