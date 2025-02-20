@@ -32,6 +32,10 @@ export const getFontConfig = (scaleRatio: number) => {
       fontSize: 14 * scaleRatio,
       fontFamily: "Regular",
     },
+    navbar: {
+      fontSize: 9 * scaleRatio,
+      fontFamily: "Regular",
+    },
   };
   return config;
 };

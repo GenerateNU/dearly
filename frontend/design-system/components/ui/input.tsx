@@ -1,11 +1,13 @@
 import React from "react";
 import { TextInput, TextInputProps } from "react-native";
 
-import { BoxProps, createBox } from "@shopify/restyle";
+import { BoxProps, createBox, useTheme } from "@shopify/restyle";
 
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { Theme } from "@/design-system/base/theme";
+import { Icon } from "./icon";
+import { MaterialIcon } from "@/types/icon";
 
 type TextboxProps = {
   title?: string;
@@ -19,6 +21,9 @@ type TextboxProps = {
   maxLength?: number;
   secureTextEntry?: boolean;
   children?: React.ReactNode;
+  paragraph?: boolean;
+  leftIcon?: MaterialIcon;
+  rightIcon?: MaterialIcon;
 } & BoxProps<Theme>;
 
 const BaseTextInput = createBox<Theme, TextboxProps & TextInputProps>(TextInput);
@@ -34,29 +39,67 @@ const Input: React.FC<TextboxProps> = ({
   value,
   maxLength,
   secureTextEntry = false,
+  leftIcon,
+  rightIcon,
+  paragraph,
 }) => {
+  const theme = useTheme<Theme>();
+
   return (
     <Box>
-      <Text paddingBottom="s">{title}</Text>
-      <BaseTextInput
-        placeholder={placeholder}
-        autoFocus={autoFocus}
-        readOnly={readOnly}
-        inputMode={inputMode}
-        placeholderTextColor="#D3D3D3"
-        onChangeText={onChangeText}
-        value={value}
-        maxLength={maxLength}
-        secureTextEntry={secureTextEntry}
-        opacity={readOnly ? 0.5 : 1}
-        borderWidth={1}
+      {title && <Text paddingBottom="s">{title}</Text>}
+      <Box
+        paddingHorizontal="s"
+        padding="xs"
+        justifyContent="space-between"
+        flexDirection="row"
         borderRadius="s"
-        padding="s"
-        borderColor={error ? "error" : "honey"}
-      />
+        borderWidth={1}
+        opacity={readOnly ? 0.5 : 1}
+        borderColor={error ? "error" : "slate"}
+        alignItems={paragraph ? "flex-start" : "center"}
+        minHeight={paragraph ? 100 : undefined}
+      >
+        <Box flex={1} flexDirection="row" alignItems={paragraph ? "flex-start" : "center"}>
+          {leftIcon && (
+            <Box paddingRight="xs">
+              <Icon name={leftIcon} color="slate" />
+            </Box>
+          )}
+          <Box flex={1}>
+            <BaseTextInput
+              placeholder={placeholder}
+              autoFocus={autoFocus}
+              readOnly={readOnly}
+              inputMode={inputMode}
+              placeholderTextColor="#D3D3D3"
+              onChangeText={onChangeText}
+              value={value}
+              maxLength={maxLength}
+              secureTextEntry={secureTextEntry}
+              borderRadius="s"
+              padding="s"
+              multiline={paragraph}
+              numberOfLines={paragraph ? 4 : 1}
+              textAlignVertical={paragraph ? "top" : "center"}
+              style={{
+                fontSize: theme.textVariants["caption"].fontSize,
+              }}
+              borderColor={error ? "error" : "slate"}
+            />
+          </Box>
+        </Box>
+        {rightIcon && (
+          <Box paddingLeft="xs">
+            <Icon name={rightIcon} color="slate" />
+          </Box>
+        )}
+      </Box>
       {error && (
-        <Box gap="xxs" flexDirection="row" alignItems="center">
-          <Text color="error">{error}</Text>
+        <Box paddingTop="xs" flexDirection="row" alignItems="center">
+          <Text variant="caption" color="error">
+            {error}
+          </Text>
         </Box>
       )}
     </Box>

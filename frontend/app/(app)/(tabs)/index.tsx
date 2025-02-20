@@ -6,7 +6,7 @@ const Home = () => {
   const { logout } = useAuth();
   return (
     <Box gap="xl" alignItems="center" justifyContent="center" backgroundColor="pearl" flex={1}>
-      <TextButton variant="halfHoney" label="Logout" onPress={logout} />
+      <TextButton variant="honey" label="Logout" onPress={logout} />
     </Box>
   );
 };

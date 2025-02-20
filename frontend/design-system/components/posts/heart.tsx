@@ -6,7 +6,7 @@ interface HeartProps {
   like: boolean;
   onLike: () => void;
   label?: boolean;
-  variant: "iconHoney" | "iconBlush";
+  variant: "blush" | "honey";
 }
 
 export const Heart: React.FC<HeartProps> = ({ like, onLike, variant, label }) => {
@@ -16,10 +16,10 @@ export const Heart: React.FC<HeartProps> = ({ like, onLike, variant, label }) =>
 
   return (
     <IconButton
+      label={label ? "Like" : undefined}
       onPress={onLike}
       icon={variantStyle.icon}
-      variant={variant}
-      size={variantStyle.size}
+      variant={variant === "blush" ? "blushRounded" : "honeyRounded"}
     />
   );
 };

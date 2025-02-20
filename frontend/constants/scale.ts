@@ -1,0 +1,2 @@
+export const BIGGER_PHONE_SCALE_RATIO = 1.5;
+export const BIGGER_PHONE_SCREEN = 400;

@@ -11,15 +11,14 @@ import { handleAWSServiceError } from "../utilities/errors/aws-error";
 import { NudgeSchedulePayload, SchedulePayload } from "../types/api/internal/nudges";
 import { getConfigurations } from "../config/config";
 
-export interface NudgeScheduler {
-  // TODO: think about I/O type of this & more debugging
+export interface NudgeSchedulerService {
   addSchedule(id: string, payload: SchedulePayload): Promise<number | null>;
-  updateSchedule(id: string, payload: SchedulePayload, isActive: boolean): Promise<number | null>;
+  updateSchedule(id: string, payload: SchedulePayload): Promise<number | null>;
   disableSchedule(id: string): Promise<number | null>;
   removeSchedule(id: string): Promise<number | null>;
 }
 
-export class AWSEventBridgeScheduler implements NudgeScheduler {
+export class AWSEventBridgeScheduler implements NudgeSchedulerService {
   private scheduler: SchedulerClient;
 
   constructor(scheduler: SchedulerClient) {

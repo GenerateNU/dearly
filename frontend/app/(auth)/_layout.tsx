@@ -32,10 +32,18 @@ const Layout = () => {
         }}
       />
       <Stack.Screen
-        name="demo"
+        name="components"
         options={{
           headerShown: true,
-          headerTitle: "All Hands Demo",
+          headerTitle: "Components Library",
+          gestureEnabled: false,
+        }}
+      />
+      <Stack.Screen
+        name="design-system"
+        options={{
+          headerShown: true,
+          headerTitle: "Design System",
           gestureEnabled: false,
         }}
       />

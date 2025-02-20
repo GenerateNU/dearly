@@ -16,6 +16,7 @@ const getTheme = (ratio: number) => {
     heartVariants: heartVariants,
     avatarVariants: avatarVariants,
     buttonVariants: buttonVariants,
+    iconSize: 30,
   });
   return theme;
 };

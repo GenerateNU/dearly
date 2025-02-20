@@ -4,8 +4,7 @@ import { ExpoPushService } from "../../services/notification/expo";
 import { getNotificationBody } from "../../utilities/nudge";
 import { InternalServerError } from "../../utilities/errors/app-error";
 import { NudgeSchedulePayload, NudgeSchedule } from "../../types/api/internal/nudges";
-import { AWSEventBridgeScheduler } from "../../services/nudgeScheduler";
-import { SchedulerClient } from "@aws-sdk/client-scheduler";
+import { NudgeScheduler } from "../../services/nudgeScheduler";
 
 export interface NudgeService {
   manualNudge(userIds: string[], groupId: string, managerId: string): Promise<void>;
@@ -17,16 +16,16 @@ export interface NudgeService {
 export class NudgeServiceImpl implements NudgeService {
   private nudgeTransaction: NudgeTransaction;
   private expoService: ExpoPushService;
-  private scheduler: AWSEventBridgeScheduler;
+  private scheduler: NudgeScheduler;
 
   constructor(
     nudgeTransaction: NudgeTransaction,
     expoService: ExpoPushService,
-    scheduler: SchedulerClient,
+    scheduler: NudgeScheduler,
   ) {
     this.nudgeTransaction = nudgeTransaction;
     this.expoService = expoService;
-    this.scheduler = new AWSEventBridgeScheduler(scheduler);
+    this.scheduler = scheduler;
   }
 
   async manualNudge(userIds: string[], groupId: string, managerId: string): Promise<void> {
