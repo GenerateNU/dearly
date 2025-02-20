@@ -35,7 +35,7 @@ export const Profile: React.FC<ProfileProps> = ({
         )}
         {birthday && (
           <Box gap="xs" flexDirection="row" alignItems="center" justifyContent="center">
-            <Icon name={getZodiacIcon(birthday)} color="ink" size={30} />
+            <Icon name={getZodiacIcon(birthday)} color="ink" />
             <Text>{formatDay(new Date(birthday))}</Text>
           </Box>
         )}

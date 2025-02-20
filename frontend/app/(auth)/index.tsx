@@ -10,22 +10,28 @@ const Index = () => {
 
   return (
     <Box backgroundColor="pearl" gap="m" flex={1} justifyContent="center" alignItems="center">
-      <TextButton variant="halfHoney" label="Login" onPress={() => router.push("/(auth)/login")} />
-      <TextButton
-        variant="halfHoney"
-        label="Register"
-        onPress={() => router.push("/(auth)/register")}
-      />
-      <TextButton
-        variant="halfHoney"
-        label="Components"
-        onPress={() => router.push("/(auth)/demo")}
-      />
-      <TextButton
-        variant="halfHoney"
-        onPress={() => sheetRef.current?.snapToIndex(0)}
-        label="Popup"
-      />
+      <Box gap="s" width="50%">
+        <TextButton
+          variant="honeyRounded"
+          label="Login"
+          onPress={() => router.push("/(auth)/login")}
+        />
+        <TextButton
+          variant="honeyRounded"
+          label="Register"
+          onPress={() => router.push("/(auth)/register")}
+        />
+        <TextButton
+          variant="honeyRounded"
+          label="Components"
+          onPress={() => router.push("/(auth)/demo")}
+        />
+        <TextButton
+          variant="honeyRounded"
+          onPress={() => sheetRef.current?.snapToIndex(0)}
+          label="Popup"
+        />
+      </Box>
       <CommentPopUp id="" ref={sheetRef} />
     </Box>
   );

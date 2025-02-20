@@ -83,7 +83,7 @@ const LoginForm = () => {
       {authError && <Text color="error">{authError}</Text>}
       <Box alignItems="center" className="w-full">
         <TextButton
-          variant="fullHoneyRounded"
+          variant="honeyRounded"
           label={isPending ? "Logging in..." : "Log In"}
           onPress={handleSubmit(onLoginPress)}
           disabled={isPending || !isValid}

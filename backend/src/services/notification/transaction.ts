@@ -72,6 +72,7 @@ export class NotificationTransactionImpl implements NotificationTransaction {
           userId: postsTable.userId,
           username: usersTable.username,
           groupName: groupsTable.name,
+          groupId: groupsTable.id,
           deviceTokens: sql<string[]>`ARRAY_AGG(DISTINCT ${devicesTable.token})`,
           isEnabled: membersTable.notificationsEnabled,
         })
@@ -87,6 +88,7 @@ export class NotificationTransactionImpl implements NotificationTransaction {
           postsTable.userId,
           usersTable.username,
           groupsTable.name,
+          groupsTable.id,
           membersTable.notificationsEnabled,
         );
 
@@ -105,6 +107,7 @@ export class NotificationTransactionImpl implements NotificationTransaction {
           userId: postsTable.userId,
           username: usersTable.username,
           groupName: groupsTable.name,
+          groupId: groupsTable.id,
           isEnabled: membersTable.notificationsEnabled,
           deviceTokens: sql<string[]>`ARRAY_AGG(DISTINCT ${devicesTable.token})`,
         })
@@ -119,6 +122,7 @@ export class NotificationTransactionImpl implements NotificationTransaction {
           postsTable.userId,
           usersTable.username,
           groupsTable.name,
+          groupsTable.id,
           membersTable.notificationsEnabled,
         );
 

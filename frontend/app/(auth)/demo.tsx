@@ -11,6 +11,7 @@ import { RefreshControl } from "react-native";
 import { Heart } from "@/design-system/components/posts/heart";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { CommentPopUp } from "@/design-system/components/comments/bottom-sheet";
+import Input from "@/design-system/components/ui/input";
 
 const Index = () => {
   const [menu1, setMenu1] = useState("Home");
@@ -43,39 +44,41 @@ const Index = () => {
         <Box gap="l" paddingBottom="l">
           <Box gap="s" alignItems="flex-start" flexDirection="column">
             <Text variant="bodyLargeBold">design system</Text>
-            <Box width="100%" flexDirection="row"></Box>
-            <Box flexDirection="row" justifyContent="space-evenly">
-              <Box width="50%" flexDirection="row" gap="s">
-                <Heart like={false} onLike={() => null} variant="iconBlush" />
-                <Heart like={true} onLike={() => null} variant="iconHoney" />
+            <Box gap="xs" flexDirection="row">
+              <Box>
+                <Heart like={false} onLike={() => null} variant="blush" />
               </Box>
-
-              <Box width="100%" gap="s">
-                <TextButton variant="halfBlush" label="half blush" onPress={() => null} />
-                <TextButton variant="halfHoneyRounded" label="half honey" onPress={() => null} />
+              <Box>
+                <Heart like={true} onLike={() => null} variant="honey" />
+              </Box>
+            </Box>
+            <Box flexDirection="row" width="100%">
+              <Box gap="xs" width="27%" flexDirection="row">
+                <Heart label like={false} onLike={() => null} variant="blush" />
+                <Heart label like={true} onLike={() => null} variant="honey" />
               </Box>
             </Box>
 
             <Box width="100%" gap="s">
-              <TextButton variant="fullBlush" label="full blush" onPress={() => null} />
-              <TextButton
-                variant="fullBlushRounded"
-                label="full blush rounded"
-                onPress={() => null}
-              />
-              <TextButton variant="fullHoney" label="full honey" onPress={() => null} />
-              <TextButton
-                variant="fullHoneyRounded"
-                label="full honey rounded"
-                onPress={() => null}
-              />
-              <TextButton variant="fullPearl" label="full pearl" onPress={() => null} />
-              <TextButton
-                variant="fullPearlRounded"
-                label="full pearl rounded"
-                onPress={() => null}
-              />
+              <TextButton variant="blush" label="blush" onPress={() => null} />
+              <TextButton variant="blushRounded" label="blush rounded" onPress={() => null} />
+              <TextButton variant="honey" label="honey" onPress={() => null} />
+              <TextButton variant="honeyRounded" label="honey rounded" onPress={() => null} />
+              <TextButton variant="pearl" label="pearl" onPress={() => null} />
+              <TextButton variant="pearlRounded" label="pearl rounded" onPress={() => null} />
             </Box>
+          </Box>
+
+          <Box gap="s" flexDirection="column" width="100%">
+            <Input placeholder="this is a normal textbox" />
+            <Input placeholder="right icon" rightIcon="account-voice" />
+            <Input placeholder="left icon" leftIcon="map-marker" />
+            <Input
+              placeholder="left right icon"
+              leftIcon="camera"
+              rightIcon="arrow-down-circle-outline"
+            />
+            <Input placeholder="big paragraph" paragraph />
           </Box>
 
           <Box>

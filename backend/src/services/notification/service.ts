@@ -86,7 +86,7 @@ export class ExpoNotificationService implements NotificationService {
   }
 
   async notifyComment(comment: Comment): Promise<Notification[]> {
-    const { userId, username, groupName, deviceTokens, isEnabled } =
+    const { userId, username, groupName, deviceTokens, isEnabled, groupId } =
       await this.transaction.getCommentMetadata(comment);
 
     const message = this.formatMessage(username, groupName, NotificationType.COMMENT);
@@ -99,6 +99,7 @@ export class ExpoNotificationService implements NotificationService {
         commentId: comment.id,
         postId: comment.postId,
         title: "New Comment",
+        groupId,
         likeId: null,
         description: message,
       },
@@ -116,7 +117,7 @@ export class ExpoNotificationService implements NotificationService {
   }
 
   async notifyLike(like: Like): Promise<Notification[]> {
-    const { userId, username, groupName, deviceTokens, isEnabled } =
+    const { userId, username, groupName, deviceTokens, isEnabled, groupId } =
       await this.transaction.getLikeMetadata(like);
 
     const message = this.formatMessage(username, groupName, NotificationType.LIKE);
@@ -127,6 +128,7 @@ export class ExpoNotificationService implements NotificationService {
         receiverId: userId,
         referenceType: "LIKE",
         likeId: like.id,
+        groupId,
         postId: like.postId,
         title: "New Like",
         description: message,
