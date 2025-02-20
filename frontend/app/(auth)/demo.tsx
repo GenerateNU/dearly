@@ -66,19 +66,28 @@ const Index = () => {
               <TextButton variant="honeyRounded" label="honey rounded" onPress={() => null} />
               <TextButton variant="pearl" label="pearl" onPress={() => null} />
               <TextButton variant="pearlRounded" label="pearl rounded" onPress={() => null} />
+              <TextButton variant="inkOutline" label="ink outline" onPress={() => null} />
+              <TextButton
+                variant="inkRoundedOutline"
+                label="ink rounded outline"
+                onPress={() => null}
+              />
             </Box>
           </Box>
 
           <Box gap="s" flexDirection="column" width="100%">
             <Input placeholder="this is a normal textbox" />
+            <Input readOnly placeholder="this is a read only textbox" />
+            <Input secureTextEntry placeholder="this is secure text, you won't see anything" />
             <Input placeholder="right icon" rightIcon="account-voice" />
             <Input placeholder="left icon" leftIcon="map-marker" />
             <Input
-              placeholder="left right icon"
+              placeholder="left and right icon"
               leftIcon="camera"
               rightIcon="arrow-down-circle-outline"
             />
             <Input placeholder="big paragraph" paragraph />
+            <Input error="some error message here" placeholder="this is an error textbox" />
           </Box>
 
           <Box>

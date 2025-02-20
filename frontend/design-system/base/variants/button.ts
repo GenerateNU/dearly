@@ -14,13 +14,16 @@ const baseIcon = {
 };
 
 const createButtonStyle = (
-  backgroundColor: ColorName,
+  color: ColorName,
   borderRadius: string | undefined = undefined,
+  outline?: boolean,
 ) => ({
   ...baseButton,
   width: "100%",
-  backgroundColor,
+  backgroundColor: outline ? "" : color,
   borderRadius,
+  borderWidth: outline ? 1 : 1,
+  borderColor: color,
 });
 
 export const buttonVariants = {
@@ -42,6 +45,14 @@ export const buttonVariants = {
   blushRounded: createButtonStyle("blush", "full"),
   honey: createButtonStyle("honey", "s"),
   honeyRounded: createButtonStyle("honey", "full"),
+  blushRoundedOutline: createButtonStyle("blush", "full", true),
+  honeyRoundedOutline: createButtonStyle("honey", "full", true),
+  blushOutline: createButtonStyle("blush", "s", true),
+  honeyOutline: createButtonStyle("honey", "s", true),
+  slateOutline: createButtonStyle("slate", "s", true),
+  slateRoundedOutline: createButtonStyle("slate", "full", true),
+  inkOutline: createButtonStyle("ink", "s", true),
+  inkRoundedOutline: createButtonStyle("ink", "full", true),
 };
 
 export type ButtonVariant = keyof typeof buttonVariants;
