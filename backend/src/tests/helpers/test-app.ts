@@ -8,17 +8,16 @@ import { resetDB } from "../../database/reset";
 import { seedDatabase } from "./seed-db";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { mockClient } from "aws-sdk-client-mock";
-import { S3Impl } from "../../services/s3Service";
 import Expo from "expo-server-sdk";
 import { spyOn } from "bun:test";
+import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import { mockSchedulerClient } from "./mock";
+import { SchedulerClient } from "@aws-sdk/client-scheduler";
+import { initIntegration, initService } from "../../services/init";
 
 export const expo = new Expo();
 export const sendPushNotificationsAsyncSpy = spyOn(expo, "sendPushNotificationsAsync");
 export const chunkPushNotificationsSpy = spyOn(expo, "chunkPushNotifications");
-import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { ExpoPushService } from "../../services/notification/expo";
-import { mockSchedulerClient } from "./mock";
-import { SchedulerClient } from "@aws-sdk/client-scheduler";
 
 export const startTestApp = async (
   mockedSchedulerClient: SchedulerClient = mockSchedulerClient,
@@ -38,14 +37,23 @@ export const startTestApp = async (
 
   // mock AWS S3
   const mockS3Client = mockClient(S3Client);
-  const client = mockS3Client.on(PutObjectCommand).resolves({}) as unknown as S3Client;
+  const s3Client = mockS3Client.on(PutObjectCommand).resolves({}) as unknown as S3Client;
 
-  const s3 = new S3Impl(config.s3Config, client);
+  // setup integrations and services
+  const integrations = initIntegration(config, s3Client, expo, schedulerClient);
+  const { mediaService, expoService, nudgeSchedulerService } = initService(
+    integrations,
+    db,
+    config,
+  );
 
-  const expoService = new ExpoPushService(expo);
-
+  // setup app
   configureMiddlewares(app, config);
+  setUpRoutes(app, db, config, {
+    mediaService,
+    expoService,
+    nudgeSchedulerService,
+  });
 
-  setUpRoutes(app, db, config, s3, expoService, schedulerClient);
   return app;
 };

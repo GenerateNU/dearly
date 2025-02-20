@@ -4,32 +4,37 @@ import { connectDB } from "./database/connect";
 import { configureMiddlewares } from "./middlewares/init";
 import { setUpRoutes } from "./routes/init";
 import { automigrateDB } from "./database/migrate";
-import { S3Impl } from "./services/s3Service";
-import Expo from "expo-server-sdk";
-import { NotificationTransactionImpl } from "./services/notification/transaction";
-import { ExpoPushService } from "./services/notification/expo";
-import { ExpoNotificationService } from "./services/notification/service";
-import { SchedulerClient } from "@aws-sdk/client-scheduler";
+import { initIntegration, initService } from "./services/init";
+import { handleServerShuttingDown } from "./utilities/server";
 
 const app = new Hono();
 const config = getConfigurations();
 
 (async function setUpServer() {
-  const s3ServiceProvider = new S3Impl(config.s3Config);
-  const expo = new Expo();
-  const schedulerClient = new SchedulerClient();
-
   try {
+    // set up database
     const db = connectDB(config);
-
     await automigrateDB(db, config);
 
+    // set up external integrations and services
+    const integrations = initIntegration(config);
+
+    const { pushNotificationService, mediaService, expoService, nudgeSchedulerService } =
+      initService(integrations, db, config);
+
+    pushNotificationService.subscribeToSupabaseRealtime();
+
+    // set up app
     configureMiddlewares(app, config);
 
-    const expoService = new ExpoPushService(expo);
-    new ExpoNotificationService(config, new NotificationTransactionImpl(db), expoService);
+    setUpRoutes(app, db, config, {
+      mediaService,
+      expoService,
+      nudgeSchedulerService,
+    });
 
-    setUpRoutes(app, db, config, s3ServiceProvider, expoService, schedulerClient);
+    // handle server shutting down
+    handleServerShuttingDown(pushNotificationService);
 
     console.log("Successfully initialize app");
   } catch (error) {

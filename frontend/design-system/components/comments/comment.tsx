@@ -5,7 +5,7 @@ import { DEFAULT_PROFILE_PHOTO } from "@/constants/photo";
 import { Text } from "@/design-system/base/text";
 import { formatTime } from "@/utilities/time";
 
-export const CommentCard: React.FC<Comment> = ({
+export const CommentCard: React.FC<Required<Comment>> = ({
   id,
   userId,
   voiceMemo,

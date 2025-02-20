@@ -140,7 +140,7 @@ const RegisterForm = () => {
       />
       <Box alignItems="center" className="w-full">
         <TextButton
-          variant="fullHoneyRounded"
+          variant="honeyRounded"
           disabled={isPending || !isValid}
           label={isPending ? "Signing up..." : "Sign Up"}
           onPress={handleSubmit(onSignUpPress)}

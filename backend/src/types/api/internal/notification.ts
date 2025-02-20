@@ -27,6 +27,7 @@ export type PostNotificationMetadata = {
 
 export type LikeCommentNotificationMetadata = {
   userId: string;
+  groupId: string;
   username: string;
   groupName: string;
   deviceTokens: string[];

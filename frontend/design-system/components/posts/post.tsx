@@ -5,8 +5,14 @@ import { PostHeader } from "./header";
 import { Media } from "@/types/media";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
+import { useState } from "react";
 
-export const ImagePost: React.FC<Required<Post>> = ({
+interface Props {
+  onCommentClicked: () => void;
+  onLikeClicked: () => void;
+}
+
+export const ImagePost: React.FC<Required<Post> & Props> = ({
   profilePhoto,
   username,
   name,
@@ -19,7 +25,10 @@ export const ImagePost: React.FC<Required<Post>> = ({
   likes,
   caption,
   media,
+  onCommentClicked,
+  onLikeClicked,
 }) => {
+  const [like, setLike] = useState(isLiked);
   const data = media
     .filter(
       (item): item is Required<Pick<Media, "url">> =>
@@ -37,8 +46,15 @@ export const ImagePost: React.FC<Required<Post>> = ({
         createdAt={createdAt}
         onPress={() => null}
       />
-      <ImageCarousel like={isLiked} data={data} />
-      <CommentLike postId={id} likes={likes} comments={comments} />
+      <ImageCarousel setLike={() => setLike(!like)} like={like} data={data} />
+      <CommentLike
+        onCommentClicked={onCommentClicked}
+        onLikeClicked={onLikeClicked}
+        liked={like}
+        postId={id}
+        likes={likes}
+        comments={comments}
+      />
       <Box gap="s" flexDirection="row" justifyContent="flex-start" alignItems="flex-start">
         <Box>
           <Text>💬</Text>

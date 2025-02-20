@@ -7,21 +7,19 @@ import { getOpenAPISpecification } from "../utilities/docs";
 import { HEALTHCHECK } from "../types/api/routes/healthcheck";
 import { groupRoutes } from "../entities/groups/route";
 import { postRoutes } from "../entities/posts/route";
-import { IS3Operations } from "../services/s3Service";
-import { MediaServiceImpl } from "../entities/media/service";
+import { MediaService } from "../entities/media/service";
 import { commentsRoutes } from "../entities/comments/route";
 import { SlackController, SlackControllerImpl } from "./webhook";
 import { mediaRoutes } from "../entities/media/route";
 import { ExpoPushService } from "../services/notification/expo";
-import { SchedulerClient } from "@aws-sdk/client-scheduler";
+import { AppService } from "../types/api/internal/services";
+import { NudgeSchedulerService } from "../services/nudgeScheduler";
 
 export const setUpRoutes = (
   app: Hono,
   db: PostgresJsDatabase,
   config: Configuration,
-  s3ServiceProvider: IS3Operations,
-  expo: ExpoPushService,
-  scheduler: SchedulerClient,
+  services: AppService,
 ) => {
   // api documentation
   app.get(
@@ -41,7 +39,10 @@ export const setUpRoutes = (
   // webhook to send to slack channel for CI message
   const slackController: SlackController = new SlackControllerImpl(config.slackConfig);
   app.post("/slack", (ctx: Context) => slackController.receiveBuildEvent(ctx));
-  app.route("/api/v1", apiRoutes(db, s3ServiceProvider, expo, scheduler));
+
+  // initialize routes
+  const { expoService, mediaService, nudgeSchedulerService } = services;
+  app.route("/api/v1", apiRoutes(db, mediaService, expoService, nudgeSchedulerService));
 
   // unsupported route
   app.notFound((ctx: Context) => {
@@ -51,15 +52,14 @@ export const setUpRoutes = (
 
 const apiRoutes = (
   db: PostgresJsDatabase,
-  s3Service: IS3Operations,
-  expo: ExpoPushService,
-  schedulerClient: SchedulerClient,
+  mediaService: MediaService,
+  expoService: ExpoPushService,
+  nudgeService: NudgeSchedulerService,
 ): Hono => {
   const api = new Hono();
-  const mediaService = new MediaServiceImpl(db, s3Service);
 
   api.route("/users", userRoutes(db, mediaService));
-  api.route("/groups", groupRoutes(db, mediaService, expo, schedulerClient));
+  api.route("/groups", groupRoutes(db, mediaService, expoService, nudgeService));
   api.route("/", postRoutes(db, mediaService));
   api.route("/", commentsRoutes(db, mediaService));
   api.route("/", mediaRoutes(mediaService));
