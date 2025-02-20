@@ -86,27 +86,23 @@ export class MemberTransactionImpl implements MemberTransaction {
       .returning();
 
     // delete comment
-    const comments = tx
-      .$with("comments")
-      .as(
-        tx
-          .select()
-          .from(commentsTable)
-          .innerJoin(postsTable, eq(postsTable.id, commentsTable.postId))
-          .where(eq(postsTable.groupId, groupId)),
-      );
+    const comments = tx.$with("comments").as(
+      tx
+        .select()
+        .from(commentsTable)
+        .innerJoin(postsTable, eq(postsTable.id, commentsTable.postId))
+        .where(and(eq(postsTable.groupId, groupId), eq(commentsTable.userId, userId))),
+    );
     await tx.with(comments).delete(commentsTable);
 
     // delete like
-    const likes = tx
-      .$with("likes")
-      .as(
-        tx
-          .select()
-          .from(likesTable)
-          .innerJoin(postsTable, eq(postsTable.id, likesTable.postId))
-          .where(eq(postsTable.groupId, groupId)),
-      );
+    const likes = tx.$with("likes").as(
+      tx
+        .select()
+        .from(likesTable)
+        .innerJoin(postsTable, eq(postsTable.id, likesTable.postId))
+        .where(and(eq(postsTable.groupId, groupId), eq(likesTable.userId, userId))),
+    );
     await tx.with(likes).delete(likesTable);
 
     // delete notification
