@@ -39,7 +39,6 @@ const Layout = () => {
                     label={hasLabel ? "HOME" : undefined}
                     name="home"
                     color={focused ? "ink" : "slate"}
-                    size={30}
                   />
                 </Box>
               );
@@ -61,7 +60,6 @@ const Layout = () => {
                     label={hasLabel ? "POST" : undefined}
                     name="plus-circle"
                     color={focused ? "ink" : "slate"}
-                    size={30}
                   />
                 </Box>
               );
@@ -83,7 +81,6 @@ const Layout = () => {
                     label={hasLabel ? "PROFILE" : undefined}
                     name="account-circle"
                     color={focused ? "ink" : "slate"}
-                    size={30}
                   />
                 </Box>
               );
