@@ -13,7 +13,7 @@ import BottomSheet from "@gorhom/bottom-sheet";
 import { CommentPopUp } from "@/design-system/components/comments/bottom-sheet";
 import Input from "@/design-system/components/ui/input";
 
-const Index = () => {
+const ComponentLibrary = () => {
   const [menu1, setMenu1] = useState("Home");
   const [menu2, setMenu2] = useState("Home");
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -42,64 +42,6 @@ const Index = () => {
         className="flex-1 w-full p-5 bg-white"
       >
         <Box gap="l" paddingBottom="l">
-          <Box gap="s" alignItems="flex-start" flexDirection="column">
-            <Text variant="bodyLargeBold">design system</Text>
-            <Box gap="xs" flexDirection="row">
-              <Box>
-                <Heart like={false} onLike={() => null} variant="blush" />
-              </Box>
-              <Box>
-                <Heart like={true} onLike={() => null} variant="honey" />
-              </Box>
-            </Box>
-            <Box flexDirection="row" width="100%">
-              <Box gap="xs" width="27%" flexDirection="row">
-                <Heart label like={false} onLike={() => null} variant="blush" />
-                <Heart label like={true} onLike={() => null} variant="honey" />
-              </Box>
-            </Box>
-
-            <Box width="100%" gap="s">
-              <TextButton variant="blush" label="blush" onPress={() => null} />
-              <TextButton variant="blushRounded" label="blush rounded" onPress={() => null} />
-              <TextButton variant="honey" label="honey" onPress={() => null} />
-              <TextButton variant="honeyRounded" label="honey rounded" onPress={() => null} />
-              <TextButton variant="pearl" label="pearl" onPress={() => null} />
-              <TextButton variant="pearlRounded" label="pearl rounded" onPress={() => null} />
-              <TextButton variant="inkOutline" label="ink outline" onPress={() => null} />
-              <TextButton
-                variant="inkRoundedOutline"
-                label="ink rounded outline"
-                onPress={() => null}
-              />
-            </Box>
-          </Box>
-
-          <Box gap="s" flexDirection="column" width="100%">
-            <Input placeholder="this is a normal textbox" />
-            <Input readOnly placeholder="this is a read only textbox" />
-            <Input secureTextEntry placeholder="this is secure text, you won't see anything" />
-            <Input placeholder="right icon" rightIcon="account-voice" />
-            <Input placeholder="left icon" leftIcon="map-marker" />
-            <Input
-              placeholder="left and right icon"
-              leftIcon="camera"
-              rightIcon="arrow-down-circle-outline"
-            />
-            <Input placeholder="big paragraph" paragraph />
-            <Input error="some error message here" placeholder="this is an error textbox" />
-          </Box>
-
-          <Box>
-            <Text variant="h1">h1</Text>
-            <Text variant="h2">h2</Text>
-            <Text variant="bodyLargeBold">body large bold</Text>
-            <Text variant="bodyLarge">body large</Text>
-            <Text variant="button">button</Text>
-            <Text variant="body">body</Text>
-            <Text variant="caption">caption</Text>
-          </Box>
-
           <Box gap="s">
             <Text variant="bodyLargeBold">home menu</Text>
             <HomeMenu categories={["Home", "Calendar"]} selected={menu1} setSelected={setMenu1} />
@@ -159,4 +101,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default ComponentLibrary;
