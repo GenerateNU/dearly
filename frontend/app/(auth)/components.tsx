@@ -5,13 +5,18 @@ import { ScrollView } from "react-native-gesture-handler";
 import HomeMenu from "@/design-system/components/ui/home-menu";
 import { useRef, useState } from "react";
 import { ImagePost } from "@/design-system/components/posts/post";
-import { TextButton } from "@/design-system/components/ui/text-button";
 import { Profile } from "@/design-system/components/ui/profile";
 import { RefreshControl } from "react-native";
-import { Heart } from "@/design-system/components/posts/heart";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { CommentPopUp } from "@/design-system/components/comments/bottom-sheet";
-import Input from "@/design-system/components/ui/input";
+import { SelectItem } from "@/design-system/components/ui/select";
+import { Group } from "@/types/group";
+
+const families: Group[] = [
+  { id: "1", name: "Family 1" },
+  { id: "2", name: "Family 2" },
+  { id: "3", name: "Family 3" },
+];
 
 const ComponentLibrary = () => {
   const [menu1, setMenu1] = useState("Home");
@@ -27,6 +32,9 @@ const ComponentLibrary = () => {
 
   const commentRef = useRef<BottomSheet>(null);
   const likeRef = useRef<BottomSheet>(null);
+  const [selectedFamily, setSelectedFamily] = useState<Group>(
+    families[0] ?? { id: "0", name: "Default Family" },
+  );
 
   const onRefresh = () => {
     setIsRefreshing(true);
@@ -91,6 +99,16 @@ const ComponentLibrary = () => {
               birthday={new Date().toISOString()}
               name="Quokka"
               username="quokka"
+            />
+          </Box>
+
+          <Box>
+            <Text variant="bodyLargeBold">select item</Text>
+            <SelectItem
+              selected={selectedFamily}
+              setSelected={setSelectedFamily}
+              data={families}
+              renderLabel={(item: Group) => item.name}
             />
           </Box>
         </Box>

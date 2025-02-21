@@ -4,12 +4,12 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z, ZodError } from "zod";
 import { router } from "expo-router";
-import { useAuthStore } from "@/auth/store";
 import Input from "@/design-system/components/ui/input";
 import { TextButton } from "@/design-system/components/ui/text-button";
 import { AuthRequest } from "@/types/auth";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
+import { useUserStore } from "@/auth/store";
 
 const LOGIN_SCHEMA = z.object({
   email: z.string().email({ message: "Invalid email" }),
@@ -27,13 +27,13 @@ const LoginForm = () => {
     mode: "onTouched",
   });
 
-  const { login, isPending, error: authError } = useAuthStore();
+  const { login, isPending, error: authError } = useUserStore();
 
   const onLoginPress = async (loginData: AuthRequest) => {
     try {
       const validData = LOGIN_SCHEMA.parse(loginData);
       await login(validData);
-      const isAuthenticated = useAuthStore.getState().isAuthenticated;
+      const isAuthenticated = useUserStore.getState().isAuthenticated;
       if (isAuthenticated) {
         router.push("/(app)/(tabs)");
       }

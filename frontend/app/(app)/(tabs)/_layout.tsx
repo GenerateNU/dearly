@@ -1,13 +1,11 @@
-import { useAuth } from "@/auth/provider";
 import { Box } from "@/design-system/base/box";
 import { Icon } from "@/design-system/components/ui/icon";
-import { Mode } from "@/types/mode";
+import { useIsBasicMode } from "@/hooks/component/mode";
 import { Tabs } from "expo-router";
 import React from "react";
 
 const Layout = () => {
-  const { mode } = useAuth();
-  const hasLabel = mode === Mode.BASIC;
+  const hasLabel = useIsBasicMode();
 
   return (
     <>

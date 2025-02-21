@@ -1,12 +1,13 @@
-import { useAuth } from "@/auth/provider";
+import { useUserStore } from "@/auth/store";
 import { Box } from "@/design-system/base/box";
 import { TextButton } from "@/design-system/components/ui/text-button";
 
 const Home = () => {
-  const { logout } = useAuth();
+  const { logout } = useUserStore();
+
   return (
     <Box gap="xl" alignItems="center" justifyContent="center" backgroundColor="pearl" flex={1}>
-      <TextButton variant="honey" label="Logout" onPress={logout} />
+      <TextButton variant="text" label="Logout" onPress={logout} />
     </Box>
   );
 };

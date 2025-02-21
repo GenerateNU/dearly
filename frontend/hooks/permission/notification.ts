@@ -5,7 +5,7 @@ import { AppState } from "react-native";
 import { NOTIFICATION_TOKEN_KEY } from "@/constants/notification";
 import { getExpoDeviceToken } from "@/utilities/device-token";
 import { registerDeviceToken, unregisterDeviceToken } from "@/api/device";
-import { useAuth } from "@/auth/provider";
+import { useUserState } from "@/auth/provider";
 
 /**
  * Registers or unregisters the device token for push notifications
@@ -49,7 +49,7 @@ const manageDeviceNotificationToken = async (isAuthenticated: boolean) => {
  * It listens for changes in authentication and app state to manage push notification token registration.
  */
 export const useNotificationPermission = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useUserState();
 
   // manage notification based on the authentication state
   const handleNotificationPermissions = useCallback(() => {
