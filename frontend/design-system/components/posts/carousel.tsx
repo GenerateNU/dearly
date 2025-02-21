@@ -87,7 +87,6 @@ const ImageCarousel: React.FC<CarouselProps> = ({ data, initialPage = 0, like, s
     const DOUBLE_TAP_DELAY = 300;
 
     if (now - lastTap < DOUBLE_TAP_DELAY) {
-      // Double tap detected
       if (!like) {
         setLike();
         animateHeart();

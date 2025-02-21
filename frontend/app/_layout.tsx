@@ -12,12 +12,13 @@ import { useFonts } from "expo-font";
 import { useAccessibility } from "@/hooks/component/accessibility";
 import { Dimensions } from "react-native";
 import { BIGGER_PHONE_SCALE_RATIO, BIGGER_PHONE_SCREEN } from "@/constants/scale";
-import { UserProvider, useUserState } from "@/auth/provider";
+import { UserProvider } from "@/auth/provider";
+import { useUserStore } from "@/auth/store";
 
 const queryClient = new QueryClient();
 
 const InitialLayout = () => {
-  const { isAuthenticated } = useUserState();
+  const { isAuthenticated } = useUserStore();
 
   const { width } = Dimensions.get("window");
   const scaleFactor = width >= BIGGER_PHONE_SCREEN ? BIGGER_PHONE_SCALE_RATIO : 1;
