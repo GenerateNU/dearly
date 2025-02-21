@@ -11,14 +11,16 @@ import { createUser, getUser } from "@/api/user";
 import { NOTIFICATION_TOKEN_KEY } from "@/constants/notification";
 import { unregisterDeviceToken } from "@/api/device";
 import { getExpoDeviceToken } from "@/utilities/device-token";
+import { Group } from "@/types/group";
 
-interface AuthState {
+interface UserState {
   isAuthenticated: boolean;
   userId: string | null;
   error: string | null;
   isPending: boolean;
   inviteToken: string | null;
   mode: Mode;
+  group: Group | null;
 
   login: ({ email, password }: { email: string; password: string }) => Promise<void>;
   register: (data: CreateUserPayload & AuthRequest) => Promise<void>;
@@ -26,12 +28,13 @@ interface AuthState {
   forgotPassword: ({ email }: { email: string }) => Promise<void>;
   resetPassword: ({ password }: { password: string }) => Promise<void>;
   setMode: (mode: Mode) => void;
+  setSelectedGroup: (group: Group) => void;
   setInviteToken: (inviteToken: string) => void;
 }
 
 const authService: AuthService = new SupabaseAuth();
 
-export const useAuthStore = create<AuthState>()(
+export const useUserStore = create<UserState>()(
   persist(
     (set, _) => ({
       isAuthenticated: false,
@@ -40,10 +43,17 @@ export const useAuthStore = create<AuthState>()(
       isPending: false,
       mode: Mode.ADVANCED,
       inviteToken: null,
+      group: null,
 
       setMode: (mode: Mode) => {
         set({
           mode: mode,
+        });
+      },
+
+      setSelectedGroup: (group: Group) => {
+        set({
+          group: group,
         });
       },
 
@@ -67,7 +77,7 @@ export const useAuthStore = create<AuthState>()(
             mode: user.mode as Mode,
           });
         } catch (err) {
-          await useAuthStore.getState().logout();
+          await useUserStore.getState().logout();
           handleError(err, set);
         }
       },
@@ -95,7 +105,7 @@ export const useAuthStore = create<AuthState>()(
             isPending: false,
           });
         } catch (err) {
-          await useAuthStore.getState().logout();
+          await useUserStore.getState().logout();
           handleError(err, set);
         }
       },
@@ -150,7 +160,7 @@ export const useAuthStore = create<AuthState>()(
  * @param err error
  * @param set setter function to mutate auth statte
  */
-const handleError = (err: unknown, set: (state: Partial<AuthState>) => void) => {
+const handleError = (err: unknown, set: (state: Partial<UserState>) => void) => {
   const errorMessage = err instanceof Error ? err.message : AUTH_ERROR_MESSAGE;
   set({ error: errorMessage });
   setTimeout(() => {

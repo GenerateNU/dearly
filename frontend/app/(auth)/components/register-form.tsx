@@ -4,13 +4,14 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z, ZodError } from "zod";
 import { router } from "expo-router";
-import { useAuthStore } from "@/auth/store";
 import Input from "@/design-system/components/ui/input";
 import { TextButton } from "@/design-system/components/ui/text-button";
 import { AuthRequest } from "@/types/auth";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { Mode } from "@/types/mode";
+import { useUserState } from "@/auth/provider";
+import { useUserStore } from "@/auth/store";
 
 type RegisterFormData = AuthRequest & {
   name: string;
@@ -47,7 +48,7 @@ const RegisterForm = () => {
     mode: "onTouched",
   });
 
-  const { register, isPending, error: authError } = useAuthStore();
+  const { register, isPending, error: authError } = useUserStore();
 
   const onSignUpPress = async (signupData: RegisterFormData) => {
     try {
@@ -58,7 +59,7 @@ const RegisterForm = () => {
       };
 
       await register(data);
-      const isAuthenticated = useAuthStore.getState().isAuthenticated;
+      const isAuthenticated = useUserStore.getState().isAuthenticated;
       if (isAuthenticated) {
         router.push("/(app)/(tabs)");
       }
