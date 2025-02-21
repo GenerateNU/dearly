@@ -1,7 +1,7 @@
 import { useTheme } from "@shopify/restyle";
 import { Theme } from "@/design-system/base/theme";
 import { IconButton } from "../ui/icon-button";
-import { isBasicMode } from "@/utilities/mode";
+import { useIsBasicMode } from "@/hooks/component/mode";
 
 interface HeartProps {
   like: boolean;
@@ -11,7 +11,7 @@ interface HeartProps {
 
 export const Heart: React.FC<HeartProps> = ({ like, onLike, variant }) => {
   const theme = useTheme<Theme>();
-  const isBasic = isBasicMode();
+  const isBasic = useIsBasicMode();
 
   const variantStyle = theme.heartVariants[like ? "filled" : "outlined"];
 

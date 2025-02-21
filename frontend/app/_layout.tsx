@@ -13,12 +13,11 @@ import { useAccessibility } from "@/hooks/component/accessibility";
 import { Dimensions } from "react-native";
 import { BIGGER_PHONE_SCALE_RATIO, BIGGER_PHONE_SCREEN } from "@/constants/scale";
 import { UserProvider, useUserState } from "@/auth/provider";
-import { Mode } from "@/types/mode";
 
 const queryClient = new QueryClient();
 
 const InitialLayout = () => {
-  const { isAuthenticated, setMode } = useUserState();
+  const { isAuthenticated } = useUserState();
 
   const { width } = Dimensions.get("window");
   const scaleFactor = width >= BIGGER_PHONE_SCREEN ? BIGGER_PHONE_SCALE_RATIO : 1;

@@ -10,7 +10,6 @@ import { AuthRequest } from "@/types/auth";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { Mode } from "@/types/mode";
-import { useUserState } from "@/auth/provider";
 import { useUserStore } from "@/auth/store";
 
 type RegisterFormData = AuthRequest & {

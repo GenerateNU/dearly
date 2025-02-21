@@ -7,7 +7,7 @@ import {
   VariantProps,
 } from "@shopify/restyle";
 import { Theme } from "./theme";
-import { TouchableOpacity, StyleSheet } from "react-native";
+import { TouchableOpacity } from "react-native";
 
 export const BaseButton = createRestyleComponent<
   VariantProps<Theme, "buttonVariants"> &

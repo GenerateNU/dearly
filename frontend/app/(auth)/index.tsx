@@ -1,7 +1,6 @@
 import { Box } from "@/design-system/base/box";
 import { router } from "expo-router";
 import { TextButton } from "@/design-system/components/ui/text-button";
-import { SelectItem } from "@/design-system/components/ui/select";
 
 const Index = () => {
   return (

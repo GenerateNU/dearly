@@ -4,7 +4,6 @@ import { ScrollView } from "react-native-gesture-handler";
 import { useState } from "react";
 import { TextButton } from "@/design-system/components/ui/text-button";
 import { RefreshControl } from "react-native";
-import { Heart } from "@/design-system/components/posts/heart";
 import Input from "@/design-system/components/ui/input";
 import { Avatar } from "@/design-system/components/ui/avatar";
 import { Icon } from "@/design-system/components/ui/icon";
