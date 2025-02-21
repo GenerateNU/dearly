@@ -25,6 +25,7 @@ export const CommentPopUp = forwardRef<Ref, CommentPopUpProps>(({ id }, ref) => 
       snapPoints={snapPoints}
       backdropComponent={renderBackdrop}
       enableDynamicSizing={false}
+      enablePanDownToClose={true}
     >
       <BottomSheetView>
         <Box
