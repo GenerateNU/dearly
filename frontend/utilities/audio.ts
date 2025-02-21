@@ -29,7 +29,7 @@ export const condenseAudioBarHeights = (numLines: number, audioLevels: number[])
 }
 
 const normalizeLines = (audioLevels: number[], start: number, end:number): number[] => {
-    const newLines = []
+    const newLines: number[] = []
         for(let i = start; i < end; i ++){
             const reverseNum = 160 - Math.abs(audioLevels[i] || 3)
             newLines.push(( reverseNum / (160 - 20)) * 20)
