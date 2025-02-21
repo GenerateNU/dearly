@@ -69,6 +69,7 @@ export const useUserStore = create<UserState>()(
             isPending: false,
           });
         } catch (err) {
+          await useUserStore.getState().logout();
           handleError(err, set);
         }
       },
@@ -88,6 +89,7 @@ export const useUserStore = create<UserState>()(
             isPending: false,
           });
         } catch (err) {
+          await useUserStore.getState().logout();
           handleError(err, set);
         }
       },
