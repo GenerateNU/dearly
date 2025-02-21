@@ -67,21 +67,6 @@ const DesignSystem = () => {
 
           <Box gap="s" alignItems="flex-start" flexDirection="column">
             <Text variant="bodyLargeBold">buttons</Text>
-            <Box gap="xs" flexDirection="row">
-              <Box>
-                <Heart like={false} onLike={() => null} variant="blush" />
-              </Box>
-              <Box>
-                <Heart like={true} onLike={() => null} variant="honey" />
-              </Box>
-            </Box>
-            <Box flexDirection="row" width="100%">
-              <Box gap="xs" width="27%" flexDirection="row">
-                <Heart label like={false} onLike={() => null} variant="blush" />
-                <Heart label like={true} onLike={() => null} variant="honey" />
-              </Box>
-            </Box>
-
             <Box width="100%" gap="s">
               <TextButton variant="blush" label="blush" onPress={() => null} />
               <TextButton variant="blushRounded" label="blush rounded" onPress={() => null} />

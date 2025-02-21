@@ -41,7 +41,7 @@ export const useUserStore = create<UserState>()(
       userId: null,
       error: null,
       isPending: false,
-      mode: Mode.ADVANCED,
+      mode: Mode.BASIC,
       inviteToken: null,
       group: null,
 
@@ -140,7 +140,7 @@ export const useUserStore = create<UserState>()(
             isAuthenticated: false,
             userId: null,
             isPending: false,
-            mode: Mode.ADVANCED,
+            mode: Mode.BASIC,
             error: null,
           });
         } catch (err) {

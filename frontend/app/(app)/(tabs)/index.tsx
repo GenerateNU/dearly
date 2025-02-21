@@ -7,7 +7,7 @@ const Home = () => {
 
   return (
     <Box gap="xl" alignItems="center" justifyContent="center" backgroundColor="pearl" flex={1}>
-      <TextButton variant="honey" label="Logout" onPress={logout} />
+      <TextButton variant="text" label="Logout" onPress={logout} />
     </Box>
   );
 };
