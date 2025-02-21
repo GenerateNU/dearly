@@ -8,9 +8,9 @@ import { ImagePost } from "@/design-system/components/posts/post";
 import { Profile } from "@/design-system/components/ui/profile";
 import { RefreshControl } from "react-native";
 import BottomSheet from "@gorhom/bottom-sheet";
-import { CommentPopUp } from "@/design-system/components/comments/bottom-sheet";
 import { SelectItem } from "@/design-system/components/ui/select";
 import { Group } from "@/types/group";
+import { CommentPopUp } from "@/design-system/components/comments/comment-popup";
 
 const families: Group[] = [
   { id: "1", name: "Family 1" },

@@ -46,21 +46,15 @@ export const useUserStore = create<UserState>()(
       group: null,
 
       setMode: (mode: Mode) => {
-        set({
-          mode: mode,
-        });
+        set({ mode });
       },
 
       setSelectedGroup: (group: Group) => {
-        set({
-          group: group,
-        });
+        set({ group });
       },
 
       setInviteToken: (inviteToken: string) => {
-        set({
-          inviteToken,
-        });
+        set({ inviteToken });
       },
 
       login: async ({ email, password }: { email: string; password: string }) => {
@@ -71,41 +65,29 @@ export const useUserStore = create<UserState>()(
           set({
             isAuthenticated: true,
             userId: session.user.id,
+            mode: user.mode as Mode,
             isPending: false,
           });
-          set({
-            mode: user.mode as Mode,
-          });
         } catch (err) {
-          await useUserStore.getState().logout();
           handleError(err, set);
         }
       },
 
-      register: async ({
-        name,
-        username,
-        mode,
-        email,
-        password,
-      }: CreateUserPayload & AuthRequest) => {
+      register: async (data: CreateUserPayload & AuthRequest) => {
         set({ isPending: true });
         try {
           const session: Session = await authService.signUp({
-            email,
-            password,
+            email: data.email,
+            password: data.password,
           });
-          const user = await createUser({ name, username, mode });
+          const user = await createUser(data);
           set({
             mode: user.mode as Mode,
-          });
-          set({
             isAuthenticated: true,
             userId: session.user.id,
             isPending: false,
           });
         } catch (err) {
-          await useUserStore.getState().logout();
           handleError(err, set);
         }
       },
@@ -131,7 +113,7 @@ export const useUserStore = create<UserState>()(
         try {
           const expoToken = await getExpoDeviceToken();
           const savedToken = await AsyncStorage.getItem(NOTIFICATION_TOKEN_KEY);
-          if (savedToken && expoToken !== null) {
+          if (savedToken && expoToken) {
             await unregisterDeviceToken(expoToken);
             await AsyncStorage.removeItem(NOTIFICATION_TOKEN_KEY);
           }
@@ -151,6 +133,9 @@ export const useUserStore = create<UserState>()(
     {
       name: "auth-storage",
       storage: createJSONStorage(() => AsyncStorage),
+      onRehydrateStorage: () => {
+        console.log("Rehydrating state...");
+      },
     },
   ),
 );
