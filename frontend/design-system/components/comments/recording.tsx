@@ -126,12 +126,12 @@ export const Recording: React.FC<RecordingProps> = ({onClose}) => {
         <Box gap="s" flexDirection="row" justifyContent="center" height={50} borderRadius="l" >
             {doneRecording && (
                 <Box> 
-                    <IconButton variant="iconGray" onPress={onClose} size={25} icon="close" color="darkGray"/>
+                    <IconButton variant="iconGray" onPress={onClose} icon="close" />
                 </Box>
             )
             }
             <Box backgroundColor="gray" paddingLeft ="xs" gap = "s" width= {doneRecording? "70%" : "80%"} height={50} borderRadius="l" flexDirection="row" alignContent="center" >
-                {doneRecording && (playingSound? <IconButton variant="iconPearl" onPress={pauseRecording} size={20} icon="pause" color="darkGray"/>  : <IconButton variant="iconPearl" onPress={playRecording} size={20} icon="play" color="darkGray"/>)}
+                {doneRecording && (playingSound? <IconButton variant="iconPearl" onPress={pauseRecording} icon="pause"/>  : <IconButton variant="iconPearl" onPress={playRecording} icon="play" />)}
              
                 <Box flexDirection="row" gap="xs" alignItems="center">
                     <Box flexDirection="row" gap="xs" alignItems="center">
@@ -151,9 +151,9 @@ export const Recording: React.FC<RecordingProps> = ({onClose}) => {
             </Box>
 
             {isRecording? 
-            <IconButton variant="iconGray" onPress={stopRecording} size={25} icon="square-rounded" color="darkGray"/> : 
-            doneRecording? <IconButton variant="iconGray" onPress={startRecording} size={25} icon="send" color="darkGray"/> 
-            : <IconButton variant="iconGray" onPress={startRecording} size={25} icon="circle" color="darkGray"/>
+            <IconButton variant="iconGray" onPress={stopRecording}  icon="square-rounded" /> : 
+            doneRecording? <IconButton variant="iconGray" onPress={startRecording}  icon="send"/> 
+            : <IconButton variant="iconGray" onPress={startRecording} icon="circle" />
             }
         </Box>
     )

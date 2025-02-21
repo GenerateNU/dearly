@@ -12,6 +12,7 @@ import { Heart } from "@/design-system/components/posts/heart";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { CommentPopUp } from "@/design-system/components/comments/bottom-sheet";
 import Input from "@/design-system/components/ui/input";
+import { Recording } from "@/design-system/components/comments/recording";
 
 const ComponentLibrary = () => {
   const [menu1, setMenu1] = useState("Home");
@@ -93,10 +94,13 @@ const ComponentLibrary = () => {
               username="quokka"
             />
           </Box>
+
+          <Recording onClose={() => null}/>
         </Box>
       </ScrollView>
       <CommentPopUp id="" ref={commentRef} />
       <CommentPopUp id="" ref={likeRef} />
+      
     </>
   );
 };
