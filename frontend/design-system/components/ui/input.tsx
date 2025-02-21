@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { TextInput, TextInputProps } from "react-native";
 
 import { BoxProps, createBox, useTheme } from "@shopify/restyle";
@@ -6,8 +6,6 @@ import { BoxProps, createBox, useTheme } from "@shopify/restyle";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { Theme } from "@/design-system/base/theme";
-import { Icon } from "./icon";
-import { MaterialIcon } from "@/types/icon";
 
 type TextboxProps = {
   title?: string;
@@ -22,8 +20,8 @@ type TextboxProps = {
   secureTextEntry?: boolean;
   children?: React.ReactNode;
   paragraph?: boolean;
-  leftIcon?: MaterialIcon;
-  rightIcon?: MaterialIcon;
+  leftIcon?: ReactNode;
+  rightIcon?: ReactNode;
 } & BoxProps<Theme>;
 
 const BaseTextInput = createBox<Theme, TextboxProps & TextInputProps>(TextInput);
@@ -61,11 +59,7 @@ const Input: React.FC<TextboxProps> = ({
         minHeight={paragraph ? 100 : undefined}
       >
         <Box flex={1} flexDirection="row" alignItems={paragraph ? "flex-start" : "center"}>
-          {leftIcon && (
-            <Box paddingRight="xs">
-              <Icon name={leftIcon} color="slate" />
-            </Box>
-          )}
+          {leftIcon && <Box paddingRight="xs">{leftIcon}</Box>}
           <Box flex={1}>
             <BaseTextInput
               placeholder={placeholder}
@@ -89,11 +83,7 @@ const Input: React.FC<TextboxProps> = ({
             />
           </Box>
         </Box>
-        {rightIcon && (
-          <Box paddingLeft="xs">
-            <Icon name={rightIcon} color="slate" />
-          </Box>
-        )}
+        {rightIcon && <Box paddingLeft="xs">{rightIcon}</Box>}
       </Box>
       {error && (
         <Box paddingTop="xs" flexDirection="row" alignItems="center">

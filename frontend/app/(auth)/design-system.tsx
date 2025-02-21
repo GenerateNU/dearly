@@ -7,6 +7,7 @@ import { RefreshControl } from "react-native";
 import { Heart } from "@/design-system/components/posts/heart";
 import Input from "@/design-system/components/ui/input";
 import { Avatar } from "@/design-system/components/ui/avatar";
+import { Icon } from "@/design-system/components/ui/icon";
 
 const DesignSystem = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -102,12 +103,12 @@ const DesignSystem = () => {
             <Input placeholder="this is a normal textbox" />
             <Input readOnly placeholder="this is a read only textbox" />
             <Input secureTextEntry placeholder="this is secure text, you won't see anything" />
-            <Input placeholder="right icon" rightIcon="account-voice" />
-            <Input placeholder="left icon" leftIcon="map-marker" />
+            <Input placeholder="right icon" rightIcon={<Icon name="account-voice" />} />
+            <Input placeholder="left icon" leftIcon={<Icon name="map-marker" />} />
             <Input
               placeholder="left and right icon"
-              leftIcon="camera"
-              rightIcon="arrow-down-circle-outline"
+              leftIcon={<Icon name="camera" />}
+              rightIcon={<Icon name="arrow-down-box" />}
             />
             <Input placeholder="big paragraph" paragraph />
             <Input error="some error message here" placeholder="this is an error textbox" />

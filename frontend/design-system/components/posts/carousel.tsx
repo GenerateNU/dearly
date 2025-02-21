@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { LayoutChangeEvent } from "react-native";
+import { LayoutChangeEvent, TouchableWithoutFeedback } from "react-native";
 import {
   useSharedValue,
   withSpring,
@@ -28,6 +28,7 @@ const ImageCarousel: React.FC<CarouselProps> = ({ data, initialPage = 0, like, s
   const [page, setPage] = useState<number>(0);
   const [showFlyingHeart, setShowFlyingHeart] = useState(false);
   const scrollOffsetValue = useSharedValue<number>(0);
+  const [lastTap, setLastTap] = useState<number>(0);
 
   // Animation values
   const scale = useSharedValue(0.5);
@@ -81,6 +82,20 @@ const ImageCarousel: React.FC<CarouselProps> = ({ data, initialPage = 0, like, s
     }
   }, [like, animateHeart]);
 
+  const handleDoubleTap = useCallback(() => {
+    const now = Date.now();
+    const DOUBLE_TAP_DELAY = 300;
+
+    if (now - lastTap < DOUBLE_TAP_DELAY) {
+      // Double tap detected
+      if (!like) {
+        setLike();
+        animateHeart();
+      }
+    }
+    setLastTap(now);
+  }, [lastTap, like, setLike, animateHeart]);
+
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
       { translateX: translateX.value },
@@ -91,69 +106,73 @@ const ImageCarousel: React.FC<CarouselProps> = ({ data, initialPage = 0, like, s
   }));
 
   const renderItem = ({ item }: { item: string }) => (
-    <Box style={{ width: "100%" }}>
-      <Image
-        className="w-full"
-        style={{
-          aspectRatio: 1,
-          borderRadius: 12,
-        }}
-        source={{
-          uri: item,
-        }}
-      />
-    </Box>
+    <TouchableWithoutFeedback onPress={handleDoubleTap}>
+      <Box style={{ width: "100%" }}>
+        <Image
+          className="w-full"
+          style={{
+            aspectRatio: 1,
+            borderRadius: 12,
+          }}
+          source={{
+            uri: item,
+          }}
+        />
+      </Box>
+    </TouchableWithoutFeedback>
   );
 
   return (
-    <>
-      <Box width="100%" justifyContent="center">
-        <Box onLayout={handleLayout} className="w-full">
-          {containerWidth > 0 && (
-            <>
-              <Box position="absolute" zIndex={10} right={0} bottom={0} padding="m">
-                <Heart variant="blush" onLike={handleLike} like={like} />
-              </Box>
+    <Box gap="s" width="100%" justifyContent="center">
+      <Box onLayout={handleLayout} className="w-full">
+        {containerWidth > 0 && (
+          <>
+            <Box position="absolute" zIndex={10} right={0} bottom={0} padding="m">
+              <Heart variant="blush" onLike={handleLike} like={like} />
+            </Box>
 
-              {showFlyingHeart && (
-                <AnimatedBox position="absolute" zIndex={100} style={animatedStyle}>
-                  <Box width={40} height={40} justifyContent="center" alignItems="center">
-                    <FontAwesomeIcon icon={faHeart} size={100} />
-                  </Box>
-                </AnimatedBox>
-              )}
+            {showFlyingHeart && (
+              <AnimatedBox position="absolute" zIndex={100} style={animatedStyle}>
+                <Box width={40} height={40} justifyContent="center" alignItems="center">
+                  <FontAwesomeIcon icon={faHeart} size={100} />
+                </Box>
+              </AnimatedBox>
+            )}
 
-              <Carousel
-                loop={false}
-                overscrollEnabled={false}
-                height={containerWidth}
-                width={containerWidth}
-                snapEnabled={true}
-                enabled={data.length !== 1}
-                defaultIndex={initialPage}
-                style={{ position: "relative", borderRadius: 12 }}
-                data={data}
-                onProgressChange={(_, index) => setPage(Math.round(index))}
-                defaultScrollOffsetValue={scrollOffsetValue}
-                renderItem={renderItem}
-              />
-            </>
-          )}
+            <Carousel
+              loop={false}
+              overscrollEnabled={false}
+              height={containerWidth}
+              width={containerWidth}
+              snapEnabled={true}
+              enabled={data.length !== 1}
+              defaultIndex={initialPage}
+              style={{ position: "relative", borderRadius: 12 }}
+              data={data}
+              onProgressChange={(_, index) => setPage(Math.round(index))}
+              defaultScrollOffsetValue={scrollOffsetValue}
+              renderItem={renderItem}
+            />
+          </>
+        )}
+      </Box>
+      {data.length > 1 ? (
+        <Box flexDirection="row" width="100%" justifyContent="center" alignItems="center">
+          {data.map((_, index) => (
+            <Box
+              key={index}
+              width={8}
+              height={8}
+              borderRadius="s"
+              margin="xs"
+              backgroundColor={index === page ? "ink" : "honey"}
+            />
+          ))}
         </Box>
-      </Box>
-      <Box flexDirection="row" width="100%" justifyContent="center" alignItems="center">
-        {data.map((_, index) => (
-          <Box
-            key={index}
-            width={8}
-            height={8}
-            borderRadius="s"
-            margin="xs"
-            backgroundColor={index === page ? "ink" : "honey"}
-          />
-        ))}
-      </Box>
-    </>
+      ) : (
+        <></>
+      )}
+    </Box>
   );
 };
 

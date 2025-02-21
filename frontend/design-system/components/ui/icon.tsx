@@ -6,6 +6,7 @@ import { Text } from "@/design-system/base/text";
 import { ResponsiveValue, useTheme } from "@shopify/restyle";
 import { ColorName, ColorPalette } from "@/design-system/base/config/color";
 import { Theme } from "@/design-system/base/theme";
+import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 
 interface IconProps {
   name: MaterialIcon;
@@ -13,6 +14,7 @@ interface IconProps {
   labelPosition?: "left" | "right" | "bottom" | "top";
   label?: string;
   navbar?: boolean;
+  onPress?: () => void;
 }
 
 export const Icon: React.FC<IconProps> = ({
@@ -21,6 +23,7 @@ export const Icon: React.FC<IconProps> = ({
   labelPosition,
   label,
   navbar,
+  onPress,
 }) => {
   const positionStyles: Record<
     string,
@@ -35,18 +38,20 @@ export const Icon: React.FC<IconProps> = ({
   const { iconSize } = useTheme<Theme>();
 
   return (
-    <Box
-      justifyContent="center"
-      alignItems="center"
-      gap="xs"
-      flexDirection={positionStyles[labelPosition || "left"]}
-    >
-      <MaterialCommunityIcons name={name} color={ColorPalette[color]} size={iconSize} />
-      {label && (
-        <Text color={color} variant={navbar ? "navbar" : "body"}>
-          {label}
-        </Text>
-      )}
-    </Box>
+    <TouchableWithoutFeedback onPress={onPress}>
+      <Box
+        justifyContent="center"
+        alignItems="center"
+        gap="xs"
+        flexDirection={positionStyles[labelPosition || "left"]}
+      >
+        <MaterialCommunityIcons name={name} color={ColorPalette[color]} size={iconSize} />
+        {label && (
+          <Text color={color} variant={navbar ? "navbar" : "body"}>
+            {label}
+          </Text>
+        )}
+      </Box>
+    </TouchableWithoutFeedback>
   );
 };
