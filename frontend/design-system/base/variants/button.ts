@@ -1,3 +1,4 @@
+import { backgroundColor } from "@shopify/restyle";
 import { ColorName } from "../config/color";
 
 const baseButton = {
@@ -38,6 +39,14 @@ export const buttonVariants = {
   iconHoney: {
     ...baseIcon,
     backgroundColor: "honey",
+  },
+  iconGray: {
+    ...baseIcon,
+    backgroundColor: "gray",
+  },
+  iconPearl : {
+    ...baseIcon,
+    backgroundColor: "pearl"
   },
   text: {
     width: "auto",

@@ -9,6 +9,8 @@ import { TextButton } from "@/design-system/components/ui/text-button";
 import { Profile } from "@/design-system/components/ui/profile";
 import { RefreshControl } from "react-native";
 import { Heart } from "@/design-system/components/posts/heart";
+import { Recording } from "@/design-system/components/comments/recording";
+
 
 const Index = () => {
   const [menu1, setMenu1] = useState("Home");
@@ -130,6 +132,9 @@ const Index = () => {
             name="Quokka"
             username="quokka"
           />
+        </Box>
+        <Box>
+          <Recording/>
         </Box>
       </Box>
     </ScrollView>

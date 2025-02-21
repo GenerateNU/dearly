@@ -8,9 +8,11 @@ interface IconButtonProps {
   onPress: () => void;
   disabled?: boolean;
   icon: MaterialIcon;
-  variant: "iconHoney" | "iconBlush" | "oneThirdHoneyRounded" | "oneThirdBlushRounded";
+  variant: "iconHoney" | "iconBlush" | "iconGray" | "iconPearl" | "oneThirdHoneyRounded" | "oneThirdBlushRounded";
   size: number;
+  color: string;
 }
+
 
 export const IconButton: React.FC<IconButtonProps> = ({
   onPress,
@@ -18,12 +20,13 @@ export const IconButton: React.FC<IconButtonProps> = ({
   icon,
   disabled = false,
   variant,
+  color = "ink",
 }) => {
   return (
     <Box width="auto" alignItems="center" justifyContent="center">
       <BaseButton activeOpacity={1} disabled={disabled} variant={variant} onPress={onPress}>
         <Box width="100%" gap="s" flexDirection="row" justifyContent="center" alignItems="center">
-          <Icon name={icon} color="ink" size={size} />
+          <Icon name={icon} color={color} size={size} />
         </Box>
       </BaseButton>
     </Box>

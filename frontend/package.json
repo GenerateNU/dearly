@@ -39,6 +39,7 @@
     "expo-camera": "16.0.15",
     "expo-constants": "17.0.6",
     "expo-device": "^7.0.2",
+    "expo-file-system": "~18.0.11",
     "expo-font": "^13.0.3",
     "expo-haptics": "~14.0.1",
     "expo-image": "^2.0.5",

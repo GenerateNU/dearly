@@ -91,3 +91,9 @@ export const getZodiacIcon = (date: string): MaterialIcon => {
 
   throw new Error("Invalid birthday");
 };
+
+export const formatSeconds = (time: number): string => {
+  const minutes = Math.floor(time / 60);
+  const seconds = Math.floor(time % 60);
+  return minutes.toString() + ":" + seconds.toString().padStart(2, '0')
+}
