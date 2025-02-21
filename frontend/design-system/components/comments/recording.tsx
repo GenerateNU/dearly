@@ -24,7 +24,7 @@ export const Recording: React.FC<RecordingProps> = ({onClose}) => {
     const [length, setLength] = useState<number>(0);
     const [stringLength, setStringLength] = useState<string>("");
     const [memoLines, setMemoLines] = useState<number[]>(new Array(50).fill(5));
-    const numLines = 35;
+    const numLines = 33;
     const [totalLength, setTotalLength] = useState<number>(0);
 
     // get length of recording
@@ -131,14 +131,14 @@ export const Recording: React.FC<RecordingProps> = ({onClose}) => {
             )
             }
             <Box backgroundColor="gray" paddingLeft ="xs" gap = "s" width= {doneRecording? "70%" : "80%"} height={50} borderRadius="l" flexDirection="row" alignContent="center" >
-                {doneRecording && (playingSound? <IconButton variant="iconPearl" onPress={pauseRecording} icon="pause"/>  : <IconButton variant="iconPearl" onPress={playRecording} icon="play" />)}
+                {doneRecording &&  (playingSound? <IconButton variant="iconPearl" onPress={pauseRecording} icon="pause"/>  :  <IconButton variant="iconPearl" onPress={playRecording} icon="play" />)}
              
                 <Box flexDirection="row" gap="xs" alignItems="center">
                     <Box flexDirection="row" gap="xs" alignItems="center">
                         {!doneRecording &&
                         <Box borderRadius="xl" width={8} height={8} backgroundColor= {isRecording? "blush" : "darkGray"} marginLeft="m"> 
                         </Box> }
-                        <Text>{stringLength}</Text>
+                        <Text variant="caption">{stringLength}</Text>
                     </Box>
                     {(isRecording || doneRecording ) &&
                     <Box flexDirection="row" gap="xs" alignItems="center">
