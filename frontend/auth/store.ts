@@ -30,7 +30,7 @@ interface UserState {
   setMode: (mode: Mode) => void;
   setSelectedGroup: (group: Group) => void;
   setInviteToken: (inviteToken: string) => void;
-  useBiometrics: () => Promise<void>;
+  loginWithBiometrics: () => Promise<void>;
 }
 
 const authService: AuthService = new SupabaseAuth();
@@ -69,10 +69,10 @@ export const useUserStore = create<UserState>()(
         set({ inviteToken });
       },
 
-      useBiometrics: async () => {
+      loginWithBiometrics: async () => {
         const biomentricsImpl = async () => {
           set({ isPending: true });
-          const session: Session = await authService.useBiometrics()
+          const session: Session = await authService.loginWithBiometrics()
           const user = await getUser(session.user.id)
           set({
             isAuthenticated: true,

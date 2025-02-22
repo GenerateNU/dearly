@@ -2,7 +2,7 @@ import { AppState } from "react-native";
 import { supabase } from "./client";
 import { Session, User } from "@supabase/supabase-js";
 import { AuthRequest, PhoneAuth } from "@/types/auth";
-import { LocalAuthenticationOptions, LocalAuthenticationResult, authenticateAsync } from "expo-local-authentication";
+import { LocalAuthenticationOptions, authenticateAsync, hasHardwareAsync } from "expo-local-authentication";
 
 /**
  * Interface for authentication services, providing methods for user sign-up, login,
@@ -66,18 +66,25 @@ export interface AuthService {
    */
   verifyPhoneOTP(payload: PhoneAuth): Promise<Session>;
 
-  useBiometrics(): Promise<Session>;
+  loginWithBiometrics(): Promise<Session>;
 }
 
 export class SupabaseAuth implements AuthService {
 
-  async useBiometrics(): Promise<Session> {
+  async loginWithBiometrics(): Promise<Session> {
     
     const options : LocalAuthenticationOptions = {
       promptMessage: "Dearly wants to authenticate you with biometrics."
     }
+    
+    const hasHardware = await hasHardwareAsync()
+
+    if (!hasHardware) {
+      throw new Error("Device does not support fingerprinting or facial id.")
+    }
 
     const auth = await authenticateAsync(options)
+    console.log(auth)
 
     if (auth.success) {
       const session = await this.storeLocalSessionToDevice()
