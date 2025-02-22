@@ -17,7 +17,7 @@ interface UserContextType {
   setSelectedGroup: (group: Group) => void;
   setInviteToken: (inviteToken: string) => void;
   inviteToken: string | null;
-  useBiometrics: () => Promise<void>
+  useBiometrics: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);

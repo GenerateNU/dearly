@@ -29,8 +29,8 @@ const LoginForm = () => {
   const { login, isPending, error: authError, loginWithBiometrics } = useUserStore();
 
   const onBiometricPress = async () => {
-    await loginWithBiometrics()
-  }
+    await loginWithBiometrics();
+  };
 
   const onLoginPress = async (loginData: AuthRequest) => {
     try {

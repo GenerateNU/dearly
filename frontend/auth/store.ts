@@ -72,8 +72,8 @@ export const useUserStore = create<UserState>()(
       loginWithBiometrics: async () => {
         const biomentricsImpl = async () => {
           set({ isPending: true });
-          const session: Session = await authService.loginWithBiometrics()
-          const user = await getUser(session.user.id)
+          const session: Session = await authService.loginWithBiometrics();
+          const user = await getUser(session.user.id);
           set({
             isAuthenticated: true,
             userId: session.user.id,
@@ -82,12 +82,12 @@ export const useUserStore = create<UserState>()(
           set({
             mode: user.mode as Mode,
           });
-        }
+        };
         const failureImpl = async (err: unknown) => {
           await useUserStore.getState().logout();
           handleError(err, set);
         };
-        await userWrapper(biomentricsImpl, failureImpl)
+        await userWrapper(biomentricsImpl, failureImpl);
       },
 
       login: async ({ email, password }: { email: string; password: string }) => {
@@ -101,7 +101,7 @@ export const useUserStore = create<UserState>()(
             mode: user.mode as Mode,
             isPending: false,
           });
-          await authService.storeLocalSessionToDevice(email, password)
+          await authService.storeLocalSessionToDevice(email, password);
         };
         const failureImpl = async (err: unknown) => {
           await useUserStore.getState().logout();
@@ -124,7 +124,7 @@ export const useUserStore = create<UserState>()(
             userId: session.user.id,
             isPending: false,
           });
-          await authService.storeLocalSessionToDevice(data.email, data.password)
+          await authService.storeLocalSessionToDevice(data.email, data.password);
         };
         const errorImpl = async (err: unknown) => {
           await useUserStore.getState().logout();
@@ -172,11 +172,11 @@ export const useUserStore = create<UserState>()(
             mode: Mode.BASIC,
             error: null,
           });
-        }
+        };
         const errorImpl = async (err: unknown) => {
           handleError(err, set);
-        }
-        await userWrapper(logoutImpl, errorImpl)
+        };
+        await userWrapper(logoutImpl, errorImpl);
       },
     }),
     {

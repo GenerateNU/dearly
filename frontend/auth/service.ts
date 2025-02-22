@@ -82,9 +82,7 @@ export interface AuthService {
 }
 
 export class SupabaseAuth implements AuthService {
-
   async loginWithBiometrics(): Promise<Session> {
-
     const options: LocalAuthenticationOptions = {
       promptMessage: "Dearly wants to authenticate you with biometrics.",
     };
@@ -106,12 +104,12 @@ export class SupabaseAuth implements AuthService {
   }
 
   private async getSessionFromDevice(): Promise<Session> {
-    const email = await AsyncStorage.getItem("email")
-    const password = await AsyncStorage.getItem("password")
+    const email = await AsyncStorage.getItem("email");
+    const password = await AsyncStorage.getItem("password");
     if (!email || !password) {
-      throw new Error("Please login again to use biometrics")
+      throw new Error("Please login again to use biometrics");
     }
-    const auth = this.login({email, password})
+    const auth = this.login({ email, password });
     return auth;
   }
 
