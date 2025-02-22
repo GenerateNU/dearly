@@ -38,6 +38,12 @@
       "expo-router",
       "expo-localization",
       [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow Dearly to use Face ID."
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "imageWidth": 200,

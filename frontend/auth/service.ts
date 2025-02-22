@@ -2,6 +2,7 @@ import { AppState } from "react-native";
 import { supabase } from "./client";
 import { Session, User } from "@supabase/supabase-js";
 import { AuthRequest, PhoneAuth } from "@/types/auth";
+import { LocalAuthenticationResult } from "expo-local-authentication";
 
 /**
  * Interface for authentication services, providing methods for user sign-up, login,
@@ -64,9 +65,16 @@ export interface AuthService {
    * @param {string} payload.token - OTP code sent to user.
    */
   verifyPhoneOTP(payload: PhoneAuth): Promise<Session>;
+
+  useBiometrics(): Promise<LocalAuthenticationResult>;
 }
 
 export class SupabaseAuth implements AuthService {
+
+  async useBiometrics(): Promise<LocalAuthenticationResult> {
+      throw new Error("Method not implemented.");
+  }
+
   async signUp({ email, password }: { email: string; password: string }): Promise<Session> {
     const { data, error } = await supabase.auth.signUp({
       email,
