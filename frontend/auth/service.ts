@@ -2,7 +2,7 @@ import { AppState } from "react-native";
 import { supabase } from "./client";
 import { Session, User } from "@supabase/supabase-js";
 import { AuthRequest, PhoneAuth } from "@/types/auth";
-import { LocalAuthenticationResult } from "expo-local-authentication";
+import { LocalAuthenticationOptions, LocalAuthenticationResult, authenticateAsync } from "expo-local-authentication";
 
 /**
  * Interface for authentication services, providing methods for user sign-up, login,
@@ -66,13 +66,40 @@ export interface AuthService {
    */
   verifyPhoneOTP(payload: PhoneAuth): Promise<Session>;
 
-  useBiometrics(): Promise<LocalAuthenticationResult>;
+  useBiometrics(): Promise<Session>;
 }
 
 export class SupabaseAuth implements AuthService {
 
-  async useBiometrics(): Promise<LocalAuthenticationResult> {
-      throw new Error("Method not implemented.");
+  async useBiometrics(): Promise<Session> {
+    
+    const options : LocalAuthenticationOptions = {
+      promptMessage: "Dearly wants to authenticate you with biometrics."
+    }
+
+    const auth = await authenticateAsync(options)
+
+    if (auth.success) {
+      const session = await this.storeLocalSessionToDevice()
+      return session
+    } else {
+      throw new Error(auth.error);
+    }
+  }
+
+  private async storeLocalSessionToDevice() {
+    const localSession = await supabase.auth.getSession()
+
+    if (localSession.error) {
+      throw new Error(localSession.error.message)
+    }
+
+    if (!localSession.data.session) {
+      throw new Error("You are currently not signed in, please sign in to authenticate with biometrics.")
+    }
+
+    return localSession.data.session
+
   }
 
   async signUp({ email, password }: { email: string; password: string }): Promise<Session> {

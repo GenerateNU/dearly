@@ -30,9 +30,21 @@ interface UserState {
   setMode: (mode: Mode) => void;
   setSelectedGroup: (group: Group) => void;
   setInviteToken: (inviteToken: string) => void;
+  useBiometrics: () => Promise<void>;
 }
 
 const authService: AuthService = new SupabaseAuth();
+
+const userWrapper = async (
+  userFn: () => Promise<void>,
+  onFailure: (error: unknown) => Promise<void>,
+) => {
+  try {
+    await userFn();
+  } catch (error) {
+    await onFailure(error);
+  }
+};
 
 export const useUserStore = create<UserState>()(
   persist(
@@ -57,9 +69,30 @@ export const useUserStore = create<UserState>()(
         set({ inviteToken });
       },
 
+      useBiometrics: async () => {
+        const biomentricsImpl = async () => {
+          set({ isPending: true });
+          const session: Session = await authService.useBiometrics()
+          const user = await getUser(session.user.id)
+          set({
+            isAuthenticated: true,
+            userId: session.user.id,
+            isPending: false,
+          });
+          set({
+            mode: user.mode as Mode,
+          });
+        }
+        const failureImpl = async (err: unknown) => {
+          await useUserStore.getState().logout();
+          handleError(err, set);
+        };
+        await userWrapper(biomentricsImpl, failureImpl)
+      },
+
       login: async ({ email, password }: { email: string; password: string }) => {
-        set({ isPending: true });
-        try {
+        const loginImpl = async () => {
+          set({ isPending: true });
           const session: Session = await authService.login({ email, password });
           const user = await getUser(session.user.id);
           set({
@@ -68,15 +101,17 @@ export const useUserStore = create<UserState>()(
             mode: user.mode as Mode,
             isPending: false,
           });
-        } catch (err) {
+        };
+        const failureImpl = async (err: unknown) => {
           await useUserStore.getState().logout();
           handleError(err, set);
-        }
+        };
+        await userWrapper(loginImpl, failureImpl);
       },
 
       register: async (data: CreateUserPayload & AuthRequest) => {
-        set({ isPending: true });
-        try {
+        const registerImpl = async () => {
+          set({ isPending: true });
           const session: Session = await authService.signUp({
             email: data.email,
             password: data.password,
@@ -88,31 +123,39 @@ export const useUserStore = create<UserState>()(
             userId: session.user.id,
             isPending: false,
           });
-        } catch (err) {
+        };
+        const errorImpl = async (err: unknown) => {
           await useUserStore.getState().logout();
           handleError(err, set);
-        }
+        };
+        await userWrapper(registerImpl, errorImpl);
       },
 
       forgotPassword: async ({ email }: { email: string }) => {
-        try {
-          await authService.forgotPassword({ email });
-        } catch (err) {
-          handleError(err, set);
-        }
+        await userWrapper(
+          async () => {
+            await authService.forgotPassword({ email });
+          },
+          async (err: unknown) => {
+            handleError(err, set);
+          },
+        );
       },
 
       resetPassword: async ({ password }: { password: string }) => {
-        try {
-          await authService.resetPassword({ password });
-          set({ error: null });
-        } catch (err) {
-          handleError(err, set);
-        }
+        await userWrapper(
+          async () => {
+            await authService.resetPassword({ password });
+            set({ error: null });
+          },
+          async (err: unknown) => {
+            handleError(err, set);
+          },
+        );
       },
 
       logout: async () => {
-        try {
+        const logoutImpl = async () => {
           const expoToken = await getExpoDeviceToken();
           const savedToken = await AsyncStorage.getItem(NOTIFICATION_TOKEN_KEY);
           if (savedToken && expoToken) {
@@ -127,9 +170,11 @@ export const useUserStore = create<UserState>()(
             mode: Mode.BASIC,
             error: null,
           });
-        } catch (err) {
+        }
+        const errorImpl = async (err: unknown) => {
           handleError(err, set);
         }
+        await userWrapper(logoutImpl, errorImpl)
       },
     }),
     {
