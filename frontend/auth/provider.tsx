@@ -17,6 +17,7 @@ interface UserContextType {
   setSelectedGroup: (group: Group) => void;
   setInviteToken: (inviteToken: string) => void;
   inviteToken: string | null;
+  useBiometrics: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -24,6 +25,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const {
     isAuthenticated,
+    useBiometrics,
     login,
     register,
     logout,
@@ -40,6 +42,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     <UserContext.Provider
       value={{
         isAuthenticated,
+        useBiometrics,
         login,
         setSelectedGroup,
         group,

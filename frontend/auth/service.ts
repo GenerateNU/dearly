@@ -2,7 +2,12 @@ import { AppState } from "react-native";
 import { supabase } from "./client";
 import { Session, User } from "@supabase/supabase-js";
 import { AuthRequest, PhoneAuth } from "@/types/auth";
-
+import {
+  LocalAuthenticationOptions,
+  authenticateAsync,
+  hasHardwareAsync,
+} from "expo-local-authentication";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 /**
  * Interface for authentication services, providing methods for user sign-up, login,
  * logout, and password management.
@@ -64,9 +69,55 @@ export interface AuthService {
    * @param {string} payload.token - OTP code sent to user.
    */
   verifyPhoneOTP(payload: PhoneAuth): Promise<Session>;
+
+  /**
+   * Attempts to login to the device using any available biometrics.
+   */
+  loginWithBiometrics(): Promise<Session>;
+
+  /**
+   * Stores an active device token onto the device, allow for biometric facial scans.
+   */
+  storeLocalSessionToDevice(email: string, password: string): Promise<void>;
 }
 
 export class SupabaseAuth implements AuthService {
+  async loginWithBiometrics(): Promise<Session> {
+    const options: LocalAuthenticationOptions = {
+      promptMessage: "Dearly wants to authenticate you with biometrics.",
+    };
+
+    const hasHardware = await hasHardwareAsync();
+
+    if (!hasHardware) {
+      throw new Error("Device does not support fingerprinting or facial id.");
+    }
+
+    const auth = await authenticateAsync(options);
+
+    if (auth.success) {
+      const session = await this.getSessionFromDevice();
+      return session;
+    } else {
+      throw new Error(auth.error);
+    }
+  }
+
+  private async getSessionFromDevice(): Promise<Session> {
+    const email = await AsyncStorage.getItem("email");
+    const password = await AsyncStorage.getItem("password");
+    if (!email || !password) {
+      throw new Error("Please login again to use biometrics");
+    }
+    const auth = this.login({ email, password });
+    return auth;
+  }
+
+  async storeLocalSessionToDevice(email: string, password: string) {
+    await AsyncStorage.setItem("email", email);
+    await AsyncStorage.setItem("password", password);
+  }
+
   async signUp({ email, password }: { email: string; password: string }): Promise<Session> {
     const { data, error } = await supabase.auth.signUp({
       email,

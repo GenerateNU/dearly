@@ -1,4 +1,3 @@
-import React from "react";
 import { Alert } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -27,7 +26,11 @@ const LoginForm = () => {
     mode: "onTouched",
   });
 
-  const { login, isPending, error: authError } = useUserStore();
+  const { login, isPending, error: authError, loginWithBiometrics } = useUserStore();
+
+  const onBiometricPress = async () => {
+    await loginWithBiometrics();
+  };
 
   const onLoginPress = async (loginData: AuthRequest) => {
     try {
@@ -87,6 +90,14 @@ const LoginForm = () => {
           label={isPending ? "Logging in..." : "Log In"}
           onPress={handleSubmit(onLoginPress)}
           disabled={isPending || !isValid}
+        />
+      </Box>
+      <Box alignItems="center" className="w-full">
+        <TextButton
+          variant="honeyRounded"
+          label={"Login with Biometrics"}
+          onPress={onBiometricPress}
+          disabled={isPending}
         />
       </Box>
     </Box>
