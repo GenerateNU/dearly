@@ -2,8 +2,12 @@ import { AppState } from "react-native";
 import { supabase } from "./client";
 import { Session, User } from "@supabase/supabase-js";
 import { AuthRequest, PhoneAuth } from "@/types/auth";
-import { LocalAuthenticationOptions, authenticateAsync, hasHardwareAsync } from "expo-local-authentication";
-
+import {
+  LocalAuthenticationOptions,
+  authenticateAsync,
+  hasHardwareAsync,
+} from "expo-local-authentication";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 /**
  * Interface for authentication services, providing methods for user sign-up, login,
  * logout, and password management.
@@ -66,47 +70,67 @@ export interface AuthService {
    */
   verifyPhoneOTP(payload: PhoneAuth): Promise<Session>;
 
+  /**
+   * Attempts to login to the device using any available biometrics.
+   */
   loginWithBiometrics(): Promise<Session>;
+
+  /**
+   * Stores an active device token onto the device, allow for biometric facial scans.
+   */
+  storeLocalSessionToDevice(): Promise<void>;
 }
 
 export class SupabaseAuth implements AuthService {
 
   async loginWithBiometrics(): Promise<Session> {
-    
-    const options : LocalAuthenticationOptions = {
-      promptMessage: "Dearly wants to authenticate you with biometrics."
-    }
-    
-    const hasHardware = await hasHardwareAsync()
+
+    const options: LocalAuthenticationOptions = {
+      promptMessage: "Dearly wants to authenticate you with biometrics.",
+    };
+
+    const hasHardware = await hasHardwareAsync();
 
     if (!hasHardware) {
-      throw new Error("Device does not support fingerprinting or facial id.")
+      throw new Error("Device does not support fingerprinting or facial id.");
     }
 
-    const auth = await authenticateAsync(options)
-    console.log(auth)
+    const auth = await authenticateAsync(options);
 
     if (auth.success) {
-      const session = await this.storeLocalSessionToDevice()
-      return session
+      const session = await this.getSessionFromDevice();
+      return session;
     } else {
       throw new Error(auth.error);
     }
   }
 
-  private async storeLocalSessionToDevice() {
-    const localSession = await supabase.auth.getSession()
+  private async getSessionFromDevice(): Promise<Session> {
+    const access_token = await AsyncStorage.getItem("access_token");
+    const refresh_token = await AsyncStorage.getItem("refresh_token");
+    if (!refresh_token || !access_token) {
+      throw new Error("Failed to retrieve token(s).");
+    }
+    const auth = await supabase.auth.setSession({ access_token, refresh_token });
+    if (auth.error) {
+      throw new Error(auth.error.message);
+    }
+    return auth.data.session!;
+  }
 
+  async storeLocalSessionToDevice() {
+    const localSession = await supabase.auth.getSession();
     if (localSession.error) {
-      throw new Error(localSession.error.message)
+      throw new Error(localSession.error.message);
     }
 
     if (!localSession.data.session) {
-      throw new Error("You are currently not signed in, please sign in to authenticate with biometrics.")
+      throw new Error(
+        "You are currently not signed in, please sign in to authenticate with biometrics.",
+      );
     }
-
-    return localSession.data.session
-
+    await AsyncStorage.setItem("access_token", localSession.data.session.access_token);
+    await AsyncStorage.setItem("refresh_token", localSession.data.session.refresh_token);
   }
 
   async signUp({ email, password }: { email: string; password: string }): Promise<Session> {

@@ -101,6 +101,7 @@ export const useUserStore = create<UserState>()(
             mode: user.mode as Mode,
             isPending: false,
           });
+          await authService.storeLocalSessionToDevice()
         };
         const failureImpl = async (err: unknown) => {
           await useUserStore.getState().logout();
@@ -123,6 +124,7 @@ export const useUserStore = create<UserState>()(
             userId: session.user.id,
             isPending: false,
           });
+          await authService.storeLocalSessionToDevice()
         };
         const errorImpl = async (err: unknown) => {
           await useUserStore.getState().logout();
