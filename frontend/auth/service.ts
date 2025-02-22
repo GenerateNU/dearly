@@ -78,7 +78,7 @@ export interface AuthService {
   /**
    * Stores an active device token onto the device, allow for biometric facial scans.
    */
-  storeLocalSessionToDevice(): Promise<void>;
+  storeLocalSessionToDevice(email: string, password: string): Promise<void>;
 }
 
 export class SupabaseAuth implements AuthService {
@@ -106,31 +106,18 @@ export class SupabaseAuth implements AuthService {
   }
 
   private async getSessionFromDevice(): Promise<Session> {
-    const access_token = await AsyncStorage.getItem("access_token");
-    const refresh_token = await AsyncStorage.getItem("refresh_token");
-    if (!refresh_token || !access_token) {
-      throw new Error("Failed to retrieve token(s).");
+    const email = await AsyncStorage.getItem("email")
+    const password = await AsyncStorage.getItem("password")
+    if (!email || !password) {
+      throw new Error("Please login again to use biometrics")
     }
-    const auth = await supabase.auth.setSession({ access_token, refresh_token });
-    if (auth.error) {
-      throw new Error(auth.error.message);
-    }
-    return auth.data.session!;
+    const auth = this.login({email, password})
+    return auth;
   }
 
-  async storeLocalSessionToDevice() {
-    const localSession = await supabase.auth.getSession();
-    if (localSession.error) {
-      throw new Error(localSession.error.message);
-    }
-
-    if (!localSession.data.session) {
-      throw new Error(
-        "You are currently not signed in, please sign in to authenticate with biometrics.",
-      );
-    }
-    await AsyncStorage.setItem("access_token", localSession.data.session.access_token);
-    await AsyncStorage.setItem("refresh_token", localSession.data.session.refresh_token);
+  async storeLocalSessionToDevice(email: string, password: string) {
+    await AsyncStorage.setItem("email", email);
+    await AsyncStorage.setItem("password", password);
   }
 
   async signUp({ email, password }: { email: string; password: string }): Promise<Session> {
