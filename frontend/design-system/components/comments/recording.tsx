@@ -1,23 +1,22 @@
-import React, { memo, useEffect, useState } from "react";
-import { useTheme } from "@shopify/restyle";
-import { Theme } from "@/design-system/base/theme";
+import React, {useEffect, useState } from "react";
 import { AVPlaybackStatus, Audio } from 'expo-av';
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { IconButton } from "../ui/icon-button";
-import { MaterialIcon } from "@/types/icon";
 import { formatSeconds } from "@/utilities/time";
 import { audioBarHeights, condenseAudioBarHeights } from "@/utilities/audio";
 
 interface RecordingProps {
     onClose: () => void;
+    onSend: (uri:string) => void;
 }
 
-export const Recording: React.FC<RecordingProps> = ({onClose}) => {
+export const Recording: React.FC<RecordingProps> = ({onClose, onSend}) => {
     const [isRecording, setIsRecording] = useState<boolean>(false);
     const [sound, setSound] = useState<Audio.Sound>();
     const [doneRecording, setDoneRecording] = useState<boolean>(false);
     const [playingSound, setPlayingSound] = useState<boolean>(false);
+    const [pausing, setPausing] = useState<boolean>(false);
     const [uri, setURI] = useState<string>("");
     const [recording, setRecording] = useState<Audio.Recording | null>();
     const [audioLevels, setAudioLevels] = useState<number[]>([]);
@@ -88,16 +87,17 @@ export const Recording: React.FC<RecordingProps> = ({onClose}) => {
           }
         );
         setMemoLines(condenseAudioBarHeights(25, audioLevels));
-        console.log(doneRecording)
         const uri = recording?.getURI();
         setURI(uri || "");
     }
 
     async function playRecording() {
-        if(playingSound){
+        if(pausing){
+            setPausing(false)
+            setPlayingSound(true)
             await sound?.playAsync()
         }   
-        else{
+        else {
             setPlayingSound(true)
             const { sound } = await Audio.Sound.createAsync({uri});
             sound.setOnPlaybackStatusUpdate(onPlayingUpdate)
@@ -110,6 +110,7 @@ export const Recording: React.FC<RecordingProps> = ({onClose}) => {
     async function pauseRecording() {
         await sound?.pauseAsync()
         setPlayingSound(false)
+        setPausing(true)
     }
 
     const onPlayingUpdate = (status: AVPlaybackStatus) => {
@@ -126,12 +127,15 @@ export const Recording: React.FC<RecordingProps> = ({onClose}) => {
         <Box gap="s" flexDirection="row" justifyContent="center" height={50} borderRadius="l" >
             {doneRecording && (
                 <Box> 
-                    <IconButton variant="iconGray" onPress={onClose} icon="close" />
+                    <IconButton variant="iconBlush" onPress={onClose} icon="close" />
                 </Box>
             )
             }
-            <Box backgroundColor="gray" paddingLeft ="xs" gap = "s" width= {doneRecording? "70%" : "80%"} height={50} borderRadius="l" flexDirection="row" alignContent="center" >
-                {doneRecording &&  (playingSound? <IconButton variant="iconPearl" onPress={pauseRecording} icon="pause"/>  :  <IconButton variant="iconPearl" onPress={playRecording} icon="play" />)}
+            <Box borderWidth={1}borderColor = "ink" backgroundColor="pearl" paddingLeft ="xs" gap = "s" width= {doneRecording? "70%" : "80%"} height={50} borderRadius="l" flexDirection="row" alignContent="center" >
+                {doneRecording && 
+                <Box alignItems="center" justifyContent="center" paddingLeft="s"> 
+                    {playingSound? <IconButton variant="smallIconPearlBorder" onPress={pauseRecording} icon="pause" size={20}/>  :  <IconButton variant="smallIconPearlBorder" onPress={playRecording} icon="play" size={20}/> } 
+                </Box>}
              
                 <Box flexDirection="row" gap="xs" alignItems="center">
                     <Box flexDirection="row" gap="xs" alignItems="center">
@@ -151,9 +155,9 @@ export const Recording: React.FC<RecordingProps> = ({onClose}) => {
             </Box>
 
             {isRecording? 
-            <IconButton variant="iconGray" onPress={stopRecording}  icon="square-rounded" /> : 
-            doneRecording? <IconButton variant="iconGray" onPress={startRecording}  icon="send"/> 
-            : <IconButton variant="iconGray" onPress={startRecording} icon="circle" />
+            <IconButton variant="iconHoney" onPress={stopRecording}  icon="square-rounded" /> : 
+            doneRecording? <IconButton variant="iconHoney" onPress={() =>{ setIsRecording(false); setDoneRecording(false); setLength(0)}}  icon="send"/> 
+            : <IconButton variant="iconHoney" onPress={startRecording} icon="circle" />
             }
         </Box>
     )

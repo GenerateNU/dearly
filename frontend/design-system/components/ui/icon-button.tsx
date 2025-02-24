@@ -2,6 +2,7 @@ import { BaseButton } from "@/design-system/base/button";
 import { MaterialIcon } from "@/types/icon";
 import { Icon } from "./icon";
 import { ButtonVariant } from "@/design-system/base/variants/button";
+import { Box } from "@/design-system/base/box";
 
 interface IconButtonProps {
   onPress: () => void;
@@ -10,6 +11,7 @@ interface IconButtonProps {
   variant: ButtonVariant;
   label?: string;
   labelPosition?: "left" | "right" | "bottom" | "top";
+  size?:number
 }
 
 
@@ -20,10 +22,13 @@ export const IconButton: React.FC<IconButtonProps> = ({
   variant,
   label,
   labelPosition,
+  size
 }) => {
   return (
-    <BaseButton activeOpacity={1} disabled={disabled} variant={variant} onPress={onPress}>
-      <Icon labelPosition={labelPosition} label={label} name={icon} color="ink" />
-    </BaseButton>
+    <Box alignItems="center" justifyContent="center">
+      <BaseButton activeOpacity={1} disabled={disabled} variant={variant} onPress={onPress}>
+        <Icon labelPosition={labelPosition} label={label} name={icon} color="ink" size={size} />
+      </BaseButton>
+    </Box>
   );
 };

@@ -1,4 +1,5 @@
 export const audioBarHeights = (numLines: number, audioLevels: number[]): number[] => {
+    
     let start = 0
     if (audioLevels.length > numLines){
         start = audioLevels.length - numLines
@@ -17,11 +18,10 @@ export const condenseAudioBarHeights = (numLines: number, audioLevels: number[])
     }
       const ratio = audioLevels.length / numLines;
       const compressedLines: number[] = [];
-    
       for (let i = 0; i < numLines; i++) {
         const start = Math.floor(i * ratio);
-        const end = Math.floor((i + 1) * ratio);
-        const chunk = audioLevels.slice(start, end);3
+        const end = start + ratio;
+        const chunk = audioLevels.slice(start, end);
         const avg = chunk.reduce((acc, val) => acc + val, 0) / chunk.length;
         compressedLines.push(avg);
       }
@@ -32,7 +32,11 @@ const normalizeLines = (audioLevels: number[], start: number, end:number): numbe
     const newLines: number[] = []
         for(let i = start; i < end; i ++){
             const reverseNum = 160 - Math.abs(audioLevels[i] || 3)
-            newLines.push(( reverseNum / (160 - 20)) * 20)
+            const squaredNum = Math.pow(reverseNum, 2)
+            let scaledNum = ( squaredNum / 25600) * 25 
+            scaledNum = scaledNum > 3 ? scaledNum : 3
+            newLines.push(scaledNum)
+
        }
     return newLines;
 
