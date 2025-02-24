@@ -12,6 +12,7 @@ import { NOTIFICATION_TOKEN_KEY } from "@/constants/notification";
 import { unregisterDeviceToken } from "@/api/device";
 import { getExpoDeviceToken } from "@/utilities/device-token";
 import { Group } from "@/types/group";
+import * as SecureStore from "expo-secure-store";
 
 interface UserState {
   isAuthenticated: boolean;
@@ -137,6 +138,7 @@ export const useUserStore = create<UserState>()(
         await userWrapper(
           async () => {
             await authService.forgotPassword({ email });
+            SecureStore.getItem("email");
           },
           async (err: unknown) => {
             handleError(err, set);
@@ -149,6 +151,11 @@ export const useUserStore = create<UserState>()(
           async () => {
             await authService.resetPassword({ password });
             set({ error: null });
+            const validEmail = SecureStore.getItem("email");
+            if (!validEmail) {
+              throw new Error("No email found.");
+            }
+            await authService.storeLocalSessionToDevice(validEmail, password);
           },
           async (err: unknown) => {
             handleError(err, set);

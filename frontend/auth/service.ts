@@ -8,6 +8,7 @@ import {
   hasHardwareAsync,
 } from "expo-local-authentication";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
 /**
  * Interface for authentication services, providing methods for user sign-up, login,
  * logout, and password management.
@@ -104,8 +105,8 @@ export class SupabaseAuth implements AuthService {
   }
 
   private async getSessionFromDevice(): Promise<Session> {
-    const email = await AsyncStorage.getItem("email");
-    const password = await AsyncStorage.getItem("password");
+    const email = SecureStore.getItem("email");
+    const password = SecureStore.getItem("password");
     if (!email || !password) {
       throw new Error("Please login again to use biometrics");
     }
@@ -114,8 +115,8 @@ export class SupabaseAuth implements AuthService {
   }
 
   async storeLocalSessionToDevice(email: string, password: string) {
-    await AsyncStorage.setItem("email", email);
-    await AsyncStorage.setItem("password", password);
+    SecureStore.setItem("email", email);
+    SecureStore.setItem("password", password);
   }
 
   async signUp({ email, password }: { email: string; password: string }): Promise<Session> {
