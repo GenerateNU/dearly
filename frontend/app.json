@@ -38,6 +38,12 @@
       "expo-router",
       "expo-localization",
       [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow Dearly to use Face ID."
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "imageWidth": 200,
@@ -69,7 +75,13 @@
           "isAndroidBackgroundLocationEnabled": true
         }
       ],
-      "expo-secure-store"
+      [
+        "expo-secure-store",
+        {
+          "configureAndroidBackup": true,
+          "faceIDPermission": "Allow Dearly to access your Face ID biometric data."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

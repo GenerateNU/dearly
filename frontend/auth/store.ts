@@ -12,6 +12,7 @@ import { NOTIFICATION_TOKEN_KEY } from "@/constants/notification";
 import { unregisterDeviceToken } from "@/api/device";
 import { getExpoDeviceToken } from "@/utilities/device-token";
 import { Group } from "@/types/group";
+import * as SecureStore from "expo-secure-store";
 
 interface UserState {
   isAuthenticated: boolean;
@@ -30,9 +31,21 @@ interface UserState {
   setMode: (mode: Mode) => void;
   setSelectedGroup: (group: Group) => void;
   setInviteToken: (inviteToken: string) => void;
+  loginWithBiometrics: () => Promise<void>;
 }
 
 const authService: AuthService = new SupabaseAuth();
+
+const userWrapper = async (
+  userFn: () => Promise<void>,
+  onFailure: (error: unknown) => Promise<void>,
+) => {
+  try {
+    await userFn();
+  } catch (error) {
+    await onFailure(error);
+  }
+};
 
 export const useUserStore = create<UserState>()(
   persist(
@@ -57,9 +70,30 @@ export const useUserStore = create<UserState>()(
         set({ inviteToken });
       },
 
+      loginWithBiometrics: async () => {
+        const biomentricsImpl = async () => {
+          set({ isPending: true });
+          const session: Session = await authService.loginWithBiometrics();
+          const user = await getUser(session.user.id);
+          set({
+            isAuthenticated: true,
+            userId: session.user.id,
+            isPending: false,
+          });
+          set({
+            mode: user.mode as Mode,
+          });
+        };
+        const failureImpl = async (err: unknown) => {
+          await useUserStore.getState().logout();
+          handleError(err, set);
+        };
+        await userWrapper(biomentricsImpl, failureImpl);
+      },
+
       login: async ({ email, password }: { email: string; password: string }) => {
-        set({ isPending: true });
-        try {
+        const loginImpl = async () => {
+          set({ isPending: true });
           const session: Session = await authService.login({ email, password });
           const user = await getUser(session.user.id);
           set({
@@ -68,15 +102,18 @@ export const useUserStore = create<UserState>()(
             mode: user.mode as Mode,
             isPending: false,
           });
-        } catch (err) {
+          await authService.storeLocalSessionToDevice(email, password);
+        };
+        const failureImpl = async (err: unknown) => {
           await useUserStore.getState().logout();
           handleError(err, set);
-        }
+        };
+        await userWrapper(loginImpl, failureImpl);
       },
 
       register: async (data: CreateUserPayload & AuthRequest) => {
-        set({ isPending: true });
-        try {
+        const registerImpl = async () => {
+          set({ isPending: true });
           const session: Session = await authService.signUp({
             email: data.email,
             password: data.password,
@@ -88,31 +125,46 @@ export const useUserStore = create<UserState>()(
             userId: session.user.id,
             isPending: false,
           });
-        } catch (err) {
+          await authService.storeLocalSessionToDevice(data.email, data.password);
+        };
+        const errorImpl = async (err: unknown) => {
           await useUserStore.getState().logout();
           handleError(err, set);
-        }
+        };
+        await userWrapper(registerImpl, errorImpl);
       },
 
       forgotPassword: async ({ email }: { email: string }) => {
-        try {
-          await authService.forgotPassword({ email });
-        } catch (err) {
-          handleError(err, set);
-        }
+        await userWrapper(
+          async () => {
+            await authService.forgotPassword({ email });
+            SecureStore.getItem("email");
+          },
+          async (err: unknown) => {
+            handleError(err, set);
+          },
+        );
       },
 
       resetPassword: async ({ password }: { password: string }) => {
-        try {
-          await authService.resetPassword({ password });
-          set({ error: null });
-        } catch (err) {
-          handleError(err, set);
-        }
+        await userWrapper(
+          async () => {
+            await authService.resetPassword({ password });
+            set({ error: null });
+            const validEmail = SecureStore.getItem("email");
+            if (!validEmail) {
+              throw new Error("No email found.");
+            }
+            await authService.storeLocalSessionToDevice(validEmail, password);
+          },
+          async (err: unknown) => {
+            handleError(err, set);
+          },
+        );
       },
 
       logout: async () => {
-        try {
+        const logoutImpl = async () => {
           const expoToken = await getExpoDeviceToken();
           const savedToken = await AsyncStorage.getItem(NOTIFICATION_TOKEN_KEY);
           if (savedToken && expoToken) {
@@ -127,9 +179,11 @@ export const useUserStore = create<UserState>()(
             mode: Mode.BASIC,
             error: null,
           });
-        } catch (err) {
+        };
+        const errorImpl = async (err: unknown) => {
           handleError(err, set);
-        }
+        };
+        await userWrapper(logoutImpl, errorImpl);
       },
     }),
     {
