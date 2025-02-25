@@ -133,7 +133,7 @@ const RegisterForm = () => {
             <Input
               secureTextEntry
               value={value}
-              title="Password Confirmation"
+              title="Retype Password"
               placeholder="Retype your password"
               onChangeText={(text: string) => {
                 onChange(text);
