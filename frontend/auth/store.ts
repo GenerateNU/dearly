@@ -23,10 +23,13 @@ interface UserState {
   mode: Mode;
   group: Group | null;
   email: string | null;
+  email: string | null;
 
   login: ({ email, password }: { email: string; password: string }) => Promise<void>;
   register: (data: CreateUserPayload & AuthRequest) => Promise<void>;
   logout: () => Promise<void>;
+  forgotPassword: (email?: string) => Promise<void>;
+  resetPassword: (password: string) => Promise<void>;
   forgotPassword: (email?: string) => Promise<void>;
   resetPassword: (password: string) => Promise<void>;
   setMode: (mode: Mode) => void;
@@ -58,6 +61,7 @@ export const useUserStore = create<UserState>()(
       mode: Mode.BASIC,
       inviteToken: null,
       group: null,
+      email: null,
       email: null,
 
       setMode: (mode: Mode) => {
@@ -147,8 +151,7 @@ export const useUserStore = create<UserState>()(
             const savedEmail = await useUserStore.getState().email;
             if (savedEmail) {
               await authService.forgotPassword({ email: savedEmail });
-            }
-            else {
+            } else {
               throw new Error("No email found.");
             }
           },
