@@ -1,8 +1,8 @@
 import { Box } from "@/design-system/base/box";
 import Illustration from "@/assets/splash-screen-illustration.svg";
 import { Text } from "@/design-system/base/text";
-import Carousel from "react-native-reanimated-carousel";
-import { useRef, useState } from "react";
+import Carousel, { ICarouselInstance } from "react-native-reanimated-carousel";
+import { useRef, useState, useEffect } from "react";
 import { Dimensions, Keyboard, TouchableWithoutFeedback } from "react-native";
 import { TextButton } from "@/design-system/components/ui/text-button";
 import { router } from "expo-router";
@@ -21,6 +21,8 @@ const Welcome = () => {
   const [page, setPage] = useState<number>(0);
   const { width } = Dimensions.get("window");
   const loginRef = useRef<BottomSheet>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const carouselRef = useRef<ICarouselInstance>(null);
 
   const renderItem = ({ item }: { item: SplashScreenContent }) => (
     <AnimatedBox entering={FadeIn.duration(1000).delay(300)}>
@@ -33,6 +35,36 @@ const Welcome = () => {
       </Box>
     </AnimatedBox>
   );
+
+  useEffect(() => {
+    intervalRef.current = setInterval(() => {
+      const nextPage = (page + 1) % SPLASH_SCREEN_INFO.length;
+      setPage(nextPage);
+      if (carouselRef.current) {
+        carouselRef.current.scrollTo({ index: nextPage, animated: true });
+      }
+    }, 5000);
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [page]);
+
+  const handlePageChange = (index: number) => {
+    setPage(index);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = setInterval(() => {
+        const nextPage = (index + 1) % SPLASH_SCREEN_INFO.length;
+        setPage(nextPage);
+        if (carouselRef.current) {
+          carouselRef.current.scrollTo({ index: nextPage, animated: true });
+        }
+      }, 5000);
+    }
+  };
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()} accessible={false}>
@@ -47,15 +79,21 @@ const Welcome = () => {
 
           <AnimatedBox entering={FadeIn.duration(1000).delay(200)}>
             <Carousel
+              ref={carouselRef}
               loop={false}
               overscrollEnabled={false}
               snapEnabled={true}
               width={width}
-              height={width * 1.05}
+              height={width * 1.06}
               defaultIndex={0}
               style={{ position: "relative" }}
               data={SPLASH_SCREEN_INFO}
-              onProgressChange={(_, index) => setPage(Math.round(index))}
+              onProgressChange={(_, absoluteIndex) => {
+                const index = Math.round(absoluteIndex);
+                if (index !== page) {
+                  handlePageChange(index);
+                }
+              }}
               renderItem={renderItem}
             />
           </AnimatedBox>

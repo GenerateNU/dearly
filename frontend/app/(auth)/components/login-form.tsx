@@ -78,7 +78,7 @@ const LoginForm = () => {
                 onChange(text);
                 trigger("password");
               }}
-              rightIcon={<Icon onPress={() => null} name="face-recognition" />}
+              rightIcon={<Icon onPress={onBiometricPress} name="face-recognition" />}
               secureTextEntry
               value={value}
               title="Password"
@@ -93,7 +93,7 @@ const LoginForm = () => {
             textVariant="caption"
             onPress={() => router.push("/(auth)/forgot-password")}
             variant="text"
-            label="Forgot Password"
+            label="Forgot Password?"
           />
         </Box>
       </Box>
@@ -103,14 +103,6 @@ const LoginForm = () => {
           label={isPending ? "Logging in..." : "Log In"}
           onPress={handleSubmit(onLoginPress)}
           disabled={isPending || !isValid}
-        />
-      </Box>
-      <Box alignItems="center" className="w-full">
-        <TextButton
-          variant="honeyRounded"
-          label={"Login with Biometrics"}
-          onPress={onBiometricPress}
-          disabled={isPending}
         />
       </Box>
     </Box>

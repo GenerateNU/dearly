@@ -11,13 +11,14 @@ import { Text } from "@/design-system/base/text";
 
 const Register = () => {
   return (
-    <SafeAreaView className="flex-1">
-      <KeyboardAvoidingView
-        className="flex-1"
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-      >
+    <KeyboardAvoidingView
+      className="flex-1"
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <SafeAreaView className="flex-1">
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <Box
+            paddingTop="xxl"
             backgroundColor="pearl"
             className="w-full"
             flex={1}
@@ -31,8 +32,8 @@ const Register = () => {
             <RegisterForm />
           </Box>
         </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 

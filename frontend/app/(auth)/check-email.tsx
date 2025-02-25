@@ -2,7 +2,7 @@ import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import Illustration from "@/assets/splash-screen-illustration.svg";
 import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { BaseButton } from "@/design-system/base/button";
 import { useUserState } from "@/auth/provider";
 

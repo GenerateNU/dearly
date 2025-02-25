@@ -1,9 +1,8 @@
-import React from "react";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import ForgotPasswordForm from "./components/forgot-password-form";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { TouchableWithoutFeedback, View } from "react-native";
+import { TouchableWithoutFeedback } from "react-native";
 import { Keyboard } from "react-native";
 
 const ForgotPassword = () => {

@@ -5,7 +5,7 @@ import BottomSheetModal from "@/design-system/components/ui/bottom-sheet";
 import { forwardRef, useEffect, RefObject } from "react";
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 
-const LoginModal = forwardRef<BottomSheetMethods, {}>((_, ref) => {
+const LoginModal = forwardRef<BottomSheetMethods, object>((_, ref) => {
   useEffect(() => {
     const refObject = ref as RefObject<BottomSheetMethods>;
 
