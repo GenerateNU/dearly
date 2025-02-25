@@ -11,6 +11,7 @@ import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { Mode } from "@/types/mode";
 import { useUserStore } from "@/auth/store";
+import { useOnboarding } from "@/contexts/onboarding";
 
 type RegisterFormData = AuthRequest & {
   username: string;
@@ -51,6 +52,7 @@ const RegisterForm = () => {
 
   const { register, isPending, error: authError } = useUserStore();
   const [isPasswordConfirmationTouched, setIsPasswordConfirmationTouched] = useState(false);
+  const { setPage } = useOnboarding();
 
   const onSignUpPress = async (signupData: RegisterFormData) => {
     try {
@@ -150,7 +152,7 @@ const RegisterForm = () => {
         />
       </Box>
       <Box gap="m" alignItems="center" className="w-full">
-        <TextButton variant="blushRounded" label="Back" onPress={router.back} />
+        <TextButton variant="blushRounded" label="Back" onPress={() => setPage(0)} />
         <TextButton
           variant="honeyRounded"
           label="Next"

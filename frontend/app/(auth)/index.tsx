@@ -5,12 +5,12 @@ import Carousel, { ICarouselInstance } from "react-native-reanimated-carousel";
 import { useRef, useState, useEffect } from "react";
 import { Dimensions, Keyboard, TouchableWithoutFeedback } from "react-native";
 import { TextButton } from "@/design-system/components/ui/text-button";
-import { router } from "expo-router";
 import BottomSheet from "@gorhom/bottom-sheet";
 import LoginModal from "./components/login-popup";
 import { SPLASH_SCREEN_INFO } from "@/constants/splash-screen";
 import { FadeIn, FadeInDown, SlideInDown } from "react-native-reanimated";
 import { AnimatedBox } from "@/design-system/base/animated-box";
+import { useOnboarding } from "@/contexts/onboarding";
 
 interface SplashScreenContent {
   header: string;
@@ -19,6 +19,7 @@ interface SplashScreenContent {
 
 const Welcome = () => {
   const [page, setPage] = useState<number>(0);
+  const { setPage: setOnboardingPage } = useOnboarding();
   const { width } = Dimensions.get("window");
   const loginRef = useRef<BottomSheet>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -118,7 +119,7 @@ const Welcome = () => {
               <TextButton
                 variant="honeyRounded"
                 label="Get Started"
-                onPress={() => router.push("/(auth)/register")}
+                onPress={() => setOnboardingPage(1)}
               />
               <TextButton
                 variant="blushRounded"

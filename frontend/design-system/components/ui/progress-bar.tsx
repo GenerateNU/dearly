@@ -4,7 +4,6 @@ import { Box } from "@/design-system/base/box";
 import { AnimatedBox } from "@/design-system/base/animated-box";
 import { Icon } from "./icon";
 import { useOnboarding } from "@/contexts/onboarding";
-import { router } from "expo-router";
 
 interface ProgressBarProps {
   progress: number;
@@ -25,15 +24,15 @@ const ProgressBar = ({ progress }: ProgressBarProps) => {
   });
 
   const handlePreviousPage = () => {
-    if (page > 1) {
+    if (page === 1) {
+      setPage(0);
+    } else if (page > 1) {
       setPage(page - 1);
-    } else {
-      router.back();
     }
   };
 
   const handleNextPage = () => {
-    if (page <= 4) {
+    if (page < 4) {
       setPage(page + 1);
     }
   };

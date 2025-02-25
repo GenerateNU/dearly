@@ -1,5 +1,6 @@
 import { Mode } from "@/types/mode";
-import React, { createContext, useState, ReactNode, useContext } from "react";
+import { router } from "expo-router";
+import React, { createContext, useState, ReactNode, useContext, useEffect } from "react";
 
 interface User {
   email: string;
@@ -16,6 +17,8 @@ interface OnboardingContextType {
   setUser: (updatedUser: Partial<User>) => void;
   page: number;
   setPage: (page: number) => void;
+  popupVisible: boolean;
+  setPopupVisible: (visible: boolean) => void;
 }
 
 export const OnboardingContext = createContext<OnboardingContextType>({
@@ -31,6 +34,8 @@ export const OnboardingContext = createContext<OnboardingContextType>({
   setUser: () => {},
   page: 0,
   setPage: () => {},
+  popupVisible: false,
+  setPopupVisible: () => {},
 });
 
 interface UserProviderProps {
@@ -49,6 +54,38 @@ export const OnboardingProvider: React.FC<UserProviderProps> = ({ children }) =>
   });
 
   const [page, setPage] = useState<number>(0);
+  const [prevPage, setPrevPage] = useState<number | null>(null);
+  const [popupVisible, setPopupVisible] = useState<boolean>(false);
+
+  useEffect(() => {
+    const navigateToPage = () => {
+      if (prevPage !== null && page < prevPage) {
+        router.back();
+        return;
+      }
+      switch (page) {
+        case 0:
+          router.push("/(auth)/welcome");
+          break;
+        case 1:
+          router.push("/(auth)/register");
+          break;
+        case 2:
+          router.push("/(auth)/mode");
+          break;
+        case 3:
+          router.push("/(auth)/edit-profile");
+          break;
+        case 4:
+          router.push("/(auth)/birthday");
+          break;
+        default:
+          break;
+      }
+    };
+    setPrevPage(page);
+    navigateToPage();
+  }, [page]);
 
   const handleSetUser = (updatedUser: Partial<User>) => {
     setUser((prevUser) => ({
@@ -64,6 +101,8 @@ export const OnboardingProvider: React.FC<UserProviderProps> = ({ children }) =>
         setUser: handleSetUser,
         page,
         setPage,
+        popupVisible,
+        setPopupVisible,
       }}
     >
       {children}

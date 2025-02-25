@@ -5,7 +5,11 @@ import BottomSheetModal from "@/design-system/components/ui/bottom-sheet";
 import { forwardRef, useEffect, RefObject } from "react";
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 
-const LoginModal = forwardRef<BottomSheetMethods, object>((_, ref) => {
+interface LoginModalProps {
+  onClose?: () => void;
+}
+
+const LoginModal = forwardRef<BottomSheetMethods, LoginModalProps>(({ onClose }, ref) => {
   useEffect(() => {
     const refObject = ref as RefObject<BottomSheetMethods>;
 
@@ -27,8 +31,15 @@ const LoginModal = forwardRef<BottomSheetMethods, object>((_, ref) => {
     };
   }, [ref]);
 
+  const handleClose = () => {
+    Keyboard.dismiss();
+    if (onClose) {
+      onClose();
+    }
+  };
+
   return (
-    <BottomSheetModal snapPoints={["55%", "90%"]} ref={ref} onClose={() => Keyboard.dismiss()}>
+    <BottomSheetModal snapPoints={["55%", "90%"]} ref={ref} onClose={handleClose}>
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <Box

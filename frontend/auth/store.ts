@@ -213,7 +213,10 @@ export const useUserStore = create<UserState>()(
  * @param set setter function to mutate auth statte
  */
 const handleError = (err: unknown, set: (state: Partial<UserState>) => void) => {
-  const errorMessage = err instanceof Error ? err.message : AUTH_ERROR_MESSAGE;
+  let errorMessage = err instanceof Error ? err.message : AUTH_ERROR_MESSAGE;
+  if (errorMessage === "user_cancel") {
+    errorMessage = "Login in with FaceID cancelled";
+  }
   set({ error: errorMessage });
   setTimeout(() => {
     set({ error: null });

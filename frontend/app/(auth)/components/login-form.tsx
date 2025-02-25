@@ -10,17 +10,20 @@ import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { useUserStore } from "@/auth/store";
 import { Icon } from "@/design-system/components/ui/icon";
+import { useEffect } from "react";
+import { useOnboarding } from "@/contexts/onboarding";
 
 const LOGIN_SCHEMA = z.object({
   email: z.string().email({ message: "Invalid email" }),
   password: z.string().min(1, { message: "Password required" }),
 });
 
-const LoginForm = () => {
+const LoginForm = ({ clearError }: { clearError?: boolean }) => {
   const {
     control,
     handleSubmit,
     trigger,
+    reset,
     formState: { errors, isValid },
   } = useForm<AuthRequest>({
     resolver: zodResolver(LOGIN_SCHEMA),
@@ -28,6 +31,19 @@ const LoginForm = () => {
   });
 
   const { login, isPending, error: authError, loginWithBiometrics } = useUserStore();
+  const { popupVisible } = useOnboarding();
+
+  useEffect(() => {
+    if (clearError) {
+      reset({}, { keepValues: true });
+    }
+  }, [clearError, reset]);
+
+  useEffect(() => {
+    if (popupVisible) {
+      reset({}, { keepValues: false });
+    }
+  }, [popupVisible, reset]);
 
   const onBiometricPress = async () => {
     await loginWithBiometrics();
@@ -87,7 +103,11 @@ const LoginForm = () => {
             />
           )}
         />
-        {authError && <Text color="error">{authError}</Text>}
+        {authError && (
+          <Text variant="caption" color="error">
+            {authError}
+          </Text>
+        )}
         <Box alignItems="flex-end" width="auto">
           <TextButton
             textVariant="caption"
