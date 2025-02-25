@@ -81,7 +81,6 @@ components:
           nullable: true
           description: Number of posts that a user made.
       required:
-        - name
         - username
         - mode
     ThumbnailResponse:
@@ -654,7 +653,6 @@ paths:
                   nullable: true
                   description: A URL to the user's profile photo.
               required:
-                - name
                 - username
               additionalProperties: true
       responses:

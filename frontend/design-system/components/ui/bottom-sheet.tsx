@@ -1,6 +1,7 @@
 import React, { forwardRef, useCallback } from "react";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
+import { Keyboard } from "react-native";
 
 interface BottomSheetModalProps {
   children: React.ReactNode;
@@ -19,6 +20,13 @@ const BottomSheetModal = forwardRef<Ref, BottomSheetModalProps>(
       [],
     );
 
+    const handleClose = useCallback(() => {
+      Keyboard.dismiss();
+      if (onClose) {
+        onClose();
+      }
+    }, [onClose]);
+
     return (
       <BottomSheet
         ref={ref}
@@ -29,7 +37,7 @@ const BottomSheetModal = forwardRef<Ref, BottomSheetModalProps>(
         enableOverDrag
         enablePanDownToClose
         enableHandlePanningGesture
-        onClose={onClose}
+        onClose={handleClose}
         style={{
           flex: 1,
         }}

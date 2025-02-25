@@ -22,12 +22,13 @@ interface UserState {
   inviteToken: string | null;
   mode: Mode;
   group: Group | null;
+  email: string | null;
 
   login: ({ email, password }: { email: string; password: string }) => Promise<void>;
   register: (data: CreateUserPayload & AuthRequest) => Promise<void>;
   logout: () => Promise<void>;
-  forgotPassword: ({ email }: { email: string }) => Promise<void>;
-  resetPassword: ({ password }: { password: string }) => Promise<void>;
+  forgotPassword: (email?: string) => Promise<void>;
+  resetPassword: (password: string) => Promise<void>;
   setMode: (mode: Mode) => void;
   setSelectedGroup: (group: Group) => void;
   setInviteToken: (inviteToken: string) => void;
@@ -57,6 +58,7 @@ export const useUserStore = create<UserState>()(
       mode: Mode.BASIC,
       inviteToken: null,
       group: null,
+      email: null,
 
       setMode: (mode: Mode) => {
         set({ mode });
@@ -134,11 +136,21 @@ export const useUserStore = create<UserState>()(
         await userWrapper(registerImpl, errorImpl);
       },
 
-      forgotPassword: async ({ email }: { email: string }) => {
+      forgotPassword: async (email?: string) => {
         await userWrapper(
           async () => {
-            await authService.forgotPassword({ email });
-            SecureStore.getItem("email");
+            if (email) {
+              await authService.forgotPassword({ email });
+              set({ email: email });
+              return;
+            }
+            const savedEmail = await useUserStore.getState().email;
+            if (savedEmail) {
+              await authService.forgotPassword({ email: savedEmail });
+            }
+            else {
+              throw new Error("No email found.");
+            }
           },
           async (err: unknown) => {
             handleError(err, set);
@@ -146,7 +158,7 @@ export const useUserStore = create<UserState>()(
         );
       },
 
-      resetPassword: async ({ password }: { password: string }) => {
+      resetPassword: async (password: string) => {
         await userWrapper(
           async () => {
             await authService.resetPassword({ password });
