@@ -6,7 +6,7 @@ interface User {
   email: string;
   username: string;
   password: string;
-  mode: Mode | null;
+  mode: Mode;
   profilePicture: Blob | null;
   displayName: string;
   birthday: string;
@@ -26,7 +26,7 @@ export const OnboardingContext = createContext<OnboardingContextType>({
     email: "",
     username: "",
     password: "",
-    mode: null,
+    mode: Mode.BASIC,
     profilePicture: null,
     displayName: "",
     birthday: "",
@@ -47,7 +47,7 @@ export const OnboardingProvider: React.FC<UserProviderProps> = ({ children }) =>
     email: "",
     username: "",
     password: "",
-    mode: null,
+    mode: Mode.BASIC,
     profilePicture: null,
     displayName: "",
     birthday: "",

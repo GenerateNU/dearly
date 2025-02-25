@@ -3,14 +3,10 @@ import { Alert } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z, ZodError } from "zod";
-import { router } from "expo-router";
 import Input from "@/design-system/components/ui/input";
 import { TextButton } from "@/design-system/components/ui/text-button";
 import { AuthRequest } from "@/types/auth";
 import { Box } from "@/design-system/base/box";
-import { Text } from "@/design-system/base/text";
-import { Mode } from "@/types/mode";
-import { useUserStore } from "@/auth/store";
 import { useOnboarding } from "@/contexts/onboarding";
 
 type RegisterFormData = AuthRequest & {
@@ -50,23 +46,19 @@ const RegisterForm = () => {
     mode: "onTouched",
   });
 
-  const { register, isPending, error: authError } = useUserStore();
   const [isPasswordConfirmationTouched, setIsPasswordConfirmationTouched] = useState(false);
-  const { setPage } = useOnboarding();
+  const { setPage, page, setUser } = useOnboarding();
 
   const onSignUpPress = async (signupData: RegisterFormData) => {
     try {
       const validData = REGISTER_SCHEMA.parse(signupData);
       const data = {
-        ...validData,
-        mode: "BASIC" as Mode,
+        username: validData.username,
+        email: validData.email,
+        password: validData.password,
       };
-
-      await register(data);
-      const isAuthenticated = useUserStore.getState().isAuthenticated;
-      if (isAuthenticated) {
-        router.push("/(app)/(tabs)");
-      }
+      setUser(data);
+      setPage(page + 1);
     } catch (err: unknown) {
       if (err instanceof ZodError) {
         const errorMessages = err.errors.map((error) => error.message).join("\n");
@@ -78,23 +70,6 @@ const RegisterForm = () => {
   return (
     <Box flex={1} gap="l" justifyContent="space-between" flexDirection="column" className="w-full">
       <Box gap="m">
-        {authError && <Text color="error">{authError}</Text>}
-        <Controller
-          name="username"
-          control={control}
-          render={({ field: { onChange, value } }) => (
-            <Input
-              onChangeText={(text: string) => {
-                onChange(text);
-                trigger("username");
-              }}
-              value={value}
-              title="Username"
-              placeholder="Enter your username"
-              error={errors.username && errors.username.message}
-            />
-          )}
-        />
         <Controller
           name="email"
           control={control}
@@ -108,6 +83,22 @@ const RegisterForm = () => {
               title="Email"
               placeholder="Enter your email"
               error={errors.email && errors.email.message}
+            />
+          )}
+        />
+        <Controller
+          name="username"
+          control={control}
+          render={({ field: { onChange, value } }) => (
+            <Input
+              onChangeText={(text: string) => {
+                onChange(text);
+                trigger("username");
+              }}
+              value={value}
+              title="Username"
+              placeholder="Enter your username"
+              error={errors.username && errors.username.message}
             />
           )}
         />
@@ -136,7 +127,7 @@ const RegisterForm = () => {
               secureTextEntry
               value={value}
               title="Retype Password"
-              placeholder="Retype your password"
+              placeholder="Passwords must match"
               onChangeText={(text: string) => {
                 onChange(text);
                 trigger("retypedPassword");
@@ -157,7 +148,7 @@ const RegisterForm = () => {
           variant="honeyRounded"
           label="Next"
           onPress={handleSubmit(onSignUpPress)}
-          disabled={isPending || !isValid}
+          disabled={!isValid}
         />
       </Box>
     </Box>

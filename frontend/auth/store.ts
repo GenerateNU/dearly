@@ -120,9 +120,7 @@ export const useUserStore = create<UserState>()(
             email: data.email,
             password: data.password,
           });
-          const user = await createUser(data);
           set({
-            mode: user.mode as Mode,
             isAuthenticated: true,
             userId: session.user.id,
             isPending: false,
