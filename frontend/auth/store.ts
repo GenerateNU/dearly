@@ -21,12 +21,13 @@ interface UserState {
   inviteToken: string | null;
   mode: Mode;
   group: Group | null;
+  email: string | null;
 
   login: ({ email, password }: { email: string; password: string }) => Promise<void>;
   register: (data: CreateUserPayload & AuthRequest) => Promise<void>;
   logout: () => Promise<void>;
-  forgotPassword: ({ email }: { email: string }) => Promise<void>;
-  resetPassword: ({ password }: { password: string }) => Promise<void>;
+  forgotPassword: (email?: string) => Promise<void>;
+  resetPassword: (password: string) => Promise<void>;
   setMode: (mode: Mode) => void;
   setSelectedGroup: (group: Group) => void;
   setInviteToken: (inviteToken: string) => void;
@@ -44,6 +45,7 @@ export const useUserStore = create<UserState>()(
       mode: Mode.BASIC,
       inviteToken: null,
       group: null,
+      email: null,
 
       setMode: (mode: Mode) => {
         set({ mode });
@@ -94,15 +96,23 @@ export const useUserStore = create<UserState>()(
         }
       },
 
-      forgotPassword: async ({ email }: { email: string }) => {
+      forgotPassword: async (email?: string) => {
         try {
-          await authService.forgotPassword({ email });
+          if (email) {
+            set({ email: email });
+            await authService.forgotPassword({ email });
+          } else {
+            const savedEmail = await useUserStore.getState().email;
+            if (savedEmail) {
+              await authService.forgotPassword({ email: savedEmail });
+            }
+          }
         } catch (err) {
           handleError(err, set);
         }
       },
 
-      resetPassword: async ({ password }: { password: string }) => {
+      resetPassword: async (password: string) => {
         try {
           await authService.resetPassword({ password });
           set({ error: null });

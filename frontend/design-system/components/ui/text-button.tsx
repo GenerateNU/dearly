@@ -1,12 +1,14 @@
 import { Text } from "@/design-system/base/text";
 import { BaseButton } from "@/design-system/base/button";
 import { ButtonVariant } from "@/design-system/base/variants/button";
+import { FontVariant } from "@/design-system/base/config/font-family";
 
 interface TextButtonProps {
   onPress: () => void;
   label: string;
   disabled?: boolean;
   variant: ButtonVariant;
+  textVariant?: FontVariant;
 }
 
 export const TextButton: React.FC<TextButtonProps> = ({
@@ -14,6 +16,7 @@ export const TextButton: React.FC<TextButtonProps> = ({
   label,
   disabled = false,
   variant,
+  textVariant = "body",
 }) => {
   return (
     <BaseButton
@@ -25,7 +28,7 @@ export const TextButton: React.FC<TextButtonProps> = ({
       variant={variant}
       onPress={onPress}
     >
-      <Text variant="button" color="ink">
+      <Text variant={textVariant ? textVariant : "body"} color="ink">
         {label}
       </Text>
     </BaseButton>

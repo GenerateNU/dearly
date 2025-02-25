@@ -103,7 +103,7 @@ export class SupabaseAuth implements AuthService {
 
   async forgotPassword({ email }: { email: string }): Promise<void> {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "/",
+      redirectTo: "exp://127.0.0.1:8081/--/(auth)/reset-password",
     });
 
     if (error) {

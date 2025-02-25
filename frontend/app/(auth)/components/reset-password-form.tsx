@@ -6,64 +6,42 @@ import { z, ZodError } from "zod";
 import { router } from "expo-router";
 import Input from "@/design-system/components/ui/input";
 import { TextButton } from "@/design-system/components/ui/text-button";
-import { AuthRequest } from "@/types/auth";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
-import { Mode } from "@/types/mode";
 import { useUserStore } from "@/auth/store";
 
-type RegisterFormData = AuthRequest & {
-  username: string;
-  retypedPassword: string;
-};
-
-const REGISTER_SCHEMA = z
+const RESET_PASSWORD_SCHEMA = z
   .object({
-    username: z.string().min(2, {
-      message: "Username must be at least 2 characters long",
-    }),
-    email: z.string().email({ message: "Must be a valid email" }),
-    password: z
-      .string()
-      .regex(/[0-9]/, {
-        message: "Password must contain at least one number",
-      })
-      .regex(/[^A-Za-z0-9]/, {
-        message: "Password must contain at least one special character",
-      })
-      .min(8, { message: "Password must be at least 8 characters long" }),
-    retypedPassword: z.string(),
+    retypedPassword: z.string().min(1, { message: "Required" }),
+    password: z.string().min(1, { message: "Required" }),
   })
   .refine((data) => data.password === data.retypedPassword, {
     path: ["retypedPassword"],
   });
 
-const RegisterForm = () => {
+type ResetPasswordType = z.infer<typeof RESET_PASSWORD_SCHEMA>;
+
+const ResetPasswordForm = () => {
   const {
     control,
     handleSubmit,
     trigger,
     formState: { errors, isValid },
-  } = useForm<RegisterFormData>({
-    resolver: zodResolver(REGISTER_SCHEMA),
+  } = useForm<ResetPasswordType>({
+    resolver: zodResolver(RESET_PASSWORD_SCHEMA),
     mode: "onTouched",
   });
 
-  const { register, isPending, error: authError } = useUserStore();
+  const { resetPassword, isPending, error: authError } = useUserStore();
   const [isPasswordConfirmationTouched, setIsPasswordConfirmationTouched] = useState(false);
 
-  const onSignUpPress = async (signupData: RegisterFormData) => {
+  const onResetPasswordPress = async (data: ResetPasswordType) => {
     try {
-      const validData = REGISTER_SCHEMA.parse(signupData);
-      const data = {
-        ...validData,
-        mode: "BASIC" as Mode,
-      };
-
-      await register(data);
+      const validData = RESET_PASSWORD_SCHEMA.parse(data);
+      await resetPassword(validData.password);
       const isAuthenticated = useUserStore.getState().isAuthenticated;
       if (isAuthenticated) {
-        router.push("/(app)/(tabs)");
+        router.push("/(auth)/welcome");
       }
     } catch (err: unknown) {
       if (err instanceof ZodError) {
@@ -74,41 +52,12 @@ const RegisterForm = () => {
   };
 
   return (
-    <Box flex={1} gap="l" justifyContent="space-between" flexDirection="column" className="w-full">
+    <Box flex={1} flexDirection="column" gap="l" justifyContent="space-between">
       <Box gap="m">
-        {authError && <Text color="error">{authError}</Text>}
-        <Controller
-          name="username"
-          control={control}
-          render={({ field: { onChange, value } }) => (
-            <Input
-              onChangeText={(text: string) => {
-                onChange(text);
-                trigger("username");
-              }}
-              value={value}
-              title="Username"
-              placeholder="Enter your username"
-              error={errors.username && errors.username.message}
-            />
-          )}
-        />
-        <Controller
-          name="email"
-          control={control}
-          render={({ field: { onChange, value } }) => (
-            <Input
-              onChangeText={(text: string) => {
-                onChange(text);
-                trigger("email");
-              }}
-              value={value}
-              title="Email"
-              placeholder="Enter your email"
-              error={errors.email && errors.email.message}
-            />
-          )}
-        />
+        <Box gap="xs">
+          <Text variant="bodyLargeBold">Reset Password</Text>
+          <Text variant="body">Enter your new password below, passwords must match</Text>
+        </Box>
         <Controller
           name="password"
           control={control}
@@ -120,7 +69,7 @@ const RegisterForm = () => {
               }}
               secureTextEntry
               value={value}
-              title="Password"
+              title="New Password"
               placeholder="Enter your password"
               error={errors.password && errors.password.message}
             />
@@ -148,13 +97,14 @@ const RegisterForm = () => {
             />
           )}
         />
+        {authError && <Text color="error">{authError}</Text>}
       </Box>
       <Box gap="m" alignItems="center" className="w-full">
         <TextButton variant="blushRounded" label="Back" onPress={router.back} />
         <TextButton
           variant="honeyRounded"
           label="Next"
-          onPress={handleSubmit(onSignUpPress)}
+          onPress={handleSubmit(onResetPasswordPress)}
           disabled={isPending || !isValid}
         />
       </Box>
@@ -162,4 +112,4 @@ const RegisterForm = () => {
   );
 };
 
-export default RegisterForm;
+export default ResetPasswordForm;

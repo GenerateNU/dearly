@@ -10,6 +10,7 @@ import { AuthRequest } from "@/types/auth";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { useUserStore } from "@/auth/store";
+import { Icon } from "@/design-system/components/ui/icon";
 
 const LOGIN_SCHEMA = z.object({
   email: z.string().email({ message: "Invalid email" }),
@@ -47,6 +48,7 @@ const LoginForm = () => {
 
   return (
     <Box gap="l" flexDirection="column" className="w-full">
+      <Text variant="bodyLargeBold">Login</Text>
       <Controller
         name="email"
         control={control}
@@ -63,24 +65,35 @@ const LoginForm = () => {
           />
         )}
       />
-      <Controller
-        name="password"
-        control={control}
-        render={({ field: { onChange, value } }) => (
-          <Input
-            onChangeText={(text: string) => {
-              onChange(text);
-              trigger("password");
-            }}
-            secureTextEntry
-            value={value}
-            title="Password"
-            placeholder="Enter your password"
-            error={errors.password && errors.password.message}
+      <Box gap="s">
+        <Controller
+          name="password"
+          control={control}
+          render={({ field: { onChange, value } }) => (
+            <Input
+              onChangeText={(text: string) => {
+                onChange(text);
+                trigger("password");
+              }}
+              rightIcon={<Icon onPress={() => null} name="face-recognition" />}
+              secureTextEntry
+              value={value}
+              title="Password"
+              placeholder="Enter your password"
+              error={errors.password && errors.password.message}
+            />
+          )}
+        />
+        {authError && <Text color="error">{authError}</Text>}
+        <Box alignItems="flex-end" width="auto">
+          <TextButton
+            textVariant="caption"
+            onPress={() => router.push("/(auth)/forgot-password")}
+            variant="text"
+            label="Forgot Password"
           />
-        )}
-      />
-      {authError && <Text color="error">{authError}</Text>}
+        </Box>
+      </Box>
       <Box alignItems="center" className="w-full">
         <TextButton
           variant="honeyRounded"

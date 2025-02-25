@@ -16,34 +16,44 @@ const Layout = () => {
       <Stack.Screen
         name="register"
         options={{
-          headerShown: true,
+          headerShown: false,
           headerTitle: "Register",
+          gestureEnabled: false,
+        }}
+      />
+      <Stack.Screen
+        name="welcome"
+        options={{
+          headerShown: false,
           headerTransparent: true,
+          headerTitle: "Onboarding Flow",
           gestureEnabled: false,
         }}
       />
       <Stack.Screen
-        name="login"
+        name="forgot-password"
         options={{
-          headerShown: true,
-          headerTitle: "Login",
+          headerShown: false,
           headerTransparent: true,
+          headerTitle: "Onboarding Flow",
           gestureEnabled: false,
         }}
       />
       <Stack.Screen
-        name="components"
+        name="check-email"
         options={{
-          headerShown: true,
-          headerTitle: "Components Library",
+          headerShown: false,
+          headerTransparent: true,
+          headerTitle: "Onboarding Flow",
           gestureEnabled: false,
         }}
       />
       <Stack.Screen
-        name="design-system"
+        name="reset-password"
         options={{
-          headerShown: true,
-          headerTitle: "Design System",
+          headerShown: false,
+          headerTransparent: true,
+          headerTitle: "Onboarding Flow",
           gestureEnabled: false,
         }}
       />

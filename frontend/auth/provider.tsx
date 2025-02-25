@@ -17,6 +17,8 @@ interface UserContextType {
   setSelectedGroup: (group: Group) => void;
   setInviteToken: (inviteToken: string) => void;
   inviteToken: string | null;
+  forgotPassword: (email?: string) => Promise<void>;
+  resetPassword: (password: string) => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -34,6 +36,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     inviteToken,
     group,
     setSelectedGroup,
+    forgotPassword,
+    resetPassword,
   } = useUserStore();
 
   return (
@@ -50,6 +54,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         setMode,
         setInviteToken,
         inviteToken,
+        forgotPassword,
+        resetPassword,
       }}
     >
       {children}
