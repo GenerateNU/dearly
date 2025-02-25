@@ -1,7 +1,16 @@
-import React from "react";
+import React, { createContext, useState } from "react";
 import { Stack } from "expo-router";
+import ProgressBar from "@/design-system/components/ui/progress-bar";
+import { Box } from "@/design-system/base/box";
+
+export const ProgressContext = createContext({
+  progress: 0,
+  setProgress: (p: number) => {},
+});
 
 const Layout = () => {
+  const [progress, setProgress] = useState(0);
+
   return (
     <Stack>
       <Stack.Screen
@@ -13,14 +22,22 @@ const Layout = () => {
           gestureEnabled: false,
         }}
       />
-      <Stack.Screen
-        name="register"
-        options={{
-          headerShown: false,
-          headerTitle: "Register",
-          gestureEnabled: false,
-        }}
-      />
+      <ProgressContext.Provider value={{ progress, setProgress }}>
+        <Stack.Screen
+          name="register"
+          options={{
+            headerShown: true,
+            headerTitle: "",
+            headerTransparent: true,
+            gestureEnabled: false,
+            header: () => (
+              <Box width="100%" paddingHorizontal="s" marginTop="s">
+                <ProgressBar progress={progress} />
+              </Box>
+            ),
+          }}
+        />
+      </ProgressContext.Provider>
       <Stack.Screen
         name="welcome"
         options={{
