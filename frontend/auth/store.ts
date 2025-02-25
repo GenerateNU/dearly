@@ -7,7 +7,7 @@ import { Session } from "@supabase/supabase-js";
 import { Mode } from "@/types/mode";
 import { CreateUserPayload } from "@/types/user";
 import { AuthRequest } from "@/types/auth";
-import { createUser, getUser } from "@/api/user";
+import { getUser } from "@/api/user";
 import { NOTIFICATION_TOKEN_KEY } from "@/constants/notification";
 import { unregisterDeviceToken } from "@/api/device";
 import { getExpoDeviceToken } from "@/utilities/device-token";
@@ -33,6 +33,7 @@ interface UserState {
   setSelectedGroup: (group: Group) => void;
   setInviteToken: (inviteToken: string) => void;
   loginWithBiometrics: () => Promise<void>;
+  clearError: () => void;
 }
 
 const authService: AuthService = new SupabaseAuth();
@@ -91,6 +92,10 @@ export const useUserStore = create<UserState>()(
           handleError(err, set);
         };
         await userWrapper(biomentricsImpl, failureImpl);
+      },
+
+      clearError: () => {
+        set({ error: null });
       },
 
       login: async ({ email, password }: { email: string; password: string }) => {
@@ -211,9 +216,9 @@ export const useUserStore = create<UserState>()(
  * @param set setter function to mutate auth statte
  */
 const handleError = (err: unknown, set: (state: Partial<UserState>) => void) => {
-  let errorMessage = err instanceof Error ? err.message : AUTH_ERROR_MESSAGE;
+  const errorMessage = err instanceof Error ? err.message : AUTH_ERROR_MESSAGE;
   if (errorMessage === "user_cancel") {
-    errorMessage = "Login in with FaceID cancelled";
+    return;
   }
   set({ error: errorMessage });
   setTimeout(() => {

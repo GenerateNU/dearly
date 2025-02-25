@@ -46,7 +46,7 @@ const Input: React.FC<TextboxProps> = ({
   return (
     <Box>
       {title && (
-        <Text variant="body" paddingBottom="s">
+        <Text variant="captionBold" paddingBottom="s">
           {title}
         </Text>
       )}

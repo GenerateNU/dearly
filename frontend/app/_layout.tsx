@@ -18,18 +18,20 @@ import { useUserStore } from "@/auth/store";
 const queryClient = new QueryClient();
 
 const InitialLayout = () => {
-  const { isAuthenticated } = useUserStore();
+  const { isAuthenticated, clearError } = useUserStore();
 
   const { width } = Dimensions.get("window");
   const scaleFactor = width >= BIGGER_PHONE_SCREEN ? BIGGER_PHONE_SCALE_RATIO : 1;
 
   useEffect(() => {
+    clearError();
+
     if (isAuthenticated) {
       router.push("/(app)/(tabs)");
     } else {
       router.push("/(auth)");
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, clearError, router]);
 
   // ask for notification permission
   useNotificationPermission();

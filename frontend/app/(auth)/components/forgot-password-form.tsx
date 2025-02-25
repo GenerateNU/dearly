@@ -64,7 +64,11 @@ const ForgotPasswordForm = () => {
             />
           )}
         />
-        {authError && <Text color="error">{authError}</Text>}
+        {authError && (
+          <Text variant="caption" color="error">
+            {authError}
+          </Text>
+        )}
       </Box>
       <Box gap="m" alignItems="center" className="w-full">
         <TextButton variant="blushRounded" label="Back" onPress={router.back} />

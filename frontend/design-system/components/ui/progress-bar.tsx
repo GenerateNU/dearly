@@ -39,7 +39,7 @@ const ProgressBar = ({ progress }: ProgressBarProps) => {
 
   return (
     <Box width="100%" gap="s" alignItems="center" justifyContent="center" flexDirection="row">
-      <Icon onPress={handlePreviousPage} name="arrow-left-circle-outline" />
+      <Icon name="arrow-left-circle-outline" />
       <Box
         height={8}
         width="80%"
@@ -50,7 +50,7 @@ const ProgressBar = ({ progress }: ProgressBarProps) => {
       >
         <AnimatedBox height={8} backgroundColor="ink" style={animatedStyle} />
       </Box>
-      <Icon onPress={handleNextPage} name="arrow-right-circle-outline" />
+      <Icon name="arrow-right-circle-outline" />
     </Box>
   );
 };
