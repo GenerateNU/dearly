@@ -22,7 +22,7 @@ const Birthday = () => {
             onChange={(_, date) => setUser({ birthday: date })}
             textColor="black"
             display="spinner"
-            value={new Date() || user.birthday}
+            value={user.birthday || new Date()}
             mode="date"
           />
         </Box>
