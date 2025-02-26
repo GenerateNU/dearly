@@ -68,7 +68,7 @@ export const OnboardingProvider: React.FC<UserProviderProps> = ({ children }) =>
       }
       switch (page) {
         case 0:
-          router.push("/(auth)/welcome");
+          router.push("/(auth)");
           break;
         case 1:
           router.push("/(auth)/register");

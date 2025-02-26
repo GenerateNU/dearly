@@ -7,7 +7,7 @@ import { Session } from "@supabase/supabase-js";
 import { Mode } from "@/types/mode";
 import { CreateUserPayload } from "@/types/user";
 import { AuthRequest } from "@/types/auth";
-import { getUser } from "@/api/user";
+import { createUser, getUser } from "@/api/user";
 import { NOTIFICATION_TOKEN_KEY } from "@/constants/notification";
 import { unregisterDeviceToken } from "@/api/device";
 import { getExpoDeviceToken } from "@/utilities/device-token";
@@ -125,11 +125,18 @@ export const useUserStore = create<UserState>()(
             email: data.email,
             password: data.password,
           });
+
+          console.log(session);
+          console.log("Creating user...")
+          const result = await createUser(data);
+          console.log(result)
+
           set({
             isAuthenticated: true,
             userId: session.user.id,
             isPending: false,
           });
+
           await authService.storeLocalSessionToDevice(data.email, data.password);
         };
         const errorImpl = async (err: unknown) => {
