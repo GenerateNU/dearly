@@ -31,18 +31,12 @@ const ProgressBar = ({ progress }: ProgressBarProps) => {
     }
   };
 
-  const handleNextPage = () => {
-    if (page < 4) {
-      setPage(page + 1);
-    }
-  };
-
   return (
     <Box width="100%" gap="s" alignItems="center" justifyContent="center" flexDirection="row">
-      <Icon name="arrow-left-circle-outline" />
+      <Icon onPress={handlePreviousPage} name="arrow-left-circle-outline" />
       <Box
         height={8}
-        width="80%"
+        width="90%"
         flexDirection="row"
         backgroundColor="honey"
         borderRadius="m"
@@ -50,7 +44,6 @@ const ProgressBar = ({ progress }: ProgressBarProps) => {
       >
         <AnimatedBox height={8} backgroundColor="ink" style={animatedStyle} />
       </Box>
-      <Icon name="arrow-right-circle-outline" />
     </Box>
   );
 };

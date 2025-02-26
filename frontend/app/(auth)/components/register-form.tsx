@@ -143,7 +143,6 @@ const RegisterForm = () => {
         />
       </Box>
       <Box gap="m" alignItems="center" className="w-full">
-        <TextButton variant="blushRounded" label="Back" onPress={() => setPage(0)} />
         <TextButton
           variant="honeyRounded"
           label="Next"

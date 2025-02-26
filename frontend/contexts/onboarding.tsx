@@ -7,9 +7,9 @@ interface User {
   username: string;
   password: string;
   mode: Mode;
-  profilePicture: Blob | null;
+  profilePicture: string | null;
   displayName: string;
-  birthday: string;
+  birthday: Date | null;
 }
 
 interface OnboardingContextType {
@@ -19,6 +19,7 @@ interface OnboardingContextType {
   setPage: (page: number) => void;
   popupVisible: boolean;
   setPopupVisible: (visible: boolean) => void;
+  reset: () => void;
 }
 
 export const OnboardingContext = createContext<OnboardingContextType>({
@@ -27,15 +28,16 @@ export const OnboardingContext = createContext<OnboardingContextType>({
     username: "",
     password: "",
     mode: Mode.BASIC,
-    profilePicture: null,
+    profilePicture: "",
     displayName: "",
-    birthday: "",
+    birthday: null,
   },
   setUser: () => {},
   page: 0,
   setPage: () => {},
   popupVisible: false,
   setPopupVisible: () => {},
+  reset: () => {},
 });
 
 interface UserProviderProps {
@@ -48,9 +50,9 @@ export const OnboardingProvider: React.FC<UserProviderProps> = ({ children }) =>
     username: "",
     password: "",
     mode: Mode.BASIC,
-    profilePicture: null,
+    profilePicture: "",
     displayName: "",
-    birthday: "",
+    birthday: new Date(),
   });
 
   const [page, setPage] = useState<number>(0);
@@ -61,6 +63,7 @@ export const OnboardingProvider: React.FC<UserProviderProps> = ({ children }) =>
     const navigateToPage = () => {
       if (prevPage !== null && page < prevPage) {
         router.back();
+        if (page === 0) reset();
         return;
       }
       switch (page) {
@@ -94,6 +97,20 @@ export const OnboardingProvider: React.FC<UserProviderProps> = ({ children }) =>
     }));
   };
 
+  const reset = () => {
+    setUser({
+      email: "",
+      username: "",
+      password: "",
+      mode: Mode.BASIC,
+      profilePicture: "",
+      displayName: "",
+      birthday: null,
+    });
+    setPage(0);
+    setPopupVisible(false);
+  };
+
   return (
     <OnboardingContext.Provider
       value={{
@@ -103,6 +120,7 @@ export const OnboardingProvider: React.FC<UserProviderProps> = ({ children }) =>
         setPage,
         popupVisible,
         setPopupVisible,
+        reset,
       }}
     >
       {children}

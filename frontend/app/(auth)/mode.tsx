@@ -39,7 +39,6 @@ const SelectMode = () => {
           </Box>
         </Box>
         <Box gap="m" alignItems="center" className="w-full">
-          <TextButton variant="blushRounded" label="Back" onPress={() => setPage(page - 1)} />
           <TextButton variant="honeyRounded" label="Next" onPress={() => setPage(page + 1)} />
         </Box>
       </Box>
