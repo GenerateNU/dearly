@@ -11,7 +11,7 @@ interface ProgressBarProps {
 
 const ProgressBar = ({ progress }: ProgressBarProps) => {
   const animatedWidth = useSharedValue(0);
-  const { page, setPage } = useOnboarding();
+  const { page, setPage, isCreatingProfile } = useOnboarding();
 
   useEffect(() => {
     animatedWidth.value = withTiming(progress, { duration: 300 });
@@ -33,7 +33,10 @@ const ProgressBar = ({ progress }: ProgressBarProps) => {
 
   return (
     <Box width="100%" gap="s" alignItems="center" justifyContent="center" flexDirection="row">
-      <Icon onPress={handlePreviousPage} name="arrow-left-circle-outline" />
+      <Icon
+        onPress={isCreatingProfile ? undefined : handlePreviousPage}
+        name="arrow-left-circle-outline"
+      />
       <Box
         height={8}
         width="90%"

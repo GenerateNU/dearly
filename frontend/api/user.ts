@@ -9,16 +9,16 @@ import fetchClient from "./client";
 import { authWrapper, getHeaders } from "@/utilities/auth-token";
 
 export const createUser = async (payload: CreateUserPayload): Promise<User> => {
-  console.log("In createUser api call");
+  console.log("Creating user", payload);
+
   const req = async (token: string): Promise<User> => {
     const { data } = await fetchClient.POST("/api/v1/users", {
       headers: getHeaders(token),
       body: payload,
     });
-    console.log("created user");
-    console.log(data);
     return data!;
   };
+  console.log("Creating request", req);
   return authWrapper<User>()(req);
 };
 

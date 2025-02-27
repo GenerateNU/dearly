@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Alert } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,6 +33,7 @@ const REGISTER_SCHEMA = z
   })
   .refine((data) => data.password === data.retypedPassword, {
     path: ["retypedPassword"],
+    message: "Passwords do not match",
   });
 
 const RegisterForm = () => {
@@ -40,16 +41,41 @@ const RegisterForm = () => {
     control,
     handleSubmit,
     trigger,
+    watch,
     formState: { errors, isValid },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(REGISTER_SCHEMA),
     mode: "onTouched",
   });
 
-  const [isPasswordConfirmationTouched, setIsPasswordConfirmationTouched] = useState(false);
+  // Track if retyped password field has been touched
+  const [retypePassTouched, setRetypePassTouched] = useState(false);
+
+  // Get current values of both password fields
+  const password = watch("password");
+  const retypedPassword = watch("retypedPassword");
+
+  // Manual password match error
+  const [passwordMatchError, setPasswordMatchError] = useState<string | undefined>(undefined);
+
+  // Update password match error whenever either field changes (but only show if retyped has been touched)
+  useEffect(() => {
+    if (retypePassTouched && retypedPassword) {
+      if (password !== retypedPassword) {
+        setPasswordMatchError("Passwords do not match");
+      } else {
+        setPasswordMatchError(undefined);
+      }
+    }
+  }, [password, retypedPassword, retypePassTouched]);
+
   const { setPage, page, setUser } = useOnboarding();
 
   const onSignUpPress = async (signupData: RegisterFormData) => {
+    if (password !== retypedPassword) {
+      return; // Prevent submission if passwords don't match
+    }
+
     try {
       const validData = REGISTER_SCHEMA.parse(signupData);
       const data = {
@@ -130,14 +156,9 @@ const RegisterForm = () => {
               placeholder="Passwords must match"
               onChangeText={(text: string) => {
                 onChange(text);
-                trigger("retypedPassword");
-                setIsPasswordConfirmationTouched(true);
+                setRetypePassTouched(true);
               }}
-              error={
-                isPasswordConfirmationTouched && value !== control._getWatch("password")
-                  ? "Passwords do not match"
-                  : undefined
-              }
+              error={retypePassTouched ? passwordMatchError : undefined}
             />
           )}
         />
@@ -147,7 +168,7 @@ const RegisterForm = () => {
           variant="honeyRounded"
           label="Next"
           onPress={handleSubmit(onSignUpPress)}
-          disabled={!isValid}
+          disabled={!isValid || (retypePassTouched && password !== retypedPassword)}
         />
       </Box>
     </Box>

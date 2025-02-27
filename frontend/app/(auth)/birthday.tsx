@@ -4,40 +4,70 @@ import { Text } from "@/design-system/base/text";
 import { TextButton } from "@/design-system/components/ui/text-button";
 import { Alert, SafeAreaView } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { useState } from "react";
-import { createUser } from "../../api/user";
 import { router } from "expo-router";
-import { useUserState } from "@/auth/provider";
 import { useUserStore } from "@/auth/store";
+import { uploadUserMedia } from "@/api/media";
+import * as ImageManipulator from "expo-image-manipulator";
+
+// Function to convert URI to Blob
+const uriToBlob = async (uri: string) => {
+  const response = await fetch(uri);
+  const blob = await response.blob();
+  return blob;
+};
 
 const Birthday = () => {
-  const { user, setUser } = useOnboarding();
+  const { user, setUser, setIsCreatingProfile, isCreatingProfile } = useOnboarding();
+  const { register, error, isAuthenticated } = useUserStore();
 
-  const { register, error } = useUserStore();
-
-  const [profileCreating, setProfileCreating] = useState(false);
+  const convertToJpeg = async (uri: string) => {
+    const result = await ImageManipulator.manipulateAsync(uri, [], {
+      format: ImageManipulator.SaveFormat.JPEG,
+      compress: 0.8,
+    });
+    return result.uri;
+  };
 
   const createProfile = async () => {
-    setProfileCreating(true);
+    setIsCreatingProfile(true);
+
+    if (user.profilePhoto) {
+      try {
+        // Convert the photo to JPEG (you can use PNG if preferred)
+        const jpegUri = await convertToJpeg(user.profilePhoto);
+
+        // Convert the JPEG image to a Blob
+        const profilePhotoBlob = await uriToBlob(jpegUri);
+
+        // Create FormData and append the file
+        const formData = new FormData();
+        formData.append("media", profilePhotoBlob, "profilePhoto.jpg");
+
+        // Upload the media
+        await uploadUserMedia(formData);
+      } catch (err) {
+        console.error("Error processing the profile photo:", err);
+        setIsCreatingProfile(false);
+        return;
+      }
+    }
 
     try {
-      // TODO:
-      console.log("Registering user...");
+      // Register the user and handle any errors
       await register(user);
-      console.log(`Error: ${error}`);
-      if (!error as unknown) {
-        router.push(`/(app)/(tabs)`);
-      } else {
-        let errorMessage = "Failed to create profile. Please try again.";
-        reroute(errorMessage);
+
+      if (error) {
+        reroute(error);
       }
-      setProfileCreating(false);
+      if (isAuthenticated) {
+        router.push(`/(app)/(tabs)`);
+      }
+      setIsCreatingProfile(false);
     } catch (error: unknown) {
       let errorMessage = "Failed to create profile. Please try again.";
       if (error instanceof Error) {
         errorMessage = `Failed to create profile. ${error.message} Please try again.`;
       }
-
       reroute(errorMessage);
     }
   };
@@ -78,8 +108,8 @@ const Birthday = () => {
         <Box gap="m" alignItems="center" className="w-full">
           <TextButton
             variant="honeyRounded"
-            label={profileCreating ? "Creating Profile..." : "Create Profile"}
-            disabled={profileCreating}
+            label={isCreatingProfile ? "Creating Profile..." : "Create Profile"}
+            disabled={isCreatingProfile}
             onPress={() => createProfile()}
           />
         </Box>

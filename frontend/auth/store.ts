@@ -5,14 +5,13 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Session } from "@supabase/supabase-js";
 import { Mode } from "@/types/mode";
-import { CreateUserPayload } from "@/types/user";
-import { AuthRequest } from "@/types/auth";
 import { createUser, getUser } from "@/api/user";
 import { NOTIFICATION_TOKEN_KEY } from "@/constants/notification";
 import { unregisterDeviceToken } from "@/api/device";
 import { getExpoDeviceToken } from "@/utilities/device-token";
 import { Group } from "@/types/group";
 import * as SecureStore from "expo-secure-store";
+import { OnboardingUserInfo } from "@/contexts/onboarding";
 
 interface UserState {
   isAuthenticated: boolean;
@@ -25,7 +24,7 @@ interface UserState {
   email: string | null;
 
   login: ({ email, password }: { email: string; password: string }) => Promise<void>;
-  register: (data: CreateUserPayload & AuthRequest) => Promise<void>;
+  register: (data: OnboardingUserInfo) => Promise<void>;
   logout: () => Promise<void>;
   forgotPassword: (email?: string) => Promise<void>;
   resetPassword: (password: string) => Promise<void>;
@@ -118,25 +117,27 @@ export const useUserStore = create<UserState>()(
         await userWrapper(loginImpl, failureImpl);
       },
 
-      register: async (data: CreateUserPayload & AuthRequest) => {
+      register: async (data: OnboardingUserInfo) => {
         const registerImpl = async () => {
           set({ isPending: true });
           const session: Session = await authService.signUp({
             email: data.email,
             password: data.password,
           });
-
           console.log(session);
-          console.log("Creating user...");
-          const result = await createUser(data);
-          console.log(result);
 
+          await createUser({
+            name: data.name,
+            username: data.username,
+            mode: data.mode,
+            profilePhoto: data.profilePhoto,
+            birthday: data.birthday,
+          });
           set({
             isAuthenticated: true,
             userId: session.user.id,
             isPending: false,
           });
-
           await authService.storeLocalSessionToDevice(data.email, data.password);
         };
         const errorImpl = async (err: unknown) => {

@@ -2,24 +2,26 @@ import { Mode } from "@/types/mode";
 import { router } from "expo-router";
 import React, { createContext, useState, ReactNode, useContext, useEffect } from "react";
 
-interface User {
+export interface OnboardingUserInfo {
   email: string;
   username: string;
   password: string;
   mode: Mode;
-  profilePicture: string | null;
-  displayName: string;
+  profilePhoto: string | null;
+  name: string;
   birthday: Date | null;
 }
 
 interface OnboardingContextType {
-  user: User;
-  setUser: (updatedUser: Partial<User>) => void;
+  user: OnboardingUserInfo;
+  setUser: (updatedUser: Partial<OnboardingUserInfo>) => void;
   page: number;
   setPage: (page: number) => void;
   popupVisible: boolean;
   setPopupVisible: (visible: boolean) => void;
   reset: () => void;
+  isCreatingProfile: boolean;
+  setIsCreatingProfile: (isCreating: boolean) => void;
 }
 
 export const OnboardingContext = createContext<OnboardingContextType>({
@@ -28,8 +30,8 @@ export const OnboardingContext = createContext<OnboardingContextType>({
     username: "",
     password: "",
     mode: Mode.BASIC,
-    profilePicture: "",
-    displayName: "",
+    profilePhoto: "",
+    name: "",
     birthday: null,
   },
   setUser: () => {},
@@ -38,6 +40,8 @@ export const OnboardingContext = createContext<OnboardingContextType>({
   popupVisible: false,
   setPopupVisible: () => {},
   reset: () => {},
+  isCreatingProfile: false,
+  setIsCreatingProfile: () => {},
 });
 
 interface UserProviderProps {
@@ -45,19 +49,20 @@ interface UserProviderProps {
 }
 
 export const OnboardingProvider: React.FC<UserProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User>({
+  const [user, setUser] = useState<OnboardingUserInfo>({
     email: "",
     username: "",
     password: "",
     mode: Mode.BASIC,
-    profilePicture: "",
-    displayName: "",
+    profilePhoto: "",
+    name: "",
     birthday: new Date(),
   });
 
   const [page, setPage] = useState<number>(0);
   const [prevPage, setPrevPage] = useState<number | null>(null);
   const [popupVisible, setPopupVisible] = useState<boolean>(false);
+  const [isCreatingProfile, setIsCreatingProfile] = useState<boolean>(false);
 
   useEffect(() => {
     const navigateToPage = () => {
@@ -90,7 +95,7 @@ export const OnboardingProvider: React.FC<UserProviderProps> = ({ children }) =>
     navigateToPage();
   }, [page]);
 
-  const handleSetUser = (updatedUser: Partial<User>) => {
+  const handleSetUser = (updatedUser: Partial<OnboardingUserInfo>) => {
     setUser((prevUser) => ({
       ...prevUser,
       ...updatedUser,
@@ -103,12 +108,13 @@ export const OnboardingProvider: React.FC<UserProviderProps> = ({ children }) =>
       username: "",
       password: "",
       mode: Mode.BASIC,
-      profilePicture: "",
-      displayName: "",
+      profilePhoto: "",
+      name: "",
       birthday: null,
     });
     setPage(0);
     setPopupVisible(false);
+    setIsCreatingProfile(false);
   };
 
   return (
@@ -121,6 +127,8 @@ export const OnboardingProvider: React.FC<UserProviderProps> = ({ children }) =>
         popupVisible,
         setPopupVisible,
         reset,
+        isCreatingProfile,
+        setIsCreatingProfile,
       }}
     >
       {children}

@@ -120,7 +120,7 @@ const LoginForm = ({ clearError }: { clearError?: boolean }) => {
       <Box alignItems="center" className="w-full">
         <TextButton
           variant="honeyRounded"
-          label={isPending ? "Logging in..." : "Log In"}
+          label={isPending ? "Logging in..." : "Login"}
           onPress={handleSubmit(onLoginPress)}
           disabled={isPending || !isValid}
         />
