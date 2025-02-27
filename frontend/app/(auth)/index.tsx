@@ -28,7 +28,7 @@ const Welcome = () => {
   const renderItem = ({ item }: { item: SplashScreenContent }) => (
     <AnimatedBox entering={FadeIn.duration(1000).delay(300)}>
       <Box alignContent="center" justifyContent="flex-start" alignItems="flex-start" gap="m">
-        <Illustration />
+        <Illustration width="95%" />
         <Box gap="xs" width="95%">
           <Text variant="bodyLargeBold">{item.header}</Text>
           <Text variant="body">{item.caption}</Text>
@@ -84,7 +84,7 @@ const Welcome = () => {
               loop={false}
               overscrollEnabled={false}
               snapEnabled={true}
-              width={width}
+              width={width * 0.95}
               height={width * 1.06}
               defaultIndex={0}
               style={{ position: "relative" }}

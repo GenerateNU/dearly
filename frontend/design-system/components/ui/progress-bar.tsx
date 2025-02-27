@@ -4,6 +4,7 @@ import { Box } from "@/design-system/base/box";
 import { AnimatedBox } from "@/design-system/base/animated-box";
 import { Icon } from "./icon";
 import { useOnboarding } from "@/contexts/onboarding";
+import { TouchableOpacity } from "react-native";
 
 interface ProgressBarProps {
   progress: number;
@@ -33,10 +34,12 @@ const ProgressBar = ({ progress }: ProgressBarProps) => {
 
   return (
     <Box width="100%" gap="s" alignItems="center" justifyContent="center" flexDirection="row">
-      <Icon
-        onPress={isCreatingProfile ? undefined : handlePreviousPage}
-        name="arrow-left-circle-outline"
-      />
+      <TouchableOpacity disabled={isCreatingProfile} activeOpacity={0.5}>
+        <Icon
+          onPress={isCreatingProfile ? undefined : handlePreviousPage}
+          name="arrow-left-circle-outline"
+        />
+      </TouchableOpacity>
       <Box
         height={8}
         width="90%"
