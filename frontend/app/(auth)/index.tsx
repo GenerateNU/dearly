@@ -3,7 +3,7 @@ import Illustration from "@/assets/splash-screen-illustration.svg";
 import { Text } from "@/design-system/base/text";
 import Carousel, { ICarouselInstance } from "react-native-reanimated-carousel";
 import { useRef, useState, useEffect } from "react";
-import { Dimensions, Keyboard, TouchableWithoutFeedback } from "react-native";
+import { Dimensions, Keyboard, TouchableWithoutFeedback, Alert } from "react-native";
 import { TextButton } from "@/design-system/components/ui/text-button";
 import BottomSheet from "@gorhom/bottom-sheet";
 import LoginModal from "./components/login-popup";
@@ -11,6 +11,8 @@ import { SPLASH_SCREEN_INFO } from "@/constants/splash-screen";
 import { FadeIn, FadeInDown, SlideInDown } from "react-native-reanimated";
 import { AnimatedBox } from "@/design-system/base/animated-box";
 import { useOnboarding } from "@/contexts/onboarding";
+import { useUserState } from "@/auth/provider";
+import { router } from "expo-router";
 
 interface SplashScreenContent {
   header: string;
@@ -19,11 +21,12 @@ interface SplashScreenContent {
 
 const Welcome = () => {
   const [page, setPage] = useState<number>(0);
-  const { setPage: setOnboardingPage } = useOnboarding();
+  const onboarding = useOnboarding();
   const { width } = Dimensions.get("window");
   const loginRef = useRef<BottomSheet>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const carouselRef = useRef<ICarouselInstance>(null);
+  const { loginWithBiometrics } = useUserState();
 
   const renderItem = ({ item }: { item: SplashScreenContent }) => (
     <AnimatedBox entering={FadeIn.duration(1000).delay(300)}>
@@ -36,6 +39,16 @@ const Welcome = () => {
       </Box>
     </AnimatedBox>
   );
+
+  const onLoginPress = () => {
+    loginRef.current?.snapToIndex(0);
+    loginWithBiometrics();
+  };
+
+  const handleGetStarted = () => {
+    onboarding.setPage(1);
+    router.push("/(auth)/register");
+  };
 
   useEffect(() => {
     intervalRef.current = setInterval(() => {
@@ -116,16 +129,8 @@ const Welcome = () => {
 
           <AnimatedBox entering={SlideInDown.duration(1000).delay(400)}>
             <Box gap="m" width="100%">
-              <TextButton
-                variant="honeyRounded"
-                label="Get Started"
-                onPress={() => setOnboardingPage(1)}
-              />
-              <TextButton
-                variant="blushRounded"
-                label="Login"
-                onPress={() => loginRef.current?.snapToIndex(0)}
-              />
+              <TextButton variant="honeyRounded" label="Get Started" onPress={handleGetStarted} />
+              <TextButton variant="blushRounded" label="Login" onPress={onLoginPress} />
             </Box>
           </AnimatedBox>
         </Box>

@@ -5,6 +5,7 @@ import { AnimatedBox } from "@/design-system/base/animated-box";
 import { Icon } from "./icon";
 import { useOnboarding } from "@/contexts/onboarding";
 import { TouchableOpacity } from "react-native";
+import { router } from "expo-router";
 
 interface ProgressBarProps {
   progress: number;
@@ -12,7 +13,7 @@ interface ProgressBarProps {
 
 const ProgressBar = ({ progress }: ProgressBarProps) => {
   const animatedWidth = useSharedValue(0);
-  const { page, setPage, isCreatingProfile } = useOnboarding();
+  const { page, setPage, isCreatingProfile, reset } = useOnboarding();
 
   useEffect(() => {
     animatedWidth.value = withTiming(progress, { duration: 300 });
@@ -27,8 +28,11 @@ const ProgressBar = ({ progress }: ProgressBarProps) => {
   const handlePreviousPage = () => {
     if (page === 1) {
       setPage(0);
+      reset();
+      router.back();
     } else if (page > 1) {
       setPage(page - 1);
+      router.back();
     }
   };
 

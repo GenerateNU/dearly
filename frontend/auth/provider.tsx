@@ -2,13 +2,13 @@ import { createContext, useContext, ReactNode } from "react";
 import { useUserStore } from "./store";
 import { AuthRequest } from "@/types/auth";
 import { Mode } from "@/types/mode";
-import { CreateUserPayload } from "@/types/user";
 import { Group } from "@/types/group";
+import { OnboardingUserInfo } from "@/contexts/onboarding";
 
 interface UserContextType {
   isAuthenticated: boolean;
   login: (data: AuthRequest) => Promise<void>;
-  register: (data: CreateUserPayload & AuthRequest) => Promise<void>;
+  register: (data: OnboardingUserInfo) => Promise<void>;
   logout: () => Promise<void>;
   userId: string | null;
   mode: Mode;

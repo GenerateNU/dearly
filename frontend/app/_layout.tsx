@@ -1,4 +1,4 @@
-import { router, SplashScreen, Stack } from "expo-router";
+import { router, SplashScreen, Slot } from "expo-router";
 import { StatusBar } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -15,12 +15,14 @@ import { BIGGER_PHONE_SCALE_RATIO, BIGGER_PHONE_SCREEN } from "@/constants/scale
 import { UserProvider } from "@/auth/provider";
 import { useUserStore } from "@/auth/store";
 import SplashScreenAnimation from "./(auth)/components/splash-screen";
+import { OnboardingProvider } from "@/contexts/onboarding";
 
 const queryClient = new QueryClient();
 
 const InitialLayout = () => {
   const { isAuthenticated, clearError } = useUserStore();
   const [showSplash, setShowSplash] = useState(true);
+  const [isReady, setIsReady] = useState(false);
 
   const { width } = Dimensions.get("window");
   const scaleFactor = width >= BIGGER_PHONE_SCREEN ? BIGGER_PHONE_SCALE_RATIO : 1;
@@ -34,27 +36,39 @@ const InitialLayout = () => {
   });
 
   useEffect(() => {
-    if (fontsLoaded) {
-      SplashScreen.hideAsync();
-      setTimeout(() => {
-        setShowSplash(false);
-      }, 3000);
-    } else {
-      SplashScreen.preventAutoHideAsync();
-    }
-  }, [fontsLoaded]);
+    async function prepare() {
+      try {
+        if (!fontsLoaded) {
+          await SplashScreen.preventAutoHideAsync();
+          return;
+        }
 
-  useEffect(() => {
-    clearError();
+        await SplashScreen.hideAsync();
 
-    if (!showSplash) {
-      if (isAuthenticated) {
-        router.push("/(app)/(tabs)");
-      } else {
-        router.push("/(auth)");
+        // Set a timeout for the splash screen animation
+        setTimeout(() => {
+          setShowSplash(false);
+          setIsReady(true);
+        }, 3000);
+
+        clearError();
+      } catch (e) {
+        console.warn(e);
       }
     }
-  }, [isAuthenticated, showSplash, clearError, router]);
+
+    prepare();
+  }, [fontsLoaded, clearError]);
+
+  useEffect(() => {
+    if (!showSplash && isReady) {
+      if (isAuthenticated) {
+        router.replace("/(app)/(tabs)");
+      } else {
+        router.replace("/(auth)");
+      }
+    }
+  }, [isAuthenticated, showSplash, isReady]);
 
   // ask for notification permission
   useNotificationPermission();
@@ -65,27 +79,24 @@ const InitialLayout = () => {
   // listen for accessibility setting on device
   const scaleRatio = useAccessibility();
 
+  // Return the slot to ensure navigation container is mounted first
   return (
     <ThemeProvider theme={getTheme(scaleRatio * scaleFactor)}>
-      {showSplash ? <SplashScreenAnimation /> : null}
-      {!showSplash && (
-        <Stack screenOptions={{ gestureEnabled: false }}>
-          <Stack.Screen name="(auth)" options={{ headerShown: false, gestureEnabled: false }} />
-          <Stack.Screen name="(app)" options={{ headerShown: false, gestureEnabled: false }} />
-        </Stack>
-      )}
+      {showSplash ? <SplashScreenAnimation /> : <Slot />}
     </ThemeProvider>
   );
 };
 
 const RootLayout = () => {
   return (
-    <GestureHandlerRootView>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <NotificationProvider>
         <UserProvider>
           <QueryClientProvider client={queryClient}>
-            <StatusBar />
-            <InitialLayout />
+            <OnboardingProvider>
+              <StatusBar />
+              <InitialLayout />
+            </OnboardingProvider>
           </QueryClientProvider>
         </UserProvider>
       </NotificationProvider>

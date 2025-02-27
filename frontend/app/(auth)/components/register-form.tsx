@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import { Alert } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,6 +7,8 @@ import { TextButton } from "@/design-system/components/ui/text-button";
 import { AuthRequest } from "@/types/auth";
 import { Box } from "@/design-system/base/box";
 import { useOnboarding } from "@/contexts/onboarding";
+import { useState, useEffect } from "react";
+import { router } from "expo-router";
 
 type RegisterFormData = AuthRequest & {
   username: string;
@@ -45,37 +46,38 @@ const RegisterForm = () => {
     formState: { errors, isValid },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(REGISTER_SCHEMA),
-    mode: "onTouched",
+    mode: "onChange",
+    defaultValues: {
+      username: "",
+      email: "",
+      password: "",
+      retypedPassword: "",
+    },
   });
 
-  // Track if retyped password field has been touched
-  const [retypePassTouched, setRetypePassTouched] = useState(false);
+  const { setPage, page, setUser } = useOnboarding();
+  const [passwordTouched, setPasswordTouched] = useState(false);
+  const [retypedPasswordTouched, setRetypedPasswordTouched] = useState(false);
 
-  // Get current values of both password fields
+  // Watch password and retypedPassword fields
   const password = watch("password");
   const retypedPassword = watch("retypedPassword");
 
-  // Manual password match error
+  // Check for password match manually
   const [passwordMatchError, setPasswordMatchError] = useState<string | undefined>(undefined);
 
-  // Update password match error whenever either field changes (but only show if retyped has been touched)
   useEffect(() => {
-    if (retypePassTouched && retypedPassword) {
+    // Only show mismatch error if both fields have been touched and have values
+    if (passwordTouched && retypedPasswordTouched && password && retypedPassword) {
       if (password !== retypedPassword) {
         setPasswordMatchError("Passwords do not match");
       } else {
         setPasswordMatchError(undefined);
       }
     }
-  }, [password, retypedPassword, retypePassTouched]);
-
-  const { setPage, page, setUser } = useOnboarding();
+  }, [password, retypedPassword, passwordTouched, retypedPasswordTouched]);
 
   const onSignUpPress = async (signupData: RegisterFormData) => {
-    if (password !== retypedPassword) {
-      return; // Prevent submission if passwords don't match
-    }
-
     try {
       const validData = REGISTER_SCHEMA.parse(signupData);
       const data = {
@@ -85,6 +87,7 @@ const RegisterForm = () => {
       };
       setUser(data);
       setPage(page + 1);
+      router.push("/(auth)/mode");
     } catch (err: unknown) {
       if (err instanceof ZodError) {
         const errorMessages = err.errors.map((error) => error.message).join("\n");
@@ -135,7 +138,12 @@ const RegisterForm = () => {
             <Input
               onChangeText={(text: string) => {
                 onChange(text);
+                setPasswordTouched(true);
                 trigger("password");
+                // Also trigger retypedPassword validation if it's been touched
+                if (retypedPasswordTouched) {
+                  trigger("retypedPassword");
+                }
               }}
               secureTextEntry
               value={value}
@@ -156,9 +164,13 @@ const RegisterForm = () => {
               placeholder="Passwords must match"
               onChangeText={(text: string) => {
                 onChange(text);
-                setRetypePassTouched(true);
+                setRetypedPasswordTouched(true);
+                trigger("retypedPassword");
               }}
-              error={retypePassTouched ? passwordMatchError : undefined}
+              // Show our custom error or the form validation error
+              error={
+                passwordMatchError || (errors.retypedPassword && errors.retypedPassword.message)
+              }
             />
           )}
         />
@@ -168,7 +180,7 @@ const RegisterForm = () => {
           variant="honeyRounded"
           label="Next"
           onPress={handleSubmit(onSignUpPress)}
-          disabled={!isValid || (retypePassTouched && password !== retypedPassword)}
+          disabled={!isValid || !!passwordMatchError}
         />
       </Box>
     </Box>

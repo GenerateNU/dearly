@@ -1,6 +1,5 @@
 import { Mode } from "@/types/mode";
-import { router } from "expo-router";
-import React, { createContext, useState, ReactNode, useContext, useEffect } from "react";
+import React, { createContext, useState, ReactNode, useContext } from "react";
 
 export interface OnboardingUserInfo {
   email: string;
@@ -60,40 +59,8 @@ export const OnboardingProvider: React.FC<UserProviderProps> = ({ children }) =>
   });
 
   const [page, setPage] = useState<number>(0);
-  const [prevPage, setPrevPage] = useState<number | null>(null);
   const [popupVisible, setPopupVisible] = useState<boolean>(false);
   const [isCreatingProfile, setIsCreatingProfile] = useState<boolean>(false);
-
-  useEffect(() => {
-    const navigateToPage = () => {
-      if (prevPage !== null && page < prevPage) {
-        router.back();
-        if (page === 0) reset();
-        return;
-      }
-      switch (page) {
-        case 0:
-          router.push("/(auth)");
-          break;
-        case 1:
-          router.push("/(auth)/register");
-          break;
-        case 2:
-          router.push("/(auth)/mode");
-          break;
-        case 3:
-          router.push("/(auth)/edit-profile");
-          break;
-        case 4:
-          router.push("/(auth)/birthday");
-          break;
-        default:
-          break;
-      }
-    };
-    setPrevPage(page);
-    navigateToPage();
-  }, [page]);
 
   const handleSetUser = (updatedUser: Partial<OnboardingUserInfo>) => {
     setUser((prevUser) => ({

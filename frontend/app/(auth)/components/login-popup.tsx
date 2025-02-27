@@ -4,32 +4,37 @@ import { Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback } fr
 import BottomSheetModal from "@/design-system/components/ui/bottom-sheet";
 import { forwardRef, useEffect, RefObject } from "react";
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
+import { useOnboarding } from "@/contexts/onboarding";
 
 interface LoginModalProps {
   onClose?: () => void;
 }
 
 const LoginModal = forwardRef<BottomSheetMethods, LoginModalProps>(({ onClose }, ref) => {
+  const { page } = useOnboarding();
+
   useEffect(() => {
-    const refObject = ref as RefObject<BottomSheetMethods>;
+    if (page === 0) {
+      const refObject = ref as RefObject<BottomSheetMethods>;
 
-    const keyboardDidShowListener = Keyboard.addListener("keyboardDidShow", () => {
-      if (refObject?.current) {
-        refObject.current.snapToIndex(1);
-      }
-    });
+      const keyboardDidShowListener = Keyboard.addListener("keyboardDidShow", () => {
+        if (refObject?.current) {
+          refObject.current.snapToIndex(1);
+        }
+      });
 
-    const keyboardDidHideListener = Keyboard.addListener("keyboardDidHide", () => {
-      if (refObject.current) {
-        refObject.current.snapToIndex(0);
-      }
-    });
+      const keyboardDidHideListener = Keyboard.addListener("keyboardDidHide", () => {
+        if (refObject.current) {
+          refObject.current.snapToIndex(0);
+        }
+      });
 
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
-  }, [ref]);
+      return () => {
+        keyboardDidHideListener.remove();
+        keyboardDidShowListener.remove();
+      };
+    }
+  }, [page, ref]);
 
   const handleClose = () => {
     Keyboard.dismiss();

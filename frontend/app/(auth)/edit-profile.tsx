@@ -22,7 +22,7 @@ const EditProfile = () => {
     }
 
     if (result.assets[0]) {
-      setUser({ profilePicture: result.assets[0].uri });
+      setUser({ profilePhoto: result.assets[0].uri });
     }
   };
 
@@ -41,7 +41,7 @@ const EditProfile = () => {
             <Text variant="bodyLargeBold">Profile</Text>
             <TouchableOpacity activeOpacity={0.7} onPress={pickImage}>
               <Box alignItems="center" justifyContent="center">
-                <Avatar profilePhoto={user.profilePicture} variant="huge" />
+                <Avatar profilePhoto={user.profilePhoto} variant="huge" />
                 <Box position="absolute">
                   <Text>Edit</Text>
                 </Box>

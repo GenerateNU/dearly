@@ -5,12 +5,18 @@ import { Card } from "@/design-system/components/ui/card";
 import { SafeAreaView } from "react-native";
 import { Mode } from "@/types/mode";
 import { TextButton } from "@/design-system/components/ui/text-button";
+import { router } from "expo-router";
 
 const SelectMode = () => {
-  const { user, setUser, page, setPage } = useOnboarding();
+  const { user, setUser, setPage } = useOnboarding();
 
   const handleSelectMode = (selectedMode: Mode) => {
     setUser({ mode: selectedMode });
+  };
+
+  const onNext = () => {
+    setPage(3);
+    router.push("/(auth)/edit-profile");
   };
 
   return (
@@ -39,7 +45,7 @@ const SelectMode = () => {
           </Box>
         </Box>
         <Box gap="m" alignItems="center" className="w-full">
-          <TextButton variant="honeyRounded" label="Next" onPress={() => setPage(page + 1)} />
+          <TextButton variant="honeyRounded" label="Next" onPress={onNext} />
         </Box>
       </Box>
     </SafeAreaView>
