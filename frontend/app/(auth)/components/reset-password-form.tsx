@@ -41,7 +41,7 @@ const ResetPasswordForm = () => {
       await resetPassword(validData.password);
       const isAuthenticated = useUserStore.getState().isAuthenticated;
       if (isAuthenticated) {
-        router.push("/(auth)/welcome");
+        router.push("/(auth)");
       }
     } catch (err: unknown) {
       if (err instanceof ZodError) {

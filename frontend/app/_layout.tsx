@@ -38,7 +38,7 @@ const InitialLayout = () => {
       SplashScreen.hideAsync();
       setTimeout(() => {
         setShowSplash(false);
-      }, 3300);
+      }, 3000);
     } else {
       SplashScreen.preventAutoHideAsync();
     }

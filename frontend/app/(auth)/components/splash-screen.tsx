@@ -5,7 +5,7 @@ import { Box } from "@/design-system/base/box";
 import LetterD from "@/assets/d.svg";
 
 const ANIMATION_DURATION = 600;
-const FINAL_DURATION = 800;
+const FINAL_DURATION = 600;
 
 const useAnimatedValue = (initialValue: number) => {
   return useRef(new Animated.Value(initialValue)).current;
@@ -205,15 +205,16 @@ const SplashScreenAnimation = () => {
               }),
 
               Animated.timing(letterDOpacity, {
-                delay: 400,
+                delay: 100,
                 toValue: 1,
-                duration: 400,
+                duration: FINAL_DURATION,
                 useNativeDriver: true,
               }),
+
               Animated.timing(letterDScale, {
                 toValue: 1,
-                delay: 400,
-                duration: 400,
+                delay: 100,
+                duration: FINAL_DURATION,
                 useNativeDriver: true,
               }),
 
@@ -226,7 +227,7 @@ const SplashScreenAnimation = () => {
               setAnimationPhase("completed");
             });
           });
-        }, 500);
+        }, 300);
       });
     });
   }, []);
@@ -290,7 +291,14 @@ const SplashScreenAnimation = () => {
             zIndex: 1,
             transform: [
               { scale },
-              { rotate: animationPhase === "combined" ? finalRotateDeg : rotate2Deg },
+              {
+                rotate:
+                  animationPhase === "combined" ||
+                  animationPhase === "fading" ||
+                  animationPhase === "finished"
+                    ? finalRotateDeg
+                    : rotate2Deg,
+              },
               { scale: heart2FinalScale },
               { scale: heartShrinkScale },
               { translateX: posX2 },
