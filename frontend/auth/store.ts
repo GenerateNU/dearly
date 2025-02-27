@@ -127,9 +127,9 @@ export const useUserStore = create<UserState>()(
           });
 
           console.log(session);
-          console.log("Creating user...")
+          console.log("Creating user...");
           const result = await createUser(data);
-          console.log(result)
+          console.log(result);
 
           set({
             isAuthenticated: true,

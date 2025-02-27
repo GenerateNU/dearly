@@ -5,7 +5,7 @@ import { TextButton } from "@/design-system/components/ui/text-button";
 import { Alert, SafeAreaView } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useState } from "react";
-import { createUser } from "../../api/user"
+import { createUser } from "../../api/user";
 import { router } from "expo-router";
 import { useUserState } from "@/auth/provider";
 import { useUserStore } from "@/auth/store";
@@ -13,49 +13,47 @@ import { useUserStore } from "@/auth/store";
 const Birthday = () => {
   const { user, setUser } = useOnboarding();
 
-  const { register, error } = useUserStore()
+  const { register, error } = useUserStore();
 
-  const [ profileCreating, setProfileCreating ] = useState(false)
+  const [profileCreating, setProfileCreating] = useState(false);
 
   const createProfile = async () => {
-    setProfileCreating(true)
+    setProfileCreating(true);
 
     try {
-      // TODO: 
-      console.log("Registering user...")
-      await register(user)
-      console.log(`Error: ${error}`)
+      // TODO:
+      console.log("Registering user...");
+      await register(user);
+      console.log(`Error: ${error}`);
       if (!error as unknown) {
-        router.push(`/(app)/(tabs)`)
+        router.push(`/(app)/(tabs)`);
       } else {
         let errorMessage = "Failed to create profile. Please try again.";
-        reroute(errorMessage)
+        reroute(errorMessage);
       }
-      setProfileCreating(false)
-      
-      
-    } catch(error: unknown) {
+      setProfileCreating(false);
+    } catch (error: unknown) {
       let errorMessage = "Failed to create profile. Please try again.";
       if (error instanceof Error) {
         errorMessage = `Failed to create profile. ${error.message} Please try again.`;
-      } 
+      }
 
-      reroute(errorMessage)
+      reroute(errorMessage);
     }
-  }
+  };
 
   // Route to correct page upon error
   const reroute = (message: string) => {
     Alert.alert(
       "Error Creating Profile.", // Title of the alert
       message, // Message body of the alert
-      [ 
+      [
         {
           text: "OK",
-          onPress: () => router.push(`/(auth)/register`)
+          onPress: () => router.push(`/(auth)/register`),
         },
       ],
-      { cancelable: false }
+      { cancelable: false },
     );
   };
 
@@ -78,7 +76,12 @@ const Birthday = () => {
           />
         </Box>
         <Box gap="m" alignItems="center" className="w-full">
-          <TextButton variant="honeyRounded" label={profileCreating ? 'Creating Profile...' : 'Create Profile'} disabled={profileCreating} onPress={() => createProfile()} />
+          <TextButton
+            variant="honeyRounded"
+            label={profileCreating ? "Creating Profile..." : "Create Profile"}
+            disabled={profileCreating}
+            onPress={() => createProfile()}
+          />
         </Box>
       </Box>
     </SafeAreaView>
