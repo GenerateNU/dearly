@@ -19,7 +19,7 @@ interface SplashScreenContent {
 
 const Welcome = () => {
   const [page, setPage] = useState<number>(0);
-  const { setPage: setOnboardingPage, reset } = useOnboarding();
+  const { setPage: setOnboardingPage } = useOnboarding();
   const { width } = Dimensions.get("window");
   const loginRef = useRef<BottomSheet>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
