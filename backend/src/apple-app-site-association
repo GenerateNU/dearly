@@ -1,0 +1,22 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        // Syntax: "<APPLE_TEAM_ID>.<BUNDLE_ID>"
+        "appID": "W3PR3X4XD2.com.generate.dearly",
+        // All paths that should support redirecting.
+        /* @info Replace <CODE>/records/*</CODE> with your own path. */
+        "paths": ["/(app)/(tabs)/*"]
+      }
+    ]
+  },
+  // This section enables Apple Handoff
+  "activitycontinuation": {
+    "apps": ["W3PR3X4XD2.com.generate.dearly"]
+  },
+  // This section enable Shared Web Credentials
+  "webcredentials": {
+    "apps": ["W3PR3X4XD2.com.generate.dearly"]
+  }
+}
