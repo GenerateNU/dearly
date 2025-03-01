@@ -2,6 +2,8 @@ import { Box } from "@/design-system/base/box";
 import { useUserGroups } from "@/hooks/api/group";
 import { EmptyHomePage } from "@/design-system/components/home/empty";
 import { Text } from "@/design-system/base/text";
+import { TextButton } from "@/design-system/components/ui/text-button";
+import { useInvitations } from "@/hooks/api/invite";
 
 const Home = () => {
   const { data, isLoading } = useUserGroups();
@@ -46,6 +48,7 @@ const Home = () => {
       flex={1}
     >
       <Text>Home</Text>
+      <TextButton variant="text" label="Send Message" onPress={useInvitations} />
     </Box>
   );
 };
