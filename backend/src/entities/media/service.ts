@@ -4,7 +4,7 @@ import {
   ThumbnailResponse,
   ThumbnailResponseWithURL,
 } from "./../../types/api/internal/groups";
-import { IS3Operations } from "../../services/s3Service";
+import { S3Service } from "../../services/s3Service";
 import { PostWithMedia, PostWithMediaURL } from "../../types/api/internal/posts";
 import { SearchedUser, User } from "../../types/api/internal/users";
 import { MediaType, Tag } from "../../constants/database";
@@ -80,10 +80,10 @@ export interface MediaService {
 }
 
 export class MediaServiceImpl {
-  private s3Service: IS3Operations;
+  private s3Service: S3Service;
   private db: PostgresJsDatabase;
 
-  constructor(db: PostgresJsDatabase, s3Service: IS3Operations) {
+  constructor(db: PostgresJsDatabase, s3Service: S3Service) {
     this.s3Service = s3Service;
     this.db = db;
   }

@@ -13,6 +13,9 @@ const middleware: Middleware = {
       handleHTTPStatusError(response.status, `Error found ${response.statusText}`);
     }
   },
+  async onError({ error }) {
+    console.log(error);
+  },
 };
 
 fetchClient.use(middleware);

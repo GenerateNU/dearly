@@ -6,56 +6,16 @@ import { Alert, SafeAreaView } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { router } from "expo-router";
 import { useUserStore } from "@/auth/store";
-import { uploadUserMedia } from "@/api/media";
-import * as ImageManipulator from "expo-image-manipulator";
-
-// Function to convert URI to Blob
-const uriToBlob = async (uri: string) => {
-  const response = await fetch(uri);
-  const blob = await response.blob();
-  return blob;
-};
 
 const Birthday = () => {
   const { user, setUser, setIsCreatingProfile, isCreatingProfile } = useOnboarding();
   const { register, error, isAuthenticated } = useUserStore();
 
-  const convertToJpeg = async (uri: string) => {
-    const result = await ImageManipulator.manipulateAsync(uri, [], {
-      format: ImageManipulator.SaveFormat.JPEG,
-      compress: 0.8,
-    });
-    return result.uri;
-  };
-
   const createProfile = async () => {
     setIsCreatingProfile(true);
 
-    if (user.profilePhoto) {
-      try {
-        // Convert the photo to JPEG (you can use PNG if preferred)
-        const jpegUri = await convertToJpeg(user.profilePhoto);
-
-        // Convert the JPEG image to a Blob
-        const profilePhotoBlob = await uriToBlob(jpegUri);
-
-        // Create FormData and append the file
-        const formData = new FormData();
-        formData.append("media", profilePhotoBlob, "profilePhoto.jpg");
-
-        // Upload the media
-        await uploadUserMedia(formData);
-      } catch (err) {
-        console.error("Error processing the profile photo:", err);
-        setIsCreatingProfile(false);
-        return;
-      }
-    }
-
     try {
-      // Register the user and handle any errors
       await register(user);
-
       if (error) {
         reroute(error);
       }
@@ -75,7 +35,7 @@ const Birthday = () => {
   // Route to correct page upon error
   const reroute = (message: string) => {
     Alert.alert(
-      "Error Creating Profile.", // Title of the alert
+      "Failed to create your profile.", // Title of the alert
       message, // Message body of the alert
       [
         {

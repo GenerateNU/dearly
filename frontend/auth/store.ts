@@ -12,6 +12,8 @@ import { getExpoDeviceToken } from "@/utilities/device-token";
 import { Group } from "@/types/group";
 import * as SecureStore from "expo-secure-store";
 import { OnboardingUserInfo } from "@/contexts/onboarding";
+import { uploadUserMedia } from "@/api/media";
+import { getProfilePhotoBlob } from "@/utilities/media";
 
 interface UserState {
   isAuthenticated: boolean;
@@ -122,11 +124,18 @@ export const useUserStore = create<UserState>()(
             email: data.email,
             password: data.password,
           });
+          let objectKey: string | undefined;
+          if (data.profilePhoto) {
+            const form = await getProfilePhotoBlob(data.profilePhoto);
+            console.log(form);
+            const response = await uploadUserMedia(form);
+            objectKey = response.objectKey;
+          }
           await createUser({
             name: data.name,
             username: data.username,
             mode: data.mode,
-            profilePhoto: data.profilePhoto,
+            profilePhoto: objectKey,
             birthday: data.birthday,
           });
           set({
