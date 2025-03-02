@@ -8,6 +8,8 @@ import {
   hasHardwareAsync,
 } from "expo-local-authentication";
 import * as SecureStore from "expo-secure-store";
+import * as Linking from "expo-linking";
+
 /**
  * Interface for authentication services, providing methods for user sign-up, login,
  * logout, and password management.
@@ -153,8 +155,10 @@ export class SupabaseAuth implements AuthService {
   }
 
   async forgotPassword({ email }: { email: string }): Promise<void> {
+    const redirectTo = Linking.createURL(`auth/reset-password`);
+
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "dearly://auth/reset-password",
+      redirectTo,
     });
 
     if (error) {
