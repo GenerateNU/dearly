@@ -127,7 +127,6 @@ export const useUserStore = create<UserState>()(
           let objectKey: string | undefined;
           if (data.profilePhoto) {
             const form = await getProfilePhotoBlob(data.profilePhoto);
-            console.log(form);
             const response = await uploadUserMedia(form);
             objectKey = response.objectKey;
           }

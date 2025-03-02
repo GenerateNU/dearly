@@ -26,33 +26,14 @@ export const uploadPostMedia = async (
   return authWrapper<UploadGroupMediaResponse>()(req);
 };
 
-export const uploadUserMedia = async (form: FormData): Promise<UploadUserMediaResponse> => {
-  try {
-    console.log("Form:", form);
-
-    const req = async (token: string): Promise<any> => {
-      const response = await fetch(`${API_BASE_URL}/api/v1/users/media`, {
-        method: "POST",
-        headers: {
-          ...getHeaders(token, undefined),
-        },
-        body: form,
-      });
-
-      if (!response.ok) {
-        // Throw an error if the response is not OK
-        const errorData = await response.json(); // Get the error message if available
-        throw new Error(`Failed to upload file: ${errorData.message || "Unknown error"}`);
-      }
-
-      const data = await response.json();
-      return data;
-    };
-
-    return await authWrapper<UploadUserMediaResponse>()(req);
-  } catch (error) {
-    // Catch any error and log it
-    console.error("Error uploading media:", error);
-    throw new Error(`Upload failed: ${error instanceof Error ? error.message : "Unknown error"}`);
-  }
+export const uploadUserMedia = async (payload: FormData): Promise<UploadUserMediaResponse> => {
+  const req = async (token: string): Promise<UploadUserMediaResponse> => {
+    const { data } = await fetchClient.POST("/api/v1/users/media", {
+      headers: getHeaders(token, undefined),
+      // @ts-ignore
+      body: payload,
+    });
+    return data!;
+  };
+  return authWrapper<UploadUserMediaResponse>()(req);
 };

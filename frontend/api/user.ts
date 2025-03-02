@@ -9,8 +9,6 @@ import fetchClient from "./client";
 import { authWrapper, getHeaders } from "@/utilities/auth-token";
 
 export const createUser = async (payload: CreateUserPayload): Promise<User> => {
-  console.log("Creating user", payload);
-
   const req = async (token: string): Promise<User> => {
     const { data } = await fetchClient.POST("/api/v1/users", {
       headers: getHeaders(token),
@@ -18,7 +16,6 @@ export const createUser = async (payload: CreateUserPayload): Promise<User> => {
     });
     return data!;
   };
-  console.log("Creating request", req);
   return authWrapper<User>()(req);
 };
 
@@ -32,8 +29,6 @@ export const getUser = async (id: string): Promise<User> => {
         },
       },
     });
-    console.log("creating user api endpoint...");
-    console.log(data);
     return data!;
   };
   return authWrapper<User>()(req);
