@@ -7,7 +7,6 @@ import {
   authenticateAsync,
   hasHardwareAsync,
 } from "expo-local-authentication";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 /**
  * Interface for authentication services, providing methods for user sign-up, login,
@@ -155,7 +154,7 @@ export class SupabaseAuth implements AuthService {
 
   async forgotPassword({ email }: { email: string }): Promise<void> {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "exp://127.0.0.1:8081/--/(auth)/reset-password",
+      redirectTo: "dearly://auth/reset-password",
     });
 
     if (error) {

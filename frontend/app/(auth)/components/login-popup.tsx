@@ -11,20 +11,20 @@ interface LoginModalProps {
 }
 
 const LoginModal = forwardRef<BottomSheetMethods, LoginModalProps>(({ onClose }, ref) => {
-  const { page } = useOnboarding();
+  const { page, popupVisible } = useOnboarding();
 
   useEffect(() => {
-    if (page === 0) {
+    if (page === 0 && popupVisible) {
       const refObject = ref as RefObject<BottomSheetMethods>;
 
       const keyboardDidShowListener = Keyboard.addListener("keyboardDidShow", () => {
-        if (refObject?.current) {
+        if (refObject?.current && popupVisible) {
           refObject.current.snapToIndex(1);
         }
       });
 
       const keyboardDidHideListener = Keyboard.addListener("keyboardDidHide", () => {
-        if (refObject.current) {
+        if (refObject.current && popupVisible && page === 0) {
           refObject.current.snapToIndex(0);
         }
       });
@@ -34,17 +34,10 @@ const LoginModal = forwardRef<BottomSheetMethods, LoginModalProps>(({ onClose },
         keyboardDidShowListener.remove();
       };
     }
-  }, [page, ref]);
-
-  const handleClose = () => {
-    Keyboard.dismiss();
-    if (onClose) {
-      onClose();
-    }
-  };
+  }, [page, popupVisible]);
 
   return (
-    <BottomSheetModal snapPoints={["55%", "90%"]} ref={ref} onClose={handleClose}>
+    <BottomSheetModal snapPoints={["55%", "90%"]} ref={ref} onClose={onClose}>
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <Box

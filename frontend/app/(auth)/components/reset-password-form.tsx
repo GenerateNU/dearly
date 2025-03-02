@@ -39,10 +39,7 @@ const ResetPasswordForm = () => {
     try {
       const validData = RESET_PASSWORD_SCHEMA.parse(data);
       await resetPassword(validData.password);
-      const isAuthenticated = useUserStore.getState().isAuthenticated;
-      if (isAuthenticated) {
-        router.push("/(auth)");
-      }
+      router.push("/(auth)");
     } catch (err: unknown) {
       if (err instanceof ZodError) {
         const errorMessages = err.errors.map((error) => error.message).join("\n");

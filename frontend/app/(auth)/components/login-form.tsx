@@ -18,7 +18,7 @@ const LOGIN_SCHEMA = z.object({
   password: z.string().min(1, { message: "Password required" }),
 });
 
-const LoginForm = ({ clearError }: { clearError?: boolean }) => {
+const LoginForm = () => {
   const {
     control,
     handleSubmit,
@@ -30,20 +30,28 @@ const LoginForm = ({ clearError }: { clearError?: boolean }) => {
     mode: "onTouched",
   });
 
-  const { login, isPending, error: authError, loginWithBiometrics } = useUserStore();
+  const { login, isPending, error: authError, loginWithBiometrics, clearError } = useUserStore();
   const { popupVisible } = useOnboarding();
 
   useEffect(() => {
-    if (clearError) {
-      reset({}, { keepValues: true });
-    }
-  }, [clearError, reset]);
-
-  useEffect(() => {
     if (popupVisible) {
-      reset({}, { keepValues: false });
+      reset(
+        {
+          email: "",
+          password: "",
+        },
+        {
+          keepErrors: false,
+          keepDirty: false,
+          keepIsSubmitted: false,
+          keepTouched: false,
+          keepIsValid: false,
+          keepSubmitCount: false,
+        },
+      );
+      clearError();
     }
-  }, [popupVisible, reset]);
+  }, [popupVisible, reset, clearError, authError]);
 
   const onBiometricPress = async () => {
     await loginWithBiometrics();

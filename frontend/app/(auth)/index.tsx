@@ -3,7 +3,7 @@ import Illustration from "@/assets/splash-screen-illustration.svg";
 import { Text } from "@/design-system/base/text";
 import Carousel, { ICarouselInstance } from "react-native-reanimated-carousel";
 import { useRef, useState, useEffect } from "react";
-import { Dimensions, Keyboard, TouchableWithoutFeedback, Alert } from "react-native";
+import { Dimensions, Keyboard, TouchableWithoutFeedback } from "react-native";
 import { TextButton } from "@/design-system/components/ui/text-button";
 import BottomSheet from "@gorhom/bottom-sheet";
 import LoginModal from "./components/login-popup";
@@ -11,8 +11,8 @@ import { SPLASH_SCREEN_INFO } from "@/constants/splash-screen";
 import { FadeIn, FadeInDown, SlideInDown } from "react-native-reanimated";
 import { AnimatedBox } from "@/design-system/base/animated-box";
 import { useOnboarding } from "@/contexts/onboarding";
-import { useUserState } from "@/auth/provider";
 import { router } from "expo-router";
+import { useUserState } from "@/auth/provider";
 
 interface SplashScreenContent {
   header: string;
@@ -41,11 +41,13 @@ const Welcome = () => {
   );
 
   const onLoginPress = () => {
-    loginRef.current?.snapToIndex(0);
     loginWithBiometrics();
+    onboarding.setPopupVisible(true);
+    loginRef.current?.snapToIndex(0);
   };
 
   const handleGetStarted = () => {
+    onboarding.setPopupVisible(false);
     onboarding.setPage(1);
     router.push("/(auth)/register");
   };
@@ -81,7 +83,7 @@ const Welcome = () => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()} accessible={false}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <Box backgroundColor="pearl" flex={1} justifyContent="center" alignItems="center">
         <Box gap="l" width="100%" padding="m">
           <AnimatedBox entering={FadeInDown.duration(800)}>
@@ -134,7 +136,7 @@ const Welcome = () => {
             </Box>
           </AnimatedBox>
         </Box>
-        <LoginModal ref={loginRef} />
+        <LoginModal onClose={() => onboarding.setPopupVisible(false)} ref={loginRef} />
       </Box>
     </TouchableWithoutFeedback>
   );

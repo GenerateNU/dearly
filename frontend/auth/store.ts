@@ -207,9 +207,6 @@ export const useUserStore = create<UserState>()(
     {
       name: "auth-storage",
       storage: createJSONStorage(() => AsyncStorage),
-      onRehydrateStorage: () => {
-        console.log("Rehydrating state...");
-      },
     },
   ),
 );

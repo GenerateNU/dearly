@@ -20,6 +20,7 @@ interface UserContextType {
   loginWithBiometrics: () => Promise<void>;
   forgotPassword: (email?: string) => Promise<void>;
   resetPassword: (password: string) => Promise<void>;
+  clearError: () => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -40,6 +41,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     setSelectedGroup,
     forgotPassword,
     resetPassword,
+    clearError,
   } = useUserStore();
 
   return (
@@ -56,6 +58,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         mode,
         setMode,
         setInviteToken,
+        clearError,
         inviteToken,
         forgotPassword,
         resetPassword,

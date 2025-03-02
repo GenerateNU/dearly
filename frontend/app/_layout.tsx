@@ -45,7 +45,6 @@ const InitialLayout = () => {
 
         await SplashScreen.hideAsync();
 
-        // Set a timeout for the splash screen animation
         setTimeout(() => {
           setShowSplash(false);
           setIsReady(true);

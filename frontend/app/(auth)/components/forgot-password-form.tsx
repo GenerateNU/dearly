@@ -33,10 +33,7 @@ const ForgotPasswordForm = () => {
     try {
       const validData = EMAIL_SCHEMA.parse(data);
       await forgotPassword(validData.email);
-      const isAuthenticated = useUserStore.getState().isAuthenticated;
-      if (isAuthenticated) {
-        router.push("/(auth)/check-email");
-      }
+      router.push("/(auth)/check-email");
     } catch (err: unknown) {
       if (err instanceof ZodError) {
         const errorMessages = err.errors.map((error) => error.message).join("\n");

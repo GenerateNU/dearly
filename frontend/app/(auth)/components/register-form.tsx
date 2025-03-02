@@ -59,15 +59,11 @@ const RegisterForm = () => {
   const [passwordTouched, setPasswordTouched] = useState(false);
   const [retypedPasswordTouched, setRetypedPasswordTouched] = useState(false);
 
-  // Watch password and retypedPassword fields
   const password = watch("password");
   const retypedPassword = watch("retypedPassword");
-
-  // Check for password match manually
   const [passwordMatchError, setPasswordMatchError] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    // Only show mismatch error if both fields have been touched and have values
     if (passwordTouched && retypedPasswordTouched && password && retypedPassword) {
       if (password !== retypedPassword) {
         setPasswordMatchError("Passwords do not match");
@@ -167,7 +163,6 @@ const RegisterForm = () => {
                 setRetypedPasswordTouched(true);
                 trigger("retypedPassword");
               }}
-              // Show our custom error or the form validation error
               error={
                 passwordMatchError || (errors.retypedPassword && errors.retypedPassword.message)
               }
