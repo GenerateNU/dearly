@@ -4,6 +4,7 @@ import { Box } from "@/design-system/base/box";
 import { Photo } from "./photo";
 import { Post } from "@/types/post";
 import { router } from "expo-router";
+import { BaseButton } from "@/design-system/base/button";
 
 interface MasonryFeedProps {
   posts: Post[];
@@ -16,7 +17,11 @@ export const MasonryList: React.FC<MasonryFeedProps> = ({ posts }) => {
         data={posts}
         numColumns={2}
         renderItem={({ item, index }) => (
-            <Box
+
+          <BaseButton
+            variant="text"
+            onPress={() => console.log("Sending you to the post", item.id)}
+          >            <Box
               width="100%"
               height="100%"
               padding="s"
@@ -28,6 +33,7 @@ export const MasonryList: React.FC<MasonryFeedProps> = ({ posts }) => {
                 router.push(`/(ViewPost)/${item.id!}`)
               }}/>
             </Box>
+          </BaseButton>
         )}
         estimatedItemSize={200}
       />
