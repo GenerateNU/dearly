@@ -16,7 +16,6 @@ export const MasonryList: React.FC<MasonryFeedProps> = ({ posts }) => {
       <MasonryFlashList
         data={posts}
         numColumns={2}
-        estimatedItemSize={200}
         renderItem={({ item, index }) => (
           <BaseButton
             variant="text"
