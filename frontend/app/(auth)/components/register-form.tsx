@@ -1,4 +1,4 @@
-import { Alert } from "react-native";
+import { Alert, Keyboard, NativeSyntheticEvent, TextInputFocusEventData } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z, ZodError } from "zod";
@@ -114,7 +114,7 @@ const RegisterForm = () => {
         <Controller
           name="username"
           control={control}
-          render={({ field: { onChange, value } }) => (
+          render={({ field: { onChange, value, onBlur } }) => (
             <Input
               onChangeText={(text: string) => {
                 onChange(text);
@@ -130,13 +130,12 @@ const RegisterForm = () => {
         <Controller
           name="password"
           control={control}
-          render={({ field: { onChange, value } }) => (
+          render={({ field: { onChange, value, onBlur } }) => (
             <Input
               onChangeText={(text: string) => {
                 onChange(text);
                 setPasswordTouched(true);
                 trigger("password");
-                // Also trigger retypedPassword validation if it's been touched
                 if (retypedPasswordTouched) {
                   trigger("retypedPassword");
                 }

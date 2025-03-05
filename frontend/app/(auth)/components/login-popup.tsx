@@ -5,6 +5,7 @@ import BottomSheetModal from "@/design-system/components/ui/bottom-sheet";
 import { forwardRef, useEffect, RefObject } from "react";
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 import { useOnboarding } from "@/contexts/onboarding";
+import { useBottomSheetInternal } from "@gorhom/bottom-sheet";
 
 interface LoginModalProps {
   onClose?: () => void;

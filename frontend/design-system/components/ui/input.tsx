@@ -15,6 +15,7 @@ type TextboxProps = {
   readOnly?: boolean;
   inputMode?: "text" | "numeric" | "search" | "email";
   onChangeText?: (() => void) | ((value: any) => void);
+  onBlur?: (() => void) | ((value: any) => void);
   value?: string;
   maxLength?: number;
   secureTextEntry?: boolean;
@@ -40,6 +41,7 @@ const Input: React.FC<TextboxProps> = ({
   leftIcon,
   rightIcon,
   paragraph,
+  onBlur,
 }) => {
   const theme = useTheme<Theme>();
 
@@ -68,6 +70,7 @@ const Input: React.FC<TextboxProps> = ({
             <BaseTextInput
               placeholder={placeholder}
               autoFocus={autoFocus}
+              onBlur={onBlur}
               readOnly={readOnly}
               inputMode={inputMode}
               placeholderTextColor="#D3D3D3"

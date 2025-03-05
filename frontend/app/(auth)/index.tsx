@@ -47,8 +47,8 @@ const Welcome = () => {
   };
 
   const handleGetStarted = () => {
-    onboarding.setPage(1);
     onboarding.setPopupVisible(false);
+    onboarding.setPage(1);
     router.push("/(auth)/register");
   };
 
