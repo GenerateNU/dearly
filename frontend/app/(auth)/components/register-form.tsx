@@ -1,4 +1,4 @@
-import { Alert, Keyboard, NativeSyntheticEvent, TextInputFocusEventData } from "react-native";
+import { Alert } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z, ZodError } from "zod";

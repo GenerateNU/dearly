@@ -5,7 +5,6 @@ import {
   UploadGroupMediaResponse,
   UploadUserMediaResponse,
 } from "@/types/media";
-import { API_BASE_URL } from "@/constants/api";
 
 export const uploadPostMedia = async (
   id: string,

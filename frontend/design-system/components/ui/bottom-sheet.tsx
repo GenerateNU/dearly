@@ -1,5 +1,5 @@
-import React, { forwardRef, useCallback, useEffect } from "react";
-import BottomSheet, { BottomSheetBackdrop, useBottomSheetInternal } from "@gorhom/bottom-sheet";
+import React, { forwardRef, useCallback } from "react";
+import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 import { Keyboard } from "react-native";
 
