@@ -2,7 +2,6 @@ import { Box } from "@/design-system/base/box";
 import { Icon } from "@/design-system/components/ui/icon";
 import { useIsBasicMode } from "@/hooks/component/mode";
 import { Tabs } from "expo-router";
-import React from "react";
 
 const Layout = () => {
   const hasLabel = useIsBasicMode();
