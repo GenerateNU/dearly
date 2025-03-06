@@ -2,8 +2,8 @@ import React from "react";
 import { MasonryFlashList } from "@shopify/flash-list";
 import { Box } from "@/design-system/base/box";
 import { Photo } from "./photo";
-import { BaseButton } from "@/design-system/base/button";
 import { Post } from "@/types/post";
+import { router } from "expo-router";
 
 interface MasonryFeedProps {
   posts: Post[];
@@ -16,10 +16,6 @@ export const MasonryList: React.FC<MasonryFeedProps> = ({ posts }) => {
         data={posts}
         numColumns={2}
         renderItem={({ item, index }) => (
-          <BaseButton
-            variant="text"
-            onPress={() => console.log("Sending you to the post", item.id)}
-          >
             <Box
               width="100%"
               height="100%"
@@ -27,9 +23,11 @@ export const MasonryList: React.FC<MasonryFeedProps> = ({ posts }) => {
               paddingRight={index % 2 === 0 ? "s" : "none"}
               paddingLeft={index % 2 !== 0 ? "s" : "none"}
             >
-              <Photo image={item.media![0]?.url!} />
+              <Photo image={item.media![0]?.url!} 
+              onPress={() => {
+                router.push(`/ViewPost/${item.id!}`)
+              }}/>
             </Box>
-          </BaseButton>
         )}
         estimatedItemSize={200}
       />

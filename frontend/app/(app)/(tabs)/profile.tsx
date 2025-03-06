@@ -49,7 +49,7 @@ const InfoBar = () => {
   const { group } = useUserStore();
   const groupName = group ? group.name : "Unknown";
   const onPressGroupName = () => {
-    console.log("shitter");
+    console.log("group names");
   };
 
   return (
@@ -123,7 +123,7 @@ const UserPosts = () => {
   };
 
   const p2: Post = {
-    id: "12345",
+    id: "ba035ea2-ed46-4fbf-b994-11404b5bed60",
     userId: userId!,
     createdAt: new Date().toISOString(),
     caption: "Got my PHD!",
