@@ -14,8 +14,9 @@ import { Dimensions } from "react-native";
 import { BIGGER_PHONE_SCALE_RATIO, BIGGER_PHONE_SCREEN } from "@/constants/scale";
 import { UserProvider } from "@/auth/provider";
 import { useUserStore } from "@/auth/store";
-import SplashScreenAnimation from "./(auth)/components/splash-screen";
 import { OnboardingProvider } from "@/contexts/onboarding";
+import { Stack } from "expo-router";
+
 
 const queryClient = new QueryClient();
 
@@ -83,7 +84,11 @@ const InitialLayout = () => {
   // return the slot to ensure navigation container is mounted first
   return (
     <ThemeProvider theme={getTheme(scaleRatio * scaleFactor)}>
-      {showSplash ? <SplashScreenAnimation /> : <Slot />}
+      <Stack screenOptions={{ gestureEnabled: false }}>
+        <Stack.Screen name="(auth)" options={{ headerShown: false, gestureEnabled: false }} />
+        <Stack.Screen name="(app)" options={{ headerShown: false, gestureEnabled: false }} />
+        <Stack.Screen name="ViewPost" options={{ headerShown: false, gestureEnabled: false }} />
+      </Stack>
     </ThemeProvider>
   );
 };
