@@ -139,6 +139,7 @@ const InitialLayout = () => {
 
   // return the slot to ensure navigation container is mounted first
   return (
+<<<<<<< HEAD
     <ThemeProvider theme={getTheme(scaleRatio)}>
       {showSplash ? (
         <SplashScreenAnimation />
@@ -148,6 +149,14 @@ const InitialLayout = () => {
           {isPending && <AddMemberLoading />}
         </>
       )}
+=======
+    <ThemeProvider theme={getTheme(scaleRatio * scaleFactor)}>
+      <Stack screenOptions={{ gestureEnabled: false }}>
+        <Stack.Screen name="(auth)" options={{ headerShown: false, gestureEnabled: false }} />
+        <Stack.Screen name="(app)" options={{ headerShown: false, gestureEnabled: false }} />
+        <Stack.Screen name="ViewPost" options={{ headerShown: false, gestureEnabled: false }} />
+      </Stack>
+>>>>>>> e938cc4 (Clickable images that route to its post)
     </ThemeProvider>
   );
 };
