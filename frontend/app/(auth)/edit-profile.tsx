@@ -18,7 +18,7 @@ const EditProfile = () => {
     });
 
     if (result.canceled) {
-      return "";
+      return;
     }
 
     if (result.assets[0]) {
