@@ -29,8 +29,7 @@ export const uploadUserMedia = async (payload: FormData): Promise<UploadUserMedi
   const req = async (token: string): Promise<UploadUserMediaResponse> => {
     const { data } = await fetchClient.POST("/api/v1/users/media", {
       headers: getHeaders(token, undefined),
-      // @ts-ignore
-      body: payload,
+      body: payload as FormData & { media : string },
     });
     return data!;
   };
