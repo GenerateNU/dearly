@@ -12,11 +12,21 @@ import BackNextButtons from "./buttons";
 
 const RESET_PASSWORD_SCHEMA = z
   .object({
-    retypedPassword: z.string().min(1, { message: "Required" }),
-    password: z.string().min(1, { message: "Required" }),
+    password: z
+      .string()
+      .regex(/[0-9]/, {
+        message: "Password must contain at least one number",
+      })
+      .regex(/[^A-Za-z0-9]/, {
+        message: "Password must contain at least one special character",
+      })
+      .min(8, { message: "Password must be at least 8 characters long" }),
+    retypedPassword: z.string(),
   })
   .refine((data) => data.password === data.retypedPassword, {
     path: ["retypedPassword"],
+    message: "Passwords do not match",
+
   });
 
 type ResetPasswordType = z.infer<typeof RESET_PASSWORD_SCHEMA>;

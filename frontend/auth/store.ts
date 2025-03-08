@@ -171,10 +171,11 @@ export const useUserStore = create<UserState>()(
           },
         );
       },
-
+      
       resetPassword: async (password: string) => {
         await userWrapper(
           async () => {
+            set({ isPending: true });
             await authService.resetPassword({ password });
             set({ error: null });
             const validEmail = SecureStore.getItem("email");
@@ -182,6 +183,7 @@ export const useUserStore = create<UserState>()(
               throw new Error("No email found.");
             }
             await authService.storeLocalSessionToDevice(validEmail, password);
+            set({ isPending: false });
           },
           async (err: unknown) => {
             handleError(err, set);
