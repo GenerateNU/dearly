@@ -3,12 +3,12 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z, ZodError } from "zod";
 import Input from "@/design-system/components/ui/input";
-import { TextButton } from "@/design-system/components/ui/text-button";
 import { AuthRequest } from "@/types/auth";
 import { Box } from "@/design-system/base/box";
 import { useOnboarding } from "@/contexts/onboarding";
 import { useState, useEffect } from "react";
 import { router } from "expo-router";
+import BackNextButtons from "./buttons";
 
 type RegisterFormData = AuthRequest & {
   username: string;
@@ -82,14 +82,19 @@ const RegisterForm = () => {
         password: validData.password,
       };
       setUser(data);
-      setPage(page + 1);
-      router.push("/(auth)/mode");
+      setPage(3);
+      router.push("/(auth)/edit-profile");
     } catch (err: unknown) {
       if (err instanceof ZodError) {
         const errorMessages = err.errors.map((error) => error.message).join("\n");
         Alert.alert("Validation Errors", errorMessages);
       }
     }
+  };
+
+  const onPrev = () => {
+    setPage(page - 1);
+    router.back();
   };
 
   return (
@@ -105,7 +110,7 @@ const RegisterForm = () => {
                 trigger("email");
               }}
               value={value}
-              title="Email"
+              title="EMAIL"
               placeholder="Enter your email"
               error={errors.email && errors.email.message}
             />
@@ -114,14 +119,14 @@ const RegisterForm = () => {
         <Controller
           name="username"
           control={control}
-          render={({ field: { onChange, value, onBlur } }) => (
+          render={({ field: { onChange, value } }) => (
             <Input
               onChangeText={(text: string) => {
                 onChange(text);
                 trigger("username");
               }}
               value={value}
-              title="Username"
+              title="USERNAME"
               placeholder="Enter your username"
               error={errors.username && errors.username.message}
             />
@@ -142,7 +147,7 @@ const RegisterForm = () => {
               }}
               secureTextEntry
               value={value}
-              title="Password"
+              title="PASSWORD"
               placeholder="Enter your password"
               error={errors.password && errors.password.message}
             />
@@ -155,7 +160,7 @@ const RegisterForm = () => {
             <Input
               secureTextEntry
               value={value}
-              title="Retype Password"
+              title="CONFIRM PASSWORD"
               placeholder="Passwords must match"
               onChangeText={(text: string) => {
                 onChange(text);
@@ -170,11 +175,10 @@ const RegisterForm = () => {
         />
       </Box>
       <Box gap="m" alignItems="center" className="w-full">
-        <TextButton
-          variant="honeyRounded"
-          label="Next"
-          onPress={handleSubmit(onSignUpPress)}
-          disabled={!isValid || !!passwordMatchError}
+        <BackNextButtons
+          disableNext={!isValid || !!passwordMatchError}
+          onPrev={onPrev}
+          onNext={handleSubmit(onSignUpPress)}
         />
       </Box>
     </Box>

@@ -5,14 +5,12 @@ import Carousel, { ICarouselInstance } from "react-native-reanimated-carousel";
 import { useRef, useState, useEffect } from "react";
 import { Dimensions, Keyboard, TouchableWithoutFeedback } from "react-native";
 import { TextButton } from "@/design-system/components/ui/text-button";
-import BottomSheet from "@gorhom/bottom-sheet";
-import LoginModal from "./components/login-popup";
 import { SPLASH_SCREEN_INFO } from "@/constants/splash-screen";
 import { FadeIn, FadeInDown, SlideInDown } from "react-native-reanimated";
 import { AnimatedBox } from "@/design-system/base/animated-box";
 import { useOnboarding } from "@/contexts/onboarding";
 import { router } from "expo-router";
-import { useUserState } from "@/auth/provider";
+import { useUserStore } from "@/auth/store";
 
 interface SplashScreenContent {
   header: string;
@@ -23,10 +21,9 @@ const Welcome = () => {
   const [page, setPage] = useState<number>(0);
   const onboarding = useOnboarding();
   const { width } = Dimensions.get("window");
-  const loginRef = useRef<BottomSheet>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const carouselRef = useRef<ICarouselInstance>(null);
-  const { loginWithBiometrics } = useUserState();
+  const { loginWithBiometrics } = useUserStore();
 
   const renderItem = ({ item }: { item: SplashScreenContent }) => (
     <AnimatedBox entering={FadeIn.duration(1000).delay(300)}>
@@ -40,16 +37,17 @@ const Welcome = () => {
     </AnimatedBox>
   );
 
-  const onLoginPress = () => {
+  useEffect(() => {
     loginWithBiometrics();
-    onboarding.setPopupVisible(true);
-    loginRef.current?.snapToIndex(0);
+  }, []);
+
+  const onLoginPress = async () => {
+    router.push("/(auth)/login");
   };
 
   const handleGetStarted = () => {
-    onboarding.setPopupVisible(false);
     onboarding.setPage(1);
-    router.push("/(auth)/register");
+    router.push("/(auth)/mode");
   };
 
   useEffect(() => {
@@ -136,7 +134,6 @@ const Welcome = () => {
             </Box>
           </AnimatedBox>
         </Box>
-        <LoginModal onClose={() => onboarding.setPopupVisible(false)} ref={loginRef} />
       </Box>
     </TouchableWithoutFeedback>
   );

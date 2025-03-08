@@ -5,10 +5,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z, ZodError } from "zod";
 import { router } from "expo-router";
 import Input from "@/design-system/components/ui/input";
-import { TextButton } from "@/design-system/components/ui/text-button";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { useUserStore } from "@/auth/store";
+import BackNextButtons from "./buttons";
 
 const EMAIL_SCHEMA = z.object({
   email: z.string().email({ message: "Invalid email" }),
@@ -67,13 +67,12 @@ const ForgotPasswordForm = () => {
           </Text>
         )}
       </Box>
-      <Box gap="m" alignItems="center" className="w-full">
-        <TextButton variant="blushRounded" label="Back" onPress={router.back} />
-        <TextButton
-          variant="honeyRounded"
-          label="Next"
-          onPress={handleSubmit(onForgotPasswordPress)}
-          disabled={isPending || !isValid}
+      <Box alignItems="center" className="w-full">
+        <BackNextButtons
+          disablePrev={isPending}
+          disableNext={isPending || !isValid}
+          onPrev={() => router.back()}
+          onNext={handleSubmit(onForgotPasswordPress)}
         />
       </Box>
     </Box>

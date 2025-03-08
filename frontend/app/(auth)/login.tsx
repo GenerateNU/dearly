@@ -1,5 +1,4 @@
 import { Box } from "@/design-system/base/box";
-import RegisterForm from "./components/register-form";
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -8,8 +7,9 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { Text } from "@/design-system/base/text";
+import LoginForm from "./components/login-form";
 
-const Register = () => {
+const Login = () => {
   return (
     <KeyboardAvoidingView
       className="flex-1"
@@ -27,9 +27,9 @@ const Register = () => {
             paddingHorizontal="m"
           >
             <Text paddingBottom="l" variant="bodyLargeBold">
-              Create Account
+              Login
             </Text>
-            <RegisterForm />
+            <LoginForm />
           </Box>
         </TouchableWithoutFeedback>
       </SafeAreaView>
@@ -37,4 +37,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default Login;

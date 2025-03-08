@@ -4,19 +4,25 @@ import { Text } from "@/design-system/base/text";
 import { Card } from "@/design-system/components/ui/card";
 import { SafeAreaView } from "react-native";
 import { Mode } from "@/types/mode";
-import { TextButton } from "@/design-system/components/ui/text-button";
 import { router } from "expo-router";
+import BackNextButtons from "./components/buttons";
 
 const SelectMode = () => {
-  const { user, setUser, setPage } = useOnboarding();
+  const { user, setUser, setPage, reset } = useOnboarding();
 
   const handleSelectMode = (selectedMode: Mode) => {
     setUser({ mode: selectedMode });
   };
 
   const onNext = () => {
-    setPage(3);
-    router.push("/(auth)/edit-profile");
+    setPage(2);
+    router.push("/(auth)/register");
+  };
+
+  const onPrev = () => {
+    setPage(0);
+    reset();
+    router.back();
   };
 
   return (
@@ -24,8 +30,7 @@ const SelectMode = () => {
       <Box paddingBottom="l" padding="m" justifyContent="space-between" flex={1}>
         <Box gap="l" width="100%" flex={1} justifyContent="flex-start" alignItems="flex-start">
           <Box gap="s">
-            <Text variant="bodyLargeBold">Which version of the app would you like?</Text>
-            <Text variant="caption">(You can change this later in the settings)</Text>
+            <Text variant="bodyLargeBold">Choose Your Experience</Text>
           </Box>
 
           <Box gap="m" width="100%">
@@ -44,8 +49,8 @@ const SelectMode = () => {
             />
           </Box>
         </Box>
-        <Box gap="m" alignItems="center" className="w-full">
-          <TextButton variant="honeyRounded" label="Next" onPress={onNext} />
+        <Box width="100%" gap="m" alignItems="center" className="w-full">
+          <BackNextButtons onNext={onNext} onPrev={onPrev} />
         </Box>
       </Box>
     </SafeAreaView>

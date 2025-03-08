@@ -2,9 +2,10 @@ import { useOnboarding } from "@/contexts/onboarding";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { Avatar } from "@/design-system/components/ui/avatar";
-import { SafeAreaView, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from "react-native";
+import { SafeAreaView, TouchableWithoutFeedback, Keyboard } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import EditNameForm from "./components/edit-name-form";
+import { TextButton } from "@/design-system/components/ui/text-button";
 
 const EditProfile = () => {
   const { user, setUser } = useOnboarding();
@@ -39,14 +40,20 @@ const EditProfile = () => {
         >
           <Box gap="s" className="w-full" justifyContent="center" alignItems="center">
             <Text variant="bodyLargeBold">Profile</Text>
-            <TouchableOpacity activeOpacity={0.7} onPress={pickImage}>
+            <Box
+              width="100%"
+              alignItems="center"
+              justifyContent="center"
+              flexDirection="column"
+              gap="m"
+            >
               <Box alignItems="center" justifyContent="center">
                 <Avatar profilePhoto={user.profilePhoto} variant="huge" />
-                <Box position="absolute">
-                  <Text>Edit</Text>
-                </Box>
               </Box>
-            </TouchableOpacity>
+              <Box width="25%">
+                <TextButton onPress={pickImage} label="Edit" variant="honeyRounded" />
+              </Box>
+            </Box>
           </Box>
           <EditNameForm />
         </Box>

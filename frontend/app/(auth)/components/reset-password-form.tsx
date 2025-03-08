@@ -5,10 +5,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z, ZodError } from "zod";
 import { router } from "expo-router";
 import Input from "@/design-system/components/ui/input";
-import { TextButton } from "@/design-system/components/ui/text-button";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { useUserStore } from "@/auth/store";
+import BackNextButtons from "./buttons";
 
 const RESET_PASSWORD_SCHEMA = z
   .object({
@@ -51,10 +51,6 @@ const ResetPasswordForm = () => {
   return (
     <Box flex={1} flexDirection="column" gap="l" justifyContent="space-between">
       <Box gap="m">
-        <Box gap="xs">
-          <Text variant="bodyLargeBold">Reset Password</Text>
-          <Text variant="body">Enter your new password below, passwords must match</Text>
-        </Box>
         <Controller
           name="password"
           control={control}
@@ -100,13 +96,12 @@ const ResetPasswordForm = () => {
           </Text>
         )}
       </Box>
-      <Box gap="m" alignItems="center" className="w-full">
-        <TextButton variant="blushRounded" label="Back" onPress={router.back} />
-        <TextButton
-          variant="honeyRounded"
-          label="Next"
-          onPress={handleSubmit(onResetPasswordPress)}
-          disabled={isPending || !isValid}
+      <Box alignItems="center" className="w-full">
+        <BackNextButtons
+          disablePrev={isPending}
+          disableNext={isPending || !isValid}
+          onPrev={() => router.push("/(auth)")}
+          onNext={handleSubmit(onResetPasswordPress)}
         />
       </Box>
     </Box>

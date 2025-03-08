@@ -7,6 +7,7 @@ import { TextButton } from "@/design-system/components/ui/text-button";
 import { Box } from "@/design-system/base/box";
 import { useOnboarding } from "@/contexts/onboarding";
 import { router } from "expo-router";
+import BackNextButtons from "./buttons";
 
 const EDIT_NAME_SCHEMA = z.object({
   name: z.string({ message: "Invalid name" }),
@@ -15,7 +16,7 @@ const EDIT_NAME_SCHEMA = z.object({
 type Name = z.infer<typeof EDIT_NAME_SCHEMA>;
 
 const EditNameForm = () => {
-  const { user, setUser, setPage } = useOnboarding();
+  const { user, setUser, setPage, page } = useOnboarding();
 
   const {
     control,
@@ -44,6 +45,11 @@ const EditNameForm = () => {
     }
   };
 
+  const onPrev = () => {
+    setPage(page - 1);
+    router.back();
+  };
+
   return (
     <Box flexDirection="column" justifyContent="space-between" gap="l" flex={1} className="w-full">
       <Box>
@@ -57,7 +63,7 @@ const EditNameForm = () => {
                 trigger("name");
               }}
               value={value}
-              title="Display Name"
+              title="DISPLAY NAME"
               placeholder="Enter your display name"
               error={errors.name && errors.name.message}
             />
@@ -65,11 +71,10 @@ const EditNameForm = () => {
         />
       </Box>
       <Box gap="m" alignItems="center" className="w-full">
-        <TextButton
-          variant="honeyRounded"
-          label="Next"
-          onPress={handleSubmit(onEditNamePress)}
-          disabled={!isValid}
+        <BackNextButtons
+          disableNext={!isValid}
+          onPrev={onPrev}
+          onNext={handleSubmit(onEditNamePress)}
         />
       </Box>
     </Box>

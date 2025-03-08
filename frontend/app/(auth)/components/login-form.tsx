@@ -10,8 +10,7 @@ import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { useUserStore } from "@/auth/store";
 import { Icon } from "@/design-system/components/ui/icon";
-import { useEffect } from "react";
-import { useOnboarding } from "@/contexts/onboarding";
+import BackNextButtons from "./buttons";
 
 const LOGIN_SCHEMA = z.object({
   email: z.string().email({ message: "Invalid email" }),
@@ -23,7 +22,6 @@ const LoginForm = () => {
     control,
     handleSubmit,
     trigger,
-    reset,
     formState: { errors, isValid },
   } = useForm<AuthRequest>({
     resolver: zodResolver(LOGIN_SCHEMA),
@@ -31,27 +29,6 @@ const LoginForm = () => {
   });
 
   const { login, isPending, error: authError, loginWithBiometrics, clearError } = useUserStore();
-  const { popupVisible } = useOnboarding();
-
-  useEffect(() => {
-    if (popupVisible) {
-      reset(
-        {
-          email: "",
-          password: "",
-        },
-        {
-          keepErrors: false,
-          keepDirty: false,
-          keepIsSubmitted: false,
-          keepTouched: false,
-          keepIsValid: false,
-          keepSubmitCount: false,
-        },
-      );
-      clearError();
-    }
-  }, [popupVisible, reset, clearError, authError]);
 
   const onBiometricPress = async () => {
     await loginWithBiometrics();
@@ -74,63 +51,64 @@ const LoginForm = () => {
   };
 
   return (
-    <Box gap="l" flexDirection="column" className="w-full">
-      <Text variant="bodyLargeBold">Login</Text>
-      <Controller
-        name="email"
-        control={control}
-        render={({ field: { onChange, value } }) => (
-          <Input
-            onChangeText={(text: string) => {
-              onChange(text);
-              trigger("email");
-            }}
-            value={value}
-            title="Email"
-            placeholder="Enter your email"
-            error={errors.email && errors.email.message}
-          />
-        )}
-      />
-      <Box gap="s">
+    <Box flex={1} gap="l" justifyContent="space-between" flexDirection="column" className="w-full">
+      <Box gap="l">
         <Controller
-          name="password"
+          name="email"
           control={control}
           render={({ field: { onChange, value } }) => (
             <Input
               onChangeText={(text: string) => {
                 onChange(text);
-                trigger("password");
+                trigger("email");
               }}
-              rightIcon={<Icon onPress={onBiometricPress} name="face-recognition" />}
-              secureTextEntry
               value={value}
-              title="Password"
-              placeholder="Enter your password"
-              error={errors.password && errors.password.message}
+              title="EMAIL"
+              placeholder="Enter your email"
+              error={errors.email && errors.email.message}
             />
           )}
         />
-        {authError && (
-          <Text variant="caption" color="error">
-            {authError}
-          </Text>
-        )}
-        <Box alignItems="flex-end" width="auto">
-          <TextButton
-            textVariant="caption"
-            onPress={() => router.push("/(auth)/forgot-password")}
-            variant="text"
-            label="Forgot Password?"
+        <Box gap="s">
+          <Controller
+            name="password"
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <Input
+                onChangeText={(text: string) => {
+                  onChange(text);
+                  trigger("password");
+                }}
+                rightIcon={<Icon onPress={onBiometricPress} name="face-recognition" />}
+                secureTextEntry
+                value={value}
+                title="PASSWORD"
+                placeholder="Enter your password"
+                error={errors.password && errors.password.message}
+              />
+            )}
           />
+          {authError && (
+            <Text variant="caption" color="error">
+              {authError}
+            </Text>
+          )}
+          <Box alignItems="flex-end" width="auto">
+            <TextButton
+              textVariant="caption"
+              onPress={() => router.push("/(auth)/forgot-password")}
+              variant="text"
+              label="Forgot Password?"
+            />
+          </Box>
         </Box>
       </Box>
       <Box alignItems="center" className="w-full">
-        <TextButton
-          variant="honeyRounded"
-          label={isPending ? "Logging in..." : "Login"}
-          onPress={handleSubmit(onLoginPress)}
-          disabled={isPending || !isValid}
+        <BackNextButtons
+          disablePrev={isPending}
+          disableNext={isPending || !isValid}
+          onPrev={() => router.back()}
+          onNext={handleSubmit(onLoginPress)}
         />
       </Box>
     </Box>

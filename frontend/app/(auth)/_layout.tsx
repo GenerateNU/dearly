@@ -49,6 +49,15 @@ const Layout = () => {
         }}
       />
       <Stack.Screen
+        name="login"
+        options={{
+          headerShown: false,
+          headerTransparent: true,
+          headerTitle: "Onboarding Flow",
+          gestureEnabled: false,
+        }}
+      />
+      <Stack.Screen
         name="check-email"
         options={{
           headerShown: false,

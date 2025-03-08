@@ -16,8 +16,6 @@ interface OnboardingContextType {
   setUser: (updatedUser: Partial<OnboardingUserInfo>) => void;
   page: number;
   setPage: (page: number) => void;
-  popupVisible: boolean;
-  setPopupVisible: (visible: boolean) => void;
   reset: () => void;
   isCreatingProfile: boolean;
   setIsCreatingProfile: (isCreating: boolean) => void;
@@ -36,8 +34,6 @@ export const OnboardingContext = createContext<OnboardingContextType>({
   setUser: () => {},
   page: 0,
   setPage: () => {},
-  popupVisible: false,
-  setPopupVisible: () => {},
   reset: () => {},
   isCreatingProfile: false,
   setIsCreatingProfile: () => {},
@@ -55,7 +51,7 @@ export const OnboardingProvider: React.FC<UserProviderProps> = ({ children }) =>
     mode: Mode.BASIC,
     profilePhoto: "",
     name: "",
-    birthday: new Date(),
+    birthday: null,
   });
 
   const [page, setPage] = useState<number>(0);
@@ -91,8 +87,6 @@ export const OnboardingProvider: React.FC<UserProviderProps> = ({ children }) =>
         setUser: handleSetUser,
         page,
         setPage,
-        popupVisible,
-        setPopupVisible,
         reset,
         isCreatingProfile,
         setIsCreatingProfile,

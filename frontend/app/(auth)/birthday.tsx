@@ -1,15 +1,32 @@
 import { useOnboarding } from "@/contexts/onboarding";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
-import { TextButton } from "@/design-system/components/ui/text-button";
 import { Alert, SafeAreaView } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { router } from "expo-router";
 import { useUserStore } from "@/auth/store";
+import BackNextButtons from "./components/buttons";
+import Input from "@/design-system/components/ui/input";
+import SelectBirthdayPopup from "./components/birthday-popup";
+import BottomSheet from "@gorhom/bottom-sheet";
+import { useRef } from "react";
+
+const formatBirthday = (birthday?: Date | null) => {
+  if (!birthday) {
+    return "MM/DD/YYYY";
+  }
+
+  const date = new Date(birthday);
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
+  const year = date.getFullYear();
+
+  return `${month}/${day}/${year}`;
+};
 
 const Birthday = () => {
-  const { user, setUser, setIsCreatingProfile, isCreatingProfile } = useOnboarding();
+  const { user, setIsCreatingProfile, isCreatingProfile, setPage, page } = useOnboarding();
   const { register, error, isAuthenticated } = useUserStore();
+  const birthdayRef = useRef<BottomSheet>(null);
 
   const createProfile = async () => {
     setIsCreatingProfile(true);
@@ -47,33 +64,38 @@ const Birthday = () => {
     );
   };
 
+  const onPrev = () => {
+    setPage(page - 1);
+    router.back();
+  };
+
   return (
     <SafeAreaView className="flex-1 mt-[25%]">
       <Box flex={1} justifyContent="space-between" flexDirection="column" padding="m">
-        <Box gap="s" className="w-full" justifyContent="flex-start" alignItems="flex-start">
-          <Text variant="bodyLargeBold">Add your birthday</Text>
-          <Text variant="caption">
-            Enter your birthdate below to help us ensure your safety and provide the best experience
-            tailored to you. Your information will remain private and won’t appear on your public
-            profile.
-          </Text>
-          <DateTimePicker
-            onChange={(_, date) => setUser({ birthday: date })}
-            textColor="black"
-            display="spinner"
-            value={user.birthday || new Date()}
-            mode="date"
-          />
+        <Box gap="l" className="w-full" justifyContent="flex-start" alignItems="flex-start">
+          <Box flexDirection="column" gap="s">
+            <Text variant="bodyLargeBold">Add your birthday</Text>
+            <Text variant="caption">This information will be displayed on your profile.</Text>
+          </Box>
+          <Box width="100%">
+            <Input
+              isButton
+              onPress={() => birthdayRef.current?.snapToIndex(0)}
+              value={formatBirthday(user.birthday)}
+              title="BIRTHDAY"
+            />
+          </Box>
         </Box>
         <Box gap="m" alignItems="center" className="w-full">
-          <TextButton
-            variant="honeyRounded"
-            label={isCreatingProfile ? "Creating Profile..." : "Create Profile"}
-            disabled={isCreatingProfile}
-            onPress={() => createProfile()}
+          <BackNextButtons
+            disableNext={isCreatingProfile}
+            disablePrev={isCreatingProfile}
+            onPrev={onPrev}
+            onNext={createProfile}
           />
         </Box>
       </Box>
+      <SelectBirthdayPopup onClose={() => null} ref={birthdayRef} />
     </SafeAreaView>
   );
 };
