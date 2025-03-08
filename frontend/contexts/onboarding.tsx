@@ -1,3 +1,4 @@
+import { GroupAction } from "@/types/group";
 import { Mode } from "@/types/mode";
 import React, { createContext, useState, ReactNode, useContext } from "react";
 
@@ -9,6 +10,7 @@ export interface OnboardingUserInfo {
   profilePhoto: string | null;
   name: string;
   birthday: Date | null;
+  action: GroupAction;
 }
 
 interface OnboardingContextType {
@@ -30,6 +32,7 @@ export const OnboardingContext = createContext<OnboardingContextType>({
     profilePhoto: "",
     name: "",
     birthday: null,
+    action: GroupAction.JOIN,
   },
   setUser: () => {},
   page: 0,
@@ -52,6 +55,7 @@ export const OnboardingProvider: React.FC<UserProviderProps> = ({ children }) =>
     profilePhoto: "",
     name: "",
     birthday: null,
+    action: GroupAction.JOIN,
   });
 
   const [page, setPage] = useState<number>(0);
@@ -74,6 +78,7 @@ export const OnboardingProvider: React.FC<UserProviderProps> = ({ children }) =>
       profilePhoto: "",
       name: "",
       birthday: null,
+      action: GroupAction.JOIN,
     });
     setPage(0);
     setPopupVisible(false);

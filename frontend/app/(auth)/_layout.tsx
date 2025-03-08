@@ -105,6 +105,46 @@ const Layout = () => {
           header: () => <ProgressBarWrapper />,
         }}
       />
+      <Stack.Screen
+        name="group"
+        options={{
+          headerShown: true,
+          headerTransparent: true,
+          headerTitle: "Select Action",
+          gestureEnabled: false,
+          header: () => <ProgressBarWrapper />,
+        }}
+      />
+      <Stack.Screen
+        name="create-group"
+        options={{
+          headerShown: true,
+          headerTransparent: true,
+          headerTitle: "Create Group",
+          gestureEnabled: false,
+          header: () => <ProgressBarWrapper />,
+        }}
+      />
+      <Stack.Screen
+        name="invite-link"
+        options={{
+          headerShown: true,
+          headerTransparent: true,
+          headerTitle: "Invite Link",
+          gestureEnabled: false,
+          header: () => <ProgressBarWrapper />,
+        }}
+      />
+      <Stack.Screen
+        name="join-group"
+        options={{
+          headerShown: true,
+          headerTransparent: true,
+          headerTitle: "Join Group",
+          gestureEnabled: false,
+          header: () => <ProgressBarWrapper />,
+        }}
+      />
     </Stack>
   );
 };

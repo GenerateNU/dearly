@@ -24,6 +24,7 @@ interface UserState {
   mode: Mode;
   group: Group | null;
   email: string | null;
+  completeOnboarding: boolean;
 
   login: ({ email, password }: { email: string; password: string }) => Promise<void>;
   register: (data: OnboardingUserInfo) => Promise<void>;
@@ -35,6 +36,7 @@ interface UserState {
   setInviteToken: (inviteToken: string) => void;
   loginWithBiometrics: () => Promise<void>;
   clearError: () => void;
+  finishOnboarding: () => void;
 }
 
 const authService: AuthService = new SupabaseAuth();
@@ -61,9 +63,14 @@ export const useUserStore = create<UserState>()(
       inviteToken: null,
       group: null,
       email: null,
+      completeOnboarding: false,
 
       setMode: (mode: Mode) => {
         set({ mode });
+      },
+
+      finishOnboarding: () => {
+        set({ completeOnboarding: true });
       },
 
       setSelectedGroup: (group: Group) => {
@@ -84,6 +91,7 @@ export const useUserStore = create<UserState>()(
             userId: session.user.id,
             isPending: false,
             mode: user.mode as Mode,
+            completeOnboarding: true,
           });
         };
         const failureImpl = async (err: unknown) => {
@@ -107,6 +115,7 @@ export const useUserStore = create<UserState>()(
             userId: session.user.id,
             mode: user.mode as Mode,
             isPending: false,
+            completeOnboarding: true,
           });
           await authService.storeLocalSessionToDevice(email, password);
         };
@@ -171,7 +180,7 @@ export const useUserStore = create<UserState>()(
           },
         );
       },
-      
+
       resetPassword: async (password: string) => {
         await userWrapper(
           async () => {
@@ -206,6 +215,7 @@ export const useUserStore = create<UserState>()(
             isPending: false,
             mode: Mode.BASIC,
             error: null,
+            completeOnboarding: false,
           });
         };
         const errorImpl = async (err: unknown) => {

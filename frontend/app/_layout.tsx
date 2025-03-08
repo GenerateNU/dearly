@@ -20,7 +20,7 @@ import { OnboardingProvider } from "@/contexts/onboarding";
 const queryClient = new QueryClient();
 
 const InitialLayout = () => {
-  const { isAuthenticated, clearError } = useUserStore();
+  const { isAuthenticated, clearError, completeOnboarding } = useUserStore();
   const [showSplash, setShowSplash] = useState(true);
   const [isReady, setIsReady] = useState(false);
 
@@ -62,12 +62,16 @@ const InitialLayout = () => {
   useEffect(() => {
     if (!showSplash && isReady) {
       if (isAuthenticated) {
-        router.replace("/(app)/(tabs)");
+        if (!completeOnboarding) {
+          router.replace("/(auth)/group");
+        } else {
+          router.replace("/(app)/(tabs)");
+        }
       } else {
         router.replace("/(auth)");
       }
     }
-  }, [isAuthenticated, showSplash, isReady]);
+  }, [isAuthenticated, completeOnboarding, showSplash, isReady]);
 
   // ask for notification permission
   useNotificationPermission();
@@ -78,7 +82,7 @@ const InitialLayout = () => {
   // listen for accessibility setting on device
   const scaleRatio = useAccessibility();
 
-  // Return the slot to ensure navigation container is mounted first
+  // return the slot to ensure navigation container is mounted first
   return (
     <ThemeProvider theme={getTheme(scaleRatio * scaleFactor)}>
       {showSplash ? <SplashScreenAnimation /> : <Slot />}

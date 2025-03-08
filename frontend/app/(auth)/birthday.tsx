@@ -37,7 +37,7 @@ const Birthday = () => {
         reroute(error);
       }
       if (isAuthenticated) {
-        router.push(`/(app)/(tabs)`);
+        router.push(`/(auth)/group`);
       }
       setIsCreatingProfile(false);
     } catch (error: unknown) {
