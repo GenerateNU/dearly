@@ -55,7 +55,7 @@ export interface AuthService {
    * @returns {Promise<User>} A promise that resolves to the updated user details
    *                          upon successful password reset.
    */
-  resetPassword({ password }: { password: string }): Promise<User>;
+  resetPassword({ password, token }: { password: string; token: string }): Promise<User>;
 
   /**
    * Sign a user in with phone number by sending their phone number OTP.
@@ -166,7 +166,13 @@ export class SupabaseAuth implements AuthService {
     }
   }
 
-  async resetPassword({ password }: { password: string }): Promise<User> {
+  async resetPassword({ password, token }: { password: string; token: string }): Promise<User> {
+    const { error: sessionError } = await supabase.auth.exchangeCodeForSession(token);
+
+    if (sessionError) {
+      throw new Error(sessionError.message);
+    }
+
     const { data, error } = await supabase.auth.updateUser({
       password,
     });
