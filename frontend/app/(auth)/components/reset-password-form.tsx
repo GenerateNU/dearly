@@ -38,6 +38,7 @@ const ResetPasswordForm = () => {
 
   const { resetPassword, isPending, error: authError } = useUserStore();
   const [isPasswordConfirmationTouched, setIsPasswordConfirmationTouched] = useState(false);
+  const [linkError, setLinkError] = useState<String | null>(null);
   const [tokens, setTokens] = useState<TokenPayload>();
 
   useEffect(() => {
@@ -48,8 +49,12 @@ const ResetPasswordForm = () => {
 
     const accessToken = params.get("access_token");
     const refreshToken = params.get("refresh_token");
+    const linkError = params.get("error_description");
 
-    if (!accessToken || !refreshToken) return;
+    if (linkError || !accessToken || !refreshToken) {
+      setLinkError(linkError);
+      return;
+    }
 
     setTokens({ accessToken, refreshToken });
   }, []);
@@ -124,11 +129,16 @@ const ResetPasswordForm = () => {
             {authError}
           </Text>
         )}
+        {linkError && (
+          <Text variant="caption" color="error">
+            {`Error with link: ${linkError}`}
+          </Text>
+        )}
       </Box>
       <Box alignItems="center" className="w-full">
         <BackNextButtons
           disablePrev={isPending}
-          disableNext={isPending || !isValid}
+          disableNext={isPending || !isValid || linkError !== null}
           onPrev={() => router.push("/(auth)")}
           onNext={handleSubmit(onResetPasswordPress)}
         />
