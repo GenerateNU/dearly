@@ -25,7 +25,6 @@ const Layout = () => {
         options={{
           headerShown: false,
           headerTransparent: true,
-          headerTitle: "",
           gestureEnabled: false,
         }}
       />
@@ -33,7 +32,6 @@ const Layout = () => {
         name="register"
         options={{
           headerShown: true,
-          headerTitle: "",
           headerTransparent: true,
           gestureEnabled: false,
           header: () => <ProgressBarWrapper />,
@@ -44,7 +42,6 @@ const Layout = () => {
         options={{
           headerShown: false,
           headerTransparent: true,
-          headerTitle: "Onboarding Flow",
           gestureEnabled: false,
         }}
       />
@@ -53,7 +50,6 @@ const Layout = () => {
         options={{
           headerShown: false,
           headerTransparent: true,
-          headerTitle: "Onboarding Flow",
           gestureEnabled: false,
         }}
       />
@@ -62,7 +58,6 @@ const Layout = () => {
         options={{
           headerShown: false,
           headerTransparent: true,
-          headerTitle: "Onboarding Flow",
           gestureEnabled: false,
         }}
       />
@@ -71,7 +66,6 @@ const Layout = () => {
         options={{
           headerShown: false,
           headerTransparent: true,
-          headerTitle: "Onboarding Flow",
           gestureEnabled: false,
         }}
       />
@@ -80,7 +74,6 @@ const Layout = () => {
         options={{
           headerShown: true,
           headerTransparent: true,
-          headerTitle: "",
           gestureEnabled: false,
           header: () => <ProgressBarWrapper />,
         }}
@@ -90,7 +83,6 @@ const Layout = () => {
         options={{
           headerShown: true,
           headerTransparent: true,
-          headerTitle: "Edit Profile",
           gestureEnabled: false,
           header: () => <ProgressBarWrapper />,
         }}
@@ -100,7 +92,6 @@ const Layout = () => {
         options={{
           headerShown: true,
           headerTransparent: true,
-          headerTitle: "Birthday",
           gestureEnabled: false,
           header: () => <ProgressBarWrapper />,
         }}
@@ -110,7 +101,6 @@ const Layout = () => {
         options={{
           headerShown: true,
           headerTransparent: true,
-          headerTitle: "Select Action",
           gestureEnabled: false,
           header: () => <ProgressBarWrapper />,
         }}
@@ -120,7 +110,6 @@ const Layout = () => {
         options={{
           headerShown: true,
           headerTransparent: true,
-          headerTitle: "Create Group",
           gestureEnabled: false,
           header: () => <ProgressBarWrapper />,
         }}
@@ -130,7 +119,6 @@ const Layout = () => {
         options={{
           headerShown: true,
           headerTransparent: true,
-          headerTitle: "Invite Link",
           gestureEnabled: false,
           header: () => <ProgressBarWrapper />,
         }}
@@ -140,7 +128,6 @@ const Layout = () => {
         options={{
           headerShown: true,
           headerTransparent: true,
-          headerTitle: "Join Group",
           gestureEnabled: false,
           header: () => <ProgressBarWrapper />,
         }}
