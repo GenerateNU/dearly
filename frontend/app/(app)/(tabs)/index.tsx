@@ -1,7 +1,7 @@
 import { Box } from "@/design-system/base/box";
-import { useUserGroups } from "@/hooks/api/group";
 import { EmptyHomePage } from "@/design-system/components/home/empty";
 import { Text } from "@/design-system/base/text";
+import { useUserGroups } from "@/hooks/api/user";
 
 const Home = () => {
   const { data, isLoading } = useUserGroups();
@@ -21,7 +21,9 @@ const Home = () => {
     );
   }
 
-  if (!data || data.length === 0) {
+  const hasGroups = data?.pages.some((page) => page.length > 0);
+
+  if (!data || !hasGroups) {
     return (
       <Box
         padding="m"
