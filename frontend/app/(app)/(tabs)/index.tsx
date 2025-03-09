@@ -1,6 +1,6 @@
 import { Box } from "@/design-system/base/box";
 import { useUserGroups } from "@/hooks/api/group";
-import { EmptyHomePage } from "./home/empty";
+import { EmptyHomePage } from "@/design-system/components/home/empty";
 import { Text } from "@/design-system/base/text";
 
 const Home = () => {
