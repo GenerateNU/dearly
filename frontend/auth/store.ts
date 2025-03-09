@@ -155,8 +155,8 @@ export const useUserStore = create<UserState>()(
           await authService.storeLocalSessionToDevice(data.email, data.password);
         };
         const errorImpl = async (err: unknown) => {
-          await useUserStore.getState().logout();
           handleError(err, set);
+          await useUserStore.getState().logout();
         };
         await userWrapper(registerImpl, errorImpl);
       },
@@ -237,9 +237,9 @@ export const useUserStore = create<UserState>()(
  * @param err error
  * @param set setter function to mutate auth statte
  */
-const handleError = (err: unknown, set: (state: Partial<UserState>) => void) => {
+const handleError = async (err: unknown, set: (state: Partial<UserState>) => void) => {
   const errorMessage = err instanceof Error ? err.message : AUTH_ERROR_MESSAGE;
-  if (errorMessage === "user_cancel") {
+  if (errorMessage === "user_cancel" || errorMessage === "system_cancel") {
     return;
   }
   set({ error: errorMessage });

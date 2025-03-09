@@ -8,7 +8,7 @@ import BackNextButtons from "../../design-system/components/ui/back-next-buttons
 import Input from "@/design-system/components/ui/input";
 import SelectBirthdayPopup from "./components/birthday-popup";
 import BottomSheet from "@gorhom/bottom-sheet";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 const formatBirthday = (birthday?: Date | null) => {
   if (!birthday) {
@@ -30,39 +30,37 @@ const Birthday = () => {
 
   const createProfile = async () => {
     setIsCreatingProfile(true);
+    await register(user);
 
-    try {
-      await register(user);
-      if (error) {
-        reroute(error);
-      }
-      if (isAuthenticated) {
-        router.push(`/(auth)/group`);
-      }
-      setIsCreatingProfile(false);
-    } catch (error: unknown) {
-      let errorMessage = "Failed to create profile. Please try again.";
-      if (error instanceof Error) {
-        errorMessage = `Failed to create profile. ${error.message} Please try again.`;
-      }
-      reroute(errorMessage);
+    if (error) return;
+
+    if (isAuthenticated) {
+      router.push(`/(auth)/group`);
     }
+    setIsCreatingProfile(false);
   };
 
-  // Route to correct page upon error
-  const reroute = (message: string) => {
-    Alert.alert(
-      "Failed to create your profile.", // Title of the alert
-      message, // Message body of the alert
-      [
-        {
-          text: "OK",
-          onPress: () => router.push(`/(auth)/register`),
-        },
-      ],
-      { cancelable: false },
-    );
-  };
+  useEffect(() => {
+    const reroute = (message: string) => {
+      Alert.alert(
+        "Failed to create your profile. Please try again.", // Title of the alert
+        message, // Message body of the alert
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              router.push(`/(auth)`);
+            },
+          },
+        ],
+        { cancelable: false },
+      );
+    };
+
+    if (error) {
+      reroute(error);
+    }
+  }, [error]);
 
   const onPrev = () => {
     setPage(page - 1);
