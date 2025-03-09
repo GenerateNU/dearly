@@ -2,7 +2,6 @@ import { Group, InvitationToken } from "@/types/group";
 import { useMutationBase, useQueryBase } from "./base";
 import { createGroup, getGroup } from "@/api/group";
 import { getInviteToken } from "@/api/invite";
-import { getUserGroups } from "@/api/user";
 
 export interface CreateGroupPayload {
   name: string;

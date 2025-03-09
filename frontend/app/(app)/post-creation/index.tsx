@@ -1,14 +1,52 @@
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
-import { SafeAreaView } from "react-native";
+import {
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  TouchableWithoutFeedback,
+  FlatList,
+} from "react-native";
+import { PostCreationForm } from "./components/create-post-form";
 
 const CreatePost = () => {
-  return (
-    <SafeAreaView className="flex-1">
-      <Box paddingTop="s" padding="m" flex={1} justifyContent="flex-start" alignItems="flex-start">
+  // Create a simple data array with a single item for FlatList
+  const data = [{ key: "form" }];
+
+  // Render item function for FlatList
+  const renderItem = () => (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <Box
+        gap="m"
+        paddingTop="s"
+        padding="m"
+        flex={1}
+        justifyContent="flex-start"
+        alignItems="flex-start"
+      >
         <Text variant="bodyLargeBold">Upload Photo</Text>
+        <PostCreationForm />
       </Box>
-    </SafeAreaView>
+    </TouchableWithoutFeedback>
+  );
+
+  return (
+    <KeyboardAvoidingView
+      className="flex-1"
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <SafeAreaView collapsable={false} className="flex-1">
+        <FlatList
+          data={data}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.key}
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        />
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 

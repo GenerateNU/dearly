@@ -68,7 +68,7 @@ const Input: React.FC<TextboxProps> = ({
           opacity={readOnly ? 0.5 : 1}
           borderColor={error ? "error" : "slate"}
           alignItems={paragraph ? "flex-start" : "center"}
-          minHeight={paragraph ? 100 : undefined}
+          minHeight={paragraph ? 130 : undefined}
         >
           <Box flex={1} flexDirection="row" alignItems={paragraph ? "flex-start" : "center"}>
             {leftIcon && <Box paddingRight="xs">{leftIcon}</Box>}
