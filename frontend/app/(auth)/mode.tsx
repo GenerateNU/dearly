@@ -5,7 +5,7 @@ import { Card } from "@/design-system/components/ui/card";
 import { SafeAreaView } from "react-native";
 import { Mode } from "@/types/mode";
 import { router } from "expo-router";
-import BackNextButtons from "./components/buttons";
+import BackNextButtons from "../../design-system/components/ui/back-next-buttons";
 
 const SelectMode = () => {
   const { user, setUser, setPage, reset } = useOnboarding();
@@ -27,8 +27,8 @@ const SelectMode = () => {
 
   return (
     <SafeAreaView className="flex-1 mt-[25%]">
-      <Box paddingBottom="l" padding="m" justifyContent="space-between" flex={1}>
-        <Box gap="l" width="100%" flex={1} justifyContent="flex-start" alignItems="flex-start">
+      <Box flex={1} paddingBottom="l" padding="m" justifyContent="space-between">
+        <Box gap="l" width="100%">
           <Box gap="s">
             <Text variant="bodyLargeBold">Choose Your Experience</Text>
           </Box>

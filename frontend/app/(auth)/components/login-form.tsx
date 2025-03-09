@@ -10,7 +10,7 @@ import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { useUserStore } from "@/auth/store";
 import { Icon } from "@/design-system/components/ui/icon";
-import BackNextButtons from "./buttons";
+import BackNextButtons from "../../../design-system/components/ui/back-next-buttons";
 
 const LOGIN_SCHEMA = z.object({
   email: z.string().email({ message: "Invalid email" }),
@@ -28,7 +28,7 @@ const LoginForm = () => {
     mode: "onTouched",
   });
 
-  const { login, isPending, error: authError, loginWithBiometrics, clearError } = useUserStore();
+  const { login, isPending, error: authError, loginWithBiometrics } = useUserStore();
 
   const onBiometricPress = async () => {
     await loginWithBiometrics();

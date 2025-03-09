@@ -8,7 +8,7 @@ import Input from "@/design-system/components/ui/input";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { useUserStore } from "@/auth/store";
-import BackNextButtons from "./buttons";
+import BackNextButtons from "../../../design-system/components/ui/back-next-buttons";
 
 const EMAIL_SCHEMA = z.object({
   email: z.string().email({ message: "Invalid email" }),

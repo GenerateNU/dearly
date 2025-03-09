@@ -8,7 +8,7 @@ import Input from "@/design-system/components/ui/input";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { useUserStore } from "@/auth/store";
-import BackNextButtons from "./buttons";
+import BackNextButtons from "../../../design-system/components/ui/back-next-buttons";
 
 const RESET_PASSWORD_SCHEMA = z
   .object({
@@ -26,7 +26,6 @@ const RESET_PASSWORD_SCHEMA = z
   .refine((data) => data.password === data.retypedPassword, {
     path: ["retypedPassword"],
     message: "Passwords do not match",
-
   });
 
 type ResetPasswordType = z.infer<typeof RESET_PASSWORD_SCHEMA>;

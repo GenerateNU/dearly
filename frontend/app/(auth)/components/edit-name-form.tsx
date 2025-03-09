@@ -6,7 +6,7 @@ import Input from "@/design-system/components/ui/input";
 import { Box } from "@/design-system/base/box";
 import { useOnboarding } from "@/contexts/onboarding";
 import { router } from "expo-router";
-import BackNextButtons from "./buttons";
+import BackNextButtons from "../../../design-system/components/ui/back-next-buttons";
 
 const EDIT_NAME_SCHEMA = z.object({
   name: z.string({ message: "Invalid name" }),

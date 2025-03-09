@@ -1,14 +1,17 @@
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { SafeAreaView } from "react-native";
+import { useUserStore } from "@/auth/store";
+import BackNextButtons from "../../design-system/components/ui/back-next-buttons";
 import { router } from "expo-router";
-import { TextButton } from "@/design-system/components/ui/text-button";
 
 const JoinGroup = () => {
+  const { finishOnboarding } = useUserStore();
+
   return (
     <SafeAreaView className="flex-1 mt-[25%]">
-      <Box paddingBottom="l" padding="m" justifyContent="space-between" flex={1}>
-        <Box gap="l" width="100%" flex={1} justifyContent="flex-start" alignItems="flex-start">
+      <Box flex={1} paddingBottom="l" padding="m" justifyContent="space-between">
+        <Box gap="l" width="100%">
           <Text variant="bodyLargeBold">Join Group</Text>
           <Text variant="caption">
             The only way to join a group is via link! Ask your friend/family member to share it with
@@ -16,7 +19,11 @@ const JoinGroup = () => {
           </Text>
         </Box>
         <Box width="100%" gap="m" alignItems="center" className="w-full">
-          <TextButton variant="blushRounded" label="Back" onPress={() => router.back()} />
+          <BackNextButtons
+            nextLabel="Skip"
+            onNext={finishOnboarding}
+            onPrev={() => router.back()}
+          />
         </Box>
       </Box>
     </SafeAreaView>

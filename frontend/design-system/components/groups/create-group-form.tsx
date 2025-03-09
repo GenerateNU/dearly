@@ -2,12 +2,16 @@ import { Alert } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z, ZodError } from "zod";
-import { router } from "expo-router";
+import { RelativePathString, router } from "expo-router";
 import Input from "@/design-system/components/ui/input";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
-import BackNextButtons from "./buttons";
 import { useCreateGroup } from "@/hooks/api/group";
+import BackNextButtons from "@/design-system/components/ui/back-next-buttons";
+
+interface CreateGroupProps {
+  nextPageNavigate: string;
+}
 
 const GROUP_SCHEMA = z.object({
   name: z.string().min(1, { message: "Group name is required" }),
@@ -15,7 +19,7 @@ const GROUP_SCHEMA = z.object({
 
 type GroupFormData = z.infer<typeof GROUP_SCHEMA>;
 
-const CreateGroupForm = () => {
+const CreateGroupForm: React.FC<CreateGroupProps> = ({ nextPageNavigate }) => {
   const { mutateAsync, isPending, isError, error } = useCreateGroup();
 
   const {
@@ -35,7 +39,7 @@ const CreateGroupForm = () => {
       });
       if (!isError && !error) {
         router.push({
-          pathname: "/(auth)/invite-link",
+          pathname: nextPageNavigate as RelativePathString,
           params: { id: newGroup.id, name: newGroup.name },
         });
       }

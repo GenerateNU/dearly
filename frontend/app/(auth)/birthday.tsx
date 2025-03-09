@@ -4,7 +4,7 @@ import { Text } from "@/design-system/base/text";
 import { Alert, SafeAreaView } from "react-native";
 import { router } from "expo-router";
 import { useUserStore } from "@/auth/store";
-import BackNextButtons from "./components/buttons";
+import BackNextButtons from "../../design-system/components/ui/back-next-buttons";
 import Input from "@/design-system/components/ui/input";
 import SelectBirthdayPopup from "./components/birthday-popup";
 import BottomSheet from "@gorhom/bottom-sheet";
@@ -70,33 +70,35 @@ const Birthday = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 mt-[25%]">
-      <Box flex={1} justifyContent="space-between" flexDirection="column" padding="m">
-        <Box gap="l" className="w-full" justifyContent="flex-start" alignItems="flex-start">
-          <Box flexDirection="column" gap="s">
-            <Text variant="bodyLargeBold">Add your birthday</Text>
-            <Text variant="caption">This information will be displayed on your profile.</Text>
+    <>
+      <SafeAreaView className="flex-1 mt-[25%]">
+        <Box flex={1} paddingBottom="l" padding="m" justifyContent="space-between">
+          <Box gap="l" width="100%">
+            <Box flexDirection="column" gap="s">
+              <Text variant="bodyLargeBold">Add your birthday</Text>
+              <Text variant="caption">This information will be displayed on your profile.</Text>
+            </Box>
+            <Box width="100%">
+              <Input
+                isButton
+                onPress={() => birthdayRef.current?.snapToIndex(0)}
+                value={formatBirthday(user.birthday)}
+                title="BIRTHDAY"
+              />
+            </Box>
           </Box>
-          <Box width="100%">
-            <Input
-              isButton
-              onPress={() => birthdayRef.current?.snapToIndex(0)}
-              value={formatBirthday(user.birthday)}
-              title="BIRTHDAY"
+          <Box gap="m" alignItems="center" className="w-full">
+            <BackNextButtons
+              disableNext={isCreatingProfile}
+              disablePrev={isCreatingProfile}
+              onPrev={onPrev}
+              onNext={createProfile}
             />
           </Box>
         </Box>
-        <Box gap="m" alignItems="center" className="w-full">
-          <BackNextButtons
-            disableNext={isCreatingProfile}
-            disablePrev={isCreatingProfile}
-            onPrev={onPrev}
-            onNext={createProfile}
-          />
-        </Box>
-      </Box>
+      </SafeAreaView>
       <SelectBirthdayPopup onClose={() => null} ref={birthdayRef} />
-    </SafeAreaView>
+    </>
   );
 };
 

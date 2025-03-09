@@ -59,7 +59,6 @@ export const OnboardingProvider: React.FC<UserProviderProps> = ({ children }) =>
   });
 
   const [page, setPage] = useState<number>(0);
-  const [popupVisible, setPopupVisible] = useState<boolean>(false);
   const [isCreatingProfile, setIsCreatingProfile] = useState<boolean>(false);
 
   const handleSetUser = (updatedUser: Partial<OnboardingUserInfo>) => {
@@ -81,7 +80,6 @@ export const OnboardingProvider: React.FC<UserProviderProps> = ({ children }) =>
       action: GroupAction.JOIN,
     });
     setPage(0);
-    setPopupVisible(false);
     setIsCreatingProfile(false);
   };
 

@@ -8,7 +8,7 @@ import { Box } from "@/design-system/base/box";
 import { useOnboarding } from "@/contexts/onboarding";
 import { useState, useEffect } from "react";
 import { router } from "expo-router";
-import BackNextButtons from "./buttons";
+import BackNextButtons from "../../../design-system/components/ui/back-next-buttons";
 
 type RegisterFormData = AuthRequest & {
   username: string;

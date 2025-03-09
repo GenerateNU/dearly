@@ -5,7 +5,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useState, useEffect } from "react";
 import { BaseButton } from "@/design-system/base/button";
 import { useUserState } from "@/auth/provider";
-import BackNextButtons from "./components/buttons";
 import { TextButton } from "@/design-system/components/ui/text-button";
 import { router } from "expo-router";
 

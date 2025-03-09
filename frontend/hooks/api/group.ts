@@ -2,6 +2,7 @@ import { Group, InvitationToken } from "@/types/group";
 import { useMutationBase, useQueryBase } from "./base";
 import { createGroup, getGroup } from "@/api/group";
 import { getInviteToken } from "@/api/invite";
+import { getUserGroups } from "@/api/user";
 
 export interface CreateGroupPayload {
   name: string;
@@ -14,16 +15,7 @@ export interface CreateGroupPayload {
  * @returns Mutation object for creating a group
  */
 export const useCreateGroup = () => {
-  return useMutationBase<CreateGroupPayload, Group>(
-    createGroup,
-    ["groups"],
-    (data) => {
-      console.log("Group created successfully:", data);
-    },
-    (error) => {
-      console.error("Failed to create group:", error);
-    },
-  );
+  return useMutationBase<CreateGroupPayload, Group>(createGroup, ["groups"]);
 };
 
 /**
@@ -36,6 +28,19 @@ export const useCreateGroup = () => {
 export const useGetGroup = (id: string, options: any = {}) => {
   return useQueryBase<Group>(["groups", id], () => getGroup(id), {
     enabled: !!id,
+    ...options,
+  });
+};
+
+/**
+ * Hook to get all user groups
+ *
+ * @param id - The ID of the group to fetch
+ * @param options - Additional options for the query
+ * @returns Query result containing the group data
+ */
+export const useGetUserGroups = (options: any = {}) => {
+  return useQueryBase<Group[]>(["users", "groups"], () => getUserGroups(5, 1), {
     ...options,
   });
 };

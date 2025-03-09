@@ -51,8 +51,8 @@ const InitialLayout = () => {
         }, 3000);
 
         clearError();
-      } catch (e) {
-        console.warn(e);
+      } catch (error) {
+        console.warn(error);
       }
     }
 
@@ -60,16 +60,14 @@ const InitialLayout = () => {
   }, [fontsLoaded, clearError]);
 
   useEffect(() => {
-    if (!showSplash && isReady) {
-      if (isAuthenticated) {
-        if (!completeOnboarding) {
-          router.replace("/(auth)/group");
-        } else {
-          router.replace("/(app)/(tabs)");
-        }
-      } else {
-        router.replace("/(auth)");
-      }
+    if (showSplash || !isReady) return;
+
+    if (isAuthenticated && !completeOnboarding) {
+      router.replace("/(auth)/group");
+    } else if (isAuthenticated && completeOnboarding) {
+      router.replace("/(app)/(tabs)");
+    } else {
+      router.replace("/(auth)");
     }
   }, [isAuthenticated, completeOnboarding, showSplash, isReady]);
 

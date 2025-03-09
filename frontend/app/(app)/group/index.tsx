@@ -4,8 +4,8 @@ import { Keyboard, SafeAreaView, TouchableWithoutFeedback } from "react-native";
 const CreateGroup = () => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <SafeAreaView className="flex-1 mt-[25%]">
-        <CreateGroupComponent nextPageNavigate="/(auth)/invite-link" />
+      <SafeAreaView className="flex-1 mt-[15%]">
+        <CreateGroupComponent nextPageNavigate="/group/invite" />
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );

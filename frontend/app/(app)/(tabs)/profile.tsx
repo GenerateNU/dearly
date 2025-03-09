@@ -1,10 +1,13 @@
+import { useUserStore } from "@/auth/store";
 import { Box } from "@/design-system/base/box";
-import { Text } from "@/design-system/base/text";
+import { TextButton } from "@/design-system/components/ui/text-button";
 
 const Profile = () => {
+  const { logout } = useUserStore();
+
   return (
     <Box gap="xl" alignItems="center" justifyContent="center" backgroundColor="pearl" flex={1}>
-      <Text>Profile</Text>
+      <TextButton variant="text" label="Logout" onPress={logout} />
     </Box>
   );
 };
