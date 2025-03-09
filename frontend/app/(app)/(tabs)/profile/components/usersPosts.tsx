@@ -1,23 +1,11 @@
-import { Box } from "@/design-system/base/box";
-<<<<<<< HEAD:frontend/app/(app)/(tabs)/profile.tsx
-import { Text } from "@/design-system/base/text";
-import { BaseButton } from "@/design-system/base/button";
-import { getUser } from "@/api/user";
-import { useQuery } from "@tanstack/react-query";
-import { useUserStore } from "@/auth/store";
-import { Icon } from "@/design-system/components/shared/icons/icon";
-import { Profile } from "@/design-system/components/profiles/profile";
-import { getMemberPosts } from "@/api/member";
-import { MasonryList } from "@/design-system/components/posts/masonry";
-=======
->>>>>>> 32a72cf (Cleaned up the code for the profile page):frontend/app/(app)/(tabs)/profile/components/usersPosts.tsx
-import { Post } from "@/types/post";
-import { useUserStore } from "@/auth/store";
-import { useQuery } from "@tanstack/react-query";
-import { getMemberPosts } from "@/api/member";
-import { Text } from "@/design-system/base/text";
-import { MasonryList } from "@/design-system/components/posts/masonry";
 
+import { Text } from "@/design-system/base/text";
+import { useQuery } from "@tanstack/react-query";
+import { useUserStore } from "@/auth/store";
+import { getMemberPosts } from "@/api/member";
+import { MasonryList } from "@/design-system/components/posts/masonry";
+import { Box } from "@/design-system/base/box";
+import { Post } from "@/types/post";
 const UserPosts = () => {
   const { userId, group } = useUserStore();
   const p1: Post = {
