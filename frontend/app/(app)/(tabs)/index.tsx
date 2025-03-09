@@ -1,10 +1,10 @@
 import { Box } from "@/design-system/base/box";
-import { useGetUserGroups } from "@/hooks/api/group";
+import { useUserGroups } from "@/hooks/api/group";
 import { EmptyHomePage } from "./home/empty";
 import { Text } from "@/design-system/base/text";
 
 const Home = () => {
-  const { data, isLoading } = useGetUserGroups();
+  const { data, isLoading } = useUserGroups();
 
   if (isLoading) {
     return (

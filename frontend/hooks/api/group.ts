@@ -35,11 +35,10 @@ export const useGetGroup = (id: string, options: any = {}) => {
 /**
  * Hook to get all user groups
  *
- * @param id - The ID of the group to fetch
  * @param options - Additional options for the query
  * @returns Query result containing the group data
  */
-export const useGetUserGroups = (options: any = {}) => {
+export const useUserGroups = (options: any = {}) => {
   return useQueryBase<Group[]>(["users", "groups"], () => getUserGroups(5, 1), {
     ...options,
   });

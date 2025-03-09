@@ -71,7 +71,7 @@ const ResetPasswordForm = () => {
               }}
               secureTextEntry
               value={value}
-              title="New Password"
+              title="NEW PASSWORD"
               placeholder="Enter your password"
               error={errors.password && errors.password.message}
             />
@@ -84,7 +84,7 @@ const ResetPasswordForm = () => {
             <Input
               secureTextEntry
               value={value}
-              title="Password Confirmation"
+              title="CONFIRM YOUR PASSWORD"
               placeholder="Retype your password"
               onChangeText={(text: string) => {
                 onChange(text);
