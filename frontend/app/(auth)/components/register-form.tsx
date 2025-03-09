@@ -9,6 +9,7 @@ import { useOnboarding } from "@/contexts/onboarding";
 import { useState, useEffect } from "react";
 import { router } from "expo-router";
 import BackNextButtons from "../../../design-system/components/ui/back-next-buttons";
+import { PASSWORD_SCHEMA } from "@/utilities/password";
 
 type RegisterFormData = AuthRequest & {
   username: string;
@@ -21,17 +22,8 @@ const REGISTER_SCHEMA = z
       message: "Username must be at least 2 characters long",
     }),
     email: z.string().email({ message: "Must be a valid email" }),
-    password: z
-      .string()
-      .regex(/[0-9]/, {
-        message: "Password must contain at least one number",
-      })
-      .regex(/[^A-Za-z0-9]/, {
-        message: "Password must contain at least one special character",
-      })
-      .min(8, { message: "Password must be at least 8 characters long" }),
-    retypedPassword: z.string(),
   })
+  .merge(PASSWORD_SCHEMA)
   .refine((data) => data.password === data.retypedPassword, {
     path: ["retypedPassword"],
     message: "Passwords do not match",

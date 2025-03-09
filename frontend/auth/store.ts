@@ -14,6 +14,7 @@ import * as SecureStore from "expo-secure-store";
 import { OnboardingUserInfo } from "@/contexts/onboarding";
 import { uploadUserMedia } from "@/api/media";
 import { getProfilePhotoBlob } from "@/utilities/media";
+import { ResetPasswordPayload } from "@/types/auth";
 
 interface UserState {
   isAuthenticated: boolean;
@@ -30,7 +31,7 @@ interface UserState {
   register: (data: OnboardingUserInfo) => Promise<void>;
   logout: () => Promise<void>;
   forgotPassword: (email?: string) => Promise<void>;
-  resetPassword: (password: string) => Promise<void>;
+  resetPassword: (payload: ResetPasswordPayload) => Promise<void>;
   setMode: (mode: Mode) => void;
   setSelectedGroup: (group: Group) => void;
   setInviteToken: (inviteToken: string) => void;
@@ -181,17 +182,17 @@ export const useUserStore = create<UserState>()(
         );
       },
 
-      resetPassword: async (password: string) => {
+      resetPassword: async (payload: ResetPasswordPayload) => {
         await userWrapper(
           async () => {
             set({ isPending: true });
-            await authService.resetPassword({ password });
+            await authService.resetPassword(payload);
             set({ error: null });
             const validEmail = SecureStore.getItem("email");
             if (!validEmail) {
               throw new Error("No email found.");
             }
-            await authService.storeLocalSessionToDevice(validEmail, password);
+            await authService.storeLocalSessionToDevice(validEmail, payload.password);
             set({ isPending: false });
           },
           async (err: unknown) => {

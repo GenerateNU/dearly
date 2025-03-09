@@ -1,6 +1,6 @@
 import { createContext, useContext, ReactNode } from "react";
 import { useUserStore } from "./store";
-import { AuthRequest } from "@/types/auth";
+import { AuthRequest, ResetPasswordPayload } from "@/types/auth";
 import { Mode } from "@/types/mode";
 import { Group } from "@/types/group";
 import { OnboardingUserInfo } from "@/contexts/onboarding";
@@ -19,7 +19,7 @@ interface UserContextType {
   inviteToken: string | null;
   loginWithBiometrics: () => Promise<void>;
   forgotPassword: (email?: string) => Promise<void>;
-  resetPassword: (password: string) => Promise<void>;
+  resetPassword: (payload: ResetPasswordPayload) => Promise<void>;
   clearError: () => void;
 }
 

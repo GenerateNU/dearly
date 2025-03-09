@@ -1,7 +1,7 @@
 import { AppState } from "react-native";
 import { supabase } from "./client";
 import { Session, User } from "@supabase/supabase-js";
-import { AuthRequest, PhoneAuth } from "@/types/auth";
+import { AuthRequest, PhoneAuth, ResetPasswordPayload } from "@/types/auth";
 import {
   LocalAuthenticationOptions,
   authenticateAsync,
@@ -55,7 +55,7 @@ export interface AuthService {
    * @returns {Promise<User>} A promise that resolves to the updated user details
    *                          upon successful password reset.
    */
-  resetPassword({ password, token }: { password: string; token: string }): Promise<User>;
+  resetPassword(payload: ResetPasswordPayload): Promise<User>;
 
   /**
    * Sign a user in with phone number by sending their phone number OTP.
@@ -155,7 +155,7 @@ export class SupabaseAuth implements AuthService {
   }
 
   async forgotPassword({ email }: { email: string }): Promise<void> {
-    const redirectTo = Linking.createURL(`auth/reset-password`);
+    const redirectTo = Linking.createURL(`(auth)/reset-password`);
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo,
@@ -166,16 +166,26 @@ export class SupabaseAuth implements AuthService {
     }
   }
 
-  async resetPassword({ password, token }: { password: string; token: string }): Promise<User> {
-    const { error: sessionError } = await supabase.auth.exchangeCodeForSession(token);
+  async resetPassword({
+    password,
+    accessToken,
+    refreshToken,
+  }: ResetPasswordPayload): Promise<User> {
+    const { error: setSessionError } = await supabase.auth.setSession({
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    });
 
-    if (sessionError) {
-      throw new Error(sessionError.message);
+    if (setSessionError) {
+      throw new Error(setSessionError.message);
     }
 
     const { data, error } = await supabase.auth.updateUser({
       password,
     });
+
+    console.log("Data", data);
+    console.log("Error", error);
 
     if (error) {
       throw new Error(error.message);

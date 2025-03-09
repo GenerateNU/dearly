@@ -10,27 +10,18 @@ import { Text } from "@/design-system/base/text";
 import { useUserStore } from "@/auth/store";
 import BackNextButtons from "../../../design-system/components/ui/back-next-buttons";
 import * as Linking from "expo-linking";
-import { supabase } from "@/auth/client";
+import { PASSWORD_SCHEMA } from "@/utilities/password";
+import { TokenPayload } from "@/types/auth";
 
-const RESET_PASSWORD_SCHEMA = z
-  .object({
-    password: z
-      .string()
-      .regex(/[0-9]/, {
-        message: "Password must contain at least one number",
-      })
-      .regex(/[^A-Za-z0-9]/, {
-        message: "Password must contain at least one special character",
-      })
-      .min(8, { message: "Password must be at least 8 characters long" }),
-    retypedPassword: z.string(),
-  })
-  .refine((data) => data.password === data.retypedPassword, {
+export const PASSWORD_CONFIRM_SCHEMA = PASSWORD_SCHEMA.refine(
+  (data) => data.password === data.retypedPassword,
+  {
     path: ["retypedPassword"],
     message: "Passwords do not match",
-  });
+  },
+);
 
-type ResetPasswordType = z.infer<typeof RESET_PASSWORD_SCHEMA>;
+type ResetPasswordType = z.infer<typeof PASSWORD_CONFIRM_SCHEMA>;
 
 const ResetPasswordForm = () => {
   const {
@@ -39,98 +30,44 @@ const ResetPasswordForm = () => {
     trigger,
     formState: { errors, isValid },
   } = useForm<ResetPasswordType>({
-    resolver: zodResolver(RESET_PASSWORD_SCHEMA),
+    resolver: zodResolver(PASSWORD_CONFIRM_SCHEMA),
     mode: "onTouched",
   });
 
+  const deeplink = Linking.useLinkingURL();
+
   const { resetPassword, isPending, error: authError } = useUserStore();
   const [isPasswordConfirmationTouched, setIsPasswordConfirmationTouched] = useState(false);
-
-  
+  const [tokens, setTokens] = useState<TokenPayload>();
 
   useEffect(() => {
-    // Function to extract token from URL
-    const handleDeepLink = (url:string) => {
-      if (url) {
-        console.log("Received deep link:", url);
+    if (!deeplink) return;
 
-        // Extract query parameters
-        const params = new URL(url).searchParams;
-        console.log(params)
-        const token = params.get("access_token");
+    const url = new URL(deeplink);
+    const params = new URLSearchParams(url.hash.replace("#", "?"));
 
-        if (token) {
-          console.log("Extracted token:", token);
-          // Handle the token (e.g., navigate to reset password screen)
-        } else {
-          console.warn("No token found in deep link");
-        }
-      }
-    };
+    const accessToken = params.get("access_token");
+    const refreshToken = params.get("refresh_token");
 
-    
+    if (!accessToken || !refreshToken) return;
 
-    // Get initial URL when the app is opened from a closed state
-    // Linking.getInitialURL()
-    //   .then((url) => {
-    //     if (url) handleDeepLink(url);
-    //   })
-    //   .catch((err) => console.error("Error getting initial URL:", err));
-
-    
-
-    // Listen for deep links while the app is running
-    // const subscription = Linking.addEventListener("url", (event) => {
-    //   handleDeepLink(event.url);
-    // });
-
-    // const { data, error } = await supabase.auth.getSession();
-    // console.log("checking session...")
-    // console.log(data)
-    // console.log(error)
-    
-    const subscription = Linking.addEventListener("url", async (event) => {
-      const parseSupabaseUrl = (url: string) => {
-        console.log(`Parsing full url: ${url}`)
-
-        let parsedUrl = url;
-        if (url.includes("#")) {
-          parsedUrl = url.replace("#", "?");
-        }
-        return Linking.parse(parsedUrl);
-      };
-      const url = parseSupabaseUrl(event.url);
-  
-      console.log("parsed url", url);
-  
-  
-      const access_token = url.queryParams?.access_token;
-      const refresh_token = url.queryParams?.refresh_token;
-      if (typeof access_token === "string" && typeof refresh_token === "string") {
-        console.log(`Access_token: ${access_token}`)
-        console.log(`refresh_token: ${refresh_token}`)
-      
-        const { data: setSessionData, error: setSessionError } =
-          await supabase.auth.setSession({
-            access_token: access_token,
-            refresh_token: refresh_token,
-          });
-        console.log("setSessionData", setSessionData);
-        console.log("setSessionError", setSessionError);
-      } else {
-        console.log("No url found")
-      }
-    });
-
-    return () => {
-      subscription.remove();
-    };
+    setTokens({ accessToken, refreshToken });
   }, []);
 
   const onResetPasswordPress = async (data: ResetPasswordType) => {
     try {
-      const validData = RESET_PASSWORD_SCHEMA.parse(data);
-      await resetPassword(validData.password);
+      if (!tokens?.accessToken || !tokens?.refreshToken) {
+        throw new Error("Failed to reset password. Please try again.");
+      }
+
+      if (authError) return;
+
+      const validData = PASSWORD_CONFIRM_SCHEMA.parse(data);
+      await resetPassword({
+        password: validData.password,
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+      });
       router.push("/(auth)");
     } catch (err: unknown) {
       if (err instanceof ZodError) {
