@@ -25,7 +25,7 @@ export const MasonryList: React.FC<MasonryFeedProps> = ({ posts }) => {
             >
               <Photo image={item.media![0]?.url!} 
               onPress={() => {
-                router.push(`/ViewPost/${item.id!}`)
+                router.push(`/(ViewPost)/${item.id!}`)
               }}/>
             </Box>
         )}
