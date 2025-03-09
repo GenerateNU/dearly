@@ -41,4 +41,11 @@ const ProfilePage = () => {
   ) : <Box></Box>;
 };
 
+<<<<<<< HEAD
+=======
+
+
+
+
+>>>>>>> e62ce19 (Cleaned up the code for the profile page)
 export default ProfilePage;
