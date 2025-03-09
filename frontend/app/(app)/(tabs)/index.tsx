@@ -1,13 +1,51 @@
-import { useUserStore } from "@/auth/store";
 import { Box } from "@/design-system/base/box";
-import { TextButton } from "@/design-system/components/ui/text-button";
+import { useUserGroups } from "@/hooks/api/group";
+import { EmptyHomePage } from "./home/empty";
+import { Text } from "@/design-system/base/text";
 
 const Home = () => {
-  const { logout } = useUserStore();
+  const { data, isLoading } = useUserGroups();
+
+  if (isLoading) {
+    return (
+      <Box
+        padding="m"
+        gap="xl"
+        alignItems="center"
+        justifyContent="center"
+        backgroundColor="pearl"
+        flex={1}
+      >
+        <Text>Loading...</Text>
+      </Box>
+    );
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <Box
+        padding="m"
+        gap="xl"
+        alignItems="center"
+        justifyContent="center"
+        backgroundColor="pearl"
+        flex={1}
+      >
+        <EmptyHomePage />
+      </Box>
+    );
+  }
 
   return (
-    <Box gap="xl" alignItems="center" justifyContent="center" backgroundColor="pearl" flex={1}>
-      <TextButton variant="text" label="Logout" onPress={logout} />
+    <Box
+      padding="m"
+      gap="xl"
+      alignItems="center"
+      justifyContent="center"
+      backgroundColor="pearl"
+      flex={1}
+    >
+      <Text>Home</Text>
     </Box>
   );
 };

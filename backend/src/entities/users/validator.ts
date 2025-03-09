@@ -6,7 +6,6 @@ import { MIN_LIMIT } from "../../constants/database";
 import { paginationSchema } from "../../utilities/pagination";
 
 export const createUserValidate = createInsertSchema(usersTable, {
-  name: (schema) => schema.min(MIN_LIMIT),
   username: (schema) => schema.min(MIN_LIMIT),
 }).omit({ id: true });
 

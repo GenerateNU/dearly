@@ -9,6 +9,8 @@ import { AuthRequest } from "@/types/auth";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { useUserStore } from "@/auth/store";
+import { Icon } from "@/design-system/components/ui/icon";
+import BackNextButtons from "../../../design-system/components/ui/back-next-buttons";
 
 const LOGIN_SCHEMA = z.object({
   email: z.string().email({ message: "Invalid email" }),
@@ -49,55 +51,64 @@ const LoginForm = () => {
   };
 
   return (
-    <Box gap="l" flexDirection="column" className="w-full">
-      <Controller
-        name="email"
-        control={control}
-        render={({ field: { onChange, value } }) => (
-          <Input
-            onChangeText={(text: string) => {
-              onChange(text);
-              trigger("email");
-            }}
-            value={value}
-            title="Email"
-            placeholder="Enter your email"
-            error={errors.email && errors.email.message}
-          />
-        )}
-      />
-      <Controller
-        name="password"
-        control={control}
-        render={({ field: { onChange, value } }) => (
-          <Input
-            onChangeText={(text: string) => {
-              onChange(text);
-              trigger("password");
-            }}
-            secureTextEntry
-            value={value}
-            title="Password"
-            placeholder="Enter your password"
-            error={errors.password && errors.password.message}
-          />
-        )}
-      />
-      {authError && <Text color="error">{authError}</Text>}
-      <Box alignItems="center" className="w-full">
-        <TextButton
-          variant="honeyRounded"
-          label={isPending ? "Logging in..." : "Log In"}
-          onPress={handleSubmit(onLoginPress)}
-          disabled={isPending || !isValid}
+    <Box flex={1} gap="l" justifyContent="space-between" flexDirection="column" className="w-full">
+      <Box gap="l">
+        <Controller
+          name="email"
+          control={control}
+          render={({ field: { onChange, value } }) => (
+            <Input
+              onChangeText={(text: string) => {
+                onChange(text);
+                trigger("email");
+              }}
+              value={value}
+              title="EMAIL"
+              placeholder="Enter your email"
+              error={errors.email && errors.email.message}
+            />
+          )}
         />
+        <Box gap="s">
+          <Controller
+            name="password"
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <Input
+                onChangeText={(text: string) => {
+                  onChange(text);
+                  trigger("password");
+                }}
+                rightIcon={<Icon onPress={onBiometricPress} name="face-recognition" />}
+                secureTextEntry
+                value={value}
+                title="PASSWORD"
+                placeholder="Enter your password"
+                error={errors.password && errors.password.message}
+              />
+            )}
+          />
+          {authError && (
+            <Text variant="caption" color="error">
+              {authError}
+            </Text>
+          )}
+          <Box alignItems="flex-end" width="auto">
+            <TextButton
+              textVariant="caption"
+              onPress={() => router.push("/(auth)/forgot-password")}
+              variant="text"
+              label="Forgot Password?"
+            />
+          </Box>
+        </Box>
       </Box>
       <Box alignItems="center" className="w-full">
-        <TextButton
-          variant="honeyRounded"
-          label={"Login with Biometrics"}
-          onPress={onBiometricPress}
-          disabled={isPending}
+        <BackNextButtons
+          disablePrev={isPending}
+          disableNext={isPending || !isValid}
+          onPrev={() => router.back()}
+          onNext={handleSubmit(onLoginPress)}
         />
       </Box>
     </Box>

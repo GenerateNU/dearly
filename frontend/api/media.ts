@@ -25,13 +25,11 @@ export const uploadPostMedia = async (
   return authWrapper<UploadGroupMediaResponse>()(req);
 };
 
-export const uploadUserMedia = async (
-  payload: UploadMediaPayload,
-): Promise<UploadUserMediaResponse> => {
+export const uploadUserMedia = async (payload: FormData): Promise<UploadUserMediaResponse> => {
   const req = async (token: string): Promise<UploadUserMediaResponse> => {
     const { data } = await fetchClient.POST("/api/v1/users/media", {
-      headers: getHeaders(token, "multipart/form-data"),
-      body: payload,
+      headers: getHeaders(token, undefined),
+      body: payload as FormData & { media: string },
     });
     return data!;
   };

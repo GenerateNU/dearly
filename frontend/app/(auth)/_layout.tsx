@@ -1,5 +1,21 @@
-import React from "react";
 import { Stack } from "expo-router";
+import { Box } from "@/design-system/base/box";
+import { SafeAreaView } from "react-native-safe-area-context";
+import ProgressBar from "@/design-system/components/ui/progress-bar";
+import { useOnboarding } from "@/contexts/onboarding";
+
+const ProgressBarWrapper = () => {
+  const { page } = useOnboarding();
+  const progress = page * 25;
+
+  return (
+    <SafeAreaView>
+      <Box width="100%" paddingHorizontal="m">
+        <ProgressBar progress={progress} />
+      </Box>
+    </SafeAreaView>
+  );
+};
 
 const Layout = () => {
   return (
@@ -7,8 +23,7 @@ const Layout = () => {
       <Stack.Screen
         name="index"
         options={{
-          headerShown: true,
-          headerTitle: "",
+          headerShown: false,
           headerTransparent: true,
           gestureEnabled: false,
         }}
@@ -17,7 +32,15 @@ const Layout = () => {
         name="register"
         options={{
           headerShown: true,
-          headerTitle: "Register",
+          headerTransparent: true,
+          gestureEnabled: false,
+          header: () => <ProgressBarWrapper />,
+        }}
+      />
+      <Stack.Screen
+        name="forgot-password"
+        options={{
+          headerShown: false,
           headerTransparent: true,
           gestureEnabled: false,
         }}
@@ -25,26 +48,88 @@ const Layout = () => {
       <Stack.Screen
         name="login"
         options={{
-          headerShown: true,
-          headerTitle: "Login",
+          headerShown: false,
           headerTransparent: true,
           gestureEnabled: false,
         }}
       />
       <Stack.Screen
-        name="components"
+        name="check-email"
         options={{
-          headerShown: true,
-          headerTitle: "Components Library",
+          headerShown: false,
+          headerTransparent: true,
           gestureEnabled: false,
         }}
       />
       <Stack.Screen
-        name="design-system"
+        name="reset-password"
+        options={{
+          headerShown: false,
+          headerTransparent: true,
+          gestureEnabled: false,
+        }}
+      />
+      <Stack.Screen
+        name="mode"
         options={{
           headerShown: true,
-          headerTitle: "Design System",
+          headerTransparent: true,
           gestureEnabled: false,
+          header: () => <ProgressBarWrapper />,
+        }}
+      />
+      <Stack.Screen
+        name="edit-profile"
+        options={{
+          headerShown: true,
+          headerTransparent: true,
+          gestureEnabled: false,
+          header: () => <ProgressBarWrapper />,
+        }}
+      />
+      <Stack.Screen
+        name="birthday"
+        options={{
+          headerShown: true,
+          headerTransparent: true,
+          gestureEnabled: false,
+          header: () => <ProgressBarWrapper />,
+        }}
+      />
+      <Stack.Screen
+        name="group"
+        options={{
+          headerShown: true,
+          headerTransparent: true,
+          gestureEnabled: false,
+          header: () => <ProgressBarWrapper />,
+        }}
+      />
+      <Stack.Screen
+        name="create-group"
+        options={{
+          headerShown: true,
+          headerTransparent: true,
+          gestureEnabled: false,
+          header: () => <ProgressBarWrapper />,
+        }}
+      />
+      <Stack.Screen
+        name="invite-link"
+        options={{
+          headerShown: true,
+          headerTransparent: true,
+          gestureEnabled: false,
+          header: () => <ProgressBarWrapper />,
+        }}
+      />
+      <Stack.Screen
+        name="join-group"
+        options={{
+          headerShown: true,
+          headerTransparent: true,
+          gestureEnabled: false,
+          header: () => <ProgressBarWrapper />,
         }}
       />
     </Stack>

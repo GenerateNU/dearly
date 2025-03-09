@@ -5,14 +5,16 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Session } from "@supabase/supabase-js";
 import { Mode } from "@/types/mode";
-import { CreateUserPayload } from "@/types/user";
-import { AuthRequest } from "@/types/auth";
 import { createUser, getUser } from "@/api/user";
 import { NOTIFICATION_TOKEN_KEY } from "@/constants/notification";
 import { unregisterDeviceToken } from "@/api/device";
 import { getExpoDeviceToken } from "@/utilities/device-token";
 import { Group } from "@/types/group";
 import * as SecureStore from "expo-secure-store";
+import { OnboardingUserInfo } from "@/contexts/onboarding";
+import { uploadUserMedia } from "@/api/media";
+import { getProfilePhotoBlob } from "@/utilities/media";
+import { ResetPasswordPayload } from "@/types/auth";
 
 interface UserState {
   isAuthenticated: boolean;
@@ -22,16 +24,20 @@ interface UserState {
   inviteToken: string | null;
   mode: Mode;
   group: Group | null;
+  email: string | null;
+  completeOnboarding: boolean;
 
   login: ({ email, password }: { email: string; password: string }) => Promise<void>;
-  register: (data: CreateUserPayload & AuthRequest) => Promise<void>;
+  register: (data: OnboardingUserInfo) => Promise<void>;
   logout: () => Promise<void>;
-  forgotPassword: ({ email }: { email: string }) => Promise<void>;
-  resetPassword: ({ password }: { password: string }) => Promise<void>;
+  forgotPassword: (email?: string) => Promise<void>;
+  resetPassword: (payload: ResetPasswordPayload) => Promise<void>;
   setMode: (mode: Mode) => void;
   setSelectedGroup: (group: Group) => void;
   setInviteToken: (inviteToken: string) => void;
   loginWithBiometrics: () => Promise<void>;
+  clearError: () => void;
+  finishOnboarding: () => void;
 }
 
 const authService: AuthService = new SupabaseAuth();
@@ -57,9 +63,15 @@ export const useUserStore = create<UserState>()(
       mode: Mode.BASIC,
       inviteToken: null,
       group: null,
+      email: null,
+      completeOnboarding: false,
 
       setMode: (mode: Mode) => {
         set({ mode });
+      },
+
+      finishOnboarding: () => {
+        set({ completeOnboarding: true });
       },
 
       setSelectedGroup: (group: Group) => {
@@ -79,9 +91,8 @@ export const useUserStore = create<UserState>()(
             isAuthenticated: true,
             userId: session.user.id,
             isPending: false,
-          });
-          set({
             mode: user.mode as Mode,
+            completeOnboarding: true,
           });
         };
         const failureImpl = async (err: unknown) => {
@@ -89,6 +100,10 @@ export const useUserStore = create<UserState>()(
           handleError(err, set);
         };
         await userWrapper(biomentricsImpl, failureImpl);
+      },
+
+      clearError: () => {
+        set({ error: null });
       },
 
       login: async ({ email, password }: { email: string; password: string }) => {
@@ -101,6 +116,7 @@ export const useUserStore = create<UserState>()(
             userId: session.user.id,
             mode: user.mode as Mode,
             isPending: false,
+            completeOnboarding: true,
           });
           await authService.storeLocalSessionToDevice(email, password);
         };
@@ -111,16 +127,27 @@ export const useUserStore = create<UserState>()(
         await userWrapper(loginImpl, failureImpl);
       },
 
-      register: async (data: CreateUserPayload & AuthRequest) => {
+      register: async (data: OnboardingUserInfo) => {
         const registerImpl = async () => {
           set({ isPending: true });
           const session: Session = await authService.signUp({
             email: data.email,
             password: data.password,
           });
-          const user = await createUser(data);
+          let objectKey: string | undefined;
+          if (data.profilePhoto) {
+            const form = await getProfilePhotoBlob(data.profilePhoto);
+            const response = await uploadUserMedia(form);
+            objectKey = response.objectKey;
+          }
+          await createUser({
+            name: data.name,
+            username: data.username,
+            mode: data.mode,
+            profilePhoto: objectKey,
+            birthday: data.birthday,
+          });
           set({
-            mode: user.mode as Mode,
             isAuthenticated: true,
             userId: session.user.id,
             isPending: false,
@@ -128,17 +155,26 @@ export const useUserStore = create<UserState>()(
           await authService.storeLocalSessionToDevice(data.email, data.password);
         };
         const errorImpl = async (err: unknown) => {
-          await useUserStore.getState().logout();
           handleError(err, set);
+          await useUserStore.getState().logout();
         };
         await userWrapper(registerImpl, errorImpl);
       },
 
-      forgotPassword: async ({ email }: { email: string }) => {
+      forgotPassword: async (email?: string) => {
         await userWrapper(
           async () => {
-            await authService.forgotPassword({ email });
-            SecureStore.getItem("email");
+            if (email) {
+              await authService.forgotPassword({ email });
+              set({ email: email });
+              return;
+            }
+            const savedEmail = await useUserStore.getState().email;
+            if (savedEmail) {
+              await authService.forgotPassword({ email: savedEmail });
+            } else {
+              throw new Error("No email found.");
+            }
           },
           async (err: unknown) => {
             handleError(err, set);
@@ -146,16 +182,18 @@ export const useUserStore = create<UserState>()(
         );
       },
 
-      resetPassword: async ({ password }: { password: string }) => {
+      resetPassword: async (payload: ResetPasswordPayload) => {
         await userWrapper(
           async () => {
-            await authService.resetPassword({ password });
+            set({ isPending: true });
+            await authService.resetPassword(payload);
             set({ error: null });
             const validEmail = SecureStore.getItem("email");
             if (!validEmail) {
               throw new Error("No email found.");
             }
-            await authService.storeLocalSessionToDevice(validEmail, password);
+            await authService.storeLocalSessionToDevice(validEmail, payload.password);
+            set({ isPending: false });
           },
           async (err: unknown) => {
             handleError(err, set);
@@ -178,6 +216,7 @@ export const useUserStore = create<UserState>()(
             isPending: false,
             mode: Mode.BASIC,
             error: null,
+            completeOnboarding: false,
           });
         };
         const errorImpl = async (err: unknown) => {
@@ -189,9 +228,6 @@ export const useUserStore = create<UserState>()(
     {
       name: "auth-storage",
       storage: createJSONStorage(() => AsyncStorage),
-      onRehydrateStorage: () => {
-        console.log("Rehydrating state...");
-      },
     },
   ),
 );
@@ -201,8 +237,11 @@ export const useUserStore = create<UserState>()(
  * @param err error
  * @param set setter function to mutate auth statte
  */
-const handleError = (err: unknown, set: (state: Partial<UserState>) => void) => {
+const handleError = async (err: unknown, set: (state: Partial<UserState>) => void) => {
   const errorMessage = err instanceof Error ? err.message : AUTH_ERROR_MESSAGE;
+  if (errorMessage === "user_cancel" || errorMessage === "system_cancel") {
+    return;
+  }
   set({ error: errorMessage });
   setTimeout(() => {
     set({ error: null });

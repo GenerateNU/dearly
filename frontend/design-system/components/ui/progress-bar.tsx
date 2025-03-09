@@ -1,35 +1,44 @@
-import React, { useEffect, useRef } from "react";
-import { Animated } from "react-native";
+import { useEffect } from "react";
+import { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { Box } from "@/design-system/base/box";
 import { AnimatedBox } from "@/design-system/base/animated-box";
 
 interface ProgressBarProps {
-  progress: number; // progress percentage, between 0 and 100
+  progress: number;
 }
 
 const ProgressBar = ({ progress }: ProgressBarProps) => {
-  const animatedWidth = useRef(new Animated.Value(0)).current;
+  const animatedWidth = useSharedValue(0);
 
   useEffect(() => {
-    Animated.timing(animatedWidth, {
-      toValue: progress,
-      duration: 300, // sliding animation 300 ms
-      useNativeDriver: false,
-    }).start();
-  }, [progress]); // runs when the progress changes
+    animatedWidth.value = withTiming(progress, { duration: 300 });
+  }, [progress]);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      width: `${animatedWidth.value}%`,
+    };
+  });
 
   return (
-    <Box backgroundColor="pearl" width="auto" borderRadius="m" overflow="hidden">
-      <AnimatedBox
-        height={2}
-        backgroundColor="gray"
-        style={{
-          width: animatedWidth.interpolate({
-            inputRange: [0, 100],
-            outputRange: ["0%", "100%"],
-          }),
-        }}
-      />
+    <Box
+      paddingVertical="s"
+      width="100%"
+      gap="s"
+      alignItems="center"
+      justifyContent="center"
+      flexDirection="row"
+    >
+      <Box
+        height={8}
+        width="100%"
+        flexDirection="row"
+        backgroundColor="honey"
+        borderRadius="m"
+        overflow="hidden"
+      >
+        <AnimatedBox height={8} backgroundColor="ink" style={animatedStyle} />
+      </Box>
     </Box>
   );
 };

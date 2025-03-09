@@ -1,14 +1,14 @@
-import React, { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, ReactNode } from "react";
 import { useUserStore } from "./store";
-import { AuthRequest } from "@/types/auth";
+import { AuthRequest, ResetPasswordPayload } from "@/types/auth";
 import { Mode } from "@/types/mode";
-import { CreateUserPayload } from "@/types/user";
 import { Group } from "@/types/group";
+import { OnboardingUserInfo } from "@/contexts/onboarding";
 
 interface UserContextType {
   isAuthenticated: boolean;
   login: (data: AuthRequest) => Promise<void>;
-  register: (data: CreateUserPayload & AuthRequest) => Promise<void>;
+  register: (data: OnboardingUserInfo) => Promise<void>;
   logout: () => Promise<void>;
   userId: string | null;
   mode: Mode;
@@ -17,7 +17,10 @@ interface UserContextType {
   setSelectedGroup: (group: Group) => void;
   setInviteToken: (inviteToken: string) => void;
   inviteToken: string | null;
-  useBiometrics: () => Promise<void>;
+  loginWithBiometrics: () => Promise<void>;
+  forgotPassword: (email?: string) => Promise<void>;
+  resetPassword: (payload: ResetPasswordPayload) => Promise<void>;
+  clearError: () => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -25,7 +28,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const {
     isAuthenticated,
-    useBiometrics,
+    loginWithBiometrics,
     login,
     register,
     logout,
@@ -36,13 +39,16 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     inviteToken,
     group,
     setSelectedGroup,
+    forgotPassword,
+    resetPassword,
+    clearError,
   } = useUserStore();
 
   return (
     <UserContext.Provider
       value={{
         isAuthenticated,
-        useBiometrics,
+        loginWithBiometrics,
         login,
         setSelectedGroup,
         group,
@@ -52,7 +58,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         mode,
         setMode,
         setInviteToken,
+        clearError,
         inviteToken,
+        forgotPassword,
+        resetPassword,
       }}
     >
       {children}

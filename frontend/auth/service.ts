@@ -1,14 +1,15 @@
 import { AppState } from "react-native";
 import { supabase } from "./client";
 import { Session, User } from "@supabase/supabase-js";
-import { AuthRequest, PhoneAuth } from "@/types/auth";
+import { AuthRequest, PhoneAuth, ResetPasswordPayload } from "@/types/auth";
 import {
   LocalAuthenticationOptions,
   authenticateAsync,
   hasHardwareAsync,
 } from "expo-local-authentication";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
+import * as Linking from "expo-linking";
+
 /**
  * Interface for authentication services, providing methods for user sign-up, login,
  * logout, and password management.
@@ -54,7 +55,7 @@ export interface AuthService {
    * @returns {Promise<User>} A promise that resolves to the updated user details
    *                          upon successful password reset.
    */
-  resetPassword({ password }: { password: string }): Promise<User>;
+  resetPassword(payload: ResetPasswordPayload): Promise<User>;
 
   /**
    * Sign a user in with phone number by sending their phone number OTP.
@@ -154,8 +155,10 @@ export class SupabaseAuth implements AuthService {
   }
 
   async forgotPassword({ email }: { email: string }): Promise<void> {
+    const redirectTo = Linking.createURL(`(auth)/reset-password`);
+
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "/",
+      redirectTo,
     });
 
     if (error) {
@@ -163,10 +166,26 @@ export class SupabaseAuth implements AuthService {
     }
   }
 
-  async resetPassword({ password }: { password: string }): Promise<User> {
+  async resetPassword({
+    password,
+    accessToken,
+    refreshToken,
+  }: ResetPasswordPayload): Promise<User> {
+    const { error: setSessionError } = await supabase.auth.setSession({
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    });
+
+    if (setSessionError) {
+      throw new Error(setSessionError.message);
+    }
+
     const { data, error } = await supabase.auth.updateUser({
       password,
     });
+
+    console.log("Data", data);
+    console.log("Error", error);
 
     if (error) {
       throw new Error(error.message);

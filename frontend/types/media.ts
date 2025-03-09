@@ -6,6 +6,9 @@ export type Media = components["schemas"]["MediaWithURL"];
 export type UploadMediaPayload =
   paths["/api/v1/groups/{id}/media"]["post"]["requestBody"]["content"]["multipart/form-data"];
 
+export type UploadUserPayload =
+  paths["/api/v1/users/media"]["post"]["requestBody"]["content"]["multipart/form-data"];
+
 export type UploadGroupMediaResponse =
   paths["/api/v1/groups/{id}/media"]["post"]["responses"]["201"]["content"]["application/json"];
 

@@ -6,7 +6,7 @@ import { Image } from "expo-image";
 
 interface AvatarProps {
   profilePhoto: string | null;
-  variant: "small" | "medium" | "big";
+  variant: "small" | "medium" | "big" | "huge";
 }
 
 export const Avatar: React.FC<AvatarProps> = ({ profilePhoto, variant = "small" }) => {
@@ -15,7 +15,7 @@ export const Avatar: React.FC<AvatarProps> = ({ profilePhoto, variant = "small" 
   const profile = profilePhoto ? profilePhoto : DEFAULT_PROFILE_PHOTO;
 
   return (
-    <Box width={variantStyle.size}>
+    <Box aspectRatio={1} width={variantStyle.size}>
       <Image
         className="w-full"
         style={{
