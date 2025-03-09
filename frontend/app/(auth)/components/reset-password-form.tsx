@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,6 +9,8 @@ import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { useUserStore } from "@/auth/store";
 import BackNextButtons from "../../../design-system/components/ui/back-next-buttons";
+import * as Linking from "expo-linking";
+import { supabase } from "@/auth/client";
 
 const RESET_PASSWORD_SCHEMA = z
   .object({
@@ -43,6 +45,87 @@ const ResetPasswordForm = () => {
 
   const { resetPassword, isPending, error: authError } = useUserStore();
   const [isPasswordConfirmationTouched, setIsPasswordConfirmationTouched] = useState(false);
+
+  
+
+  useEffect(() => {
+    // Function to extract token from URL
+    const handleDeepLink = (url:string) => {
+      if (url) {
+        console.log("Received deep link:", url);
+
+        // Extract query parameters
+        const params = new URL(url).searchParams;
+        console.log(params)
+        const token = params.get("access_token");
+
+        if (token) {
+          console.log("Extracted token:", token);
+          // Handle the token (e.g., navigate to reset password screen)
+        } else {
+          console.warn("No token found in deep link");
+        }
+      }
+    };
+
+    
+
+    // Get initial URL when the app is opened from a closed state
+    // Linking.getInitialURL()
+    //   .then((url) => {
+    //     if (url) handleDeepLink(url);
+    //   })
+    //   .catch((err) => console.error("Error getting initial URL:", err));
+
+    
+
+    // Listen for deep links while the app is running
+    // const subscription = Linking.addEventListener("url", (event) => {
+    //   handleDeepLink(event.url);
+    // });
+
+    // const { data, error } = await supabase.auth.getSession();
+    // console.log("checking session...")
+    // console.log(data)
+    // console.log(error)
+    
+    const subscription = Linking.addEventListener("url", async (event) => {
+      const parseSupabaseUrl = (url: string) => {
+        console.log(`Parsing full url: ${url}`)
+
+        let parsedUrl = url;
+        if (url.includes("#")) {
+          parsedUrl = url.replace("#", "?");
+        }
+        return Linking.parse(parsedUrl);
+      };
+      const url = parseSupabaseUrl(event.url);
+  
+      console.log("parsed url", url);
+  
+  
+      const access_token = url.queryParams?.access_token;
+      const refresh_token = url.queryParams?.refresh_token;
+      if (typeof access_token === "string" && typeof refresh_token === "string") {
+        console.log(`Access_token: ${access_token}`)
+        console.log(`refresh_token: ${refresh_token}`)
+      
+        const { data: setSessionData, error: setSessionError } =
+          await supabase.auth.setSession({
+            access_token: access_token,
+            refresh_token: refresh_token,
+          });
+        console.log("setSessionData", setSessionData);
+        console.log("setSessionError", setSessionError);
+      } else {
+        console.log("No url found")
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   const onResetPasswordPress = async (data: ResetPasswordType) => {
     try {
