@@ -153,7 +153,7 @@ const InitialLayout = () => {
     <ThemeProvider theme={getTheme(scaleRatio * scaleFactor)}>
       <Stack screenOptions={{ gestureEnabled: false }}>
         <Stack.Screen name="(auth)" options={{ headerShown: false, gestureEnabled: false }} />
-        <Stack.Screen name="(app)/(tabs)" options={{ headerShown: false, gestureEnabled: false }} />
+        <Stack.Screen name="(app)" options={{ headerShown: false, gestureEnabled: false }} />
         <Stack.Screen name="(ViewPost)" options={{ headerShown: false, gestureEnabled: false }} />
       </Stack>
 >>>>>>> e938cc4 (Clickable images that route to its post)
