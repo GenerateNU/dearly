@@ -18,9 +18,12 @@ type RegisterFormData = AuthRequest & {
 
 const REGISTER_SCHEMA = z
   .object({
-    username: z.string().min(2, {
-      message: "Username must be at least 2 characters long",
-    }),
+    username: z
+      .string()
+      .min(2, {
+        message: "Username must be at least 2 characters long",
+      })
+      .refine((s) => !s.includes(" ")),
     email: z.string().email({ message: "Must be a valid email" }),
   })
   .merge(PASSWORD_SCHEMA)

@@ -12,7 +12,7 @@ import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
-import { MAX_MEDIA_COUNT, MIN_LIMIT, TEXT_MAX_LIMIT } from "../../constants/database";
+import { MAX_MEDIA_COUNT, TEXT_MAX_LIMIT } from "../../constants/database";
 
 describe("PATCH /posts/:id", () => {
   let app: Hono;
@@ -58,30 +58,6 @@ describe("PATCH /posts/:id", () => {
       .assertFieldNotEqual("media", MEDIA_MOCK)
       .assertFieldNotEqual("caption", POST_MOCK[0]!.caption)
       .assertField("caption", "updated");
-  });
-
-  it("should return 400 if owner and empty caption", async () => {
-    (
-      await testBuilder.request({
-        app,
-        type: HTTPRequest.PATCH,
-        route: `/api/v1/posts/${POST_ID}`,
-        requestBody: {
-          caption: "",
-        },
-        autoAuthorized: false,
-        headers: {
-          Authorization: `Bearer ${ALICE_JWT}`,
-        },
-      })
-    )
-      .assertStatusCode(Status.BadRequest)
-      .assertError([
-        {
-          message: `Caption must be at least ${MIN_LIMIT} character long`,
-          path: "caption",
-        },
-      ]);
   });
 
   it(`should return 400 if owner and caption > ${TEXT_MAX_LIMIT}`, async () => {

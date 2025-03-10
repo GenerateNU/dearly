@@ -57,7 +57,9 @@ const CreatePost = () => {
         <Text variant="bodyLargeBold">Upload Photo</Text>
         {error ? (
           <Box flex={1} justifyContent="center" alignItems="center">
-            <Text>Failed to load groups. Please try again later.</Text>
+            <Text variant="caption" color="error">
+              Failed to load groups. Please try again later.
+            </Text>
           </Box>
         ) : (
           <PostCreationForm

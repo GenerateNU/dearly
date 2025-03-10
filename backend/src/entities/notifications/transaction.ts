@@ -32,6 +32,7 @@ export class NotificationTransactionImpl implements NotificationTransactions {
         groupId: notificationsTable.groupId,
         commentId: notificationsTable.commentId,
         likeId: notificationsTable.likeId,
+        profilePhoto: usersTable.profilePhoto,
         objectKey: sql<string>`
                 CASE 
                   WHEN ${notificationsTable.referenceType} = 'POST' THEN ${mediaTable.objectKey}
@@ -58,11 +59,15 @@ export class NotificationTransactionImpl implements NotificationTransactions {
     }
 
     const notificationWithMedia = await Promise.all(
-      notificationPlain.map(async ({ objectKey, ...rest }) => {
+      notificationPlain.map(async ({ objectKey, profilePhoto, ...rest }) => {
         const signedURL = await mediaService.getSignedUrl(objectKey);
+        const signedProfilePhotoURL = profilePhoto
+          ? await mediaService.getSignedUrl(profilePhoto)
+          : undefined;
         return {
           ...rest,
           mediaURL: signedURL,
+          profilePhoto: signedProfilePhotoURL,
         };
       }),
     );

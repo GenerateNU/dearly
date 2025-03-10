@@ -35,12 +35,13 @@ import { TestBuilder } from "../helpers/test-builder";
 import { Hono } from "hono";
 import { HTTPRequest, Status } from "../../constants/http";
 import { generateJWTFromID } from "../helpers/test-token";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 describe("Notification server test", () => {
   const config = getConfigurations();
   const db = connectDB(config);
   const notifService = new ExpoNotificationService(
-    config,
+    new SupabaseClient("", ""),
     new NotificationTransactionImpl(db),
     new ExpoPushService(expo),
   );

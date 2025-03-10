@@ -47,6 +47,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
         placeholderStyle={{
           color: theme.colors.gray,
           opacity: 0.5,
+          width: "80%",
         }}
         style={{
           backgroundColor: pearlColor,
