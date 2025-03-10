@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+import { Profile } from "@/design-system/components/ui/profile";
+>>>>>>> e62ce19a815379c56ad4c28c7236a980a48fe2cf
 import { Box } from "@/design-system/base/box";
 import { Post } from "@/types/post";
 import { useUserStore } from "@/auth/store";
