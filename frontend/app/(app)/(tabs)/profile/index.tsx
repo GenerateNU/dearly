@@ -42,10 +42,13 @@ const ProfilePage = () => {
 };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 
 
 
 >>>>>>> e62ce19 (Cleaned up the code for the profile page)
+=======
+>>>>>>> 222c547 (Minor bug fixes)
 export default ProfilePage;
