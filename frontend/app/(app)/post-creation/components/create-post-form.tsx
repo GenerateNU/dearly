@@ -4,45 +4,24 @@ import { Icon } from "@/design-system/components/ui/icon";
 import Input from "@/design-system/components/ui/input";
 import { TextButton } from "@/design-system/components/ui/text-button";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, SetStateAction, useEffect } from "react";
+import { useState, SetStateAction } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { z } from "zod";
+import { z, ZodError } from "zod";
 import { Text } from "@/design-system/base/text";
-import { Pressable, Image, Alert } from "react-native";
+import { Pressable, Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { FlatList } from "react-native-gesture-handler";
 import { DropdownItem } from "@/types/dropdown";
-import { Theme } from "@/design-system/base/theme";
-import { useTheme } from "@shopify/restyle";
+import { CREATE_POST_SCHEMA } from "@/utilities/form-schema";
+import SelectedPhoto from "./photo";
+import ImagePlaceholder from "./photo-placeholder";
+import { useUploadGroupMedia } from "@/hooks/api/media";
+import { useCreatePost } from "@/hooks/api/post";
+import { router } from "expo-router";
+import { getPhotoBlobs } from "@/utilities/media";
+import { CreatePostPayload } from "@/types/post";
 
 const PHOTO_DIMENSION = 200;
-const CREATE_POST_SCHEMA = z.object({
-  caption: z
-    .string()
-    .max(500, {
-      message: "Caption must be at most 500 characters",
-    })
-    .optional(),
-  photos: z
-    .string()
-    .array()
-    .min(1, {
-      message: "Please select at least 1 photo",
-    })
-    .max(3, {
-      message: "Please select at most three photos",
-    }),
-  location: z
-    .string()
-    .max(100, {
-      message: "Location must be at most 100 characters long",
-    })
-    .optional(),
-  group: z.string({
-    required_error: "Group is required",
-  }),
-});
-
 type CreatePostData = z.infer<typeof CREATE_POST_SCHEMA>;
 
 interface PostCreationFormProps {
@@ -71,20 +50,10 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
 
   const watchPhotos = watch("photos");
   const watchGroup = watch("group");
-
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (groups.length > 0 && !selectedGroup) {
-      // setSelectedGroup(groups[0].value);
-      // setFormValue("group", groups[0].value);
-      // trigger("group");
-    }
-  }, [groups]);
 
   const handleGroupUpdate = (value: SetStateAction<string | null>) => {
     setSelectedGroup(value);
-
     if (typeof value === "string") {
       setFormValue("group", value);
       trigger("group");
@@ -100,10 +69,38 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
     }
   };
 
-  const theme = useTheme<Theme>();
+  const {
+    mutateAsync: uploadMedia,
+    isPending: isPendingMedia,
+    error: mediaError,
+  } = useUploadGroupMedia(getValues("group"));
 
-  const onSubmit = (data: CreatePostData) => {
-    console.log("Form submitted with:", data);
+  const {
+    mutateAsync: createPost,
+    isPending: isPendingCreatePost,
+    error: createPostError,
+  } = useCreatePost(getValues("group"));
+
+  const onSubmit = async (form: CreatePostData) => {
+    try {
+      const data = CREATE_POST_SCHEMA.parse(form);
+      const formData = await getPhotoBlobs(data.photos);
+      const keys = await uploadMedia(formData);
+
+      await createPost({
+        media: keys as CreatePostPayload["media"],
+        caption: data.caption,
+        location: data.location,
+      });
+      if (!mediaError || !createPostError) {
+        router.push("/(app)/(tabs)");
+      }
+    } catch (err: unknown) {
+      if (err instanceof ZodError) {
+        const errorMessages = err.errors.map((error) => error.message).join("\n");
+        Alert.alert("Validation Errors", errorMessages);
+      }
+    }
   };
 
   const pickImage = async () => {
@@ -143,36 +140,17 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
   const removePhoto = (indexToRemove: number) => {
     const currentPhotos = getValues("photos") || [];
     const updatedPhotos = currentPhotos.filter((_, index) => index !== indexToRemove);
-
     setFormValue("photos", updatedPhotos);
     trigger("photos");
   };
 
   const renderPhotoItem = ({ item, index }: { item: string; index: number }) => (
-    <Box marginRight="s" position="relative">
-      <Image
-        source={{ uri: item }}
-        style={{
-          borderRadius: theme.borderRadii.s,
-          height: PHOTO_DIMENSION,
-          width: PHOTO_DIMENSION,
-        }}
-      />
-      <Pressable onPress={() => removePhoto(index)} className="top-2 right-2 z-10 absolute">
-        <Box
-          backgroundColor="pearl"
-          borderRadius="full"
-          padding="xs"
-          shadowColor="ink"
-          shadowOffset={{ width: 0, height: 2 }}
-          shadowOpacity={0.3}
-          shadowRadius={3}
-          elevation={3}
-        >
-          <Icon size={20} name="close" />
-        </Box>
-      </Pressable>
-    </Box>
+    <SelectedPhoto
+      uri={item}
+      dimension={PHOTO_DIMENSION}
+      index={index}
+      onRemove={() => removePhoto(index)}
+    />
   );
 
   return (
@@ -180,23 +158,14 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
       <Box gap="xl" width="100%" alignItems="center" justifyContent="center">
         {!watchPhotos || watchPhotos.length === 0 ? (
           <Pressable onPress={pickImage}>
-            <Box
-              borderRadius="s"
-              backgroundColor="slate"
-              height={PHOTO_DIMENSION}
-              width={PHOTO_DIMENSION}
-              justifyContent="center"
-              alignItems="center"
-            >
-              <Text color="pearl">Add photos</Text>
-            </Box>
+            <ImagePlaceholder dimension={PHOTO_DIMENSION} />
           </Pressable>
         ) : (
           <Box width="100%">
             <FlatList
               data={watchPhotos}
               renderItem={renderPhotoItem}
-              keyExtractor={(item, index) => index.toString()}
+              keyExtractor={(_, index) => index.toString()}
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ paddingLeft: "20%" }}
@@ -232,11 +201,10 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
               />
             )}
           />
-
           <Controller
             name="group"
             control={control}
-            render={({ field: { value } }) => (
+            render={() => (
               <Box>
                 <Dropdown
                   value={selectedGroup}
@@ -254,7 +222,6 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
               </Box>
             )}
           />
-
           <Controller
             name="location"
             control={control}
@@ -273,9 +240,27 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
           />
         </Box>
       </Box>
+      <Box width="100%">
+        {mediaError && (
+          <Text variant="caption" color="error">
+            {mediaError.message}
+          </Text>
+        )}
+        {createPostError && (
+          <Text variant="caption" color="error">
+            {createPostError.message}
+          </Text>
+        )}
+      </Box>
       <Box alignItems="center" width="100%">
         <TextButton
-          disabled={!isValid || !watchGroup || watchPhotos.length === 0}
+          disabled={
+            !isValid ||
+            !watchGroup ||
+            watchPhotos.length === 0 ||
+            isPendingMedia ||
+            isPendingCreatePost
+          }
           variant="honeyRounded"
           onPress={handleSubmit(onSubmit)}
           label="Post"
