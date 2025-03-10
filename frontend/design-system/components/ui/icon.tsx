@@ -15,6 +15,7 @@ interface IconProps {
   label?: string;
   navbar?: boolean;
   onPress?: () => void;
+  size?: number;
 }
 
 export const Icon: React.FC<IconProps> = ({
@@ -24,6 +25,7 @@ export const Icon: React.FC<IconProps> = ({
   label,
   navbar,
   onPress,
+  size,
 }) => {
   const positionStyles: Record<
     string,
@@ -45,7 +47,11 @@ export const Icon: React.FC<IconProps> = ({
         gap="xs"
         flexDirection={positionStyles[labelPosition || "left"]}
       >
-        <MaterialCommunityIcons name={name} color={ColorPalette[color]} size={iconSize} />
+        <MaterialCommunityIcons
+          name={name}
+          color={ColorPalette[color]}
+          size={size ? size : iconSize}
+        />
         {label && (
           <Text color={color} variant={navbar ? "navbar" : "body"}>
             {label}

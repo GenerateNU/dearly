@@ -4,17 +4,46 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   TouchableWithoutFeedback,
   FlatList,
+  ActivityIndicator,
 } from "react-native";
-import { PostCreationForm } from "./components/create-post-form";
+import PostCreationForm from "./components/create-post-form";
+import { useUserGroups } from "@/hooks/api/user";
+import { useMemo } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { EmptyHomePage } from "@/design-system/components/home/empty";
 
 const CreatePost = () => {
-  // Create a simple data array with a single item for FlatList
   const data = [{ key: "form" }];
+  const { data: groupsData, isLoading, error, fetchNextPage, isFetchingNextPage } = useUserGroups();
 
-  // Render item function for FlatList
+  const formattedGroups = useMemo(() => {
+    if (!groupsData) return [];
+
+    return groupsData.pages.flat().map((group) => ({
+      label: group.name,
+      value: group.id,
+    }));
+  }, [groupsData]);
+
+  const hasGroups = formattedGroups.length > 0;
+
+  if (!hasGroups && !isLoading) {
+    return (
+      <Box
+        padding="m"
+        gap="xl"
+        alignItems="center"
+        justifyContent="center"
+        backgroundColor="pearl"
+        flex={1}
+      >
+        <EmptyHomePage />
+      </Box>
+    );
+  }
+
   const renderItem = () => (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <Box
@@ -26,7 +55,21 @@ const CreatePost = () => {
         alignItems="flex-start"
       >
         <Text variant="bodyLargeBold">Upload Photo</Text>
-        <PostCreationForm />
+        {error ? (
+          <Box flex={1} justifyContent="center" alignItems="center">
+            <Text>Failed to load groups. Please try again later.</Text>
+          </Box>
+        ) : (
+          <PostCreationForm
+            onEndReached={() => {
+              if (!isFetchingNextPage) {
+                fetchNextPage();
+              }
+            }}
+            groups={formattedGroups}
+            isLoading={isLoading || isFetchingNextPage}
+          />
+        )}
       </Box>
     </TouchableWithoutFeedback>
   );
@@ -36,7 +79,7 @@ const CreatePost = () => {
       className="flex-1"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <SafeAreaView collapsable={false} className="flex-1">
+      <SafeAreaView edges={["top"]} collapsable={false} className="flex-1 mt-[10%]">
         <FlatList
           data={data}
           renderItem={renderItem}
@@ -44,6 +87,8 @@ const CreatePost = () => {
           contentContainerStyle={{ flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={isFetchingNextPage ? <ActivityIndicator /> : null}
         />
       </SafeAreaView>
     </KeyboardAvoidingView>
