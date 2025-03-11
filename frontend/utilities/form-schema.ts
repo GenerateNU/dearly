@@ -14,7 +14,7 @@ export const CREATE_POST_SCHEMA = z.object({
       message: "Please select at least 1 photo",
     })
     .max(3, {
-      message: "Please select at most three photos",
+      message: "Maximum photos added",
     }),
   location: z
     .string()
