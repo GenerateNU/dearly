@@ -1,5 +1,5 @@
 # Lockdown the bun version dearly uses.
-FROM oven/bun:1.2.2 AS base
+FROM oven/bun:1.2.4 AS base
 WORKDIR /usr/src/app
 
 FROM base AS install
@@ -22,4 +22,5 @@ COPY --from=prerelease /usr/src/app/ .
 
 USER bun 
 EXPOSE 3000/tcp
-ENTRYPOINT [ "bun", "run", "backend/src/server.ts" ]
+WORKDIR /usr/src/app/backend
+ENTRYPOINT [ "bun", "run", "src/server.ts" ]

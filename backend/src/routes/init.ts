@@ -14,6 +14,7 @@ import { mediaRoutes } from "../entities/media/route";
 import { ExpoPushService } from "../services/notification/expo";
 import { AppService } from "../types/api/internal/services";
 import { NudgeSchedulerService } from "../services/nudgeScheduler";
+import { serveStatic } from "@hono/node-server/serve-static";
 
 export const setUpRoutes = (
   app: Hono,
@@ -43,6 +44,10 @@ export const setUpRoutes = (
   // initialize routes
   const { expoService, mediaService, nudgeSchedulerService } = services;
   app.route("/api/v1", apiRoutes(db, mediaService, expoService, nudgeSchedulerService));
+
+  app.get(".well-known/apple-app-site-association", serveStatic({
+    path: "../.well-known/apple-app-site-association"
+  }))
 
   // unsupported route
   app.notFound((ctx: Context) => {
