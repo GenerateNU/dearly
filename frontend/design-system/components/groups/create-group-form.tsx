@@ -3,11 +3,11 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z, ZodError } from "zod";
 import { RelativePathString, router } from "expo-router";
-import Input from "@/design-system/components/ui/input";
+import Input from "@/design-system/components/ui/controls/input";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { useCreateGroup } from "@/hooks/api/group";
-import BackNextButtons from "@/design-system/components/ui/back-next-buttons";
+import BackNextButtons from "@/design-system/components/ui/buttons/back-next-buttons";
 
 interface CreateGroupProps {
   nextPageNavigate: string;

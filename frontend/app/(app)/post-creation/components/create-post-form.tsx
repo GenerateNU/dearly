@@ -1,8 +1,4 @@
 import { Box } from "@/design-system/base/box";
-import { Dropdown } from "@/design-system/components/ui/dropdown";
-import { Icon } from "@/design-system/components/ui/icon";
-import Input from "@/design-system/components/ui/input";
-import { TextButton } from "@/design-system/components/ui/text-button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, SetStateAction } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -20,6 +16,10 @@ import { useCreatePost } from "@/hooks/api/post";
 import { router } from "expo-router";
 import { getPhotoBlobs } from "@/utilities/media";
 import { CreatePostPayload } from "@/types/post";
+import { TextButton } from "@/design-system/components/shared/buttons/text-button";
+import { Dropdown } from "@/design-system/components/shared/controls/dropdown";
+import Input from "@/design-system/components/shared/controls/input";
+import { Icon } from "@/design-system/components/shared/icons/icon";
 
 const PHOTO_DIMENSION = 200;
 type CreatePostData = z.infer<typeof CREATE_POST_SCHEMA>;

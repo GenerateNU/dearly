@@ -1,11 +1,11 @@
 import { useOnboarding } from "@/contexts/onboarding";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
-import { Avatar } from "@/design-system/components/ui/avatar";
 import { SafeAreaView, TouchableWithoutFeedback, Keyboard } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import EditNameForm from "./components/edit-name-form";
-import { TextButton } from "@/design-system/components/ui/text-button";
+import { TextButton } from "@/design-system/components/shared/buttons/text-button";
+import { Avatar } from "@/design-system/components/shared/avatar";
 
 const EditProfile = () => {
   const { user, setUser } = useOnboarding();

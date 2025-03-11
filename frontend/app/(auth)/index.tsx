@@ -4,13 +4,13 @@ import { Text } from "@/design-system/base/text";
 import Carousel, { ICarouselInstance } from "react-native-reanimated-carousel";
 import { useRef, useState, useEffect } from "react";
 import { Dimensions, Keyboard, TouchableWithoutFeedback } from "react-native";
-import { TextButton } from "@/design-system/components/ui/text-button";
 import { SPLASH_SCREEN_INFO } from "@/constants/splash-screen";
 import { FadeIn, FadeInDown, SlideInDown } from "react-native-reanimated";
 import { AnimatedBox } from "@/design-system/base/animated-box";
 import { useOnboarding } from "@/contexts/onboarding";
 import { router } from "expo-router";
 import { useUserStore } from "@/auth/store";
+import { TextButton } from "@/design-system/components/shared/buttons/text-button";
 
 interface SplashScreenContent {
   header: string;

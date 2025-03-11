@@ -1,7 +1,14 @@
 import { ComponentProps, ReactNode } from "react";
 import { Box } from "@/design-system/base/box";
 import Animated from "react-native-reanimated";
-import { createRestyleComponent, backgroundColor, layout, border, spacing } from "@shopify/restyle";
+import {
+  createRestyleComponent,
+  backgroundColor,
+  layout,
+  border,
+  spacing,
+  opacity,
+} from "@shopify/restyle";
 import { Theme } from "./theme";
 
 type BoxProps = ComponentProps<typeof Box>;

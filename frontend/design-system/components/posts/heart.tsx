@@ -1,6 +1,6 @@
 import { useTheme } from "@shopify/restyle";
 import { Theme } from "@/design-system/base/theme";
-import { IconButton } from "../ui/icon-button";
+import { IconButton } from "../ui/buttons/icon-button";
 import { useIsBasicMode } from "@/hooks/component/mode";
 
 interface HeartProps {

@@ -1,11 +1,11 @@
 import { useOnboarding } from "@/contexts/onboarding";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
-import { Card } from "@/design-system/components/ui/card";
 import { SafeAreaView } from "react-native";
 import { Mode } from "@/types/mode";
 import { router } from "expo-router";
-import BackNextButtons from "../../design-system/components/ui/back-next-buttons";
+import { Card } from "@/design-system/components/shared/card";
+import BackNextButtons from "@/design-system/components/shared/buttons/back-next-buttons";
 
 const SelectMode = () => {
   const { user, setUser, setPage, reset } = useOnboarding();

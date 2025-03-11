@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { TouchableOpacity, LayoutChangeEvent } from "react-native";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";

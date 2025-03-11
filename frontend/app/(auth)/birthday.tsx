@@ -4,11 +4,11 @@ import { Text } from "@/design-system/base/text";
 import { Alert, SafeAreaView } from "react-native";
 import { router } from "expo-router";
 import { useUserStore } from "@/auth/store";
-import BackNextButtons from "../../design-system/components/ui/back-next-buttons";
-import Input from "@/design-system/components/ui/input";
 import SelectBirthdayPopup from "./components/birthday-popup";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { useEffect, useRef } from "react";
+import BackNextButtons from "@/design-system/components/shared/buttons/back-next-buttons";
+import Input from "@/design-system/components/shared/controls/input";
 
 const formatBirthday = (birthday?: Date | null) => {
   if (!birthday) {

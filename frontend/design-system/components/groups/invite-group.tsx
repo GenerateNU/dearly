@@ -1,7 +1,7 @@
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { useState } from "react";
-import { TextButton } from "@/design-system/components/ui/text-button";
+import { TextButton } from "@/design-system/components/ui/buttons/text-button";
 import { useLocalSearchParams } from "expo-router";
 import { useUserStore } from "@/auth/store";
 import { useGetInviteToken } from "@/hooks/api/group";

@@ -1,5 +1,5 @@
 import { Avatar } from "../ui/avatar";
-import { TextButton } from "../ui/text-button";
+import { TextButton } from "../ui/buttons/text-button";
 import { formatTime } from "@/utilities/time";
 import { Pressable } from "react-native";
 import { Box } from "@/design-system/base/box";

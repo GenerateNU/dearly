@@ -2,11 +2,11 @@ import { Alert } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z, ZodError } from "zod";
-import Input from "@/design-system/components/ui/input";
 import { Box } from "@/design-system/base/box";
 import { useOnboarding } from "@/contexts/onboarding";
 import { router } from "expo-router";
-import BackNextButtons from "../../../design-system/components/ui/back-next-buttons";
+import Input from "@/design-system/components/shared/controls/input";
+import BackNextButtons from "@/design-system/components/shared/buttons/back-next-buttons";
 
 const EDIT_NAME_SCHEMA = z.object({
   name: z.string({ message: "Invalid name" }),

@@ -2,14 +2,14 @@ import { Alert } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z, ZodError } from "zod";
-import Input from "@/design-system/components/ui/input";
 import { AuthRequest } from "@/types/auth";
 import { Box } from "@/design-system/base/box";
 import { useOnboarding } from "@/contexts/onboarding";
 import { useState, useEffect } from "react";
 import { router } from "expo-router";
-import BackNextButtons from "../../../design-system/components/ui/back-next-buttons";
 import { PASSWORD_SCHEMA } from "@/utilities/password";
+import Input from "@/design-system/components/shared/controls/input";
+import BackNextButtons from "@/design-system/components/shared/buttons/back-next-buttons";
 
 type RegisterFormData = AuthRequest & {
   username: string;

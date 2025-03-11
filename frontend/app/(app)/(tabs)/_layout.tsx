@@ -1,5 +1,5 @@
 import { Box } from "@/design-system/base/box";
-import { Icon } from "@/design-system/components/ui/icon";
+import { Icon } from "@/design-system/components/shared/icons/icon";
 import { useIsBasicMode } from "@/hooks/component/mode";
 import { router, Tabs } from "expo-router";
 

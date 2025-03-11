@@ -1,6 +1,6 @@
 import { BaseButton } from "@/design-system/base/button";
 import { MaterialIcon } from "@/types/icon";
-import { Icon } from "./icon";
+import { Icon } from "../icons/icon";
 import { ButtonVariant } from "@/design-system/base/variants/button";
 
 interface IconButtonProps {

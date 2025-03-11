@@ -1,11 +1,11 @@
 import { useOnboarding } from "@/contexts/onboarding";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
-import { Card } from "@/design-system/components/ui/card";
 import { SafeAreaView } from "react-native";
 import { router } from "expo-router";
 import { GroupAction } from "@/types/group";
-import { TextButton } from "@/design-system/components/ui/text-button";
+import { Card } from "@/design-system/components/shared/card";
+import { TextButton } from "@/design-system/components/shared/buttons/text-button";
 
 const JoinCreateGroup = () => {
   const { user, setUser } = useOnboarding();

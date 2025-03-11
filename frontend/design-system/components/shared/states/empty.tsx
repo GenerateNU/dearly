@@ -1,8 +1,6 @@
 import { Box } from "@/design-system/base/box";
 import Illustration from "@/assets/splash-screen-illustration.svg";
 import { Text } from "@/design-system/base/text";
-import { TextButton } from "@/design-system/components/ui/text-button";
-import { router } from "expo-router";
 
 export const EmptyPage = () => {
   return (

@@ -2,8 +2,8 @@ import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { SafeAreaView } from "react-native";
 import { useUserStore } from "@/auth/store";
-import BackNextButtons from "../../design-system/components/ui/back-next-buttons";
 import { router } from "expo-router";
+import BackNextButtons from "@/design-system/components/shared/buttons/back-next-buttons";
 
 const JoinGroup = () => {
   const { finishOnboarding } = useUserStore();

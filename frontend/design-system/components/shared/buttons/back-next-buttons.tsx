@@ -1,5 +1,5 @@
 import { Box } from "@/design-system/base/box";
-import { TextButton } from "@/design-system/components/ui/text-button";
+import { TextButton } from "@/design-system/components/ui/buttons/text-button";
 
 interface BackNextProps {
   onNext: () => void;

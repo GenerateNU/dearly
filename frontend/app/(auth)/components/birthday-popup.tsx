@@ -1,9 +1,9 @@
-import BottomSheetModal from "@/design-system/components/ui/bottom-sheet";
 import { forwardRef } from "react";
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 import { useOnboarding } from "@/contexts/onboarding";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Box } from "@/design-system/base/box";
+import BottomSheetModal from "@/design-system/components/shared/bottom-sheet";
 
 interface BirthdayProps {
   onClose?: () => void;

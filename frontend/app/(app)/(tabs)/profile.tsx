@@ -1,6 +1,6 @@
 import { useUserStore } from "@/auth/store";
 import { Box } from "@/design-system/base/box";
-import { TextButton } from "@/design-system/components/ui/text-button";
+import { TextButton } from "@/design-system/components/shared/buttons/text-button";
 
 const Profile = () => {
   const { logout } = useUserStore();

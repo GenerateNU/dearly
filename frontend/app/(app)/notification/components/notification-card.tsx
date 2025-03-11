@@ -2,7 +2,7 @@ import { DEFAULT_PROFILE_PHOTO } from "@/constants/photo";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { Theme } from "@/design-system/base/theme";
-import { Avatar } from "@/design-system/components/ui/avatar";
+import { Avatar } from "@/design-system/components/shared/avatar";
 import { Notification } from "@/types/user";
 import { categorizeTime } from "@/utilities/time";
 import { useTheme } from "@shopify/restyle";

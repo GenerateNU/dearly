@@ -1,9 +1,9 @@
-import { Avatar } from "./avatar";
 import { DEFAULT_PROFILE_PHOTO } from "@/constants/photo";
-import { Icon } from "./icon";
 import { formatDay, getZodiacIcon } from "@/utilities/time";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
+import { Icon } from "@/design-system/components/shared/icons/icon";
+import { Avatar } from "@/design-system/components/shared/avatar";
 
 interface ProfileProps {
   profilePhoto: string | null;

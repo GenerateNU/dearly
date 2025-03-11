@@ -1,8 +1,8 @@
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
-import { TextButton } from "@/design-system/components/ui/text-button";
+import { TextButton } from "@/design-system/components/ui/buttons/text-button";
 import { router } from "expo-router";
-import { EmptyPage } from "../ui/empty";
+import { EmptyPage } from "../ui/states/empty";
 
 export const EmptyHomePage = () => {
   return (

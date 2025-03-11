@@ -1,8 +1,8 @@
 import { Stack } from "expo-router";
 import { Box } from "@/design-system/base/box";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ProgressBar from "@/design-system/components/ui/progress-bar";
 import { useOnboarding } from "@/contexts/onboarding";
+import ProgressBar from "@/design-system/components/shared/progress-bar";
 
 const ProgressBarWrapper = () => {
   const { page } = useOnboarding();

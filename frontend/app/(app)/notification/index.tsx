@@ -1,11 +1,12 @@
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
-import { EmptyPage } from "@/design-system/components/ui/empty";
 import { useUserNotification } from "@/hooks/api/user";
 import { SafeAreaView } from "react-native-safe-area-context";
 import NotificationCard from "./components/notification-card";
 import { Notification as NotificationType } from "@/types/user";
 import { FlatList } from "react-native-gesture-handler";
+import NotificationSkeleton from "./components/skeleton";
+import { EmptyPage } from "@/design-system/components/shared/states/empty";
 
 const Notification = () => {
   const { data, isLoading, isFetchingNextPage, error, fetchNextPage } = useUserNotification();
@@ -27,6 +28,7 @@ const Notification = () => {
 
   return (
     <SafeAreaView className="flex-1 w-full">
+      <NotificationSkeleton />
       <Box
         width="100%"
         paddingTop="xl"
