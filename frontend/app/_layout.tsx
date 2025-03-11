@@ -10,8 +10,6 @@ import { useNotificationPermission } from "@/hooks/permission/notification";
 import { useRequestDevicePermission } from "@/hooks/permission/device";
 import { useFonts } from "expo-font";
 import { useAccessibility } from "@/hooks/component/accessibility";
-import { Dimensions } from "react-native";
-import { BIGGER_PHONE_SCALE_RATIO, BIGGER_PHONE_SCREEN } from "@/constants/scale";
 import { UserProvider } from "@/auth/provider";
 import { useUserStore } from "@/auth/store";
 import SplashScreenAnimation from "./(auth)/components/splash-screen";
@@ -23,9 +21,6 @@ const InitialLayout = () => {
   const { isAuthenticated, clearError, completeOnboarding } = useUserStore();
   const [showSplash, setShowSplash] = useState(true);
   const [isReady, setIsReady] = useState(false);
-
-  const { width } = Dimensions.get("window");
-  const scaleFactor = width >= BIGGER_PHONE_SCREEN ? BIGGER_PHONE_SCALE_RATIO : 1;
 
   const [fontsLoaded] = useFonts({
     Black: require("../assets/fonts/proximanova_black.ttf"),
@@ -82,7 +77,7 @@ const InitialLayout = () => {
 
   // return the slot to ensure navigation container is mounted first
   return (
-    <ThemeProvider theme={getTheme(scaleRatio * scaleFactor)}>
+    <ThemeProvider theme={getTheme(scaleRatio)}>
       {showSplash ? <SplashScreenAnimation /> : <Slot />}
     </ThemeProvider>
   );
