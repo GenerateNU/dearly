@@ -33,15 +33,17 @@ const Notification = () => {
 
   const renderItem = ({ item }: { item: NotificationType }) => {
     return (
-      <NotificationCard
-        createdAt={item.createdAt}
-        referenceType={item.referenceType}
-        mediaURL={item.mediaURL}
-        actorId={item.actorId}
-        description={item.description}
-        receiverId={item.receiverId}
-        title={item.title}
-      />
+      <Box paddingBottom="m">
+        <NotificationCard
+          createdAt={item.createdAt}
+          referenceType={item.referenceType}
+          mediaURL={item.mediaURL}
+          actorId={item.actorId}
+          description={item.description}
+          receiverId={item.receiverId}
+          title={item.title}
+        />
+      </Box>
     );
   };
 
@@ -59,7 +61,7 @@ const Notification = () => {
   const Notifications = () => (
     <FlatList
       style={{ width: "100%" }}
-      contentContainerStyle={{ paddingBottom: 10 }}
+      contentContainerStyle={{ paddingVertical: 20 }}
       data={notifications}
       renderItem={renderItem}
       keyExtractor={(_, index) => `notification-${index}`}
