@@ -13,7 +13,7 @@ const Home = () => {
   const groupsResource = {
     data: groups,
     loading: isLoading,
-    error: error ? String(error) : null,
+    error: error ? error.message : null,
   };
 
   return (
