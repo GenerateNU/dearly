@@ -2,7 +2,7 @@ import { Box } from "@/design-system/base/box";
 import NotificationSkeleton from "./skeleton";
 import { FlatList } from "react-native";
 
-const LoadingNotifications = () => {
+const LoadingNotifications = ({ scrollable = true }: { scrollable?: boolean }) => {
   const skeletonData = Array.from({ length: 5 }, (_, index) => ({ id: `skeleton-${index}` }));
 
   return (
@@ -16,6 +16,7 @@ const LoadingNotifications = () => {
         )}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
+        scrollEnabled={scrollable}
       />
     </Box>
   );
