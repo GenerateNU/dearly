@@ -4,7 +4,7 @@ import { Text } from "@/design-system/base/text";
 import { useUserGroups } from "@/hooks/api/user";
 import ResourceView from "@/design-system/components/utilities/resource-view";
 import ErrorDisplay from "@/design-system/components/shared/states/error";
-import { ActivityIndicator } from "react-native";
+import Spinner from "@/design-system/components/shared/spinner";
 
 const Home = () => {
   const { data, isLoading, error, refetch } = useUserGroups();
@@ -27,7 +27,7 @@ const Home = () => {
     >
       <ResourceView
         resourceState={groupsResource}
-        loadingComponent={<ActivityIndicator size="large" />}
+        loadingComponent={<Spinner />}
         errorComponent={<ErrorDisplay refresh={refetch} />}
         emptyComponent={<EmptyHomePage />}
         successComponent={<Text>Home</Text>}

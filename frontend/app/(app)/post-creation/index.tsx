@@ -6,7 +6,6 @@ import {
   Platform,
   TouchableWithoutFeedback,
   FlatList,
-  ActivityIndicator,
 } from "react-native";
 import PostCreationForm from "./components/create-post-form";
 import { useUserGroups } from "@/hooks/api/user";
@@ -15,6 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ResourceView from "@/design-system/components/utilities/resource-view";
 import ErrorDisplay from "@/design-system/components/shared/states/error";
 import EmptyDataDisplay from "@/design-system/components/shared/states/empty";
+import Spinner from "@/design-system/components/shared/spinner";
 
 const CreatePost = () => {
   const data = [{ key: "form" }];
@@ -56,7 +56,7 @@ const CreatePost = () => {
 
   const LoadingComponent = (
     <Box className="mt-[80%]" flex={1} justifyContent="center" alignItems="center">
-      <ActivityIndicator size="large" />
+      <Spinner />
     </Box>
   );
 
