@@ -45,9 +45,12 @@ export const setUpRoutes = (
   const { expoService, mediaService, nudgeSchedulerService } = services;
   app.route("/api/v1", apiRoutes(db, mediaService, expoService, nudgeSchedulerService));
 
-  app.get(".well-known/apple-app-site-association", serveStatic({
-    path: "../.well-known/apple-app-site-association"
-  }))
+  app.get(
+    ".well-known/apple-app-site-association",
+    serveStatic({
+      path: "../.well-known/apple-app-site-association",
+    }),
+  );
 
   // unsupported route
   app.notFound((ctx: Context) => {

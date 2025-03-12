@@ -8,7 +8,6 @@ import { Configuration } from "../types/config";
 import { serveStatic } from "@hono/node-server/serve-static";
 
 export const configureMiddlewares = (app: Hono, config: Configuration) => {
-
   app.use(cors(config.cors));
   if (config.environment !== "test") {
     app.use(logger);
@@ -19,7 +18,7 @@ export const configureMiddlewares = (app: Hono, config: Configuration) => {
   app.use(
     ".well-known/apple-app-site-association",
     serveStatic({
-      root : "src/",
+      root: "src/",
       onNotFound: (path, c) => {
         console.log(`${path} is not found, you access ${c.req.path}`);
       },
