@@ -2,7 +2,7 @@ import { Comment } from "../../types/api/internal/comments";
 import { CreateGroupPayload, Group } from "../../types/api/internal/groups";
 import { Post } from "../../types/api/internal/posts";
 import { CreateUserPayload, SearchedUser, User } from "../../types/api/internal/users";
-import { Member } from "../../types/api/internal/members";
+import { GroupMember, Member } from "../../types/api/internal/members";
 import { Like } from "../../types/api/internal/like";
 import {
   groupsTable,
@@ -154,6 +154,26 @@ export const SEARCHED_ALICE: SearchedUser = {
   lastNudgedAt: null,
 };
 
+export const GROUP_MANAGER_ALICE: GroupMember = {
+  id: USER_ALICE_ID,
+  name: USER_ALICE["name"],
+  username: USER_ALICE["username"],
+  profilePhoto: null,
+  role: "MANAGER",
+  notificationsEnabled: true,
+  lastNudgedAt: null,
+};
+
+export const GROUP_MEMBER_ALICE: GroupMember = {
+  id: USER_ALICE_ID,
+  name: USER_ALICE["name"],
+  username: USER_ALICE["username"],
+  profilePhoto: null,
+  role: "MEMBER",
+  notificationsEnabled: true,
+  lastNudgedAt: null,
+};
+
 export const USER_BOB: CreateUserPayload = {
   name: "Bob",
   username: "bobthebuilder",
@@ -167,6 +187,16 @@ export const SEARCHED_BOB: SearchedUser = {
   username: USER_BOB["username"],
   profilePhoto: null,
   isMember: true,
+  lastNudgedAt: null,
+};
+
+export const GROUP_MEMBER_BOB: GroupMember = {
+  id: USER_BOB_ID,
+  name: USER_BOB["name"],
+  username: USER_BOB["username"],
+  profilePhoto: null,
+  role: "MEMBER",
+  notificationsEnabled: true,
   lastNudgedAt: null,
 };
 
@@ -184,6 +214,26 @@ export const SEARCHED_ANA: SearchedUser = {
   username: USER_ANA["username"],
   profilePhoto: "https://mocked-url.com",
   isMember: true,
+  lastNudgedAt: null,
+};
+
+export const GROUP_MEMBER_ANA: GroupMember = {
+  id: USER_ANA_ID,
+  name: USER_ANA["name"],
+  username: USER_ANA["username"],
+  profilePhoto: "https://mocked-url.com",
+  role: "MEMBER",
+  notificationsEnabled: true,
+  lastNudgedAt: null,
+};
+
+export const GROUP_MANAGER_ANA: GroupMember = {
+  id: USER_ANA_ID,
+  name: USER_ANA["name"],
+  username: USER_ANA["username"],
+  profilePhoto: "https://mocked-url.com",
+  role: "MANAGER",
+  notificationsEnabled: true,
   lastNudgedAt: null,
 };
 
