@@ -2,9 +2,9 @@ import React, { forwardRef } from "react";
 import { CommentCard } from "./comment";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
-import BottomSheetModal from "../ui/bottom-sheet";
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
+import BottomSheetModal from "../shared/bottom-sheet";
 
 const commentsData = [
   {

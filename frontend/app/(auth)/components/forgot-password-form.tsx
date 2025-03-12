@@ -1,4 +1,3 @@
-import React from "react";
 import { Alert } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,7 +32,7 @@ const ForgotPasswordForm = () => {
     try {
       const validData = EMAIL_SCHEMA.parse(data);
       await forgotPassword(validData.email);
-      router.push("/(auth)/check-email");
+      router.push("/(auth)/login/check-email");
     } catch (err: unknown) {
       if (err instanceof ZodError) {
         const errorMessages = err.errors.map((error) => error.message).join("\n");

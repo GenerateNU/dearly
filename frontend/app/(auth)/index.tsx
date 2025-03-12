@@ -47,7 +47,7 @@ const Welcome = () => {
 
   const handleGetStarted = () => {
     onboarding.setPage(1);
-    router.push("/(auth)/mode");
+    router.push("/(auth)/register");
   };
 
   useEffect(() => {
@@ -129,8 +129,8 @@ const Welcome = () => {
 
           <AnimatedBox entering={SlideInDown.duration(1000).delay(400)}>
             <Box gap="m" width="100%">
-              <TextButton variant="honeyRounded" label="Get Started" onPress={handleGetStarted} />
-              <TextButton variant="blushRounded" label="Login" onPress={onLoginPress} />
+              <TextButton variant="primary" label="Get Started" onPress={handleGetStarted} />
+              <TextButton variant="secondary" label="Login" onPress={onLoginPress} />
             </Box>
           </AnimatedBox>
         </Box>

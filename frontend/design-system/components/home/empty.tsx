@@ -1,8 +1,8 @@
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
-import { TextButton } from "@/design-system/components/ui/buttons/text-button";
 import { router } from "expo-router";
-import { EmptyPage } from "../ui/states/empty";
+import { EmptyPage } from "../shared/states/empty";
+import { TextButton } from "../shared/buttons/text-button";
 
 export const EmptyHomePage = () => {
   return (
@@ -14,11 +14,7 @@ export const EmptyHomePage = () => {
           a group administrator.
         </Text>
       </Box>
-      <TextButton
-        onPress={() => router.push("/group")}
-        variant="honeyRounded"
-        label="Create Group"
-      />
+      <TextButton onPress={() => router.push("/group")} variant="primary" label="Create Group" />
     </Box>
   );
 };

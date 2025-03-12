@@ -35,7 +35,7 @@ const EditNameForm = () => {
       const validData = EDIT_NAME_SCHEMA.parse(data);
       await setUser({ name: validData.name });
       setPage(4);
-      router.push("/(auth)/birthday");
+      router.push("/(auth)/register/birthday");
     } catch (err: unknown) {
       if (err instanceof ZodError) {
         const errorMessages = err.errors.map((error) => error.message).join("\n");

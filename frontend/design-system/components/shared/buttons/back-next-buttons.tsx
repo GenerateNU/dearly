@@ -1,5 +1,5 @@
 import { Box } from "@/design-system/base/box";
-import { TextButton } from "@/design-system/components/ui/buttons/text-button";
+import { TextButton } from "./text-button";
 
 interface BackNextProps {
   onNext: () => void;
@@ -25,7 +25,7 @@ const BackNextButtons: React.FC<BackNextProps> = ({
           disabled={disablePrev}
           onPress={onPrev}
           label={prevLabel ? prevLabel : "Back"}
-          variant="blushRounded"
+          variant="secondary"
         />
       </Box>
       <Box width="50%" flexDirection="row" gap="s">
@@ -33,7 +33,7 @@ const BackNextButtons: React.FC<BackNextProps> = ({
           disabled={disableNext}
           onPress={onNext}
           label={nextLabel ? nextLabel : "Next"}
-          variant="honeyRounded"
+          variant="primary"
         />
       </Box>
     </Box>

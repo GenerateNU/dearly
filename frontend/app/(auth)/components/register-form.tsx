@@ -78,7 +78,7 @@ const RegisterForm = () => {
       };
       setUser(data);
       setPage(3);
-      router.push("/(auth)/edit-profile");
+      router.push("/(auth)/register/edit-profile");
     } catch (err: unknown) {
       if (err instanceof ZodError) {
         const errorMessages = err.errors.map((error) => error.message).join("\n");
@@ -130,7 +130,7 @@ const RegisterForm = () => {
         <Controller
           name="password"
           control={control}
-          render={({ field: { onChange, value, onBlur } }) => (
+          render={({ field: { onChange, value } }) => (
             <Input
               onChangeText={(text: string) => {
                 onChange(text);

@@ -64,9 +64,10 @@ const HomeMenu = <T extends string>({
       onLayout={handleLayout}
       flexDirection="row"
       alignItems="center"
-      backgroundColor="blush"
       borderRadius="full"
       paddingVertical="s"
+      borderWidth={1}
+      borderColor="darkGray"
     >
       <AnimatedBox
         backgroundColor="honey"

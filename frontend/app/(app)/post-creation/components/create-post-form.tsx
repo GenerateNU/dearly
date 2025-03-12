@@ -175,7 +175,7 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
         <Box gap="s" width="100%">
           <TextButton
             onPress={pickImage}
-            variant="blushRounded"
+            variant="secondary"
             label={
               watchPhotos?.length > 0 ? `Add more photos (${watchPhotos.length}/3)` : "Add photos"
             }
@@ -261,7 +261,7 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
             isPendingMedia ||
             isPendingCreatePost
           }
-          variant="honeyRounded"
+          variant="primary"
           onPress={handleSubmit(onSubmit)}
           label="Post"
         />

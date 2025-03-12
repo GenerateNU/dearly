@@ -96,7 +96,7 @@ const LoginForm = () => {
           <Box alignItems="flex-end" width="auto">
             <TextButton
               textVariant="caption"
-              onPress={() => router.push("/(auth)/forgot-password")}
+              onPress={() => router.push("/(auth)/login/forgot-password")}
               variant="text"
               label="Forgot Password?"
             />

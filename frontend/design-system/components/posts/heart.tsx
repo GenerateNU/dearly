@@ -1,15 +1,14 @@
 import { useTheme } from "@shopify/restyle";
 import { Theme } from "@/design-system/base/theme";
-import { IconButton } from "../ui/buttons/icon-button";
 import { useIsBasicMode } from "@/hooks/component/mode";
+import { IconButton } from "../shared/buttons/icon-button";
 
 interface HeartProps {
   like: boolean;
   onLike: () => void;
-  variant: "blush" | "honey";
 }
 
-export const Heart: React.FC<HeartProps> = ({ like, onLike, variant }) => {
+export const Heart: React.FC<HeartProps> = ({ like, onLike }) => {
   const theme = useTheme<Theme>();
   const isBasic = useIsBasicMode();
 
@@ -19,8 +18,8 @@ export const Heart: React.FC<HeartProps> = ({ like, onLike, variant }) => {
     <IconButton
       label={isBasic ? "Like" : undefined}
       onPress={onLike}
+      variant="icon"
       icon={variantStyle.icon}
-      variant={variant === "blush" ? "blushRounded" : "honeyRounded"}
     />
   );
 };
