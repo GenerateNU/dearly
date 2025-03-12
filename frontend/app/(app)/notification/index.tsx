@@ -84,7 +84,7 @@ const Notification = () => {
         <Text variant="bodyLargeBold">Notifications</Text>
         <ResourceView
           resourceState={notificationStates}
-          loadingComponent={<LoadingNotifications scrollable={!notificationStates.loading} />}
+          loadingComponent={<LoadingNotifications />}
           emptyComponent={<EmptyDataDisplay />}
           successComponent={<Notifications />}
           errorComponent={<ErrorDisplay refresh={refetch} />}
