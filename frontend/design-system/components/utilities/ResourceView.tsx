@@ -1,17 +1,5 @@
 import { ReactElement } from "react";
 
-interface ResourceViewProps<T> {
-  resourceState: Resource<T> | Resource<T>[] | null;
-  successComponent: ReactElement | null;
-  loadingComponent: ReactElement | null;
-  errorComponent?: ReactElement | null;
-  hideWhenError?: boolean;
-  doNotShowLoadingIfDataAvailable?: boolean;
-  showLoadingForDebug?: boolean;
-  showErrorForDebug?: boolean;
-  visible?: boolean;
-}
-
 export interface Resource<T> {
   data: T | null;
   /** null means the resource has never been fetched */
@@ -19,56 +7,118 @@ export interface Resource<T> {
   error?: string | null;
 }
 
+interface ResourceViewProps<T> {
+  resourceState: Resource<T> | Resource<T>[] | null;
+  successComponent: ReactElement | null;
+  loadingComponent: ReactElement | null;
+  errorComponent?: ReactElement | null;
+  emptyStateComponent?: ReactElement | null;
+  hideWhenError?: boolean;
+  doNotShowLoadingIfDataAvailable?: boolean;
+  showLoadingForDebug?: boolean;
+  showErrorForDebug?: boolean;
+  visible?: boolean;
+}
+
+/**
+ * A component that handles different states of resource loading
+ * and renders appropriate components based on those states.
+ */
 const ResourceView = ({
   resourceState,
   successComponent,
   loadingComponent,
   errorComponent = null,
-  hideWhenError,
-  visible,
-  doNotShowLoadingIfDataAvailable,
-  showLoadingForDebug,
-  showErrorForDebug,
+  emptyStateComponent = null,
+  hideWhenError = false,
+  visible = true,
+  doNotShowLoadingIfDataAvailable = false,
+  showLoadingForDebug = false,
+  showErrorForDebug = false,
 }: ResourceViewProps<unknown>): ReactElement | null => {
+  // early returns for special cases
   if (__DEV__) {
-    // always show the loading component for testing
     if (showLoadingForDebug) return loadingComponent;
-    // always show the error component for testing
     if (showErrorForDebug) return errorComponent;
   }
 
-  if (visible === false) {
-    return null;
-  }
+  if (visible === false) return null;
+  if (!resourceState) return emptyStateComponent;
 
-  if (Array.isArray(resourceState)) {
-    // if any of the resources are loading, show the loading component
-    if (!resourceState || resourceState.some((res) => res.loading !== false)) {
-      // if there is data inside all resources while any are loading, show loading unless told so
-      if (doNotShowLoadingIfDataAvailable) {
-        if (resourceState?.some((res) => res.data == null)) return loadingComponent;
-      } else return loadingComponent;
+  // helper functions
+  const hasData = (resource: Resource<unknown>): boolean => resource.data != null;
+  const hasError = (resource: Resource<unknown>): boolean => resource.error != null;
+  const isLoading = (resource: Resource<unknown>): boolean => resource.loading !== false;
+
+  const flattenData = (resources: Resource<unknown> | Resource<unknown>[]): unknown[] => {
+    if (Array.isArray(resources)) {
+      return resources.flatMap((resource) => resource.data || []);
     }
+    return resources.data ? [resources.data] : [];
+  };
 
-    // if there are no errors in any resources, show success component
-    if (resourceState?.find((res) => res.error != null) === undefined) return successComponent;
-    // caught an error? show the error component if allowed
-    else if (resourceState?.some((res) => res.error) && !hideWhenError) return errorComponent;
-    else return null;
-  } else {
-    // show loading component if resource is loading
-    if (!resourceState || resourceState?.loading !== false) {
-      // if there is data inside this resource while it's loading, show loading unless told so
-      if ((doNotShowLoadingIfDataAvailable === true && resourceState?.data != null) === false)
+  // separated handling for multiple resources
+  const handleMultipleResources = (resources: Resource<unknown>[]): ReactElement | null => {
+    const anyLoading = resources.some(isLoading);
+    const anyError = resources.some(hasError);
+    const someDataMissing = resources.some((res) => !hasData(res));
+    const flattenedData = flattenData(resources);
+
+    // handle loading state
+    if (anyLoading) {
+      if (doNotShowLoadingIfDataAvailable && someDataMissing) {
         return loadingComponent;
+      } else if (!doNotShowLoadingIfDataAvailable) {
+        return loadingComponent;
+      }
     }
 
-    // no error? show success component
-    if (resourceState?.error == null) return successComponent;
-    // an error occurred? show the error component if allowed
-    else if (resourceState?.error && !hideWhenError) return errorComponent;
-    else return null;
-  }
+    // handle empty state
+    if (flattenedData.length === 0) {
+      return emptyStateComponent;
+    }
+
+    // handle error state
+    if (anyError) {
+      return hideWhenError ? null : errorComponent;
+    }
+
+    // success state
+    return successComponent;
+  };
+
+  // separated handling for single resource
+  const handleSingleResource = (resource: Resource<unknown>): ReactElement | null => {
+    const isResourceLoading = isLoading(resource);
+    const hasResourceData = hasData(resource);
+    const hasResourceError = hasError(resource);
+    const flattenedData = flattenData([resource]);
+
+    // handle loading state
+    if (isResourceLoading) {
+      const shouldShowLoading = !doNotShowLoadingIfDataAvailable || !hasResourceData;
+      if (shouldShowLoading) {
+        return loadingComponent;
+      }
+    }
+
+    // handle empty state
+    if (flattenedData.length === 0) {
+      return emptyStateComponent;
+    }
+
+    // handle error state
+    if (hasResourceError) {
+      return hideWhenError ? null : errorComponent;
+    }
+
+    // success state
+    return successComponent;
+  };
+
+  return Array.isArray(resourceState)
+    ? handleMultipleResources(resourceState)
+    : handleSingleResource(resourceState);
 };
 
 export default ResourceView;

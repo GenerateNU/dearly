@@ -1,6 +1,5 @@
 import { AnimatedBox } from "@/design-system/base/animated-box";
 import usePulsingAnimation from "@/hooks/component/pulse-animate";
-import { Animated, View } from "react-native";
 
 const NotificationSkeleton = () => {
   const opacity = usePulsingAnimation();
@@ -8,7 +7,7 @@ const NotificationSkeleton = () => {
   return (
     <AnimatedBox
       borderRadius="m"
-      // style={{ opacity }}
+      style={{ opacity }}
       padding="m"
       backgroundColor="silver"
       gap="s"
