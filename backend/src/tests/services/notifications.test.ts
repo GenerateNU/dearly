@@ -41,7 +41,7 @@ describe("Notification server test", () => {
   const config = getConfigurations();
   const db = connectDB(config);
   const notifService = new ExpoNotificationService(
-    new SupabaseClient("", ""),
+    new SupabaseClient("supabase_url", "supabase_key"),
     new NotificationTransactionImpl(db),
     new ExpoPushService(expo),
   );

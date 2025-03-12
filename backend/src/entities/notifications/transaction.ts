@@ -1,7 +1,7 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { notificationsTable, usersTable, mediaTable } from "../schema";
 import { Pagination } from "../../types/api/internal/users";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, desc } from "drizzle-orm";
 import { MediaService } from "../media/service";
 import { NotificationWithMedia as Notification } from "../../types/api/internal/notification";
 
@@ -33,24 +33,16 @@ export class NotificationTransactionImpl implements NotificationTransactions {
         commentId: notificationsTable.commentId,
         likeId: notificationsTable.likeId,
         profilePhoto: usersTable.profilePhoto,
-        objectKey: sql<string>`
-                CASE 
-                  WHEN ${notificationsTable.referenceType} = 'POST' THEN ${mediaTable.objectKey}
-                  ELSE ${usersTable.profilePhoto}
-                END
-              `,
+        objectKey: mediaTable.objectKey,
       })
       .from(notificationsTable)
-      .leftJoin(
+      .innerJoin(
         mediaTable,
-        and(
-          eq(mediaTable.postId, notificationsTable.postId),
-          eq(mediaTable.order, 0),
-          eq(mediaTable.type, "PHOTO"),
-        ),
+        and(eq(mediaTable.postId, notificationsTable.postId), eq(mediaTable.order, 0)),
       )
-      .leftJoin(usersTable, eq(usersTable.id, notificationsTable.actorId))
+      .innerJoin(usersTable, eq(usersTable.id, notificationsTable.actorId))
       .where(eq(notificationsTable.receiverId, id))
+      .orderBy(desc(notificationsTable.createdAt))
       .limit(limit)
       .offset((page - 1) * limit);
 

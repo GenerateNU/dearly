@@ -16,6 +16,13 @@ mock.module("@aws-sdk/s3-request-presigner", () => {
   };
 });
 
+mock.module("@supabase/supabase-js", () => {
+  return {
+    SupabaseClient: jest.fn(),
+    createClient: jest.fn(),
+  };
+});
+
 mock.module("expo-server-sdk", () => {
   return {
     Expo: class {
