@@ -52,7 +52,7 @@ const Notification = () => {
     return <NotificationSkeleton />;
   };
 
-  const notificationResource = {
+  const notificationStates = {
     data: notifications,
     loading: isLoading || isFetching,
     error: error ? error.message : null,
@@ -83,7 +83,7 @@ const Notification = () => {
       >
         <Text variant="bodyLargeBold">Notifications</Text>
         <ResourceView
-          resourceState={notificationResource}
+          resourceState={notificationStates}
           loadingComponent={<LoadingNotifications />}
           emptyComponent={<EmptyDataDisplay />}
           successComponent={<Notifications />}

@@ -15,8 +15,8 @@ const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   refresh,
 }) => {
   return (
-    <Box flex={1} width="100%" justifyContent="space-between">
-      <Box style={{ marginTop: "40%" }} gap="m">
+    <Box flex={1} width="100%">
+      <Box style={{ marginTop: "40%" }} gap="m" marginBottom="m">
         <Logo width={150} height={150} />
         <Text variant="bodyLargeBold">{title}</Text>
         <Text variant="caption">{description}</Text>

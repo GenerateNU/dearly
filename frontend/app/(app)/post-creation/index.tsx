@@ -12,11 +12,20 @@ import PostCreationForm from "./components/create-post-form";
 import { useUserGroups } from "@/hooks/api/user";
 import { useMemo } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { EmptyHomePage } from "@/design-system/components/home/empty";
+import ResourceView from "@/design-system/components/utilities/resource-view";
+import ErrorDisplay from "@/design-system/components/shared/states/error";
+import EmptyDataDisplay from "@/design-system/components/shared/states/empty";
 
 const CreatePost = () => {
   const data = [{ key: "form" }];
-  const { data: groupsData, isLoading, error, fetchNextPage, isFetchingNextPage } = useUserGroups();
+  const {
+    data: groupsData,
+    isLoading,
+    error,
+    fetchNextPage,
+    isFetchingNextPage,
+    refetch,
+  } = useUserGroups();
 
   const formattedGroups = useMemo(() => {
     if (!groupsData) return [];
@@ -27,24 +36,37 @@ const CreatePost = () => {
     }));
   }, [groupsData]);
 
-  const hasGroups = formattedGroups.length > 0;
+  const onEndReached = () => {
+    if (!isFetchingNextPage) {
+      fetchNextPage();
+    }
+  };
 
-  if (!hasGroups && !isLoading) {
-    return (
-      <Box
-        padding="m"
-        gap="xl"
-        alignItems="center"
-        justifyContent="center"
-        backgroundColor="pearl"
-        flex={1}
-      >
-        <EmptyHomePage />
-      </Box>
-    );
-  }
+  const groupState = {
+    data: formattedGroups,
+    loading: isLoading || isFetchingNextPage,
+    error: error ? error.message : null,
+  };
 
-  const renderItem = () => (
+  const ErrorComponent = (
+    <Box padding="m" alignItems="center" justifyContent="center" flex={1}>
+      <ErrorDisplay refresh={refetch} />
+    </Box>
+  );
+
+  const LoadingComponent = (
+    <Box className="mt-[80%]" flex={1} justifyContent="center" alignItems="center">
+      <ActivityIndicator size="large" />
+    </Box>
+  );
+
+  const EmptyComponent = (
+    <Box className="mt-[40%]" padding="m" flex={1} height="100%">
+      <EmptyDataDisplay />
+    </Box>
+  );
+
+  const SuccessComponent = (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <Box
         gap="m"
@@ -55,23 +77,11 @@ const CreatePost = () => {
         alignItems="flex-start"
       >
         <Text variant="bodyLargeBold">Upload Photo</Text>
-        {error ? (
-          <Box flex={1} justifyContent="center" alignItems="center">
-            <Text variant="caption" color="error">
-              Failed to load groups. Please try again later.
-            </Text>
-          </Box>
-        ) : (
-          <PostCreationForm
-            onEndReached={() => {
-              if (!isFetchingNextPage) {
-                fetchNextPage();
-              }
-            }}
-            groups={formattedGroups}
-            isLoading={isLoading || isFetchingNextPage}
-          />
-        )}
+        <PostCreationForm
+          onEndReached={onEndReached}
+          groups={formattedGroups}
+          isLoading={isLoading || isFetchingNextPage}
+        />
       </Box>
     </TouchableWithoutFeedback>
   );
@@ -81,16 +91,26 @@ const CreatePost = () => {
       className="flex-1"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <SafeAreaView edges={["top"]} collapsable={false} className="flex-1 mt-[10%]">
+      <SafeAreaView
+        edges={groupState.error ? ["top", "bottom", "left", "right"] : ["top"]}
+        className="flex-1 mt-[10%] justify-center"
+      >
         <FlatList
           data={data}
-          renderItem={renderItem}
+          renderItem={() => (
+            <ResourceView
+              resourceState={groupState}
+              successComponent={SuccessComponent}
+              loadingComponent={LoadingComponent}
+              errorComponent={ErrorComponent}
+              emptyComponent={EmptyComponent}
+              doNotShowLoadingIfDataAvailable={true}
+            />
+          )}
           keyExtractor={(item) => item.key}
-          contentContainerStyle={{ flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
           onEndReachedThreshold={0.5}
-          ListFooterComponent={isFetchingNextPage ? <ActivityIndicator /> : null}
         />
       </SafeAreaView>
     </KeyboardAvoidingView>
