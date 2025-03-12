@@ -49,7 +49,7 @@ const CreatePost = () => {
   };
 
   const ErrorComponent = (
-    <Box padding="m" alignItems="center" justifyContent="center" flex={1}>
+    <Box className="mt-[30%]" padding="m" alignItems="center" justifyContent="center" flex={1}>
       <ErrorDisplay refresh={refetch} />
     </Box>
   );

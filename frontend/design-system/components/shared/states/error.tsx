@@ -11,12 +11,12 @@ interface ErrorDisplayProps {
 
 const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   title = "Something went wrong",
-  description = "Oops, there was an issue and this page couldn’t be loaded. We're working on fixing it. Please try refreshing the page.",
+  description = "Oops! Something went a bit sideways, but our amazing engineers are on it. Please give it a moment and try refreshing!",
   refresh,
 }) => {
   return (
-    <Box flex={1} width="100%">
-      <Box style={{ marginTop: "40%" }} gap="m" marginBottom="m">
+    <Box flex={1} width="100%" justifyContent="center">
+      <Box gap="m" marginBottom="m">
         <Logo width={150} height={150} />
         <Text variant="bodyLargeBold">{title}</Text>
         <Text variant="caption">{description}</Text>

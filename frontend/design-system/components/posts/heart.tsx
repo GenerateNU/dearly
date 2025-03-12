@@ -18,7 +18,7 @@ export const Heart: React.FC<HeartProps> = ({ like, onLike }) => {
     <IconButton
       label={isBasic ? "Like" : undefined}
       onPress={onLike}
-      variant="icon"
+      variant="primary"
       icon={variantStyle.icon}
     />
   );
