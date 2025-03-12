@@ -34,7 +34,6 @@ export const buttonVariants = {
   text: {
     width: "auto",
   },
-
   primary: createButtonStyle("honey", "full"),
   secondary: createButtonStyle("darkGray", "full", true),
 };

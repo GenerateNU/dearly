@@ -7,13 +7,13 @@ const NotificationSkeleton = () => {
   return (
     <AnimatedBox
       borderRadius="m"
-      style={{ opacity }}
       padding="m"
       backgroundColor="silver"
       gap="s"
       flexDirection="row"
       justifyContent="center"
       alignContent="center"
+      style={{ opacity }}
     >
       <AnimatedBox borderRadius="full" backgroundColor="gray" width={70} height={70} />
       <AnimatedBox gap="s" width="55%">

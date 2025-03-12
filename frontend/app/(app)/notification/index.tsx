@@ -6,10 +6,29 @@ import NotificationCard from "./components/notification-card";
 import { Notification as NotificationType } from "@/types/user";
 import { FlatList } from "react-native-gesture-handler";
 import NotificationSkeleton from "./components/skeleton";
-import { EmptyPage } from "@/design-system/components/shared/states/empty";
+import ResourceView from "@/design-system/components/utilities/resource-view";
+import EmptyDataDisplay from "@/design-system/components/shared/states/empty";
+import ErrorDisplay from "@/design-system/components/shared/states/error";
+import LoadingNotifications from "./components/loading";
 
 const Notification = () => {
-  const { data, isLoading, isFetchingNextPage, error, fetchNextPage } = useUserNotification();
+  const {
+    data,
+    isLoading,
+    isFetching,
+    isFetchingNextPage,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    refetch,
+  } = useUserNotification();
+
+  const onEndReached = () => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  };
+
   const notifications = data?.pages.flatMap((page) => page) || [];
 
   const renderItem = ({ item }: { item: NotificationType }) => {
@@ -26,9 +45,32 @@ const Notification = () => {
     );
   };
 
+  const renderFooter = () => {
+    if (!isFetchingNextPage) return null;
+    return <NotificationSkeleton />;
+  };
+
+  const notificationResource = {
+    data: notifications,
+    loading: isLoading || isFetching,
+    error: error ? error.message : null,
+  };
+
+  const Notifications = () => (
+    <FlatList
+      style={{ width: "100%" }}
+      contentContainerStyle={{ paddingBottom: 10 }}
+      data={notifications}
+      renderItem={renderItem}
+      keyExtractor={(_, index) => `notification-${index}`}
+      ListFooterComponent={renderFooter}
+      onEndReached={onEndReached}
+      onEndReachedThreshold={0.5}
+    />
+  );
+
   return (
-    <SafeAreaView className="flex-1 w-full">
-      <NotificationSkeleton />
+    <SafeAreaView className="flex-1">
       <Box
         width="100%"
         paddingTop="xl"
@@ -38,24 +80,13 @@ const Notification = () => {
         alignItems="flex-start"
       >
         <Text variant="bodyLargeBold">Notifications</Text>
-        {notifications.length === 0 ? (
-          <Box
-            width="100%"
-            alignItems="center"
-            justifyContent="center"
-            backgroundColor="pearl"
-            flex={1}
-          >
-            <EmptyPage />
-          </Box>
-        ) : (
-          <FlatList
-            onEndReachedThreshold={0.3}
-            onEndReached={() => fetchNextPage}
-            data={notifications}
-            renderItem={renderItem}
-          />
-        )}
+        <ResourceView
+          resourceState={notificationResource}
+          loadingComponent={<LoadingNotifications />}
+          emptyComponent={<EmptyDataDisplay />}
+          successComponent={<Notifications />}
+          errorComponent={<ErrorDisplay refresh={refetch} />}
+        />
       </Box>
     </SafeAreaView>
   );

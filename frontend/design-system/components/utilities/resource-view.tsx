@@ -12,11 +12,12 @@ interface ResourceViewProps<T> {
   successComponent: ReactElement | null;
   loadingComponent: ReactElement | null;
   errorComponent?: ReactElement | null;
-  emptyStateComponent?: ReactElement | null;
+  emptyComponent?: ReactElement | null;
   hideWhenError?: boolean;
   doNotShowLoadingIfDataAvailable?: boolean;
   showLoadingForDebug?: boolean;
   showErrorForDebug?: boolean;
+  showEmptyDataForDebug?: boolean;
   visible?: boolean;
 }
 
@@ -29,32 +30,37 @@ const ResourceView = ({
   successComponent,
   loadingComponent,
   errorComponent = null,
-  emptyStateComponent = null,
+  emptyComponent = null,
   hideWhenError = false,
   visible = true,
   doNotShowLoadingIfDataAvailable = false,
   showLoadingForDebug = false,
   showErrorForDebug = false,
+  showEmptyDataForDebug = false,
 }: ResourceViewProps<unknown>): ReactElement | null => {
-  // early returns for special cases
+  // for debugging purposes
   if (__DEV__) {
     if (showLoadingForDebug) return loadingComponent;
     if (showErrorForDebug) return errorComponent;
+    if (showEmptyDataForDebug) return emptyComponent;
   }
 
   if (visible === false) return null;
-  if (!resourceState) return emptyStateComponent;
+  if (!resourceState) return emptyComponent;
 
   // helper functions
   const hasData = (resource: Resource<unknown>): boolean => resource.data != null;
   const hasError = (resource: Resource<unknown>): boolean => resource.error != null;
   const isLoading = (resource: Resource<unknown>): boolean => resource.loading !== false;
 
-  const flattenData = (resources: Resource<unknown> | Resource<unknown>[]): unknown[] => {
+  const isEmpty = (resources: Resource<unknown> | Resource<unknown>[]): boolean => {
     if (Array.isArray(resources)) {
-      return resources.flatMap((resource) => resource.data || []);
+      return resources.every(
+        (resource) =>
+          !resource.data || (Array.isArray(resource.data) && resource.data.length === 0),
+      );
     }
-    return resources.data ? [resources.data] : [];
+    return !resources.data || (Array.isArray(resources.data) && resources.data.length === 0);
   };
 
   // separated handling for multiple resources
@@ -62,7 +68,7 @@ const ResourceView = ({
     const anyLoading = resources.some(isLoading);
     const anyError = resources.some(hasError);
     const someDataMissing = resources.some((res) => !hasData(res));
-    const flattenedData = flattenData(resources);
+    const isDataEmpty = isEmpty(resources);
 
     // handle loading state
     if (anyLoading) {
@@ -74,8 +80,8 @@ const ResourceView = ({
     }
 
     // handle empty state
-    if (flattenedData.length === 0) {
-      return emptyStateComponent;
+    if (isDataEmpty) {
+      return emptyComponent;
     }
 
     // handle error state
@@ -92,7 +98,7 @@ const ResourceView = ({
     const isResourceLoading = isLoading(resource);
     const hasResourceData = hasData(resource);
     const hasResourceError = hasError(resource);
-    const flattenedData = flattenData([resource]);
+    const isDataEmpty = isEmpty(resource);
 
     // handle loading state
     if (isResourceLoading) {
@@ -103,8 +109,8 @@ const ResourceView = ({
     }
 
     // handle empty state
-    if (flattenedData.length === 0) {
-      return emptyStateComponent;
+    if (isDataEmpty) {
+      return emptyComponent;
     }
 
     // handle error state
