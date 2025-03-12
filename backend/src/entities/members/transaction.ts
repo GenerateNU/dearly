@@ -11,7 +11,7 @@ import {
 } from "../schema";
 import { eq, and, sql, desc, or } from "drizzle-orm";
 import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
-import { AddMemberPayload, Member } from "../../types/api/internal/members";
+import { AddMemberPayload, Member, GroupMember } from "../../types/api/internal/members";
 import { IDPayload } from "../../types/id";
 import { Pagination, SearchedUser } from "../../types/api/internal/users";
 import { PostWithMedia } from "../../types/api/internal/posts";
@@ -21,7 +21,7 @@ import { Transaction } from "../../types/api/internal/transaction";
 export interface MemberTransaction {
   insertMember(payload: AddMemberPayload): Promise<Member | null>;
   deleteMember(clientId: string, userId: string, groupId: string): Promise<Member | null>;
-  getMembers(groupId: string, payload: Pagination): Promise<SearchedUser[] | null>;
+  getMembers(groupId: string, payload: Pagination): Promise<GroupMember[] | null>;
   toggleNotification(payload: IDPayload): Promise<boolean>;
   getMemberPosts(payload: Pagination, viewer: string, groupId: string): Promise<PostWithMedia[]>;
 }
@@ -119,7 +119,7 @@ export class MemberTransactionImpl implements MemberTransaction {
   async getMembers(
     groupId: string,
     { id, limit, page }: Pagination,
-  ): Promise<SearchedUser[] | null> {
+  ): Promise<GroupMember[] | null> {
     const requesterIdIsMember = await this.db
       .select()
       .from(membersTable)
@@ -136,10 +136,8 @@ export class MemberTransactionImpl implements MemberTransaction {
         name: usersTable.name,
         username: usersTable.username,
         profilePhoto: usersTable.profilePhoto,
-        isMember:
-          sql<boolean>`CASE WHEN ${membersTable.groupId} = ${groupId} THEN true ELSE false END`.as(
-            "isMember", // assuming that member includes manager
-          ),
+        role: membersTable.role,
+        notificationsEnabled: membersTable.notificationsEnabled,
         lastNudgedAt: membersTable.lastManualNudge,
       })
       .from(usersTable)
