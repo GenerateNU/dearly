@@ -1,20 +1,17 @@
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { Avatar } from "@/design-system/components/ui/avatar";
-import { Profile } from "@/design-system/components/ui/profile";
 import { DEFAULT_PROFILE_PHOTO } from "@/constants/photo";
 import { TextButton } from "@/design-system/components/ui/text-button";
 
 interface UserProps {
+    itemKey: number,
     name: string,
-    profilePhoto: string
-    isManager: boolean
+    profilePhoto: string,
+    managerView: boolean,
+    role: string
 }
-const ViewGroupProfile = ({ name, profilePhoto, isManager } : UserProps) => {
-
-    console.log(name)
-    console.log(profilePhoto)
-
+const ViewGroupProfile = ({ itemKey, name, profilePhoto, managerView, role } : UserProps) => {
     const profile = profilePhoto ? profilePhoto : DEFAULT_PROFILE_PHOTO;
 
     const nudge = () => {
@@ -22,18 +19,18 @@ const ViewGroupProfile = ({ name, profilePhoto, isManager } : UserProps) => {
     }
 
     return (
-        <Box gap="m" flexDirection="row" alignItems="center" justifyContent="flex-start">
+        <Box gap="m" flexDirection="row" alignItems="center" justifyContent="flex-start" key={itemKey}>
             <Box>
                 <Avatar variant="small" profilePhoto={profile}/>
             </Box>
             <Box>
                 <Text>{name}</Text>
             </Box>
-            <Box>
-                {isManager && 
-                    <TextButton variant="text" label="Nudge" onPress={nudge} />
-                }    
-            </Box>
+            {managerView && role === "MEMBER" && 
+                <Box>
+                    <TextButton onPress={nudge} label="Nudge" disabled={false} variant="honeyRounded"/>
+                </Box>
+            }
         </Box>
     );
 }
