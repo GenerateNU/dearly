@@ -4,17 +4,19 @@ import { getAllMembers } from "@/api/member";
 import { useUserStore } from "@/auth/store";
 import { useQuery } from "@tanstack/react-query";
 import ViewGroupProfile from "./view-group-profile";
-import { getItemAsync } from "expo-secure-store";
-import { getGroup } from "@/api/group";
 
 interface ViewGroupProps {
     groupId: string;
 }
 
-interface UserProps {
-    name: string,
-    profilePhoto: string,
-    isMember: boolean;
+interface GroupMember {
+    id: string;
+    name: string;
+    username: string;
+    profilePhoto: string | null;
+    role: string;
+    notificationsEnabled: boolean;
+    lastNudgedAt?: Date | null;
 }
 
 const ViewGroup = ({ groupId }: ViewGroupProps) => {
@@ -22,40 +24,21 @@ const ViewGroup = ({ groupId }: ViewGroupProps) => {
     const { userId } = useUserStore();
     groupId = "0cad2e15-85b9-4680-a776-cb5292d0ba30"
 
-    // Get manager
-    const groupData = useQuery({
-        queryKey: ["api", "v1", "groups", groupId],
-        queryFn: () => getGroup(groupId!),
-    })
-
-    // let isManager = false;
-
-    console.log(groupData)
-
-    console.log(groupData.data)
-
-    const isManager = groupData.data && groupData.data.managerId === userId
-
-    console.log(`Group data: ${groupData.data}`)
-
-    const memberData = useQuery({
+    const { isPending, data, isError, error } = useQuery({
         queryKey: ["api", "v1", "groups", groupId, "members"],
         queryFn: () => getAllMembers(groupId!),
-      });
+    });
 
-
-    // console.log(isPending)
-    console.log(memberData.data)
-    // console.log(error)
-    if (memberData.data) {
-        memberData.data.map((profile: UserProps) => {
-            console.log(profile.name)
-            console.log(profile.profilePhoto)
-        })
-
+    // TODO: fix this T-T
+    let isManager = false;
+    if (data) {
+        const memberData = [...data]
+        for (let i = 0; i < memberData.length; i++) {
+            if (memberData[i].role === "MANAGER" && memberData[i].id === userId) isManager = true;
+        }
     }
 
-    return !memberData.isPending && !memberData.isError && memberData.data && !groupData.isPending && !groupData.isError && groupData.data ? ( 
+    return !isPending && !isError && data ? ( 
         <Box
             gap="xl"
             alignItems="center"
@@ -72,7 +55,7 @@ const ViewGroup = ({ groupId }: ViewGroupProps) => {
             </Text>
             <Box>
 
-            {memberData.data && memberData.data.map((profile: UserProps, index: number) => {
+            {data && data.map((profile: GroupMember, index: number) => {
                 return (
                 <Box
                     gap="xl"
@@ -86,10 +69,11 @@ const ViewGroup = ({ groupId }: ViewGroupProps) => {
                     height="100%"
                 >
                     <ViewGroupProfile
-                        key={index}
+                        itemKey={index}
                         name={profile.name}
-                        profilePhoto={profile.profilePhoto}
-                        isManager={isManager}
+                        profilePhoto={profile.profilePhoto ?? ""}
+                        managerView={isManager}
+                        role={profile.role}
                     />
                 </Box>
                 );
