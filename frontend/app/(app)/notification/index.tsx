@@ -15,8 +15,8 @@ const Notification = () => {
   const {
     data,
     isLoading,
-    isFetching,
     isFetchingNextPage,
+    isRefetching,
     error,
     fetchNextPage,
     hasNextPage,
@@ -55,7 +55,7 @@ const Notification = () => {
 
   const notificationStates = {
     data: notifications,
-    loading: isLoading || isFetching,
+    loading: isLoading || isRefetching,
     error: error ? error.message : null,
   };
 
