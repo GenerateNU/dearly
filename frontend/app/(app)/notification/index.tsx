@@ -35,6 +35,7 @@ const Notification = () => {
     return (
       <Box paddingBottom="m">
         <NotificationCard
+          postId={item.postId}
           createdAt={item.createdAt}
           referenceType={item.referenceType}
           mediaURL={item.mediaURL}
