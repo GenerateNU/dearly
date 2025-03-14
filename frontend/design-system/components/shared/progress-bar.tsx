@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import { useEffect, useRef } from "react";
+import { Animated } from "react-native";
 import { Box } from "@/design-system/base/box";
 import { AnimatedBox } from "@/design-system/base/animated-box";
 
@@ -8,17 +8,22 @@ interface ProgressBarProps {
 }
 
 const ProgressBar = ({ progress }: ProgressBarProps) => {
-  const animatedWidth = useSharedValue(0);
+  const animatedWidth = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    animatedWidth.value = withTiming(progress, { duration: 300 });
+    Animated.timing(animatedWidth, {
+      toValue: progress,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
   }, [progress]);
 
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      width: `${animatedWidth.value}%`,
-    };
-  });
+  const animatedStyle = {
+    width: animatedWidth.interpolate({
+      inputRange: [0, 100],
+      outputRange: ["0%", "100%"],
+    }),
+  };
 
   return (
     <Box
