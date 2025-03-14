@@ -144,7 +144,7 @@ export class NudgeTransactionImpl implements NudgeTransaction {
         .from(membersTable)
         .innerJoin(groupsTable, eq(membersTable.groupId, groupsTable.id))
         .innerJoin(devicesTable, eq(membersTable.userId, devicesTable.userId))
-        .where(and(eq(membersTable.notificationsEnabled, true), eq(groupsTable.id, groupId)))
+        .where(and(eq(membersTable.nudgeNotificationEnabled, true), eq(groupsTable.id, groupId)))
         .groupBy(groupsTable.id, groupsTable.name);
 
       return deviceTokens as NotificationMetadata;
@@ -216,7 +216,7 @@ export class NudgeTransactionImpl implements NudgeTransaction {
           not(eq(membersTable.userId, managerId)),
           inArray(membersTable.userId, userIds),
           eq(membersTable.groupId, groupId),
-          eq(membersTable.notificationsEnabled, true),
+          eq(membersTable.nudgeNotificationEnabled, true),
         ),
       );
   }

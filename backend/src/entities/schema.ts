@@ -101,7 +101,10 @@ export const membersTable = pgTable(
       .references(() => groupsTable.id, { onDelete: "cascade" }),
     joinedAt: timestamp().notNull().defaultNow(),
     role: memberRoleEnum().notNull().default("MEMBER"),
-    notificationsEnabled: boolean().notNull().default(true),
+    commentNotificationEnabled: boolean().notNull().default(true),
+    likeNotificationEnabled: boolean().notNull().default(true),
+    postNotificationEnabled: boolean().notNull().default(true),
+    nudgeNotificationEnabled: boolean().notNull().default(true),
     lastManualNudge: timestamp(),
   },
   (table) => {

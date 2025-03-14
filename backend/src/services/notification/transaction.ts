@@ -44,7 +44,7 @@ export class NotificationTransactionImpl implements NotificationTransaction {
           memberIDs: sql<string[]>`ARRAY_AGG(DISTINCT ${membersTable.userId})`,
           deviceTokens: sql<string[]>`ARRAY_REMOVE(ARRAY_AGG(DISTINCT 
             CASE 
-              WHEN ${membersTable.notificationsEnabled} IS TRUE 
+              WHEN ${membersTable.postNotificationEnabled} IS TRUE 
               THEN ${devicesTable.token} 
             END
           ), NULL)`,
@@ -74,7 +74,7 @@ export class NotificationTransactionImpl implements NotificationTransaction {
           groupName: groupsTable.name,
           groupId: groupsTable.id,
           deviceTokens: sql<string[]>`ARRAY_AGG(DISTINCT ${devicesTable.token})`,
-          isEnabled: membersTable.notificationsEnabled,
+          isEnabled: membersTable.likeNotificationEnabled,
         })
         .from(postsTable)
         .innerJoin(usersTable, eq(usersTable.id, like.userId))
@@ -89,7 +89,7 @@ export class NotificationTransactionImpl implements NotificationTransaction {
           usersTable.username,
           groupsTable.name,
           groupsTable.id,
-          membersTable.notificationsEnabled,
+          membersTable.likeNotificationEnabled,
         );
 
       if (!result) {
@@ -108,7 +108,7 @@ export class NotificationTransactionImpl implements NotificationTransaction {
           username: usersTable.username,
           groupName: groupsTable.name,
           groupId: groupsTable.id,
-          isEnabled: membersTable.notificationsEnabled,
+          isEnabled: membersTable.commentNotificationEnabled,
           deviceTokens: sql<string[]>`ARRAY_AGG(DISTINCT ${devicesTable.token})`,
         })
         .from(postsTable)
@@ -123,7 +123,7 @@ export class NotificationTransactionImpl implements NotificationTransaction {
           usersTable.username,
           groupsTable.name,
           groupsTable.id,
-          membersTable.notificationsEnabled,
+          membersTable.commentNotificationEnabled,
         );
 
       if (!result) {

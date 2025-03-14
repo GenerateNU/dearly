@@ -126,7 +126,10 @@ export class UserTransactionImpl implements UserTransaction {
         name: groupsTable.name,
         description: groupsTable.description,
         managerId: groupsTable.managerId,
-        notificationEnabled: membersTable.notificationsEnabled,
+        likeNotificationEnabled: membersTable.likeNotificationEnabled,
+        commentNotificationEnabled: membersTable.commentNotificationEnabled,
+        postNotificationEnabled: membersTable.postNotificationEnabled,
+        nudgeNotificationEnabled: membersTable.nudgeNotificationEnabled,
       })
       .from(groupsTable)
       .innerJoin(
