@@ -95,12 +95,11 @@ const ComponentLibrary = () => {
             />
           </Box>
 
-          <Recording onClose={() => null} onSend={(uri:string) => console.log(uri)}/>
+          <Recording onClose={() => null} onSend={(uri: string) => console.log(uri)} />
         </Box>
       </ScrollView>
       <CommentPopUp id="" ref={commentRef} />
       <CommentPopUp id="" ref={likeRef} />
-      
     </>
   );
 };

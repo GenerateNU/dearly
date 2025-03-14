@@ -11,9 +11,8 @@ interface IconButtonProps {
   variant: ButtonVariant;
   label?: string;
   labelPosition?: "left" | "right" | "bottom" | "top";
-  size?:number
+  size?: number;
 }
-
 
 export const IconButton: React.FC<IconButtonProps> = ({
   onPress,
@@ -22,7 +21,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
   variant,
   label,
   labelPosition,
-  size
+  size,
 }) => {
   return (
     <Box alignItems="center" justifyContent="center">

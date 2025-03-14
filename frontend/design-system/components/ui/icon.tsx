@@ -8,7 +8,6 @@ import { ColorName, ColorPalette } from "@/design-system/base/config/color";
 import { Theme } from "@/design-system/base/theme";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 
-
 interface IconProps {
   name: MaterialIcon;
   color?: ColorName;
@@ -16,7 +15,7 @@ interface IconProps {
   label?: string;
   navbar?: boolean;
   onPress?: () => void;
-  size?: number
+  size?: number;
 }
 
 export const Icon: React.FC<IconProps> = ({
@@ -26,7 +25,7 @@ export const Icon: React.FC<IconProps> = ({
   label,
   navbar,
   onPress,
-  size = useTheme<Theme>().iconSize
+  size = useTheme<Theme>().iconSize,
 }) => {
   const positionStyles: Record<
     string,
@@ -38,8 +37,6 @@ export const Icon: React.FC<IconProps> = ({
     bottom: "column",
   };
 
- 
-
   return (
     <TouchableWithoutFeedback onPress={onPress}>
       <Box
@@ -48,7 +45,12 @@ export const Icon: React.FC<IconProps> = ({
         gap="xs"
         flexDirection={positionStyles[labelPosition || "left"]}
       >
-        <MaterialCommunityIcons sx={{ padding: 0, margin: 0 }} name={name} color={ColorPalette[color]} size={size} />
+        <MaterialCommunityIcons
+          sx={{ padding: 0, margin: 0 }}
+          name={name}
+          color={ColorPalette[color]}
+          size={size}
+        />
         {label && (
           <Text color={color} variant={navbar ? "navbar" : "body"}>
             {label}

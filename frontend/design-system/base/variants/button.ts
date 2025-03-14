@@ -19,8 +19,8 @@ const baseIconBorder = {
   borderRadius: "full",
   aspectRatio: 1,
   borderWidth: 2,
-  borderColor: "ink"
-}
+  borderColor: "ink",
+};
 
 const createButtonStyle = (
   color: ColorName,
@@ -48,13 +48,13 @@ export const buttonVariants = {
     ...baseIcon,
     backgroundColor: "gray",
   },
-  iconPearl : {
+  iconPearl: {
     ...baseIcon,
-    backgroundColor: "pearl"
+    backgroundColor: "pearl",
   },
-  smallIconPearlBorder : {
+  smallIconPearlBorder: {
     ...baseIconBorder,
-    backgroundColor: "pearl"
+    backgroundColor: "pearl",
   },
   text: {
     width: "auto",

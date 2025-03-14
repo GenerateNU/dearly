@@ -95,5 +95,5 @@ export const getZodiacIcon = (date: string): MaterialIcon => {
 export const formatSeconds = (time: number): string => {
   const minutes = Math.floor(time / 60);
   const seconds = Math.floor(time % 60);
-  return minutes.toString() + ":" + seconds.toString().padStart(2, '0')
-}
+  return minutes.toString() + ":" + seconds.toString().padStart(2, "0");
+};
