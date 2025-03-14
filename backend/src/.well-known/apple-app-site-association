@@ -4,7 +4,7 @@
     "details": [
       {
         "appID": "W3PR3X4XD2.com.generate.dearly",
-        "paths": ["*"]
+        "paths": ["/group/*"]
       }
     ]
   },
