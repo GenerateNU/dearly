@@ -1,0 +1,26 @@
+import { Box } from "@/design-system/base/box";
+import { Text } from "@/design-system/base/text";
+import { Icon } from "../icons/icon";
+import { BaseButton } from "@/design-system/base/button";
+import { useUserStore } from "@/auth/store";
+
+interface SettingProps {
+  onPress: () => void;
+}
+
+const SettingButton: React.FC<SettingProps> = ({ onPress }) => {
+  const { group } = useUserStore();
+
+  if (!group) return;
+
+  return (
+    <BaseButton onPress={onPress} variant="text">
+      <Box justifyContent="center" alignItems="center" gap="xs" flexDirection="row">
+        <Text variant="bodyLargeBold">Settings</Text>
+        <Icon name="cog-outline" />
+      </Box>
+    </BaseButton>
+  );
+};
+
+export default SettingButton;

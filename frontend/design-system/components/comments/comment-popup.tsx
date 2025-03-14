@@ -1,4 +1,4 @@
-import React, { forwardRef } from "react";
+import { forwardRef } from "react";
 import { CommentCard } from "./comment";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
