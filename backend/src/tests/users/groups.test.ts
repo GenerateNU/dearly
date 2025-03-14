@@ -23,17 +23,26 @@ describe("GET /users/groups", () => {
 
   const ANOTHER_GROUP_WITH_NOTIFICATION = {
     ...ANOTHER_GROUP,
-    notificationEnabled: true,
+    likeNotificationEnabled: true,
+    commentNotificationEnabled: true,
+    postNotificationEnabled: true,
+    nudgeNotificationEnabled: true,
   };
 
   const DEARLY_GROUP_WITH_NOTIFICATION = {
     ...DEARLY_GROUP,
-    notificationEnabled: true,
+    likeNotificationEnabled: true,
+    commentNotificationEnabled: true,
+    postNotificationEnabled: true,
+    nudgeNotificationEnabled: true,
   };
 
   const GENERATE_GROUP_WITH_NOTIFICATION = {
     ...GENERATE_GROUP,
-    notificationEnabled: true,
+    likeNotificationEnabled: true,
+    commentNotificationEnabled: true,
+    postNotificationEnabled: true,
+    nudgeNotificationEnabled: true,
   };
 
   it("should return 200 if user not found", async () => {

@@ -8,13 +8,13 @@ import { MediaService } from "../media/service";
 import { invitationRoutes } from "../invitations/route";
 import { memberRoutes } from "../members/route";
 import { ExpoPushService } from "../../services/notification/expo";
-import { NudgeScheduler } from "../../services/nudgeScheduler";
+import { NudgeSchedulerService } from "../../services/nudgeScheduler";
 
 export const groupRoutes = (
   db: PostgresJsDatabase,
   mediaService: MediaService,
   expo: ExpoPushService,
-  scheduler: NudgeScheduler,
+  scheduler: NudgeSchedulerService,
 ): Hono => {
   const group = new Hono();
 
