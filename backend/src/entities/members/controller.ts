@@ -12,6 +12,7 @@ import {
 } from "../../types/api/routes/members";
 import { MemberRole } from "../../constants/database";
 import { paginationSchema } from "../../utilities/pagination";
+import { notificationValidate } from "./validator";
 
 export interface MemberController {
   addMember(ctx: Context): Promise<ADD_MEMBER>;
@@ -95,9 +96,15 @@ export class MemberControllerImpl implements MemberController {
     const toggleNotificationImpl = async () => {
       const userId = ctx.get("userId");
       const groupId = parseUUID(ctx.req.param("id"));
-      const notificationOn = await this.memberService.toggleNotification({ userId, id: groupId });
-      const message = notificationOn ? "turn on" : "turn off";
-      return ctx.json({ message: `Successfully ${message} notification for group` }, Status.OK);
+
+      const notificationConfig = notificationValidate.parse(await ctx.req.json());
+      const response = await this.memberService.toggleNotification({
+        id: groupId,
+        userId,
+        ...notificationConfig,
+      });
+
+      return ctx.json(response, Status.OK);
     };
     return await handleAppError(toggleNotificationImpl)(ctx);
   }
