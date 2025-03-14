@@ -17,22 +17,24 @@ const Home = () => {
   };
 
   return (
-    <Box
-      padding="m"
-      gap="xl"
-      alignItems="center"
-      justifyContent="center"
-      backgroundColor="pearl"
-      flex={1}
-    >
-      <ResourceView
-        resourceState={groupsResource}
-        loadingComponent={<Spinner />}
-        errorComponent={<ErrorDisplay refresh={refetch} />}
-        emptyComponent={<EmptyHomePage />}
-        successComponent={<Text>Home</Text>}
-      />
-    </Box>
+    <>
+      <Box
+        padding="m"
+        gap="xl"
+        alignItems="center"
+        justifyContent="center"
+        backgroundColor="pearl"
+        flex={1}
+      >
+        <ResourceView
+          resourceState={groupsResource}
+          loadingComponent={<Spinner />}
+          errorComponent={<ErrorDisplay refresh={refetch} />}
+          emptyComponent={<EmptyHomePage />}
+          successComponent={<Text>Home</Text>}
+        />
+      </Box>
+    </>
   );
 };
 
