@@ -13,6 +13,7 @@ describe("GET /users/notifications", () => {
     ...notif,
     createdAt: notif.createdAt.toISOString(),
   }));
+  const NOTFICATION_WITH_PROFILE = { ...NOTIFICATIONS[1], profilePhoto: "https://mocked-url.com" };
 
   beforeAll(async () => {
     app = await startTestApp();
@@ -54,7 +55,7 @@ describe("GET /users/notifications", () => {
         },
       })
     )
-      .assertBody(NOTIFICATIONS)
+      .assertBody([NOTIFICATIONS[0], NOTFICATION_WITH_PROFILE, NOTIFICATIONS[2]])
       .assertStatusCode(Status.OK);
   });
 
@@ -143,10 +144,10 @@ describe("GET /users/notifications", () => {
 
   it.each([
     ["1", "1", [NOTIFICATIONS[0]]],
-    ["1", "2", [NOTIFICATIONS[1]]],
+    ["1", "2", [NOTFICATION_WITH_PROFILE]],
     ["1", "3", [NOTIFICATIONS[2]]],
-    ["2", "1", [NOTIFICATIONS[0], NOTIFICATIONS[1]]],
-    ["3", "1", [NOTIFICATIONS[0], NOTIFICATIONS[1], NOTIFICATIONS[2]]],
+    ["2", "1", [NOTIFICATIONS[0], NOTFICATION_WITH_PROFILE]],
+    ["3", "1", [NOTIFICATIONS[0], NOTFICATION_WITH_PROFILE, NOTIFICATIONS[2]]],
     ["2", "2", [NOTIFICATIONS[2]]],
   ])("should return 200 with limit %s and page %s", async (limit, page, expectedBody) => {
     (

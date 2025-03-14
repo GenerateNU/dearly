@@ -2,14 +2,14 @@ import { Alert } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z, ZodError } from "zod";
-import Input from "@/design-system/components/ui/input";
 import { AuthRequest } from "@/types/auth";
 import { Box } from "@/design-system/base/box";
 import { useOnboarding } from "@/contexts/onboarding";
 import { useState, useEffect } from "react";
 import { router } from "expo-router";
-import BackNextButtons from "../../../design-system/components/ui/back-next-buttons";
 import { PASSWORD_SCHEMA } from "@/utilities/password";
+import Input from "@/design-system/components/shared/controls/input";
+import BackNextButtons from "@/design-system/components/shared/buttons/back-next-buttons";
 
 type RegisterFormData = AuthRequest & {
   username: string;
@@ -18,9 +18,12 @@ type RegisterFormData = AuthRequest & {
 
 const REGISTER_SCHEMA = z
   .object({
-    username: z.string().min(2, {
-      message: "Username must be at least 2 characters long",
-    }),
+    username: z
+      .string()
+      .min(2, {
+        message: "Username must be at least 2 characters long",
+      })
+      .refine((s) => !s.includes(" ")),
     email: z.string().email({ message: "Must be a valid email" }),
   })
   .merge(PASSWORD_SCHEMA)
@@ -75,7 +78,7 @@ const RegisterForm = () => {
       };
       setUser(data);
       setPage(3);
-      router.push("/(auth)/edit-profile");
+      router.push("/(auth)/register/edit-profile");
     } catch (err: unknown) {
       if (err instanceof ZodError) {
         const errorMessages = err.errors.map((error) => error.message).join("\n");
@@ -127,7 +130,7 @@ const RegisterForm = () => {
         <Controller
           name="password"
           control={control}
-          render={({ field: { onChange, value, onBlur } }) => (
+          render={({ field: { onChange, value } }) => (
             <Input
               onChangeText={(text: string) => {
                 onChange(text);

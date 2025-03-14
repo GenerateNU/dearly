@@ -1,6 +1,7 @@
 import { paths, components } from "@/gen/openapi";
 
 export type User = components["schemas"]["User"];
+export type Notification = components["schemas"]["Notification"];
 
 export type SearchedUser = components["schemas"]["SearchedUser"];
 

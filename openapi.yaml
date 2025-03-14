@@ -515,12 +515,23 @@ components:
         mediaURL:
           type: string
           description: The URL of the media associated with the notification.
+        profilePhoto:
+          type: string
+          description: The URL of user's profile photo associated with the notification.
           nullable: true
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-01-17T00:00:00Z"
+          description: The date and time when the notification was created.
       required:
         - actorId
         - receiverId
         - referenceType
         - title
+        - createdAt
+        - mediaURL
+        - postId
       oneOf:
         - required:
             - postId

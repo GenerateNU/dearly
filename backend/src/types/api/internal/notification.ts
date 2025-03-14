@@ -46,5 +46,6 @@ export type SendNotificationPayload = {
 export type NotificationPlain = typeof notificationsTable.$inferSelect;
 
 export type NotificationWithMedia = typeof notificationsTable.$inferSelect & {
-  mediaURL: string | null;
+  mediaURL: string;
+  profilePhoto?: string;
 };

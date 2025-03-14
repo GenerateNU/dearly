@@ -1,6 +1,6 @@
 import { Box } from "@/design-system/base/box";
 import { BaseButton } from "@/design-system/base/button";
-import { Icon } from "../ui/icon";
+import { Icon } from "../shared/icons/icon";
 
 interface CommentLikeProps {
   postId: string;

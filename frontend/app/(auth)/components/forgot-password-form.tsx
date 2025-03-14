@@ -1,14 +1,13 @@
-import React from "react";
 import { Alert } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z, ZodError } from "zod";
 import { router } from "expo-router";
-import Input from "@/design-system/components/ui/input";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { useUserStore } from "@/auth/store";
-import BackNextButtons from "../../../design-system/components/ui/back-next-buttons";
+import Input from "@/design-system/components/shared/controls/input";
+import BackNextButtons from "@/design-system/components/shared/buttons/back-next-buttons";
 
 const EMAIL_SCHEMA = z.object({
   email: z.string().email({ message: "Invalid email" }),
@@ -33,7 +32,7 @@ const ForgotPasswordForm = () => {
     try {
       const validData = EMAIL_SCHEMA.parse(data);
       await forgotPassword(validData.email);
-      router.push("/(auth)/check-email");
+      router.push("/(auth)/login/check-email");
     } catch (err: unknown) {
       if (err instanceof ZodError) {
         const errorMessages = err.errors.map((error) => error.message).join("\n");

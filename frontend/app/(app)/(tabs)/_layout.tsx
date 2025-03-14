@@ -1,7 +1,7 @@
 import { Box } from "@/design-system/base/box";
-import { Icon } from "@/design-system/components/ui/icon";
+import { Icon } from "@/design-system/components/shared/icons/icon";
 import { useIsBasicMode } from "@/hooks/component/mode";
-import { Tabs } from "expo-router";
+import { router, Tabs } from "expo-router";
 
 const Layout = () => {
   const hasLabel = useIsBasicMode();
@@ -24,8 +24,8 @@ const Layout = () => {
         <Tabs.Screen
           name="index"
           options={{
-            title: "Home",
-            headerShown: false,
+            headerShown: true,
+            headerTitle: "",
             headerTransparent: true,
             tabBarIcon: ({ focused }) => {
               return (
@@ -40,6 +40,11 @@ const Layout = () => {
                 </Box>
               );
             },
+            headerRight: () => (
+              <Box paddingRight="m">
+                <Icon onPress={() => router.push("/(app)/notification")} name="bell-outline" />
+              </Box>
+            ),
           }}
         />
         <Tabs.Screen
@@ -61,6 +66,7 @@ const Layout = () => {
                 </Box>
               );
             },
+            href: "/(app)/post-creation",
           }}
         />
         <Tabs.Screen

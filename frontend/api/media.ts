@@ -1,19 +1,15 @@
 import { authWrapper, getHeaders } from "@/utilities/auth-token";
 import fetchClient from "./client";
-import {
-  UploadMediaPayload,
-  UploadGroupMediaResponse,
-  UploadUserMediaResponse,
-} from "@/types/media";
+import { UploadGroupMediaResponse, UploadUserMediaResponse } from "@/types/media";
 
 export const uploadPostMedia = async (
   id: string,
-  payload: UploadMediaPayload,
+  payload: FormData,
 ): Promise<UploadGroupMediaResponse> => {
   const req = async (token: string): Promise<UploadGroupMediaResponse> => {
     const { data } = await fetchClient.POST("/api/v1/groups/{id}/media", {
-      headers: getHeaders(token, "multipart/form-data"),
-      body: payload,
+      headers: getHeaders(token, undefined),
+      body: payload as FormData & { media: string },
       params: {
         path: {
           id,

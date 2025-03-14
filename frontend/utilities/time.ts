@@ -23,14 +23,10 @@ export const categorizeTime = (time: string) => {
   const diffInDays = diffInMs / (1000 * 3600 * 24);
 
   if (diffInDays < 1) return "New";
-  if (diffInDays < 2) return "1 day ago";
-  if (diffInDays < 7) return `${Math.floor(diffInDays)} days ago`;
-  if (diffInDays < 14) return "1 week ago";
-  if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} weeks ago`;
-  if (diffInDays < 60) return "1 month ago";
-  if (diffInDays < 365) return `${Math.floor(diffInDays / 30)} months ago`;
-  if (diffInDays < 730) return "1 year ago";
-  return `${Math.floor(diffInDays / 365)} years ago`;
+  if (diffInDays < 7) return `${Math.floor(diffInDays)}D`;
+  if (diffInDays < 30) return `${Math.floor(diffInDays / 7)}W`;
+  if (diffInDays < 365) return `${Math.floor(diffInDays / 30)}M`;
+  return `${Math.floor(diffInDays / 365)}Y`;
 };
 
 export const formatTime = (createdAt: string): string => {

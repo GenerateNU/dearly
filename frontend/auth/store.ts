@@ -13,7 +13,7 @@ import { Group } from "@/types/group";
 import * as SecureStore from "expo-secure-store";
 import { OnboardingUserInfo } from "@/contexts/onboarding";
 import { uploadUserMedia } from "@/api/media";
-import { getProfilePhotoBlob } from "@/utilities/media";
+import { getPhotoBlobs } from "@/utilities/media";
 import { ResetPasswordPayload } from "@/types/auth";
 
 interface UserState {
@@ -136,7 +136,7 @@ export const useUserStore = create<UserState>()(
           });
           let objectKey: string | undefined;
           if (data.profilePhoto) {
-            const form = await getProfilePhotoBlob(data.profilePhoto);
+            const form = await getPhotoBlobs([data.profilePhoto]);
             const response = await uploadUserMedia(form);
             objectKey = response.objectKey;
           }

@@ -4,14 +4,14 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z, ZodError } from "zod";
 import { router } from "expo-router";
-import Input from "@/design-system/components/ui/input";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { useUserStore } from "@/auth/store";
-import BackNextButtons from "../../../design-system/components/ui/back-next-buttons";
 import * as Linking from "expo-linking";
 import { PASSWORD_SCHEMA } from "@/utilities/password";
 import { TokenPayload } from "@/types/auth";
+import Input from "@/design-system/components/shared/controls/input";
+import BackNextButtons from "@/design-system/components/shared/buttons/back-next-buttons";
 
 export const PASSWORD_CONFIRM_SCHEMA = PASSWORD_SCHEMA.refine(
   (data) => data.password === data.retypedPassword,

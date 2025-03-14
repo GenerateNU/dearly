@@ -9,6 +9,6 @@ export const avatarVariants = {
     size: 100,
   },
   small: {
-    size: 65,
+    size: 70,
   },
 };

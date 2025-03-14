@@ -98,6 +98,14 @@ export const MEDIA_MOCK: (typeof mediaTable.$inferInsert)[] = [
   },
 ];
 
+export const BOB_MEDIA: typeof mediaTable.$inferInsert = {
+  postId: NEW_POST_ID,
+  objectKey: "photo",
+  type: "PHOTO",
+  id: "8c8d8a3e-b9e4-4d79-b0a0-e186b0beada1",
+  order: 0,
+};
+
 export const POST_MOCK: (typeof postsTable.$inferInsert)[] = [
   {
     userId: USER_ALICE_ID,
@@ -386,7 +394,7 @@ export const NOTIFICATIONS_MOCK: NotificationWithMedia[] = [
     id: MOCK_COMMENT_NOTIF_UUID,
     actorId: USER_BILL_ID,
     receiverId: USER_BOB_ID,
-    postId: null,
+    postId: NEW_POST_ID,
     referenceType: "POST",
     title: "New Comment",
     description: "Bill commented on your post",
@@ -400,15 +408,15 @@ export const NOTIFICATIONS_MOCK: NotificationWithMedia[] = [
     id: MOCK_LIKE_NOTIF_UUID,
     actorId: USER_ANA_ID,
     receiverId: USER_BOB_ID,
-    postId: null,
+    postId: NEW_POST_ID,
     referenceType: "LIKE",
     title: "New Like",
     description: "Ana liked your post",
-    createdAt: new Date(),
+    createdAt: new Date("2025-03-11"),
     groupId: DEARLY_GROUP_ID,
     commentId: null,
     likeId: MOCK_RANDOM_UUID,
-    mediaURL: SEARCHED_ANA["profilePhoto"],
+    mediaURL: SEARCHED_ANA["profilePhoto"]!,
   },
   {
     id: MOCK_POST_NOTIF_UUID,
@@ -418,7 +426,7 @@ export const NOTIFICATIONS_MOCK: NotificationWithMedia[] = [
     referenceType: "POST",
     title: "New Post",
     description: "Alice posted in your group",
-    createdAt: new Date(),
+    createdAt: new Date("2025-02-11"),
     groupId: DEARLY_GROUP_ID,
     commentId: null,
     likeId: null,

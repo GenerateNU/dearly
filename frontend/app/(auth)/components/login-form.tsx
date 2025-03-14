@@ -3,14 +3,14 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z, ZodError } from "zod";
 import { router } from "expo-router";
-import Input from "@/design-system/components/ui/input";
-import { TextButton } from "@/design-system/components/ui/text-button";
 import { AuthRequest } from "@/types/auth";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { useUserStore } from "@/auth/store";
-import { Icon } from "@/design-system/components/ui/icon";
-import BackNextButtons from "../../../design-system/components/ui/back-next-buttons";
+import Input from "@/design-system/components/shared/controls/input";
+import { Icon } from "@/design-system/components/shared/icons/icon";
+import { TextButton } from "@/design-system/components/shared/buttons/text-button";
+import BackNextButtons from "@/design-system/components/shared/buttons/back-next-buttons";
 
 const LOGIN_SCHEMA = z.object({
   email: z.string().email({ message: "Invalid email" }),
@@ -96,7 +96,7 @@ const LoginForm = () => {
           <Box alignItems="flex-end" width="auto">
             <TextButton
               textVariant="caption"
-              onPress={() => router.push("/(auth)/forgot-password")}
+              onPress={() => router.push("/(auth)/login/forgot-password")}
               variant="text"
               label="Forgot Password?"
             />

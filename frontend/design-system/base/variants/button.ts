@@ -22,37 +22,20 @@ const createButtonStyle = (
   width: "100%",
   backgroundColor: outline ? "" : color,
   borderRadius,
-  borderWidth: outline ? 1 : 1,
+  borderWidth: outline ? 2 : 1,
   borderColor: color,
 });
 
 export const buttonVariants = {
-  iconBlush: {
-    ...baseIcon,
-    backgroundColor: "blush",
-  },
-  iconHoney: {
+  icon: {
     ...baseIcon,
     backgroundColor: "honey",
   },
   text: {
     width: "auto",
   },
-
-  pearl: createButtonStyle("pearl", "s"),
-  pearlRounded: createButtonStyle("pearl", "full"),
-  blush: createButtonStyle("blush", "s"),
-  blushRounded: createButtonStyle("blush", "full"),
-  honey: createButtonStyle("honey", "s"),
-  honeyRounded: createButtonStyle("honey", "full"),
-  blushRoundedOutline: createButtonStyle("blush", "full", true),
-  honeyRoundedOutline: createButtonStyle("honey", "full", true),
-  blushOutline: createButtonStyle("blush", "s", true),
-  honeyOutline: createButtonStyle("honey", "s", true),
-  slateOutline: createButtonStyle("slate", "s", true),
-  slateRoundedOutline: createButtonStyle("slate", "full", true),
-  inkOutline: createButtonStyle("ink", "s", true),
-  inkRoundedOutline: createButtonStyle("ink", "full", true),
+  primary: createButtonStyle("honey", "full"),
+  secondary: createButtonStyle("darkGray", "full", true),
 };
 
 export type ButtonVariant = keyof typeof buttonVariants;

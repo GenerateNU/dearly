@@ -1,9 +1,9 @@
-import { Avatar } from "../ui/avatar";
-import { TextButton } from "../ui/text-button";
 import { formatTime } from "@/utilities/time";
 import { Pressable } from "react-native";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
+import { Avatar } from "../shared/avatar";
+import { TextButton } from "../shared/buttons/text-button";
 interface PostHeaderProps {
   username: string;
   profilePhoto: string | null;

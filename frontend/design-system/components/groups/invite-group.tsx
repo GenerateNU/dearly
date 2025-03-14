@@ -1,12 +1,12 @@
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { useState } from "react";
-import { TextButton } from "@/design-system/components/ui/text-button";
 import { useLocalSearchParams } from "expo-router";
 import { useUserStore } from "@/auth/store";
 import { useGetInviteToken } from "@/hooks/api/group";
 import { Share } from "react-native";
 import * as Linking from "expo-linking";
+import { TextButton } from "../shared/buttons/text-button";
 
 interface InviteLinkProps {
   nextPageNavigate?: () => void;
@@ -57,7 +57,7 @@ const InviteLinkComponent: React.FC<InviteLinkProps> = ({ nextPageNavigate }) =>
             disabled={isLoading}
             label={"Copy Link"}
             onPress={invite}
-            variant="blushRounded"
+            variant="secondary"
           />
           {isError && <Text color="error">{error.message}</Text>}
         </Box>
@@ -66,7 +66,7 @@ const InviteLinkComponent: React.FC<InviteLinkProps> = ({ nextPageNavigate }) =>
         <TextButton
           label="Next"
           onPress={nextPageNavigate ? nextPageNavigate : finishOnboarding}
-          variant="honeyRounded"
+          variant="primary"
         />
       </Box>
     </Box>
