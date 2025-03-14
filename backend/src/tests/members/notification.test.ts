@@ -21,8 +21,7 @@ describe("PATCH /groups/:id/members/notifications", () => {
     app = await startTestApp();
   });
 
-  it("should return 200 if notification is toggled successfully for member", async () => {
-    // Alice has notification for group turned on by default, so it should be turned off
+  it("should return 200 if full notification config updated successfully for member", async () => {
     (
       await testBuilder.request({
         app,
@@ -32,12 +31,24 @@ describe("PATCH /groups/:id/members/notifications", () => {
         headers: {
           Authorization: `Bearer ${ALICE_JWT}`,
         },
+        requestBody: {
+          likeNotificationEnabled: false,
+          commentNotificationEnabled: false,
+          postNotificationEnabled: false,
+          nudgeNotificationEnabled: false,
+        },
       })
     )
       .assertStatusCode(Status.OK)
-      .assertMessage("Successfully turn off notification for group");
+      .assertFields({
+        commentNotificationEnabled: false,
+        likeNotificationEnabled: false,
+        nudgeNotificationEnabled: false,
+        postNotificationEnabled: false,
+      });
+  });
 
-    // now notification is turned off, should turn on again
+  it("should return 200 if partially update notification config successfully for member", async () => {
     (
       await testBuilder.request({
         app,
@@ -47,10 +58,19 @@ describe("PATCH /groups/:id/members/notifications", () => {
         headers: {
           Authorization: `Bearer ${ALICE_JWT}`,
         },
+        requestBody: {
+          likeNotificationEnabled: true,
+          commentNotificationEnabled: true,
+        },
       })
     )
       .assertStatusCode(Status.OK)
-      .assertMessage("Successfully turn on notification for group");
+      .assertFields({
+        commentNotificationEnabled: true,
+        likeNotificationEnabled: true,
+        nudgeNotificationEnabled: false,
+        postNotificationEnabled: false,
+      });
   });
 
   it("should return 403 if post exists but user not in group", async () => {
@@ -62,6 +82,9 @@ describe("PATCH /groups/:id/members/notifications", () => {
         autoAuthorized: false,
         headers: {
           Authorization: `Bearer ${ANA_JWT}`,
+        },
+        requestBody: {
+          likeNotificationEnabled: false,
         },
       })
     ).assertStatusCode(Status.Forbidden);
@@ -76,6 +99,9 @@ describe("PATCH /groups/:id/members/notifications", () => {
         autoAuthorized: false,
         headers: {
           Authorization: `Bearer ${ALICE_JWT}`,
+        },
+        requestBody: {
+          likeNotificationEnabled: false,
         },
       })
     )
