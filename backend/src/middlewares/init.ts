@@ -5,6 +5,7 @@ import { secureHeaders } from "hono/secure-headers";
 import { isAuthorized } from "./auth";
 import { compress } from "./compress";
 import { Configuration } from "../types/config";
+import { serveStatic } from "@hono/node-server/serve-static";
 
 export const configureMiddlewares = (app: Hono, config: Configuration) => {
   app.use(cors(config.cors));
@@ -14,4 +15,16 @@ export const configureMiddlewares = (app: Hono, config: Configuration) => {
   }
   app.use(secureHeaders());
   app.use("/api/v1/*", isAuthorized(config.authorization.jwtSecretKey));
+  app.use(
+    ".well-known/apple-app-site-association",
+    serveStatic({
+      root: "src/static",
+    }),
+  );
+  app.use(
+    "logo.svg",
+    serveStatic({
+      root: "src/static",
+    }),
+  );
 };

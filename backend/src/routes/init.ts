@@ -14,6 +14,7 @@ import { mediaRoutes } from "../entities/media/route";
 import { ExpoPushService } from "../services/notification/expo";
 import { AppService } from "../types/api/internal/services";
 import { NudgeSchedulerService } from "../services/nudgeScheduler";
+import { redirectPage } from "../utilities/redirect";
 
 export const setUpRoutes = (
   app: Hono,
@@ -43,6 +44,11 @@ export const setUpRoutes = (
   // initialize routes
   const { expoService, mediaService, nudgeSchedulerService } = services;
   app.route("/api/v1", apiRoutes(db, mediaService, expoService, nudgeSchedulerService));
+
+  // State website redirect page.
+  app.get("/group", (c) => {
+    return c.html(redirectPage());
+  });
 
   // unsupported route
   app.notFound((ctx: Context) => {

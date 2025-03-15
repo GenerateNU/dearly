@@ -5,6 +5,8 @@ import { useUserGroups } from "@/hooks/api/user";
 import ResourceView from "@/design-system/components/utilities/resource-view";
 import ErrorDisplay from "@/design-system/components/shared/states/error";
 import Spinner from "@/design-system/components/shared/spinner";
+import { useInvitations } from "@/hooks/api/invite";
+import { TextButton } from "@/design-system/components/shared/buttons/text-button";
 
 const Home = () => {
   const { data, isLoading, error, refetch } = useUserGroups();
@@ -32,6 +34,8 @@ const Home = () => {
         emptyComponent={<EmptyHomePage />}
         successComponent={<Text>Home</Text>}
       />
+      <Text>Home</Text>
+      <TextButton variant="text" label="Send Message" onPress={useInvitations} />
     </Box>
   );
 };
