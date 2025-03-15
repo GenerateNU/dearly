@@ -45,7 +45,7 @@ const HomeMenu = <T extends string>({
     setContainerWidth(width);
   };
 
-  const tabWidth = (containerWidth / categories.length) * 0.97;
+  const tabWidth = (containerWidth / categories.length) * 0.98;
 
   useEffect(() => {
     const selectedIndex = categories.indexOf(selected);
@@ -76,14 +76,13 @@ const HomeMenu = <T extends string>({
             alignItems: "center",
             borderRadius: theme.borderRadii.full,
             width: tabWidth,
-            height: "150%",
-            left: 3,
-            right: 3,
+            height: "155%",
             shadowColor: "black",
             shadowOffset: { width: 0, height: 1 },
             shadowOpacity: 0.05,
             shadowRadius: 8,
             elevation: 0,
+            left: 2,
             transform: [{ translateX }],
           },
         ]}
