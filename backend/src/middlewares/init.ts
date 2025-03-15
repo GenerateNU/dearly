@@ -18,10 +18,13 @@ export const configureMiddlewares = (app: Hono, config: Configuration) => {
   app.use(
     ".well-known/apple-app-site-association",
     serveStatic({
-      root: "src/",
-      onNotFound: (path, c) => {
-        console.log(`${path} is not found, you access ${c.req.path}`);
-      },
+      root: "src/static",
+    }),
+  );
+  app.use(
+    "logo.svg",
+    serveStatic({
+      root: "src/static",
     }),
   );
 };
