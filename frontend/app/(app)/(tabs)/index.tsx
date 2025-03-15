@@ -34,7 +34,6 @@ const Home = () => {
         emptyComponent={<EmptyHomePage />}
         successComponent={<Text>Home</Text>}
       />
-      <Text>Home</Text>
       <TextButton variant="text" label="Send Message" onPress={useInvitations} />
     </Box>
   );

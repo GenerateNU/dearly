@@ -16,7 +16,7 @@ const SettingButton: React.FC<SettingProps> = ({ onPress }) => {
   return (
     <BaseButton onPress={onPress} variant="text">
       <Box justifyContent="center" alignItems="center" gap="xs" flexDirection="row">
-        <Text variant="bodyLargeBold">Settings</Text>
+        <Text variant="bodyBold">Settings</Text>
         <Icon name="cog-outline" />
       </Box>
     </BaseButton>
