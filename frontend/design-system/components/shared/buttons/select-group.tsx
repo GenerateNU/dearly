@@ -38,12 +38,18 @@ const SwitchGroupButton: React.FC<SwitchGroupProps> = ({ onPress }) => {
     return null;
   }
 
-  const displayName = group.name.length > 12 ? `${group.name.substring(0, 11)}...` : group.name;
+  const displayName = group.name.length > 10 ? `${group.name.substring(0, 8)}...` : group.name;
 
   return (
     <BaseButton variant="text" onPress={onPress}>
-      <Box alignItems="center" flexDirection="row" gap="xs">
-        <Text color="ink" variant="h2">
+      <Box
+        justifyContent="center"
+        alignContent="center"
+        alignItems="center"
+        flexDirection="row"
+        gap="xs"
+      >
+        <Text color="ink" variant="bodyLargeBold">
           {displayName}
         </Text>
         <Icon color="ink" name="arrow-down-drop-circle-outline" />
