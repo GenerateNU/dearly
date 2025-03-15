@@ -14,7 +14,7 @@ import { UserProvider } from "@/auth/provider";
 import { useUserStore } from "@/auth/store";
 import SplashScreenAnimation from "./(auth)/components/splash-screen";
 import { OnboardingProvider } from "@/contexts/onboarding";
-import * as Linking from 'expo-linking';
+import * as Linking from "expo-linking";
 
 const queryClient = new QueryClient();
 
@@ -54,8 +54,8 @@ const InitialLayout = () => {
 
     prepare();
   }, [fontsLoaded, clearError]);
-  const url = Linking.useURL()
-  console.log(url)
+  const url = Linking.useURL();
+  console.log(url);
 
   useEffect(() => {
     if (showSplash || !isReady) return;
