@@ -1,9 +1,10 @@
 import { Box } from "@/design-system/base/box";
-import { TextButton } from "./buttons/text-button";
-import { Icon } from "./icons/icon";
 import { router } from "expo-router";
+import { TextButton } from "@/design-system/components/shared/buttons/text-button";
+import { Icon } from "@/design-system/components/shared/icons/icon";
 
 const SettingContent = () => {
+  // TODO: add routing for the setting menu
   return (
     <Box gap="s" flexDirection="column">
       <TextButton

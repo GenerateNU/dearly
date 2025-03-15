@@ -10,7 +10,7 @@ import { configNotification, getMember } from "@/api/member";
 export const useConfigNotification = (id: string) => {
   return useMutationBase<NotificationConfigPayload, Member>(
     (payload) => configNotification(id, payload),
-    ["groups", id, "members", "notifications"],
+    ["groups", id, "members", "info"],
   );
 };
 

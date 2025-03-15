@@ -4,7 +4,7 @@ import { Text } from "@/design-system/base/text";
 import { Theme } from "@/design-system/base/theme";
 import { useTheme } from "@shopify/restyle";
 import React, { useState, useEffect } from "react";
-import { Animated, TouchableOpacity, ActivityIndicator } from "react-native";
+import { Animated, TouchableOpacity } from "react-native";
 
 interface ToggleProps {
   onToggle: () => void;
@@ -74,15 +74,7 @@ const Toggle: React.FC<ToggleProps> = ({ onToggle, enabled, label, isPending = f
               justifyContent: "center",
               alignItems: "center",
             }}
-          >
-            {isPending && (
-              <ActivityIndicator
-                size="small"
-                color={theme.colors.ink}
-                style={{ position: "absolute" }}
-              />
-            )}
-          </AnimatedBox>
+          ></AnimatedBox>
         </AnimatedBox>
       </TouchableOpacity>
     </Box>

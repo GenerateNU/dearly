@@ -1,27 +1,19 @@
-import { useUserGroups } from "@/hooks/api/user";
-import { SelectItem } from "./controls/select";
-import { Group } from "@/types/group";
-import ResourceView from "../utilities/resource-view";
-import { Box } from "@/design-system/base/box";
-import { Text } from "@/design-system/base/text";
-import ErrorDisplay from "./states/error";
-import Spinner from "./spinner";
 import { useUserStore } from "@/auth/store";
-import { TextButton } from "./buttons/text-button";
+import { Box } from "@/design-system/base/box";
+import { useUserGroups } from "@/hooks/api/user";
 import { router } from "expo-router";
+import { Text } from "@/design-system/base/text";
+import { SelectItem } from "../controls/select";
+import { Group } from "@/types/group";
+import { TextButton } from "../buttons/text-button";
+import Spinner from "../spinner";
+import ResourceView from "../../utilities/resource-view";
+import ErrorDisplay from "../states/error";
 
 const SelectGroup = () => {
-  const {
-    data,
-    isLoading,
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage,
-    error,
-    refetch,
-    isRefetching,
-  } = useUserGroups();
-  const groups = data?.pages.flatMap((page) => page);
+  const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage, error, isRefetching } =
+    useUserGroups();
+  const groups = data?.pages.flatMap((page) => page) || [];
   const { group, setSelectedGroup } = useUserStore();
 
   const groupState = {
@@ -45,7 +37,7 @@ const SelectGroup = () => {
   const SuccessComponent = () => (
     <>
       <SelectItem
-        selected={group}
+        selected={group!}
         fetchNextPage={getNextPage}
         setSelected={setSelectedGroup}
         data={groups}

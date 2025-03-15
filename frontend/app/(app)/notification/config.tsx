@@ -28,12 +28,6 @@ const NotificationConfig = () => {
   const [notificationSettings, setNotificationSettings] = useState<NotificationSettings | null>(
     null,
   );
-  const [pendingToggles, setPendingToggles] = useState<Record<NotificationSettingKey, boolean>>({
-    likeNotificationEnabled: false,
-    commentNotificationEnabled: false,
-    postNotificationEnabled: false,
-    nudgeNotificationEnabled: false,
-  });
 
   useEffect(() => {
     if (data) {
@@ -48,29 +42,15 @@ const NotificationConfig = () => {
 
   const handleToggle = (type: NotificationSettingKey) => {
     if (!notificationSettings || !data || !groupId) return;
-
-    // Set this specific toggle to pending state
-    setPendingToggles((prev) => ({ ...prev, [type]: true }));
-
     const updatedSettings: NotificationSettings = {
       ...notificationSettings,
       [type]: !notificationSettings[type],
     };
 
-    setNotificationSettings(updatedSettings);
-
-    mutate(
-      {
-        groupId,
-        ...updatedSettings,
-      },
-      {
-        onSettled: () => {
-          // Clear the pending state for this toggle when the request completes
-          setPendingToggles((prev) => ({ ...prev, [type]: false }));
-        },
-      },
-    );
+    mutate({
+      groupId,
+      ...updatedSettings,
+    });
   };
 
   if (!group || !groupId) {
@@ -106,25 +86,19 @@ const NotificationConfig = () => {
           label="Likes"
           enabled={notificationSettings.likeNotificationEnabled}
           onToggle={() => handleToggle("likeNotificationEnabled")}
-          isPending={pendingToggles.likeNotificationEnabled}
+          isPending={isPending}
         />
         <Toggle
           label="Comments"
           enabled={notificationSettings.commentNotificationEnabled}
           onToggle={() => handleToggle("commentNotificationEnabled")}
-          isPending={pendingToggles.commentNotificationEnabled}
+          isPending={isPending}
         />
         <Toggle
           label="Posts"
           enabled={notificationSettings.postNotificationEnabled}
           onToggle={() => handleToggle("postNotificationEnabled")}
-          isPending={pendingToggles.postNotificationEnabled}
-        />
-        <Toggle
-          label="Nudges"
-          enabled={notificationSettings.nudgeNotificationEnabled}
-          onToggle={() => handleToggle("nudgeNotificationEnabled")}
-          isPending={pendingToggles.nudgeNotificationEnabled}
+          isPending={isPending}
         />
       </Box>
     );

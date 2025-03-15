@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import BottomSheetModal from "./bottom-sheet";
+import BottomSheetModal from "../bottom-sheet";
 import SelectGroup from "./select-group";
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 import { Box } from "@/design-system/base/box";

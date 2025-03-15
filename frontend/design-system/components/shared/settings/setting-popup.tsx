@@ -1,6 +1,6 @@
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 import { forwardRef } from "react";
-import BottomSheetModal from "./bottom-sheet";
+import BottomSheetModal from "../bottom-sheet";
 import { Box } from "@/design-system/base/box";
 import SettingContent from "./setting";
 
