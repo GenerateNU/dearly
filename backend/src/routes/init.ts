@@ -15,6 +15,16 @@ import { ExpoPushService } from "../services/notification/expo";
 import { AppService } from "../types/api/internal/services";
 import { NudgeSchedulerService } from "../services/nudgeScheduler";
 import { serveStatic } from "@hono/node-server/serve-static";
+import { html } from "hono/html";
+
+const redirectPage = () => html`
+  <html>
+    <head> </head>
+    <body>
+      Hello World.
+    </body>
+  </html>
+`;
 
 export const setUpRoutes = (
   app: Hono,
@@ -45,12 +55,18 @@ export const setUpRoutes = (
   const { expoService, mediaService, nudgeSchedulerService } = services;
   app.route("/api/v1", apiRoutes(db, mediaService, expoService, nudgeSchedulerService));
 
+  // Apple app site association file serving.
   app.get(
     ".well-known/apple-app-site-association",
     serveStatic({
       path: "../.well-known/apple-app-site-association",
     }),
   );
+
+  // State website redirect page.
+  app.get("/group", (c) => {
+    return c.html(redirectPage());
+  });
 
   // unsupported route
   app.notFound((ctx: Context) => {
