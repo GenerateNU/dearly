@@ -1,8 +1,7 @@
-import { Group, InvitationToken, Member, NotificationConfigPayload } from "@/types/group";
+import { Group, InvitationToken } from "@/types/group";
 import { useMutationBase, useQueryBase } from "./base";
 import { createGroup, getGroup } from "@/api/group";
 import { getInviteToken } from "@/api/invite";
-import { configNotification } from "@/api/member";
 
 export interface CreateGroupPayload {
   name: string;

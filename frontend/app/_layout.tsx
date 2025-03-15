@@ -1,4 +1,4 @@
-import { router, SplashScreen, Slot, Link } from "expo-router";
+import { router, SplashScreen, Slot } from "expo-router";
 import { StatusBar } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -14,7 +14,6 @@ import { UserProvider } from "@/auth/provider";
 import { useUserStore } from "@/auth/store";
 import SplashScreenAnimation from "./(auth)/components/splash-screen";
 import { OnboardingProvider } from "@/contexts/onboarding";
-import * as Linking from "expo-linking";
 
 const queryClient = new QueryClient();
 
@@ -54,8 +53,6 @@ const InitialLayout = () => {
 
     prepare();
   }, [fontsLoaded, clearError]);
-  const url = Linking.useURL();
-  console.log(url);
 
   useEffect(() => {
     if (showSplash || !isReady) return;

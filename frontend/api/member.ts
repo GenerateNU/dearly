@@ -1,4 +1,4 @@
-import { Group, GroupMembers, Member, MemberPosts, NotificationConfigPayload } from "@/types/group";
+import { GroupMembers, Member, MemberPosts, NotificationConfigPayload } from "@/types/group";
 import fetchClient from "./client";
 import { authWrapper, getHeaders } from "@/utilities/auth-token";
 

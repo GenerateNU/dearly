@@ -17,8 +17,15 @@ const SwitchGroupButton: React.FC<SwitchGroupProps> = ({ onPress }) => {
   const hasInitialized = useRef(false);
 
   useEffect(() => {
-    // Skip if no groups available yet or already initialized
-    if (!groups || groups.length === 0 || !groups[0] || hasInitialized.current) {
+    // not render button if no group, group is loading or fail to load group
+    if (
+      !groups ||
+      groups.length === 0 ||
+      !groups[0] ||
+      hasInitialized.current ||
+      isLoading ||
+      error
+    ) {
       return;
     }
 
@@ -42,7 +49,7 @@ const SwitchGroupButton: React.FC<SwitchGroupProps> = ({ onPress }) => {
 
     // Mark as initialized to prevent further updates
     hasInitialized.current = true;
-  }, [groups]);
+  }, [groups, error, isLoading]);
 
   if (!groups || groups.length === 0 || !groups[0] || !group) {
     return null;

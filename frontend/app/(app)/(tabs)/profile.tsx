@@ -4,13 +4,7 @@ import { useInvitations } from "@/hooks/api/invite";
 
 const Profile = () => {
   return (
-    <Box
-      gap="xl"
-      alignItems="center"
-      justifyContent="center"
-      backgroundColor="pearl"
-      flex={1}
-    >
+    <Box gap="xl" alignItems="center" justifyContent="center" backgroundColor="pearl" flex={1}>
       <TextButton variant="text" label="Send Message" onPress={useInvitations} />
     </Box>
   );
