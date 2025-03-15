@@ -1,9 +1,10 @@
-import { useState } from "react";
-import { TouchableOpacity, LayoutChangeEvent } from "react-native";
+import { useState, useRef, useEffect } from "react";
+import { TouchableOpacity, LayoutChangeEvent, Animated, Easing } from "react-native";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { AnimatedBox } from "@/design-system/base/animated-box";
-import { useAnimatedStyle, withTiming, Easing } from "react-native-reanimated";
+import { useTheme } from "@shopify/restyle";
+import { Theme } from "@/design-system/base/theme";
 
 const MenuTab = <T extends string>({
   isSelected,
@@ -37,27 +38,24 @@ const HomeMenu = <T extends string>({
   setSelected: (category: T) => void;
 }) => {
   const [containerWidth, setContainerWidth] = useState<number>(0);
-
+  const translateX = useRef(new Animated.Value(0)).current;
+  const theme = useTheme<Theme>();
   const handleLayout = (event: LayoutChangeEvent) => {
     const { width } = event.nativeEvent.layout;
     setContainerWidth(width);
   };
 
-  const tabWidth = (containerWidth / categories.length) * 0.999;
+  const tabWidth = (containerWidth / categories.length) * 0.97;
 
-  const translateX = useAnimatedStyle(() => {
+  useEffect(() => {
     const selectedIndex = categories.indexOf(selected);
-    return {
-      transform: [
-        {
-          translateX: withTiming(selectedIndex * tabWidth, {
-            duration: 300,
-            easing: Easing.inOut(Easing.ease),
-          }),
-        },
-      ],
-    };
-  }, [selected, categories, tabWidth, containerWidth]);
+    Animated.timing(translateX, {
+      toValue: selectedIndex * tabWidth,
+      duration: 300,
+      easing: Easing.inOut(Easing.ease),
+      useNativeDriver: true,
+    }).start();
+  }, [selected, categories, tabWidth, containerWidth, translateX]);
 
   return (
     <Box
@@ -66,27 +64,27 @@ const HomeMenu = <T extends string>({
       alignItems="center"
       borderRadius="full"
       paddingVertical="s"
-      borderWidth={1}
+      borderWidth={2}
       borderColor="darkGray"
     >
       <AnimatedBox
-        backgroundColor="honey"
-        position="absolute"
-        justifyContent="center"
-        alignItems="center"
-        borderRadius="xl"
-        width={tabWidth}
-        height="160%"
         style={[
-          translateX,
           {
+            backgroundColor: theme.colors.honey,
+            position: "absolute",
+            justifyContent: "center",
+            alignItems: "center",
+            borderRadius: theme.borderRadii.full,
+            width: tabWidth,
+            height: "150%",
+            left: 3,
+            right: 3,
             shadowColor: "black",
             shadowOffset: { width: 0, height: 1 },
             shadowOpacity: 0.05,
             shadowRadius: 8,
             elevation: 0,
-            borderWidth: 2,
-            borderColor: "rgba(255, 243, 243, 0.48)",
+            transform: [{ translateX }],
           },
         ]}
       />

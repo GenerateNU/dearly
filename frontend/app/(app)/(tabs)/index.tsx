@@ -7,10 +7,14 @@ import ErrorDisplay from "@/design-system/components/shared/states/error";
 import Spinner from "@/design-system/components/shared/spinner";
 import { useInvitations } from "@/hooks/api/invite";
 import { TextButton } from "@/design-system/components/shared/buttons/text-button";
+import HomeMenu from "@/design-system/components/home/home-menu";
+import { useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Home = () => {
   const { data, isLoading, error, refetch } = useUserGroups();
   const groups = data?.pages.flatMap((page) => page) || [];
+  const [selected, setSelected] = useState<string>("Home");
 
   const groupsResource = {
     data: groups,
@@ -19,23 +23,26 @@ const Home = () => {
   };
 
   return (
-    <Box
-      padding="m"
-      gap="xl"
-      alignItems="center"
-      justifyContent="center"
-      backgroundColor="pearl"
-      flex={1}
-    >
-      <ResourceView
-        resourceState={groupsResource}
-        loadingComponent={<Spinner />}
-        errorComponent={<ErrorDisplay refresh={refetch} />}
-        emptyComponent={<EmptyHomePage />}
-        successComponent={<Text>Home</Text>}
-      />
-      <TextButton variant="text" label="Send Message" onPress={useInvitations} />
-    </Box>
+    <SafeAreaView className="flex-1 pt-[35%]">
+      <Box
+        padding="m"
+        gap="xl"
+        alignItems="center"
+        justifyContent="flex-start"
+        backgroundColor="pearl"
+        flex={1}
+      >
+        <HomeMenu categories={["Home", "Calendar"]} selected={selected} setSelected={setSelected} />
+        <ResourceView
+          resourceState={groupsResource}
+          loadingComponent={<Spinner />}
+          errorComponent={<ErrorDisplay refresh={refetch} />}
+          emptyComponent={<EmptyHomePage />}
+          successComponent={<Text>Home Feed Here</Text>}
+        />
+        <TextButton variant="text" label="Send Message" onPress={useInvitations} />
+      </Box>
+    </SafeAreaView>
   );
 };
 
