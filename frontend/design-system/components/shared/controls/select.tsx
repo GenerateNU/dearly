@@ -8,6 +8,7 @@ interface SelectItemProps<T> {
   setSelected: (value: T) => void;
   data: T[];
   renderLabel: (item: T) => string;
+  fetchNextPage: () => void;
 }
 
 export const SelectItem = <T extends object>({
@@ -15,6 +16,7 @@ export const SelectItem = <T extends object>({
   setSelected,
   data,
   renderLabel,
+  fetchNextPage,
 }: SelectItemProps<T>) => {
   const isEqual = (a: T, b: T) => {
     return a && b && (a as any).id === (b as any).id;
@@ -59,6 +61,8 @@ export const SelectItem = <T extends object>({
         renderItem={renderItem}
         keyExtractor={(item) => (item as any).id?.toString() || Math.random().toString()}
         scrollEnabled={data.length > 5}
+        onEndReached={fetchNextPage}
+        onEndReachedThreshold={0.5}
       />
     </Box>
   );

@@ -21,9 +21,11 @@ import { PostWithMedia } from "../../types/api/internal/posts";
 import { getPostMetadata } from "../../utilities/query";
 import { Transaction } from "../../types/api/internal/transaction";
 import { NotificationConfigPayload } from "../../types/api/internal/notification";
+import { IDPayload } from "../../types/id";
 
 export interface MemberTransaction {
   insertMember(payload: AddMemberPayload): Promise<Member | null>;
+  getMember(payload: IDPayload): Promise<Member | null>;
   deleteMember(clientId: string, userId: string, groupId: string): Promise<Member | null>;
   getMembers(groupId: string, payload: Pagination): Promise<SearchedUser[] | null>;
   toggleNotification(payload: NotificationConfigPayload): Promise<Member>;
@@ -49,6 +51,15 @@ export class MemberTransactionImpl implements MemberTransaction {
       .limit(1);
 
     return memberAdded ?? null;
+  }
+
+  async getMember({ id: groupId, userId }: IDPayload): Promise<Member | null> {
+    const [member] = await this.db
+      .select()
+      .from(membersTable)
+      .where(and(eq(membersTable.groupId, groupId), eq(membersTable.userId, userId)));
+
+    return member ?? null;
   }
 
   async deleteMember(clientId: string, userId: string, groupId: string): Promise<Member | null> {

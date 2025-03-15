@@ -16,6 +16,7 @@ import { notificationValidate } from "./validator";
 
 export interface MemberController {
   addMember(ctx: Context): Promise<ADD_MEMBER>;
+  getMember(ctx: Context): Promise<Response>;
   deleteMember(ctx: Context): Promise<DEL_MEMBER>;
   getMembers(ctx: Context): Promise<MEMBERS_API>;
   getMemberPosts(ctx: Context): Promise<MEMBER_POSTS>;
@@ -45,6 +46,17 @@ export class MemberControllerImpl implements MemberController {
       return ctx.json(member, Status.Created);
     };
     return await handleAppError(addMemberImp)(ctx);
+  }
+
+  async getMember(ctx: Context): Promise<Response> {
+    const getMemberImp = async () => {
+      const userId = parseUUID(ctx.get("userId"));
+      const groupId = parseUUID(ctx.req.param("id"));
+
+      const member = await this.memberService.getMember({ id: groupId, userId });
+      return ctx.json(member, Status.OK);
+    };
+    return await handleAppError(getMemberImp)(ctx);
   }
 
   async deleteMember(ctx: Context): Promise<DEL_MEMBER> {
@@ -103,7 +115,6 @@ export class MemberControllerImpl implements MemberController {
         userId,
         ...notificationConfig,
       });
-
       return ctx.json(response, Status.OK);
     };
     return await handleAppError(toggleNotificationImpl)(ctx);

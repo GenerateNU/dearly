@@ -24,6 +24,10 @@ export const getFontConfig = (scaleRatio: number) => {
       fontSize: 14 * scaleRatio,
       fontFamily: "Regular",
     },
+    bodyBold: {
+      fontSize: 14 * scaleRatio,
+      fontFamily: "Bold",
+    },
     caption: {
       fontSize: 11 * scaleRatio,
       fontFamily: "Regular",
