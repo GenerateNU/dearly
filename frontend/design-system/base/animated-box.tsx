@@ -1,5 +1,3 @@
-import { ComponentProps, ReactNode } from "react";
-import { Box } from "@/design-system/base/box";
 import { Animated } from "react-native";
 import {
   createRestyleComponent,
@@ -10,16 +8,9 @@ import {
   opacity,
 } from "@shopify/restyle";
 import { Theme } from "./theme";
+import { AnimationProps } from "@/types/animated";
 
-type BoxProps = ComponentProps<typeof Box>;
-
-type AnimatedBoxProps = BoxProps & {
-  children?: ReactNode;
-  entering?: unknown;
-  style?: any;
-};
-
-export const AnimatedBox = createRestyleComponent<AnimatedBoxProps, Theme>(
+export const AnimatedBox = createRestyleComponent<AnimationProps, Theme>(
   [backgroundColor, layout, border, spacing, opacity],
   Animated.View,
 );

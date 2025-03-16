@@ -6,14 +6,11 @@ import ErrorDisplay from "@/design-system/components/shared/states/error";
 import Spinner from "@/design-system/components/shared/spinner";
 import { useInvitations } from "@/hooks/api/invite";
 import { TextButton } from "@/design-system/components/shared/buttons/text-button";
-import HomeMenu from "@/design-system/components/home/home-menu";
-import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Home = () => {
   const { data, isLoading, error, refetch } = useUserGroups();
   const groups = data?.pages.flatMap((page) => page) || [];
-  const [selected, setSelected] = useState<string>("Home");
 
   const groupsResource = {
     data: groups,
@@ -23,7 +20,6 @@ const Home = () => {
 
   const SuccessComponent = () => (
     <>
-      <HomeMenu categories={["Home", "Calendar"]} selected={selected} setSelected={setSelected} />
       <TextButton variant="text" label="Send Message" onPress={useInvitations} />
     </>
   );

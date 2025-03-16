@@ -1,7 +1,7 @@
 import { router, SplashScreen, Slot } from "expo-router";
 import { StatusBar } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "@shopify/restyle";
 import { useEffect, useState } from "react";
 import { getTheme } from "@/design-system/base/theme";
@@ -14,11 +14,10 @@ import { UserProvider } from "@/auth/provider";
 import { useUserStore } from "@/auth/store";
 import SplashScreenAnimation from "./(auth)/components/splash-screen";
 import { OnboardingProvider } from "@/contexts/onboarding";
-
-const queryClient = new QueryClient();
+import { queryClient } from "@/auth/client";
 
 const InitialLayout = () => {
-  const { isAuthenticated, clearError, completeOnboarding } = useUserStore();
+  const { isAuthenticated, clearError, completeOnboarding, group } = useUserStore();
   const [showSplash, setShowSplash] = useState(true);
   const [isReady, setIsReady] = useState(false);
 

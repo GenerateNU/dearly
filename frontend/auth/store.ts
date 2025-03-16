@@ -15,6 +15,7 @@ import { OnboardingUserInfo } from "@/contexts/onboarding";
 import { uploadUserMedia } from "@/api/media";
 import { getPhotoBlobs } from "@/utilities/media";
 import { ResetPasswordPayload } from "@/types/auth";
+import { queryClient } from "./client";
 
 interface UserState {
   isAuthenticated: boolean;
@@ -33,7 +34,7 @@ interface UserState {
   forgotPassword: (email?: string) => Promise<void>;
   resetPassword: (payload: ResetPasswordPayload) => Promise<void>;
   setMode: (mode: Mode) => void;
-  setSelectedGroup: (group: Group) => void;
+  setSelectedGroup: (group: Group | null) => void;
   setInviteToken: (inviteToken: string) => void;
   loginWithBiometrics: () => Promise<void>;
   clearError: () => void;
@@ -74,7 +75,7 @@ export const useUserStore = create<UserState>()(
         set({ completeOnboarding: true });
       },
 
-      setSelectedGroup: (group: Group) => {
+      setSelectedGroup: (group: Group | null) => {
         set({ group });
       },
 
@@ -84,10 +85,7 @@ export const useUserStore = create<UserState>()(
 
       loginWithBiometrics: async () => {
         const biomentricsImpl = async () => {
-          set({
-            isPending: true,
-            group: null,
-          });
+          set({ isPending: true });
           const session: Session = await authService.loginWithBiometrics();
           const user = await getUser(session.user.id);
           set({
@@ -111,10 +109,7 @@ export const useUserStore = create<UserState>()(
 
       login: async ({ email, password }: { email: string; password: string }) => {
         const loginImpl = async () => {
-          set({
-            isPending: true,
-            group: null,
-          });
+          set({ isPending: true });
           const session: Session = await authService.login({ email, password });
           const user = await getUser(session.user.id);
           set({
@@ -136,10 +131,7 @@ export const useUserStore = create<UserState>()(
 
       register: async (data: OnboardingUserInfo) => {
         const registerImpl = async () => {
-          set({
-            isPending: true,
-            group: null,
-          });
+          set({ isPending: true });
           const session: Session = await authService.signUp({
             email: data.email,
             password: data.password,
@@ -219,6 +211,7 @@ export const useUserStore = create<UserState>()(
             await unregisterDeviceToken(expoToken);
             await AsyncStorage.removeItem(NOTIFICATION_TOKEN_KEY);
           }
+          await queryClient.clear();
           await authService.logout();
           set({
             isAuthenticated: false,
