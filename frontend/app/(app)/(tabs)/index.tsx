@@ -1,6 +1,5 @@
 import { Box } from "@/design-system/base/box";
 import { EmptyHomePage } from "@/design-system/components/home/empty";
-import { Text } from "@/design-system/base/text";
 import { useUserGroups } from "@/hooks/api/user";
 import ResourceView from "@/design-system/components/utilities/resource-view";
 import ErrorDisplay from "@/design-system/components/shared/states/error";
@@ -22,6 +21,13 @@ const Home = () => {
     error: error ? error.message : null,
   };
 
+  const SuccessComponent = () => (
+    <>
+      <HomeMenu categories={["Home", "Calendar"]} selected={selected} setSelected={setSelected} />
+      <TextButton variant="text" label="Send Message" onPress={useInvitations} />
+    </>
+  );
+
   return (
     <SafeAreaView className="flex-1 pt-[35%]">
       <Box
@@ -32,15 +38,13 @@ const Home = () => {
         backgroundColor="pearl"
         flex={1}
       >
-        <HomeMenu categories={["Home", "Calendar"]} selected={selected} setSelected={setSelected} />
         <ResourceView
           resourceState={groupsResource}
           loadingComponent={<Spinner />}
           errorComponent={<ErrorDisplay refresh={refetch} />}
           emptyComponent={<EmptyHomePage />}
-          successComponent={<Text>Home Feed Here</Text>}
+          successComponent={<SuccessComponent />}
         />
-        <TextButton variant="text" label="Send Message" onPress={useInvitations} />
       </Box>
     </SafeAreaView>
   );

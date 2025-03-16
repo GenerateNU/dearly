@@ -84,7 +84,10 @@ export const useUserStore = create<UserState>()(
 
       loginWithBiometrics: async () => {
         const biomentricsImpl = async () => {
-          set({ isPending: true });
+          set({
+            isPending: true,
+            group: null,
+          });
           const session: Session = await authService.loginWithBiometrics();
           const user = await getUser(session.user.id);
           set({
@@ -108,7 +111,10 @@ export const useUserStore = create<UserState>()(
 
       login: async ({ email, password }: { email: string; password: string }) => {
         const loginImpl = async () => {
-          set({ isPending: true });
+          set({
+            isPending: true,
+            group: null,
+          });
           const session: Session = await authService.login({ email, password });
           const user = await getUser(session.user.id);
           set({
@@ -117,6 +123,7 @@ export const useUserStore = create<UserState>()(
             mode: user.mode as Mode,
             isPending: false,
             completeOnboarding: true,
+            group: null,
           });
           await authService.storeLocalSessionToDevice(email, password);
         };
@@ -129,7 +136,10 @@ export const useUserStore = create<UserState>()(
 
       register: async (data: OnboardingUserInfo) => {
         const registerImpl = async () => {
-          set({ isPending: true });
+          set({
+            isPending: true,
+            group: null,
+          });
           const session: Session = await authService.signUp({
             email: data.email,
             password: data.password,
@@ -217,6 +227,8 @@ export const useUserStore = create<UserState>()(
             mode: Mode.BASIC,
             error: null,
             completeOnboarding: false,
+            email: null,
+            group: null,
           });
         };
         const errorImpl = async (err: unknown) => {

@@ -56,6 +56,9 @@ const Layout = () => {
                 </Box>
               );
             },
+            headerStyle: {
+              height: 100,
+            },
             headerRight: () => (
               <Box paddingRight="m">
                 <Icon onPress={() => router.push("/(app)/notification")} name="bell-outline" />
@@ -108,6 +111,9 @@ const Layout = () => {
                   />
                 </Box>
               );
+            },
+            headerStyle: {
+              height: 100,
             },
             headerLeft: () => (
               <Box paddingLeft="m">
