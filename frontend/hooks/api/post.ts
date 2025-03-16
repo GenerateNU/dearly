@@ -1,6 +1,8 @@
 import { CreatePostPayload, Post } from "@/types/post";
-import { useMutationBase } from "./base";
+import { useMutationBase, useQueryPagination, useQueryPaginationWithID } from "./base";
 import { createPost } from "@/api/post";
+import { getGroupFeed } from "@/api/group";
+import { useUserStore } from "@/auth/store";
 
 /**
  * Hook to create a new post
@@ -12,4 +14,9 @@ export const useCreatePost = (groupId: string) => {
     (payload) => createPost(groupId, payload),
     ["groups", groupId],
   );
+};
+
+export const useGroupFeed = (options: any = {}) => {
+  const { group } = useUserStore();
+  return useQueryPaginationWithID<Post>(["users", "feed"], group.id, getGroupFeed, options, 10);
 };

@@ -7,10 +7,15 @@ import Spinner from "@/design-system/components/shared/spinner";
 import { useInvitations } from "@/hooks/api/invite";
 import { TextButton } from "@/design-system/components/shared/buttons/text-button";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useState } from "react";
+import HomeMenu from "@/design-system/components/home/home-menu";
+import Feed from "../home/feed";
+import Calendar from "../home/calendar";
 
 const Home = () => {
   const { data, isLoading, error, refetch } = useUserGroups();
   const groups = data?.pages.flatMap((page) => page) || [];
+  const [selectedView, setSelectedView] = useState<string>("Feed");
 
   const groupsResource = {
     data: groups,
@@ -19,15 +24,21 @@ const Home = () => {
   };
 
   const SuccessComponent = () => (
-    <>
-      <TextButton variant="text" label="Send Message" onPress={useInvitations} />
-    </>
+    <Box flexDirection="column" gap="m">
+      <HomeMenu
+        categories={["Feed", "Calendar"]}
+        selected={selectedView}
+        setSelected={setSelectedView}
+      />
+      {selectedView == "Feed" ? <Feed /> : <Calendar />}
+    </Box>
   );
 
   return (
     <SafeAreaView className="flex-1 pt-[35%]">
       <Box
-        padding="m"
+        paddingHorizontal="m"
+        paddingTop="m"
         gap="xl"
         alignItems="center"
         justifyContent="flex-start"
