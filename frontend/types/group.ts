@@ -2,10 +2,15 @@ import { components, paths } from "@/gen/openapi";
 
 export type Group = components["schemas"]["Group"];
 
+export type Member = components["schemas"]["Member"];
+
 export enum GroupAction {
   JOIN = "Join Group",
   CREATE = "Create Group",
 }
+
+export type NotificationConfigPayload =
+  paths["/api/v1/groups/{id}/members/notifications"]["patch"]["requestBody"]["content"]["application/json"];
 
 export type CreateGroupPayload =
   paths["/api/v1/groups"]["post"]["requestBody"]["content"]["application/json"];

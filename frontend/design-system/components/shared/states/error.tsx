@@ -7,17 +7,19 @@ interface ErrorDisplayProps {
   title?: string;
   description?: string;
   refresh?: () => void;
+  isBottomSheet?: boolean;
 }
 
 const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   title = "Something went wrong",
   description = "Oops! Something went a bit sideways, but our amazing engineers are on it. Please give it a moment and try refreshing!",
   refresh,
+  isBottomSheet,
 }) => {
   return (
     <Box flex={1} width="100%" justifyContent="center">
       <Box gap="m" marginBottom="m">
-        <Logo width={150} height={150} />
+        {!isBottomSheet && <Logo width={150} height={150} />}
         <Text variant="bodyLargeBold">{title}</Text>
         <Text variant="caption">{description}</Text>
       </Box>

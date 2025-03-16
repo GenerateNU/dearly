@@ -1,4 +1,4 @@
-import { GroupMembers, MemberPosts } from "@/types/group";
+import { GroupMembers, Member, MemberPosts, NotificationConfigPayload } from "@/types/group";
 import fetchClient from "./client";
 import { authWrapper, getHeaders } from "@/utilities/auth-token";
 
@@ -15,6 +15,21 @@ export const removeMember = async (groupId: string, userId: string): Promise<voi
     });
   };
   return authWrapper<void>()(req);
+};
+
+export const getMember = async (groupId: string): Promise<Member> => {
+  const req = async (token: string): Promise<Member> => {
+    const { data } = await fetchClient.GET("/api/v1/groups/{id}/members/info", {
+      headers: getHeaders(token),
+      params: {
+        path: {
+          id: groupId,
+        },
+      },
+    });
+    return data!;
+  };
+  return authWrapper<Member>()(req);
 };
 
 export const getAllMembers = async (
@@ -40,18 +55,23 @@ export const getAllMembers = async (
   return authWrapper<GroupMembers>()(req);
 };
 
-export const toggleNotification = async (id: string): Promise<void> => {
-  const req = async (token: string): Promise<void> => {
-    await fetchClient.PATCH("/api/v1/groups/{id}/members/notifications", {
+export const configNotification = async (
+  id: string,
+  body: NotificationConfigPayload,
+): Promise<Member> => {
+  const req = async (token: string): Promise<Member> => {
+    const { data } = await fetchClient.PATCH("/api/v1/groups/{id}/members/notifications", {
       headers: getHeaders(token),
       params: {
         path: {
           id,
         },
       },
+      body,
     });
+    return data!;
   };
-  return authWrapper<void>()(req);
+  return authWrapper<Member>()(req);
 };
 
 export const getMemberPosts = async (

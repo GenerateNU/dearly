@@ -7,6 +7,7 @@ const Layout = () => {
       <Stack.Screen name="group" options={{ headerShown: false }} />
       <Stack.Screen name="notification" options={{ headerShown: false }} />
       <Stack.Screen name="post-creation" options={{ headerShown: false, gestureEnabled: false }} />
+      <Stack.Screen name="logout" options={{ headerShown: false }} />
     </Stack>
   );
 };

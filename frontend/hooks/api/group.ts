@@ -14,7 +14,7 @@ export interface CreateGroupPayload {
  * @returns Mutation object for creating a group
  */
 export const useCreateGroup = () => {
-  return useMutationBase<CreateGroupPayload, Group>(createGroup, ["groups"]);
+  return useMutationBase<CreateGroupPayload, Group>(createGroup, ["users", "groups"]);
 };
 
 /**

@@ -10,6 +10,6 @@ import { createPost } from "@/api/post";
 export const useCreatePost = (groupId: string) => {
   return useMutationBase<CreatePostPayload, Post>(
     (payload) => createPost(groupId, payload),
-    ["posts"],
+    ["groups", groupId],
   );
 };

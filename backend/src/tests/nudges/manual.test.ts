@@ -174,10 +174,11 @@ describe("POST /groups/:id/nudges/manual", () => {
         headers: {
           Authorization: `Bearer ${generateJWTFromID(USER_BOB_ID)}`,
         },
+        requestBody: {
+          nudgeNotificationEnabled: false,
+        },
       })
-    )
-      .assertStatusCode(Status.OK)
-      .assertMessage("Successfully turn off notification for group");
+    ).assertStatusCode(Status.OK);
 
     // group manager should be able to nudge without problems since we will
     // simply ignore Bob because he has notification turned off

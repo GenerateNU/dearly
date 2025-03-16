@@ -14,6 +14,7 @@ export const memberRoutes = (db: PostgresJsDatabase, mediaService: MediaService)
 
   member.post("/:userId", (ctx) => memberController.addMember(ctx));
   member.delete("/:userId", (ctx) => memberController.deleteMember(ctx));
+  member.get("/info", (ctx) => memberController.getMember(ctx));
   member.get("/", (ctx) => memberController.getMembers(ctx));
   member.get("/:userId/posts", (ctx) => memberController.getMemberPosts(ctx));
   member.patch("/notifications", (ctx) => memberController.toggleNotification(ctx));

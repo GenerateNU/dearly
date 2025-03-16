@@ -38,7 +38,7 @@ const ResetPasswordForm = () => {
 
   const { resetPassword, isPending, error: authError } = useUserStore();
   const [isPasswordConfirmationTouched, setIsPasswordConfirmationTouched] = useState(false);
-  const [linkError, setLinkError] = useState<String | null>(null);
+  const [linkError, setLinkError] = useState<string | null>(null);
   const [tokens, setTokens] = useState<TokenPayload>();
 
   useEffect(() => {

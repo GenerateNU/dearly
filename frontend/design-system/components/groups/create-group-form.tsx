@@ -8,6 +8,7 @@ import { Text } from "@/design-system/base/text";
 import { useCreateGroup } from "@/hooks/api/group";
 import BackNextButtons from "../shared/buttons/back-next-buttons";
 import Input from "../shared/controls/input";
+import { useUserStore } from "@/auth/store";
 
 interface CreateGroupProps {
   nextPageNavigate: string;
@@ -21,6 +22,7 @@ type GroupFormData = z.infer<typeof GROUP_SCHEMA>;
 
 const CreateGroupForm: React.FC<CreateGroupProps> = ({ nextPageNavigate }) => {
   const { mutateAsync, isPending, isError, error } = useCreateGroup();
+  const { setSelectedGroup } = useUserStore();
 
   const {
     control,
@@ -38,6 +40,7 @@ const CreateGroupForm: React.FC<CreateGroupProps> = ({ nextPageNavigate }) => {
         name: data.name,
       });
       if (!isError && !error) {
+        setSelectedGroup(newGroup);
         router.push({
           pathname: nextPageNavigate as RelativePathString,
           params: { id: newGroup.id, name: newGroup.name },
@@ -72,7 +75,6 @@ const CreateGroupForm: React.FC<CreateGroupProps> = ({ nextPageNavigate }) => {
             />
           )}
         />
-
         {isError && (
           <Text variant="caption" color="error">
             {error.message}

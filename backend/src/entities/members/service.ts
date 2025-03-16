@@ -1,4 +1,5 @@
 import { AddMemberPayload, Member } from "../../types/api/internal/members";
+import { NotificationConfigPayload } from "../../types/api/internal/notification";
 import { PostWithMediaURL } from "../../types/api/internal/posts";
 import { Pagination, SearchedUser } from "../../types/api/internal/users";
 import { IDPayload } from "../../types/id";
@@ -9,9 +10,10 @@ import { MemberTransaction } from "./transaction";
 
 export interface MemberService {
   addMember(payload: AddMemberPayload): Promise<Member>;
+  getMember(payload: IDPayload): Promise<Member>;
   deleteMember(clientId: string, userId: string, groupId: string): Promise<void>;
   getMembers(groupId: string, payload: Pagination): Promise<SearchedUser[]>;
-  toggleNotification(payload: IDPayload): Promise<boolean>;
+  toggleNotification(payload: NotificationConfigPayload): Promise<Member>;
   getMemberPosts(payload: Pagination, viewer: string, groupId: string): Promise<PostWithMediaURL[]>;
 }
 
@@ -22,6 +24,17 @@ export class MemberServiceImpl implements MemberService {
   constructor(memberTransaction: MemberTransaction, mediaService: MediaService) {
     this.memberTransaction = memberTransaction;
     this.mediaService = mediaService;
+  }
+
+  async getMember(payload: IDPayload): Promise<Member> {
+    const getMemberImpl = async () => {
+      const member = await this.memberTransaction.getMember(payload);
+      if (!member) {
+        throw new NotFoundError("Group");
+      }
+      return member;
+    };
+    return handleServiceError(getMemberImpl)();
   }
 
   async addMember(payload: AddMemberPayload): Promise<Member> {
@@ -69,7 +82,7 @@ export class MemberServiceImpl implements MemberService {
     return handleServiceError(getMemberPostsImpl)();
   }
 
-  async toggleNotification(payload: IDPayload): Promise<boolean> {
+  async toggleNotification(payload: NotificationConfigPayload): Promise<Member> {
     const toggleNotificationImpl = async () => {
       return await this.memberTransaction.toggleNotification(payload);
     };

@@ -15,6 +15,7 @@ import { OnboardingUserInfo } from "@/contexts/onboarding";
 import { uploadUserMedia } from "@/api/media";
 import { getPhotoBlobs } from "@/utilities/media";
 import { ResetPasswordPayload } from "@/types/auth";
+import { queryClient } from "./client";
 
 interface UserState {
   isAuthenticated: boolean;
@@ -33,7 +34,7 @@ interface UserState {
   forgotPassword: (email?: string) => Promise<void>;
   resetPassword: (payload: ResetPasswordPayload) => Promise<void>;
   setMode: (mode: Mode) => void;
-  setSelectedGroup: (group: Group) => void;
+  setSelectedGroup: (group: Group | null) => void;
   setInviteToken: (inviteToken: string) => void;
   loginWithBiometrics: () => Promise<void>;
   clearError: () => void;
@@ -74,7 +75,7 @@ export const useUserStore = create<UserState>()(
         set({ completeOnboarding: true });
       },
 
-      setSelectedGroup: (group: Group) => {
+      setSelectedGroup: (group: Group | null) => {
         set({ group });
       },
 
@@ -117,6 +118,7 @@ export const useUserStore = create<UserState>()(
             mode: user.mode as Mode,
             isPending: false,
             completeOnboarding: true,
+            group: null,
           });
           await authService.storeLocalSessionToDevice(email, password);
         };
@@ -209,6 +211,7 @@ export const useUserStore = create<UserState>()(
             await unregisterDeviceToken(expoToken);
             await AsyncStorage.removeItem(NOTIFICATION_TOKEN_KEY);
           }
+          await queryClient.clear();
           await authService.logout();
           set({
             isAuthenticated: false,
@@ -217,6 +220,8 @@ export const useUserStore = create<UserState>()(
             mode: Mode.BASIC,
             error: null,
             completeOnboarding: false,
+            email: null,
+            group: null,
           });
         };
         const errorImpl = async (err: unknown) => {

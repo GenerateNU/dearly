@@ -1,10 +1,26 @@
 import { Box } from "@/design-system/base/box";
+import SwitchGroupButton from "@/design-system/components/shared/buttons/select-group";
+import Setting from "@/design-system/components/shared/buttons/setting";
 import { Icon } from "@/design-system/components/shared/icons/icon";
+import SettingPopup from "@/design-system/components/shared/settings/setting-popup";
+import SwitchGroupBottomSheet from "@/design-system/components/shared/switch-group/switch-group-sheet";
 import { useIsBasicMode } from "@/hooks/component/mode";
+import BottomSheet from "@gorhom/bottom-sheet";
 import { router, Tabs } from "expo-router";
+import { useRef } from "react";
 
 const Layout = () => {
   const hasLabel = useIsBasicMode();
+  const switchGroupRef = useRef<BottomSheet>(null);
+  const settingRef = useRef<BottomSheet>(null);
+
+  const onSwitchGroup = () => {
+    switchGroupRef.current?.snapToIndex(0);
+  };
+
+  const onSettingPressed = () => {
+    settingRef.current?.snapToIndex(0);
+  };
 
   return (
     <>
@@ -40,9 +56,17 @@ const Layout = () => {
                 </Box>
               );
             },
+            headerStyle: {
+              height: 100,
+            },
             headerRight: () => (
               <Box paddingRight="m">
                 <Icon onPress={() => router.push("/(app)/notification")} name="bell-outline" />
+              </Box>
+            ),
+            headerLeft: () => (
+              <Box paddingLeft="m">
+                <SwitchGroupButton onPress={onSwitchGroup} />
               </Box>
             ),
           }}
@@ -72,8 +96,8 @@ const Layout = () => {
         <Tabs.Screen
           name="profile"
           options={{
-            title: "Profile",
-            headerShown: false,
+            title: "",
+            headerShown: true,
             headerTransparent: true,
             tabBarIcon: ({ focused }) => {
               return (
@@ -88,9 +112,24 @@ const Layout = () => {
                 </Box>
               );
             },
+            headerStyle: {
+              height: 100,
+            },
+            headerLeft: () => (
+              <Box paddingLeft="m">
+                <SwitchGroupButton onPress={onSwitchGroup} />
+              </Box>
+            ),
+            headerRight: () => (
+              <Box paddingRight="m">
+                <Setting onPress={onSettingPressed} />
+              </Box>
+            ),
           }}
         />
       </Tabs>
+      <SwitchGroupBottomSheet ref={switchGroupRef} />
+      <SettingPopup ref={settingRef} />
     </>
   );
 };
