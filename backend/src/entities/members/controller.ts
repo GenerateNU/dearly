@@ -6,6 +6,7 @@ import { Status } from "../../constants/http";
 import {
   ADD_MEMBER,
   DEL_MEMBER,
+  MEMBER,
   MEMBER_POSTS,
   MEMBERS_API,
   NOTIFICATION,
@@ -16,7 +17,7 @@ import { notificationValidate } from "./validator";
 
 export interface MemberController {
   addMember(ctx: Context): Promise<ADD_MEMBER>;
-  getMember(ctx: Context): Promise<Response>;
+  getMember(ctx: Context): Promise<MEMBER>;
   deleteMember(ctx: Context): Promise<DEL_MEMBER>;
   getMembers(ctx: Context): Promise<MEMBERS_API>;
   getMemberPosts(ctx: Context): Promise<MEMBER_POSTS>;
@@ -48,7 +49,7 @@ export class MemberControllerImpl implements MemberController {
     return await handleAppError(addMemberImp)(ctx);
   }
 
-  async getMember(ctx: Context): Promise<Response> {
+  async getMember(ctx: Context): Promise<ADD_MEMBER> {
     const getMemberImp = async () => {
       const userId = parseUUID(ctx.get("userId"));
       const groupId = parseUUID(ctx.req.param("id"));

@@ -7,6 +7,11 @@ export type ADD_MEMBER = TypedResponse<
   | API_ERROR
 >;
 
+export type MEMBER = TypedResponse<
+  | paths["/api/v1/groups/{id}/members/info"]["get"]["responses"]["200"]["content"]["application/json"]
+  | API_ERROR
+>;
+
 export type DEL_MEMBER = TypedResponse<
   | paths["/api/v1/groups/{id}/members/{userId}"]["delete"]["responses"]["200"]["content"]["application/json"]
   | API_ERROR
