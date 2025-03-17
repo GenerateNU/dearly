@@ -15,6 +15,7 @@ import { useUserStore } from "@/auth/store";
 import SplashScreenAnimation from "./(auth)/components/splash-screen";
 import { OnboardingProvider } from "@/contexts/onboarding";
 import { queryClient } from "@/auth/client";
+import { useLinkingURL } from "expo-linking";
 
 const InitialLayout = () => {
   const { isAuthenticated, clearError, completeOnboarding } = useUserStore();
@@ -28,6 +29,16 @@ const InitialLayout = () => {
     Regular: require("../assets/fonts/proximanova_regular.ttf"),
     Light: require("../assets/fonts/proximanova_light.otf"),
   });
+
+  const deeplink = useLinkingURL();
+  console.log("Deeplink:", deeplink);
+
+  if (deeplink) {
+    const url = new URL(deeplink);
+    const params = new URLSearchParams(url.search);
+    const inviteToken = params.get("token");
+    console.log("Invite Token:", inviteToken);
+  }
 
   useEffect(() => {
     async function prepare() {

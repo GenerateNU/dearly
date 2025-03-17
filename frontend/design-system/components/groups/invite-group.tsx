@@ -21,7 +21,7 @@ const InviteLinkComponent: React.FC<InviteLinkProps> = ({ nextPageNavigate }) =>
   const [inviteLink, setInviteLink] = useState<string | null>(null);
 
   const invite = async () => {
-    const url = Linking.createURL(`/app/tabs?token=${data?.token}`);
+    const url = Linking.createURL(`/(app)/(tabs)?token=${data?.token}`);
     setInviteLink(url);
 
     if (inviteLink) {

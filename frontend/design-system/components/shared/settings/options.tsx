@@ -24,7 +24,7 @@ const GroupOptionContent = () => {
   const isManager = userId === group.managerId;
 
   const invite = async () => {
-    const url = Linking.createURL(`/app/tabs?token=${data?.token}`);
+    const url = Linking.createURL(`/(app)/(tabs)?token=${data?.token}`);
     setInviteLink(url);
 
     if (inviteLink) {
