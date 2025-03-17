@@ -6,8 +6,8 @@ import { ThemeProvider } from "@shopify/restyle";
 import { useEffect, useState } from "react";
 import { getTheme } from "@/design-system/base/theme";
 import { NotificationProvider } from "@/contexts/notification";
-import { useNotificationPermission } from "@/hooks/permission/notification";
-import { useRequestDevicePermission } from "@/hooks/permission/device";
+import { useNotificationPermission } from "@/hooks/app/notification";
+import { useRequestDevicePermission } from "@/hooks/app/device";
 import { useFonts } from "expo-font";
 import { useAccessibility } from "@/hooks/component/accessibility";
 import { UserProvider } from "@/auth/provider";
@@ -15,10 +15,11 @@ import { useUserStore } from "@/auth/store";
 import SplashScreenAnimation from "./(auth)/components/splash-screen";
 import { OnboardingProvider } from "@/contexts/onboarding";
 import { queryClient } from "@/auth/client";
-import { useLinkingURL } from "expo-linking";
+import { useInviteMember } from "@/hooks/app/invite";
 
 const InitialLayout = () => {
-  const { isAuthenticated, clearError, completeOnboarding } = useUserStore();
+  const { isAuthenticated, clearError, completeOnboarding, setInviteToken, setSelectedGroup } =
+    useUserStore();
   const [showSplash, setShowSplash] = useState(true);
   const [isReady, setIsReady] = useState(false);
 
@@ -29,22 +30,6 @@ const InitialLayout = () => {
     Regular: require("../assets/fonts/proximanova_regular.ttf"),
     Light: require("../assets/fonts/proximanova_light.otf"),
   });
-
-  // TODO:
-  // - separate this into a custom hook
-  // - not authenticated: save the token in user stores (clear it afterwards)
-  //   --> only after they are authenticated, retrieve token from user store
-  //       and add them into the group
-  // - authenticated: verify token
-  const deeplink = useLinkingURL();
-  console.log("Deeplink:", deeplink);
-
-  if (deeplink) {
-    const url = new URL(deeplink);
-    const params = new URLSearchParams(url.search);
-    const inviteToken = params.get("token");
-    console.log("Invite Token:", inviteToken);
-  }
 
   useEffect(() => {
     async function prepare() {
@@ -81,6 +66,15 @@ const InitialLayout = () => {
       router.replace("/(auth)");
     }
   }, [isAuthenticated, completeOnboarding, showSplash, isReady]);
+
+  // manage invitation with deeplink
+  const inviteToken = useInviteMember();
+
+  useEffect(() => {
+    if (inviteToken) {
+      setInviteToken(inviteToken);
+    }
+  }, [inviteToken]);
 
   // ask for notification permission
   useNotificationPermission();
