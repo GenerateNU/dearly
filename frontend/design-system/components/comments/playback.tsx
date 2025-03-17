@@ -6,6 +6,7 @@ import { IconButton } from "../ui/icon-button";
 import { formatSeconds } from "@/utilities/time";
 import { audioBarHeights, condenseAudioBarHeights, getDBLevels } from "@/utilities/audio";
 import decode, { decoders } from "audio-decode";
+import { playbackStates } from "@/types/comment";
 
 interface PlaybackPropsWhenLocal {
   local: true; // is the audio message being stored locally or in s3
@@ -24,11 +25,8 @@ interface PlaybackPropsWhenURL {
 type PlaybackProps = PlaybackPropsWhenLocal | PlaybackPropsWhenURL;
 
 export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength, location }) => {
-  const [playingSound, setPlayingSound] = useState<boolean>(false);
+  const [status, setStatus] = useState<playbackStates>({playing:false, pausing:false});
   const [sound, setSound] = useState<Audio.Sound>();
-  const [pausing, setPausing] = useState<boolean>(false);
-  const [recording, setRecording] = useState<Audio.Recording | null>();
-  const [stringLength, setStringLength] = useState<string>("");
   const [length, setLength] = useState<number>(0);
   const [memoLines, setMemoLines] = useState<number[]>([]);
   const numLines = 25;
@@ -40,7 +38,6 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
         setMemoLines(condenseAudioBarHeights(numLines, dbLevels));
         setLength(audioLength);
         setTotalLength(audioLength);
-        console.log(memoLines)
       } else {
         const response = await fetch(location); // initally fetch the mp3 file
         const arrayBuffer = await response.arrayBuffer(); // convert to array buffer
@@ -56,11 +53,6 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
     initializeValues();
   }, []);
 
-  // get length of recording
-  useEffect(() => {
-    setStringLength(formatSeconds(length));
-  }, [length]);
-
   useEffect(() => {
     return sound
       ? () => {
@@ -70,12 +62,11 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
   }, [sound]);
 
   async function playRecording() {
-    if (pausing) {
-      setPausing(false);
-      setPlayingSound(true);
+    if (status.pausing) {
+      setStatus({playing:true, pausing:false})
       await sound?.playAsync();
     } else {
-      setPlayingSound(true);
+      setStatus({...status, playing:true})
       const { sound } = await Audio.Sound.createAsync({ uri: location });
       sound.setOnPlaybackStatusUpdate(onPlayingUpdate);
       sound.setProgressUpdateIntervalAsync(500);
@@ -86,17 +77,16 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
 
   async function pauseRecording() {
     await sound?.pauseAsync();
-    setPlayingSound(false);
-    setPausing(true);
+    setStatus({playing:false, pausing:true})
   }
 
-  const onPlayingUpdate = (status: AVPlaybackStatus) => {
-    if (status.isLoaded) {
-      if (status.positionMillis < status.durationMillis!)
-        setLength((status.durationMillis || 0) / 1000 - status.positionMillis / 1000);
+  const onPlayingUpdate = (statusPlayback: AVPlaybackStatus) => {
+    if (statusPlayback.isLoaded) {
+      if (statusPlayback.positionMillis < statusPlayback.durationMillis!)
+        setLength((statusPlayback.durationMillis || 0) / 1000 - statusPlayback.positionMillis / 1000);
       else {
-        setLength(status.durationMillis! / 1000);
-        setPlayingSound(false);
+        setLength(statusPlayback.durationMillis! / 1000);
+        setStatus({...status, playing:false})
       }
     }
   };
@@ -114,7 +104,7 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
       alignContent="center"
     >
       <Box alignItems="center" justifyContent="center" paddingLeft="s">
-        {playingSound ? (
+        {status.playing ? (
           <IconButton
             variant="smallIconPearlBorder"
             onPress={pauseRecording}
@@ -132,7 +122,7 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
       </Box>
       <Box flexDirection="row" gap="xs" alignItems="center">
         <Box flexDirection="row" gap="xs" alignItems="center">
-          <Text variant="caption">{stringLength}</Text>
+          <Text variant="caption">{formatSeconds(length)}</Text>
         </Box>
         <Box flexDirection="row" gap="xs" alignItems="center">
           {memoLines.map((item, index) => (
