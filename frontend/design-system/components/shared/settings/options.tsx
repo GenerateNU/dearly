@@ -23,6 +23,9 @@ const GroupOptionContent = () => {
 
   const isManager = userId === group.managerId;
 
+  // TODO:
+  // - refactor this into a separate hook since it's the same as that in onboarding
+  // - somehow you have to click twice to get the Share to pop up
   const invite = async () => {
     const url = Linking.createURL(`/(app)/(tabs)?token=${data?.token}`);
     setInviteLink(url);

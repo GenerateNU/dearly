@@ -30,6 +30,12 @@ const InitialLayout = () => {
     Light: require("../assets/fonts/proximanova_light.otf"),
   });
 
+  // TODO:
+  // - separate this into a custom hook
+  // - not authenticated: save the token in user stores (clear it afterwards)
+  //   --> only after they are authenticated, retrieve token from user store
+  //       and add them into the group
+  // - authenticated: verify token
   const deeplink = useLinkingURL();
   console.log("Deeplink:", deeplink);
 

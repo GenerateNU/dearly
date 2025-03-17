@@ -17,6 +17,7 @@ const InviteLinkComponent: React.FC<InviteLinkProps> = ({ nextPageNavigate }) =>
   const { finishOnboarding } = useUserStore();
   const groupId = params.id;
   const groupName = params.name;
+
   const { data, isLoading, isError, error } = useGetInviteToken(groupId! as string);
   const [inviteLink, setInviteLink] = useState<string | null>(null);
 
