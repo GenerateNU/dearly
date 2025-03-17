@@ -16,23 +16,24 @@ interface RecordingProps {
 export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
   const [status, setStatus] = useState<recordingStatus>({recording:false, done:false})
   const [attributes, setAttributes] = useState<recordingAttributes>({recording:null, audioLevels:[], length:0, memoLines:new Array(50).fill(5), uri:""})
-  const [recording, setRecording] = useState<Audio.Recording | null>();
-  const [audioLevels, setAudioLevels] = useState<number[]>([]);
-  const [length, setLength] = useState<number>(0);
-  const [memoLines, setMemoLines] = useState<number[]>(new Array(50).fill(5));
-  const [uri, setURI] = useState<string>("");
   const numLines = 33;
 
   useEffect(() => {
     if (status.recording) {
-      setMemoLines(audioBarHeights(numLines, audioLevels));
+      setAttributes((prevAttributes) => ({
+        ...prevAttributes, 
+        memoLines:audioBarHeights(numLines, attributes.audioLevels)
+      }));
     }
-  }, [audioLevels]);
+  }, [attributes.audioLevels]);
 
   async function startRecording() {
-    setLength(0);
+    setAttributes((prevAttributes) => ({
+      ...prevAttributes, 
+      length: 0, 
+      audioLevels: []
+    }))
     setStatus({...status, done:false})
-    setAudioLevels([]);
     try {
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
@@ -42,32 +43,40 @@ export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
       const { recording } = await Audio.Recording.createAsync(
         Audio.RecordingOptionsPresets.HIGH_QUALITY,
         (status) => {
-          setAudioLevels((prevAudioLevels) => {
-            const curAudio = [...prevAudioLevels];
+          setAttributes((prevAttributes) => {
+            const curAudio = [...prevAttributes.audioLevels];
             if (status.metering !== undefined) {
               curAudio.push(status.metering);
             }
-            return curAudio;
-          });
+            return {...prevAttributes, audioLevels:curAudio}
+          })
           if (status.durationMillis > 0) {
-            setLength(status.durationMillis / 1000);
+            setAttributes((prevAttributes) => ({
+              ...prevAttributes, 
+              length: status.durationMillis / 1000
+            }));
           }
         },
         500,
       );
-      setRecording(recording);
+      setAttributes((prevAttributes) => ({
+        ...prevAttributes, 
+        recording:recording
+      }));
     } catch (err) {}
   }
 
   async function stopRecording() {
     setStatus({recording:false, done:true})
-    await recording?.stopAndUnloadAsync();
+    await attributes.recording?.stopAndUnloadAsync();
     await Audio.setAudioModeAsync({
       allowsRecordingIOS: false,
     });
-    setMemoLines(condenseAudioBarHeights(25, audioLevels));
-    const uri = recording?.getURI();
-    setURI(uri || "");
+    setAttributes((prevAttributes) => ({
+      ...prevAttributes, 
+      memoLines:condenseAudioBarHeights(25, attributes.audioLevels),
+      uri: attributes.recording?.getURI() || ""
+    }));
   }
 
   return (
@@ -78,7 +87,7 @@ export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
         </Box>
       )}
       {status.done ? (
-        <Playback local dbLevels={memoLines} location={uri} audioLength={length} />
+        <Playback local dbLevels={attributes.memoLines} location={attributes.uri} audioLength={attributes.length} />
       ) : (
         <Box
           borderWidth={1}
@@ -94,12 +103,12 @@ export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
         >
           <Box flexDirection="row" gap="xs" alignItems="center">
             <Box flexDirection="row" gap="xs" alignItems="center" marginLeft="s">
-              <Text variant="caption">{formatSeconds(length)}</Text>
+              <Text variant="caption">{formatSeconds(attributes.length)}</Text>
             </Box>
 
             {status.recording && (
               <Box flexDirection="row" gap="xs" alignItems="center">
-                {memoLines.map((item, index) => (
+                {attributes.memoLines.map((item, index) => (
                   <Box
                     key={index}
                     height={item}
@@ -121,7 +130,7 @@ export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
           variant="iconHoney"
           onPress={() => {
             setStatus({recording:false, done:false})
-            setLength(0);
+            setAttributes({...attributes, length:0})
           }}
           icon="send"
         />
