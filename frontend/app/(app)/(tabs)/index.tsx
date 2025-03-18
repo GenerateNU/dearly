@@ -21,7 +21,6 @@ const Home = () => {
 
   const SuccessComponent = () => (
     <>
-      <Recording onClose={()=> console.log("close")} onSend={()=>console.log("send")}/>
       <TextButton variant="text" label="Send Message" onPress={useInvitations} />
     </>
   );
