@@ -118,16 +118,14 @@ const InitialLayout = () => {
 
     if (inviteToken) {
       mutate(inviteToken);
-      setInviteToken("");
-      setDeeplinkToken(undefined);
     }
 
     if (deeplinkToken) {
       mutate(deeplinkToken);
-      setInviteToken("");
-      setDeeplinkToken(undefined);
     }
 
+    setInviteToken("");
+    setDeeplinkToken(undefined);
     return router.replace("/(app)/(tabs)");
   }, [isAuthenticated, completeOnboarding, showSplash, isReady, deeplinkToken]);
 
