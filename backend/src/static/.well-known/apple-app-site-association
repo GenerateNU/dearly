@@ -1,0 +1,17 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "W3PR3X4XD2.com.generate.dearly",
+        "paths": ["/group/*"]
+      }
+    ]
+  },
+  "activitycontinuation": {
+    "apps": ["W3PR3X4XD2.com.generate.dearly"]
+  },
+  "webcredentials": {
+    "apps": ["W3PR3X4XD2.com.generate.dearly"]
+  }
+}

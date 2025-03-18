@@ -52,6 +52,7 @@ import {
   USER_MAI,
   FULL_SNAPPER_POST_EXAMPLE,
   MAI_DEVICE_TOKEN,
+  BOB_MEDIA,
 } from "./test-constants";
 import { CreateGroupPayload } from "../../types/api/internal/groups";
 import { CreateUserPayload } from "../../types/api/internal/users";
@@ -165,6 +166,7 @@ const seedPostAndMedia = async (db: PostgresJsDatabase) => {
   await db.insert(postsTable).values(POST_EXAMPLE);
   await db.insert(postsTable).values(FULL_SNAPPER_POST_EXAMPLE);
   await db.insert(mediaTable).values(MEDIA_MOCK);
+  await db.insert(mediaTable).values(BOB_MEDIA);
 };
 
 const seedComments = async (db: PostgresJsDatabase) => {

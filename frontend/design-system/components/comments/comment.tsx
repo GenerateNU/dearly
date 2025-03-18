@@ -1,9 +1,9 @@
 import { Box } from "@/design-system/base/box";
 import { Comment } from "@/types/post";
-import { Avatar } from "../ui/avatar";
 import { DEFAULT_PROFILE_PHOTO } from "@/constants/photo";
 import { Text } from "@/design-system/base/text";
 import { formatTime } from "@/utilities/time";
+import { Avatar } from "../shared/avatar";
 
 export const CommentCard: React.FC<Required<Comment>> = ({
   id,

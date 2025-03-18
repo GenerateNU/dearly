@@ -10,7 +10,7 @@ import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
-import { MAX_MEDIA_COUNT, MIN_LIMIT, TEXT_MAX_LIMIT } from "../../constants/database";
+import { MAX_MEDIA_COUNT, TEXT_MAX_LIMIT } from "../../constants/database";
 
 describe("POST /groups/:id/posts", () => {
   let app: Hono;
@@ -156,10 +156,6 @@ describe("POST /groups/:id/posts", () => {
     )
       .assertStatusCode(Status.BadRequest)
       .assertError([
-        {
-          message: `Caption must be at least ${MIN_LIMIT} character long`,
-          path: "caption",
-        },
         {
           message: "Invalid enum value. Expected 'VIDEO' | 'PHOTO', received 'AUDIO'",
           path: "media.0.type",

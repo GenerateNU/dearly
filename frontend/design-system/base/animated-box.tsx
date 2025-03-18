@@ -1,21 +1,16 @@
-import { ComponentProps, ReactNode } from "react";
-import { Box } from "@/design-system/base/box";
-import { ViewProps } from "react-native";
-import Animated from "react-native-reanimated";
+import { Animated } from "react-native";
 import {
-  boxRestyleFunctions,
   createRestyleComponent,
-  RestyleFunctionContainer,
+  backgroundColor,
+  layout,
+  border,
+  spacing,
+  opacity,
 } from "@shopify/restyle";
 import { Theme } from "./theme";
+import { AnimationProps } from "@/types/animated";
 
-type BoxProps = ComponentProps<typeof Box>;
-type AnimatedViewProps = Partial<ViewProps> & {
-  children?: ReactNode;
-};
-type Props = BoxProps & AnimatedViewProps;
-
-export const AnimatedBox = createRestyleComponent<BoxProps & Omit<Props, keyof BoxProps>, Theme>(
-  boxRestyleFunctions as RestyleFunctionContainer<BoxProps, Theme>[],
+export const AnimatedBox = createRestyleComponent<AnimationProps, Theme>(
+  [backgroundColor, layout, border, spacing, opacity],
   Animated.View,
 );

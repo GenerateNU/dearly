@@ -6,15 +6,18 @@ import { Status } from "../../constants/http";
 import {
   ADD_MEMBER,
   DEL_MEMBER,
+  MEMBER,
   MEMBER_POSTS,
   MEMBERS_API,
   NOTIFICATION,
 } from "../../types/api/routes/members";
 import { MemberRole } from "../../constants/database";
 import { paginationSchema } from "../../utilities/pagination";
+import { notificationValidate } from "./validator";
 
 export interface MemberController {
   addMember(ctx: Context): Promise<ADD_MEMBER>;
+  getMember(ctx: Context): Promise<MEMBER>;
   deleteMember(ctx: Context): Promise<DEL_MEMBER>;
   getMembers(ctx: Context): Promise<MEMBERS_API>;
   getMemberPosts(ctx: Context): Promise<MEMBER_POSTS>;
@@ -44,6 +47,17 @@ export class MemberControllerImpl implements MemberController {
       return ctx.json(member, Status.Created);
     };
     return await handleAppError(addMemberImp)(ctx);
+  }
+
+  async getMember(ctx: Context): Promise<ADD_MEMBER> {
+    const getMemberImp = async () => {
+      const userId = parseUUID(ctx.get("userId"));
+      const groupId = parseUUID(ctx.req.param("id"));
+
+      const member = await this.memberService.getMember({ id: groupId, userId });
+      return ctx.json(member, Status.OK);
+    };
+    return await handleAppError(getMemberImp)(ctx);
   }
 
   async deleteMember(ctx: Context): Promise<DEL_MEMBER> {
@@ -95,9 +109,14 @@ export class MemberControllerImpl implements MemberController {
     const toggleNotificationImpl = async () => {
       const userId = ctx.get("userId");
       const groupId = parseUUID(ctx.req.param("id"));
-      const notificationOn = await this.memberService.toggleNotification({ userId, id: groupId });
-      const message = notificationOn ? "turn on" : "turn off";
-      return ctx.json({ message: `Successfully ${message} notification for group` }, Status.OK);
+
+      const notificationConfig = notificationValidate.parse(await ctx.req.json());
+      const response = await this.memberService.toggleNotification({
+        id: groupId,
+        userId,
+        ...notificationConfig,
+      });
+      return ctx.json(response, Status.OK);
     };
     return await handleAppError(toggleNotificationImpl)(ctx);
   }

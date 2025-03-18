@@ -1,5 +1,5 @@
-import React from "react";
 import { Stack } from "expo-router";
+import ProgressBarWrapper from "./components/progress-bar";
 
 const Layout = () => {
   return (
@@ -7,8 +7,7 @@ const Layout = () => {
       <Stack.Screen
         name="index"
         options={{
-          headerShown: true,
-          headerTitle: "",
+          headerShown: false,
           headerTransparent: true,
           gestureEnabled: false,
         }}
@@ -17,34 +16,26 @@ const Layout = () => {
         name="register"
         options={{
           headerShown: true,
-          headerTitle: "Register",
           headerTransparent: true,
           gestureEnabled: false,
+          header: () => <ProgressBarWrapper />,
         }}
       />
       <Stack.Screen
         name="login"
         options={{
-          headerShown: true,
-          headerTitle: "Login",
+          headerShown: false,
           headerTransparent: true,
           gestureEnabled: false,
         }}
       />
       <Stack.Screen
-        name="components"
+        name="group"
         options={{
           headerShown: true,
-          headerTitle: "Components Library",
+          headerTransparent: true,
           gestureEnabled: false,
-        }}
-      />
-      <Stack.Screen
-        name="design-system"
-        options={{
-          headerShown: true,
-          headerTitle: "Design System",
-          gestureEnabled: false,
+          header: () => <ProgressBarWrapper />,
         }}
       />
     </Stack>

@@ -88,10 +88,6 @@ describe("POST /users", () => {
         message: "Validation failed",
         errors: [
           {
-            path: "name",
-            message: `String must contain at least ${MIN_LIMIT} character(s)`,
-          },
-          {
             path: "username",
             message: `String must contain at least ${MIN_LIMIT} character(s)`,
           },

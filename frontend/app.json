@@ -15,7 +15,8 @@
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Dearly needs access to your location to provide better service.",
         "NSLocationAlwaysUsageDescription": "Dearly needs access to your location even when the app is in the background to provide accurate tracking.",
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "associatedDomains" : ["applinks:dearly-35496165508.us-east1.run.app"]
       }
     },
     "android": {
@@ -37,6 +38,12 @@
     "plugins": [
       "expo-router",
       "expo-localization",
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow Dearly to use Face ID."
+        }
+      ],
       [
         "expo-splash-screen",
         {
@@ -69,7 +76,13 @@
           "isAndroidBackgroundLocationEnabled": true
         }
       ],
-      "expo-secure-store"
+      [
+        "expo-secure-store",
+        {
+          "configureAndroidBackup": true,
+          "faceIDPermission": "Allow Dearly to access your Face ID biometric data."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

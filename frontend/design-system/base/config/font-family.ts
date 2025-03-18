@@ -24,9 +24,17 @@ export const getFontConfig = (scaleRatio: number) => {
       fontSize: 14 * scaleRatio,
       fontFamily: "Regular",
     },
+    bodyBold: {
+      fontSize: 14 * scaleRatio,
+      fontFamily: "Bold",
+    },
     caption: {
       fontSize: 11 * scaleRatio,
       fontFamily: "Regular",
+    },
+    captionBold: {
+      fontSize: 11 * scaleRatio,
+      fontFamily: "Bold",
     },
     defaults: {
       fontSize: 14 * scaleRatio,
@@ -40,4 +48,4 @@ export const getFontConfig = (scaleRatio: number) => {
   return config;
 };
 
-export type FontVariant = keyof ReturnType<typeof getFontConfig> | unknown;
+export type FontVariant = Exclude<keyof ReturnType<typeof getFontConfig>, "defaults">;

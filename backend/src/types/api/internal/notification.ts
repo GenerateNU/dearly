@@ -3,6 +3,7 @@ import { notificationsTable } from "../../../entities/schema";
 import { Post } from "./posts";
 import { Like } from "./like";
 import { Comment } from "./comments";
+import { IDPayload } from "../../id";
 
 export const notificationValidate = createSelectSchema(notificationsTable);
 
@@ -46,5 +47,15 @@ export type SendNotificationPayload = {
 export type NotificationPlain = typeof notificationsTable.$inferSelect;
 
 export type NotificationWithMedia = typeof notificationsTable.$inferSelect & {
-  mediaURL: string | null;
+  mediaURL: string;
+  profilePhoto?: string;
 };
+
+export type NotificationConfig = {
+  likeNotificationEnabled?: boolean;
+  commentNotificationEnabled?: boolean;
+  nudgeNotificationEnabled?: boolean;
+  postNotificationEnabled?: boolean;
+};
+
+export type NotificationConfigPayload = IDPayload & NotificationConfig;

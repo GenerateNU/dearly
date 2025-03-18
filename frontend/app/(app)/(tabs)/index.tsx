@@ -1,13 +1,48 @@
-import { useAuth } from "@/auth/provider";
 import { Box } from "@/design-system/base/box";
-import { TextButton } from "@/design-system/components/ui/text-button";
+import { EmptyHomePage } from "@/design-system/components/home/empty";
+import { useUserGroups } from "@/hooks/api/user";
+import ResourceView from "@/design-system/components/utilities/resource-view";
+import ErrorDisplay from "@/design-system/components/shared/states/error";
+import Spinner from "@/design-system/components/shared/spinner";
+import { useInvitations } from "@/hooks/api/invite";
+import { TextButton } from "@/design-system/components/shared/buttons/text-button";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Home = () => {
-  const { logout } = useAuth();
+  const { data, isLoading, error, refetch } = useUserGroups();
+  const groups = data?.pages.flatMap((page) => page) || [];
+
+  const groupsResource = {
+    data: groups,
+    loading: isLoading,
+    error: error ? error.message : null,
+  };
+
+  const SuccessComponent = () => (
+    <>
+      <TextButton variant="text" label="Send Message" onPress={useInvitations} />
+    </>
+  );
+
   return (
-    <Box gap="xl" alignItems="center" justifyContent="center" backgroundColor="pearl" flex={1}>
-      <TextButton variant="honey" label="Logout" onPress={logout} />
-    </Box>
+    <SafeAreaView className="flex-1 pt-[35%]">
+      <Box
+        padding="m"
+        gap="xl"
+        alignItems="center"
+        justifyContent="flex-start"
+        backgroundColor="pearl"
+        flex={1}
+      >
+        <ResourceView
+          resourceState={groupsResource}
+          loadingComponent={<Spinner />}
+          errorComponent={<ErrorDisplay refresh={refetch} />}
+          emptyComponent={<EmptyHomePage />}
+          successComponent={<SuccessComponent />}
+        />
+      </Box>
+    </SafeAreaView>
   );
 };
 

@@ -29,32 +29,31 @@ export const useQueryBase = <T>(
 };
 
 /**
- * Custom hook for paginated queries with any set of parameters.
+ * Custom hook for paginated queries.
  *
  * @param key - The query key used for caching and tracking.
  * @param queryFunction - The query function that fetches paginated data.
- *   - It can take any number of parameters (including `id`, `page`, `limit`, etc.).
- * @param params - An object containing all the parameters (like `id`, `page`, `limit`, or others) for the query function.
- * @param limit - The number of items to fetch per page (defaults to 10).
+ * @param options - Additional options for the query.
+ * @param limit - The number of items to fetch per page.
  * @returns The result from the useInfiniteQuery hook.
  */
-export const useQueryPagination = <T, P>(
+export const useQueryPagination = <T>(
   key: string[],
-  queryFunction: (params: P) => Promise<T[]>,
-  params: P,
+  queryFunction: (limit: number, page: number) => Promise<T>,
+  options: any = {},
   limit: number = 10,
 ) => {
-  return useInfiniteQuery<T[], Error>({
+  return useInfiniteQuery<T, Error>({
     queryKey: key,
     queryFn: async ({ pageParam = 1 }) => {
-      const queryParams = { ...params, page: pageParam, limit };
-      const response = await queryFunction(queryParams);
-      return response;
+      return queryFunction(limit, pageParam as number);
     },
     initialPageParam: 1,
+    keepPreviousData: true,
     getNextPageParam: (lastPage, allPages) => {
-      return lastPage?.length ? allPages.length + 1 : undefined;
+      return Array.isArray(lastPage) && lastPage.length > 0 ? allPages.length + 1 : undefined;
     },
+    ...options,
   });
 };
 

@@ -1,13 +1,26 @@
-import { useAuth } from "@/auth/provider";
 import { Box } from "@/design-system/base/box";
-import { Icon } from "@/design-system/components/ui/icon";
-import { Mode } from "@/types/mode";
-import { Tabs } from "expo-router";
-import React from "react";
+import SwitchGroupButton from "@/design-system/components/shared/buttons/select-group";
+import Setting from "@/design-system/components/shared/buttons/setting";
+import { Icon } from "@/design-system/components/shared/icons/icon";
+import SettingPopup from "@/design-system/components/shared/settings/setting-popup";
+import SwitchGroupBottomSheet from "@/design-system/components/shared/switch-group/switch-group-sheet";
+import { useIsBasicMode } from "@/hooks/component/mode";
+import BottomSheet from "@gorhom/bottom-sheet";
+import { router, Tabs } from "expo-router";
+import { useRef } from "react";
 
 const Layout = () => {
-  const { mode } = useAuth();
-  const hasLabel = mode === Mode.BASIC;
+  const hasLabel = useIsBasicMode();
+  const switchGroupRef = useRef<BottomSheet>(null);
+  const settingRef = useRef<BottomSheet>(null);
+
+  const onSwitchGroup = () => {
+    switchGroupRef.current?.snapToIndex(0);
+  };
+
+  const onSettingPressed = () => {
+    settingRef.current?.snapToIndex(0);
+  };
 
   return (
     <>
@@ -27,8 +40,8 @@ const Layout = () => {
         <Tabs.Screen
           name="index"
           options={{
-            title: "Home",
-            headerShown: false,
+            headerShown: true,
+            headerTitle: "",
             headerTransparent: true,
             tabBarIcon: ({ focused }) => {
               return (
@@ -43,6 +56,19 @@ const Layout = () => {
                 </Box>
               );
             },
+            headerStyle: {
+              height: 100,
+            },
+            headerRight: () => (
+              <Box paddingRight="m">
+                <Icon onPress={() => router.push("/(app)/notification")} name="bell-outline" />
+              </Box>
+            ),
+            headerLeft: () => (
+              <Box paddingLeft="m">
+                <SwitchGroupButton onPress={onSwitchGroup} />
+              </Box>
+            ),
           }}
         />
         <Tabs.Screen
@@ -64,13 +90,14 @@ const Layout = () => {
                 </Box>
               );
             },
+            href: "/(app)/post-creation",
           }}
         />
         <Tabs.Screen
           name="profile"
           options={{
-            title: "Profile",
-            headerShown: false,
+            title: "",
+            headerShown: true,
             headerTransparent: true,
             tabBarIcon: ({ focused }) => {
               return (
@@ -85,9 +112,24 @@ const Layout = () => {
                 </Box>
               );
             },
+            headerStyle: {
+              height: 100,
+            },
+            headerLeft: () => (
+              <Box paddingLeft="m">
+                <SwitchGroupButton onPress={onSwitchGroup} />
+              </Box>
+            ),
+            headerRight: () => (
+              <Box paddingRight="m">
+                <Setting onPress={onSettingPressed} />
+              </Box>
+            ),
           }}
         />
       </Tabs>
+      <SwitchGroupBottomSheet ref={switchGroupRef} />
+      <SettingPopup ref={settingRef} />
     </>
   );
 };

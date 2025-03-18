@@ -1,11 +1,12 @@
 import {
-  ANOTHER_GROUP_ID,
   DEARLY_GROUP_ID,
+  GENERATE_GROUP_ID,
   INVALID_ID_ARRAY,
   MOCK_MEDIA_WITH_URL,
   POST_MOCK,
   USER_ALICE_ID,
   USER_ANA_ID,
+  USER_BILL_ID,
   USER_BOB_ID,
 } from "./../helpers/test-constants";
 import { Hono } from "hono";
@@ -107,10 +108,10 @@ describe("GET /groups/:id/feed", () => {
       await testBuilder.request({
         app,
         type: HTTPRequest.GET,
-        route: `/api/v1/groups/${ANOTHER_GROUP_ID}/feed`,
+        route: `/api/v1/groups/${GENERATE_GROUP_ID}/feed`,
         autoAuthorized: false,
         headers: {
-          Authorization: `Bearer ${generateJWTFromID(USER_ALICE_ID)}`,
+          Authorization: `Bearer ${generateJWTFromID(USER_BILL_ID)}`,
         },
       })
     )

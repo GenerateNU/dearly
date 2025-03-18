@@ -10,19 +10,25 @@ import {
   notificationsTable,
 } from "../schema";
 import { eq, and, sql, desc, or } from "drizzle-orm";
-import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
+import {
+  ForbiddenError,
+  InternalServerError,
+  NotFoundError,
+} from "../../utilities/errors/app-error";
 import { AddMemberPayload, Member } from "../../types/api/internal/members";
-import { IDPayload } from "../../types/id";
 import { Pagination, SearchedUser } from "../../types/api/internal/users";
 import { PostWithMedia } from "../../types/api/internal/posts";
 import { getPostMetadata } from "../../utilities/query";
 import { Transaction } from "../../types/api/internal/transaction";
+import { NotificationConfigPayload } from "../../types/api/internal/notification";
+import { IDPayload } from "../../types/id";
 
 export interface MemberTransaction {
   insertMember(payload: AddMemberPayload): Promise<Member | null>;
+  getMember(payload: IDPayload): Promise<Member | null>;
   deleteMember(clientId: string, userId: string, groupId: string): Promise<Member | null>;
   getMembers(groupId: string, payload: Pagination): Promise<SearchedUser[] | null>;
-  toggleNotification(payload: IDPayload): Promise<boolean>;
+  toggleNotification(payload: NotificationConfigPayload): Promise<Member>;
   getMemberPosts(payload: Pagination, viewer: string, groupId: string): Promise<PostWithMedia[]>;
 }
 
@@ -45,6 +51,15 @@ export class MemberTransactionImpl implements MemberTransaction {
       .limit(1);
 
     return memberAdded ?? null;
+  }
+
+  async getMember({ id: groupId, userId }: IDPayload): Promise<Member | null> {
+    const [member] = await this.db
+      .select()
+      .from(membersTable)
+      .where(and(eq(membersTable.groupId, groupId), eq(membersTable.userId, userId)));
+
+    return member ?? null;
   }
 
   async deleteMember(clientId: string, userId: string, groupId: string): Promise<Member | null> {
@@ -152,20 +167,33 @@ export class MemberTransactionImpl implements MemberTransaction {
     return paginatedMembers;
   }
 
-  async toggleNotification({ id, userId }: IDPayload): Promise<boolean> {
+  async toggleNotification({
+    id,
+    userId,
+    likeNotificationEnabled,
+    commentNotificationEnabled,
+    postNotificationEnabled,
+    nudgeNotificationEnabled,
+  }: NotificationConfigPayload): Promise<Member> {
     return await this.db.transaction(async (tx) => {
-      const member = await this.validateGroup(id, userId, tx);
+      await this.validateGroup(id, userId, tx);
 
-      // toggle notification setting
-      const newNotificationState = !member.notificationsEnabled;
-
-      // update the database within the transaction
-      await tx
+      const [member] = await tx
         .update(membersTable)
-        .set({ notificationsEnabled: newNotificationState })
-        .where(and(eq(membersTable.groupId, id), eq(membersTable.userId, userId)));
+        .set({
+          likeNotificationEnabled,
+          commentNotificationEnabled,
+          postNotificationEnabled,
+          nudgeNotificationEnabled,
+        })
+        .where(and(eq(membersTable.groupId, id), eq(membersTable.userId, userId)))
+        .returning();
 
-      return newNotificationState;
+      if (!member) {
+        throw new InternalServerError("Failed to update user notification");
+      }
+
+      return member;
     });
   }
 

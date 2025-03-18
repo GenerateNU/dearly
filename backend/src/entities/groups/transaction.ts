@@ -165,7 +165,10 @@ export class GroupTransactionImpl implements GroupTransaction {
         managerId: groupsTable.managerId,
         description: groupsTable.description,
         name: groupsTable.name,
-        notificationEnabled: membersTable.notificationsEnabled,
+        likeNotificationEnabled: membersTable.likeNotificationEnabled,
+        commentNotificationEnabled: membersTable.commentNotificationEnabled,
+        postNotificationEnabled: membersTable.postNotificationEnabled,
+        nudgeNotificationEnabled: membersTable.nudgeNotificationEnabled,
       })
       .from(groupsTable)
       .innerJoin(
@@ -177,7 +180,10 @@ export class GroupTransactionImpl implements GroupTransaction {
         groupsTable.managerId,
         groupsTable.description,
         groupsTable.name,
-        membersTable.notificationsEnabled,
+        membersTable.likeNotificationEnabled,
+        membersTable.commentNotificationEnabled,
+        membersTable.postNotificationEnabled,
+        membersTable.nudgeNotificationEnabled,
       )
       .where(eq(groupsTable.id, groupId));
     if (!result) return null;

@@ -1,3 +1,4 @@
+import { NotificationConfig } from "./../../types/api/internal/notification";
 import { getConfigurations } from "./../../config/config";
 import { connectDB } from "../../database/connect";
 import {
@@ -35,12 +36,13 @@ import { TestBuilder } from "../helpers/test-builder";
 import { Hono } from "hono";
 import { HTTPRequest, Status } from "../../constants/http";
 import { generateJWTFromID } from "../helpers/test-token";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 describe("Notification server test", () => {
   const config = getConfigurations();
   const db = connectDB(config);
   const notifService = new ExpoNotificationService(
-    config,
+    new SupabaseClient("supabase_url", "supabase_key"),
     new NotificationTransactionImpl(db),
     new ExpoPushService(expo),
   );
@@ -104,7 +106,9 @@ describe("Notification server test", () => {
 
   it("notifyPost: should insert and notify for a larger group with notification disabled", async () => {
     // Mai turned off notification for group
-    await turnOffNotification(GROUP_FULL_SNAPPER_ID, USER_MAI_ID);
+    await updateNotificationConfig(GROUP_FULL_SNAPPER_ID, USER_MAI_ID, {
+      postNotificationEnabled: false,
+    });
 
     await notifService.notifyPost(FULL_SNAPPER_POST_EXAMPLE);
 
@@ -196,7 +200,9 @@ describe("Notification server test", () => {
 
   it("notifyLike: should insert and notify - like another user post - notification disabled", async () => {
     // Josh turned off notification
-    await turnOffNotification(SNAPPER_GROUP_ID, USER_Josh_ID);
+    await updateNotificationConfig(SNAPPER_GROUP_ID, USER_Josh_ID, {
+      likeNotificationEnabled: false,
+    });
 
     try {
       await notifService.notifyLike(LIKE_EXAMPLE);
@@ -218,7 +224,9 @@ describe("Notification server test", () => {
 
   it("notifyComment: should insert and notify - comment on another user post - notification disabled", async () => {
     // Josh turned off notification
-    await turnOffNotification(SNAPPER_GROUP_ID, USER_Josh_ID);
+    await updateNotificationConfig(SNAPPER_GROUP_ID, USER_Josh_ID, {
+      commentNotificationEnabled: false,
+    });
 
     try {
       await notifService.notifyComment(SINGLE_COMMENT);
@@ -239,7 +247,11 @@ describe("Notification server test", () => {
   });
 
   // helpers to improve test readability
-  const turnOffNotification = async (groupId: string, userId: string) => {
+  const updateNotificationConfig = async (
+    groupId: string,
+    userId: string,
+    payload?: NotificationConfig,
+  ) => {
     (
       await testBuilder.request({
         app,
@@ -249,10 +261,9 @@ describe("Notification server test", () => {
         headers: {
           Authorization: `Bearer ${generateJWTFromID(userId)}`,
         },
+        requestBody: payload,
       })
-    )
-      .assertStatusCode(Status.OK)
-      .assertMessage("Successfully turn off notification for group");
+    ).assertStatusCode(Status.OK);
   };
 
   const assertNotificationLength = async (actorId: string, count: number) => {
