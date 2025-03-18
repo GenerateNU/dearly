@@ -3,9 +3,8 @@ import { Text } from "@/design-system/base/text";
 import { useLocalSearchParams } from "expo-router";
 import { useUserStore } from "@/auth/store";
 import { useGetInviteToken } from "@/hooks/api/group";
-import { Share } from "react-native";
-import * as Linking from "expo-linking";
 import { TextButton } from "../shared/buttons/text-button";
+import { showSharePopup } from "@/utilities/invite";
 
 interface InviteLinkProps {
   nextPageNavigate?: () => void;
@@ -18,18 +17,6 @@ const InviteLinkComponent: React.FC<InviteLinkProps> = ({ nextPageNavigate }) =>
   const groupName = params.name;
 
   const { data, isLoading, isError, error } = useGetInviteToken(groupId! as string);
-
-  const invite = async () => {
-    const url = Linking.createURL(`/(app)/(tabs)?token=${data?.token}`);
-
-    try {
-      await Share.share({
-        message: `Join my group on Dearly 💛: ${url}`,
-      });
-    } catch (error) {
-      console.error("Error sharing link:", error);
-    }
-  };
 
   return (
     <Box
@@ -52,7 +39,7 @@ const InviteLinkComponent: React.FC<InviteLinkProps> = ({ nextPageNavigate }) =>
           <TextButton
             disabled={isLoading}
             label={"Copy Link"}
-            onPress={invite}
+            onPress={() => showSharePopup(data?.token)}
             variant="secondary"
           />
           {isError && <Text color="error">{error.message}</Text>}
