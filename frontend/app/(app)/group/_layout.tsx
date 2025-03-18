@@ -42,6 +42,16 @@ const Layout = () => {
             headerRight: () => <Setting onPress={onSettingPressed} />,
           }}
         />
+        <Stack.Screen
+          name="add-member"
+          options={{
+            headerShown: true,
+            headerTitle: "",
+            headerTransparent: true,
+            gestureEnabled: false,
+            headerLeft: () => <BackIcon />,
+          }}
+        />
       </Stack>
       <OptionsPopup ref={settingRef} />
     </>

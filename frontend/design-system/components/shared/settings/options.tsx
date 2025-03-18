@@ -3,43 +3,14 @@ import { TextButton } from "@/design-system/components/shared/buttons/text-butto
 import { useUserStore } from "@/auth/store";
 import { Text } from "@/design-system/base/text";
 import RedTextButton from "../buttons/red-text-button";
-import { useEffect, useState } from "react";
-import * as Linking from "expo-linking";
-import { useGetInviteToken } from "@/hooks/api/group";
-import { Alert, Share } from "react-native";
+import { router } from "expo-router";
 
 const GroupOptionContent = () => {
   const { group, userId } = useUserStore();
-  const { data, isLoading, error } = useGetInviteToken(group?.id! as string);
-  const [inviteLink, setInviteLink] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (error) {
-      Alert.alert("Failed to get invite link. Please try again later.");
-    }
-  }, [error]);
 
   if (!group) return;
 
   const isManager = userId === group.managerId;
-
-  // TODO:
-  // - refactor this into a separate hook since it's the same as that in onboarding
-  // - somehow you have to click twice to get the Share to pop up
-  const invite = async () => {
-    const url = Linking.createURL(`/(app)/(tabs)?token=${data?.token}`);
-    setInviteLink(url);
-
-    if (inviteLink) {
-      try {
-        await Share.share({
-          message: `Join my group on Dearly 💛: ${inviteLink}`,
-        });
-      } catch (error) {
-        console.error("Error sharing link:", error);
-      }
-    }
-  };
 
   return (
     <Box gap="s" flexDirection="column">
@@ -62,8 +33,8 @@ const GroupOptionContent = () => {
           />
           <TextButton
             textVariant="bodyLargeBold"
-            onPress={invite}
-            label={isLoading ? "Generating Invite Link..." : "Invite Member"}
+            onPress={() => router.push("/(app)/group/add-member")}
+            label="Add New Member"
             variant="text"
           />
           <TextButton

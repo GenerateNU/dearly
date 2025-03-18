@@ -1,6 +1,5 @@
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
-import { useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { useUserStore } from "@/auth/store";
 import { useGetInviteToken } from "@/hooks/api/group";
@@ -19,20 +18,16 @@ const InviteLinkComponent: React.FC<InviteLinkProps> = ({ nextPageNavigate }) =>
   const groupName = params.name;
 
   const { data, isLoading, isError, error } = useGetInviteToken(groupId! as string);
-  const [inviteLink, setInviteLink] = useState<string | null>(null);
 
   const invite = async () => {
     const url = Linking.createURL(`/(app)/(tabs)?token=${data?.token}`);
-    setInviteLink(url);
 
-    if (inviteLink) {
-      try {
-        await Share.share({
-          message: `Join my group on Dearly 💛: ${inviteLink}`,
-        });
-      } catch (error) {
-        console.error("Error sharing link:", error);
-      }
+    try {
+      await Share.share({
+        message: `Join my group on Dearly 💛: ${url}`,
+      });
+    } catch (error) {
+      console.error("Error sharing link:", error);
     }
   };
 
