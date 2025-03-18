@@ -1,25 +1,13 @@
-import React, { useState } from "react";
 import { ImagePost } from "@/design-system/components/posts/post";
 import { FlatList } from "react-native-gesture-handler";
 import { Box } from "@/design-system/base/box";
 import { Post } from "@/types/post";
 import { useGroupFeed } from "@/hooks/api/post";
 import PostSkeleton from "./skeleton";
+import { useToggleLike } from "@/hooks/api/like";
 
 const Feed = () => {
-  const [page, setPage] = useState(0);
-  const [limit, setLimit] = useState(5);
-
-  const {
-    data,
-    isLoading,
-    isFetchingNextPage,
-    isRefetching,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    refetch,
-  } = useGroupFeed();
+  const { data, isFetchingNextPage, fetchNextPage, hasNextPage } = useGroupFeed();
 
   const posts = data?.pages.flatMap((page) => page) || [];
 
@@ -32,7 +20,12 @@ const Feed = () => {
   // TODO: add notification when all posts are seen
   const renderFooter = () => {
     if (!isFetchingNextPage) return null;
-    return <PostSkeleton/>;
+    return <PostSkeleton />;
+  };
+
+  const onLikeClicked = (postId: string) => {
+    const { mutate } = useToggleLike(postId);
+    mutate();
   };
 
   const renderItem = ({ item }: { item: Post }) => {
@@ -51,8 +44,8 @@ const Feed = () => {
           likes={item.likes}
           caption={item.caption}
           media={item.media}
-          onCommentClicked // comment clicked
-          onLikeClicked // like clicked 
+          onCommentClicked={() => null}
+          onLikeClicked={() => onLikeClicked(item.id)}
         />
       </Box>
     );

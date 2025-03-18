@@ -35,7 +35,6 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
         typeof item.url === "string" && item.url !== "",
     )
     .map((item) => item.url);
-
   return (
     <Box flexDirection="column" gap="s">
       <PostHeader

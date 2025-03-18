@@ -1,5 +1,5 @@
 import { CreatePostPayload, Post } from "@/types/post";
-import { useMutationBase, useQueryPagination, useQueryPaginationWithID } from "./base";
+import { useMutationBase, useQueryPaginationWithID } from "./base";
 import { createPost } from "@/api/post";
 import { getGroupFeed } from "@/api/group";
 import { useUserStore } from "@/auth/store";
