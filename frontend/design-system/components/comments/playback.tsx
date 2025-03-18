@@ -4,8 +4,8 @@ import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { IconButton } from "../ui/icon-button";
 import { formatSeconds } from "@/utilities/time";
-import { audioBarHeights, condenseAudioBarHeights, getDBLevels } from "@/utilities/audio";
-import decode, { decoders } from "audio-decode";
+import { condenseAudioBarHeights, getDBLevels } from "@/utilities/audio";
+import { decoders } from "audio-decode";
 import { playbackStates } from "@/types/comment";
 
 interface PlaybackPropsWhenLocal {
@@ -25,7 +25,7 @@ interface PlaybackPropsWhenURL {
 type PlaybackProps = PlaybackPropsWhenLocal | PlaybackPropsWhenURL;
 
 export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength, location }) => {
-  const [status, setStatus] = useState<playbackStates>({playing:false, pausing:false});
+  const [status, setStatus] = useState<playbackStates>({ playing: false, pausing: false });
   const [sound, setSound] = useState<Audio.Sound>();
   const [length, setLength] = useState<number>(0);
   const [memoLines, setMemoLines] = useState<number[]>([]);
@@ -63,10 +63,10 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
 
   async function playRecording() {
     if (status.pausing) {
-      setStatus({playing:true, pausing:false})
+      setStatus({ playing: true, pausing: false });
       await sound?.playAsync();
     } else {
-      setStatus({...status, playing:true})
+      setStatus({ ...status, playing: true });
       const { sound } = await Audio.Sound.createAsync({ uri: location });
       sound.setOnPlaybackStatusUpdate(onPlayingUpdate);
       sound.setProgressUpdateIntervalAsync(500);
@@ -77,16 +77,18 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
 
   async function pauseRecording() {
     await sound?.pauseAsync();
-    setStatus({playing:false, pausing:true})
+    setStatus({ playing: false, pausing: true });
   }
 
   const onPlayingUpdate = (statusPlayback: AVPlaybackStatus) => {
     if (statusPlayback.isLoaded) {
       if (statusPlayback.positionMillis < statusPlayback.durationMillis!)
-        setLength((statusPlayback.durationMillis || 0) / 1000 - statusPlayback.positionMillis / 1000);
+        setLength(
+          (statusPlayback.durationMillis || 0) / 1000 - statusPlayback.positionMillis / 1000,
+        );
       else {
         setLength(statusPlayback.durationMillis! / 1000);
-        setStatus({...status, playing:false})
+        setStatus({ ...status, playing: false });
       }
     }
   };
@@ -94,7 +96,7 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
     <Box
       borderWidth={1}
       borderColor="ink"
-      backgroundColor="pearl"
+      backgroundColor={local ? "pearl" : "honey"}
       paddingLeft="xs"
       gap="s"
       width="70%"
@@ -121,9 +123,11 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
         )}
       </Box>
       <Box flexDirection="row" gap="xs" alignItems="center">
-        <Box flexDirection="row" gap="xs" alignItems="center">
-          <Text variant="caption">{formatSeconds(length)}</Text>
-        </Box>
+        {local && (
+          <Box flexDirection="row" gap="xs" alignItems="center">
+            <Text variant="caption">{formatSeconds(length)}</Text>
+          </Box>
+        )}
         <Box flexDirection="row" gap="xs" alignItems="center">
           {memoLines.map((item, index) => (
             <Box
@@ -139,6 +143,11 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
             ></Box>
           ))}
         </Box>
+        {!local && (
+          <Box flexDirection="row" gap="xs" alignItems="center">
+            <Text variant="caption">{formatSeconds(length)}</Text>
+          </Box>
+        )}
       </Box>
     </Box>
   );

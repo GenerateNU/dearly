@@ -52,5 +52,3 @@ export const getDBLevels = (data: Float32Array): number[] => {
   });
   return condenseAudioBarHeights(25, dbLevels);
 };
-
-

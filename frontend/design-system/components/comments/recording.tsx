@@ -14,32 +14,38 @@ interface RecordingProps {
 }
 
 export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
-  const [status, setStatus] = useState<recordingStatus>({recording:false, done:false})
-  const [attributes, setAttributes] = useState<recordingAttributes>({recording:null, audioLevels:[], length:0, memoLines:new Array(50).fill(5), uri:""})
+  const [status, setStatus] = useState<recordingStatus>({ recording: false, done: false });
+  const [attributes, setAttributes] = useState<recordingAttributes>({
+    recording: null,
+    audioLevels: [],
+    length: 0,
+    memoLines: new Array(50).fill(5),
+    uri: "",
+  });
   const numLines = 33;
 
   useEffect(() => {
     if (status.recording) {
       setAttributes((prevAttributes) => ({
-        ...prevAttributes, 
-        memoLines:audioBarHeights(numLines, attributes.audioLevels)
+        ...prevAttributes,
+        memoLines: audioBarHeights(numLines, attributes.audioLevels),
       }));
     }
   }, [attributes.audioLevels]);
 
   async function startRecording() {
     setAttributes((prevAttributes) => ({
-      ...prevAttributes, 
-      length: 0, 
-      audioLevels: []
-    }))
-    setStatus({...status, done:false})
+      ...prevAttributes,
+      length: 0,
+      audioLevels: [],
+    }));
+    setStatus({ ...status, done: false });
     try {
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
       });
-      setStatus({...status, recording:true})
+      setStatus({ ...status, recording: true });
       const { recording } = await Audio.Recording.createAsync(
         Audio.RecordingOptionsPresets.HIGH_QUALITY,
         (status) => {
@@ -48,34 +54,34 @@ export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
             if (status.metering !== undefined) {
               curAudio.push(status.metering);
             }
-            return {...prevAttributes, audioLevels:curAudio}
-          })
+            return { ...prevAttributes, audioLevels: curAudio };
+          });
           if (status.durationMillis > 0) {
             setAttributes((prevAttributes) => ({
-              ...prevAttributes, 
-              length: status.durationMillis / 1000
+              ...prevAttributes,
+              length: status.durationMillis / 1000,
             }));
           }
         },
         500,
       );
       setAttributes((prevAttributes) => ({
-        ...prevAttributes, 
-        recording:recording
+        ...prevAttributes,
+        recording: recording,
       }));
     } catch (err) {}
   }
 
   async function stopRecording() {
-    setStatus({recording:false, done:true})
+    setStatus({ recording: false, done: true });
     await attributes.recording?.stopAndUnloadAsync();
     await Audio.setAudioModeAsync({
       allowsRecordingIOS: false,
     });
     setAttributes((prevAttributes) => ({
-      ...prevAttributes, 
-      memoLines:condenseAudioBarHeights(25, attributes.audioLevels),
-      uri: attributes.recording?.getURI() || ""
+      ...prevAttributes,
+      memoLines: condenseAudioBarHeights(25, attributes.audioLevels),
+      uri: attributes.recording?.getURI() || "",
     }));
   }
 
@@ -87,7 +93,12 @@ export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
         </Box>
       )}
       {status.done ? (
-        <Playback local dbLevels={attributes.memoLines} location={attributes.uri} audioLength={attributes.length} />
+        <Playback
+          local
+          dbLevels={attributes.memoLines}
+          location={attributes.uri}
+          audioLength={attributes.length}
+        />
       ) : (
         <Box
           borderWidth={1}
@@ -129,8 +140,8 @@ export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
         <IconButton
           variant="iconHoney"
           onPress={() => {
-            setStatus({recording:false, done:false})
-            setAttributes({...attributes, length:0})
+            setStatus({ recording: false, done: false });
+            setAttributes({ ...attributes, length: 0 });
           }}
           icon="send"
         />
