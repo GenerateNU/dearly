@@ -7,7 +7,6 @@ import Spinner from "@/design-system/components/shared/spinner";
 import { useInvitations } from "@/hooks/api/invite";
 import { TextButton } from "@/design-system/components/shared/buttons/text-button";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Recording } from "@/design-system/components/comments/recording";
 
 const Home = () => {
   const { data, isLoading, error, refetch } = useUserGroups();

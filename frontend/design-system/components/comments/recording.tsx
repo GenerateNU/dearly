@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { AVPlaybackStatus, Audio } from "expo-av";
+import { Audio } from "expo-av";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { IconButton } from "../shared/buttons/icon-button";
@@ -69,7 +69,7 @@ export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
         ...prevAttributes,
         recording: recording,
       }));
-    } catch (err) {}
+    } catch {}
   }
 
   async function stopRecording() {

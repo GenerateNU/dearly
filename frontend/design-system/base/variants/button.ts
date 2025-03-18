@@ -1,4 +1,3 @@
-import { backgroundColor } from "@shopify/restyle";
 import { ColorName } from "../config/color";
 
 const baseButton = {
