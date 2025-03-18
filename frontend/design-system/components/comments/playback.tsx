@@ -97,16 +97,16 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
       borderWidth={1}
       borderColor="ink"
       backgroundColor={local ? "pearl" : "honey"}
-      paddingLeft="xs"
+      paddingLeft="s"
       gap="s"
       width="70%"
       height={50}
       borderRadius="l"
       flexDirection="row"
       alignContent="center"
+      alignItems="center"
     >
-      <Box alignItems="center" justifyContent="center" paddingLeft="s">
-        {status.playing ? (
+      {status.playing ? (
           <IconButton
             variant="smallIconPearlBorder"
             onPress={pauseRecording}
@@ -120,13 +120,9 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
             icon="play"
             size={20}
           />
-        )}
-      </Box>
-      <Box flexDirection="row" gap="xs" alignItems="center">
+      )}
         {local && (
-          <Box flexDirection="row" gap="xs" alignItems="center">
-            <Text variant="caption">{formatSeconds(length)}</Text>
-          </Box>
+            <Text variant="bodyLarge">{formatSeconds(length)}</Text>
         )}
         <Box flexDirection="row" gap="xs" alignItems="center">
           {memoLines.map((item, index) => (
@@ -144,11 +140,8 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
           ))}
         </Box>
         {!local && (
-          <Box flexDirection="row" gap="xs" alignItems="center">
-            <Text variant="caption">{formatSeconds(length)}</Text>
-          </Box>
+          <Text variant="bodyLarge">{formatSeconds(length)}</Text>
         )}
-      </Box>
     </Box>
   );
 };
