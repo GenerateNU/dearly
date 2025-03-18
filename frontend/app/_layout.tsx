@@ -29,9 +29,6 @@ const InitialLayout = () => {
     Light: require("../assets/fonts/proximanova_light.otf"),
   });
 
-  const { width } = Dimensions.get("window");
-  const scaleFactor = width >= BIGGER_PHONE_SCREEN ? BIGGER_PHONE_SCALE_RATIO : 1;
-
   useEffect(() => {
     async function prepare() {
       try {

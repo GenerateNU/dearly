@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { AVPlaybackStatus, Audio } from "expo-av";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
-import { IconButton } from "../ui/icon-button";
+import { IconButton } from "../shared/buttons/icon-button";
 import { formatSeconds } from "@/utilities/time";
 import { condenseAudioBarHeights, getDBLevels } from "@/utilities/audio";
 import { decoders } from "audio-decode";
