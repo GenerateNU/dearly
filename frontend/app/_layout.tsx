@@ -17,7 +17,7 @@ import { OnboardingProvider } from "@/contexts/onboarding";
 import { queryClient } from "@/auth/client";
 
 const InitialLayout = () => {
-  const { isAuthenticated, clearError, completeOnboarding, group } = useUserStore();
+  const { isAuthenticated, clearError, completeOnboarding } = useUserStore();
   const [showSplash, setShowSplash] = useState(true);
   const [isReady, setIsReady] = useState(false);
 
