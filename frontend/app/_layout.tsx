@@ -15,13 +15,19 @@ import { useUserStore } from "@/auth/store";
 import SplashScreenAnimation from "./(auth)/components/splash-screen";
 import { OnboardingProvider } from "@/contexts/onboarding";
 import { queryClient } from "@/auth/client";
-import { useInviteMember } from "@/hooks/app/invite";
+import { useVerifyInviteToken } from "@/hooks/api/group";
+import * as Linking from "expo-linking";
 
 const InitialLayout = () => {
-  const { isAuthenticated, clearError, completeOnboarding, setInviteToken, setSelectedGroup } =
+  const { isAuthenticated, clearError, completeOnboarding, setInviteToken, inviteToken } =
     useUserStore();
   const [showSplash, setShowSplash] = useState(true);
   const [isReady, setIsReady] = useState(false);
+  const [deeplinkToken, setDeeplinkToken] = useState<string | undefined>(undefined);
+  const [hasProcessedInitialLink, setHasProcessedInitialLink] = useState(false);
+
+  // TODO: handle loading screen while adding user into group
+  const { mutate, isPending, error } = useVerifyInviteToken();
 
   const [fontsLoaded] = useFonts({
     Black: require("../assets/fonts/proximanova_black.ttf"),
@@ -30,6 +36,40 @@ const InitialLayout = () => {
     Regular: require("../assets/fonts/proximanova_regular.ttf"),
     Light: require("../assets/fonts/proximanova_light.otf"),
   });
+
+  // Process initial link once (if there is one when component mounts)
+  useEffect(() => {
+    if (hasProcessedInitialLink) return;
+
+    const getInitialLink = async () => {
+      try {
+        const initialUrl = await Linking.getInitialURL();
+        if (initialUrl) {
+          const { queryParams } = Linking.parse(initialUrl);
+          if (queryParams && queryParams.token) {
+            setDeeplinkToken(queryParams.token as string);
+          }
+        }
+      } catch (e) {
+        console.error("Error processing initial link:", e);
+      }
+      setHasProcessedInitialLink(true);
+    };
+
+    getInitialLink();
+  }, [hasProcessedInitialLink]);
+
+  useEffect(() => {
+    const handleLink = (event: { url: string }) => {
+      const { queryParams } = Linking.parse(event.url);
+      if (queryParams && queryParams.token) {
+        setDeeplinkToken(queryParams.token as string);
+      }
+    };
+
+    const subscription = Linking.addEventListener("url", handleLink);
+    return () => subscription.remove();
+  }, []);
 
   useEffect(() => {
     async function prepare() {
@@ -58,23 +98,32 @@ const InitialLayout = () => {
   useEffect(() => {
     if (showSplash || !isReady) return;
 
-    if (isAuthenticated && !completeOnboarding) {
-      router.replace("/(auth)/group");
-    } else if (isAuthenticated && completeOnboarding) {
-      router.replace("/(app)/(tabs)");
-    } else {
-      router.replace("/(auth)");
+    if (!isAuthenticated) {
+      console.log("Deeplink:", deeplinkToken);
+      if (deeplinkToken) {
+        setInviteToken(deeplinkToken);
+      }
+      return router.replace("/(auth)");
     }
-  }, [isAuthenticated, completeOnboarding, showSplash, isReady]);
 
-  // manage invitation with deeplink
-  const inviteToken = useInviteMember();
+    if (!completeOnboarding) {
+      return router.replace("/(auth)/group");
+    }
 
-  useEffect(() => {
     if (inviteToken) {
-      setInviteToken(inviteToken);
+      mutate(inviteToken);
+      setInviteToken("");
+      setDeeplinkToken(undefined);
     }
-  }, [inviteToken]);
+
+    if (deeplinkToken) {
+      mutate(deeplinkToken);
+      setInviteToken("");
+      setDeeplinkToken(undefined);
+    }
+
+    return router.replace("/(app)/(tabs)");
+  }, [isAuthenticated, completeOnboarding, showSplash, isReady, deeplinkToken]);
 
   // ask for notification permission
   useNotificationPermission();
