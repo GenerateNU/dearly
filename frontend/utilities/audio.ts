@@ -2,7 +2,7 @@
  * Takes in audioLevels and outputs the visual representation of them. If there are not enough
  * audioLevels to have the given number of lines it will buffer the front with a default value of
  * 3. If there are more than the num lines it will take the last numLines number of audioLevels to
- * represent. 
+ * represent.
  * @param numLines - number of lines for the representations
  * @param audioLevels - the audio levels to be represented
  * @returns an array of numbers representing the heights of the bars in a visual representation of audio
@@ -23,7 +23,7 @@ export const audioBarHeights = (numLines: number, audioLevels: number[]): number
 /**
  * Condenses the given audioLevels into a visual representation of audio. It will average
  * chunks so that the resulting array has numLines elements and represents the entire original
- * audio array. 
+ * audio array.
  * @param numLines the number of entries in the resulting array
  * @param audioLevels the audio levels to be represented
  * @returns an array representing the height of the audio levels in the visual representation

@@ -107,41 +107,30 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
       alignItems="center"
     >
       {status.playing ? (
-          <IconButton
-            variant="smallIconPearlBorder"
-            onPress={pauseRecording}
-            icon="pause"
-            size={20}
-          />
-        ) : (
-          <IconButton
-            variant="smallIconPearlBorder"
-            onPress={playRecording}
-            icon="play"
-            size={20}
-          />
+        <IconButton
+          variant="smallIconPearlBorder"
+          onPress={pauseRecording}
+          icon="pause"
+          size={20}
+        />
+      ) : (
+        <IconButton variant="smallIconPearlBorder" onPress={playRecording} icon="play" size={20} />
       )}
-        {local && (
-            <Text variant="bodyLarge">{formatSeconds(length)}</Text>
-        )}
-        <Box flexDirection="row" gap="xs" alignItems="center">
-          {memoLines.map((item, index) => (
-            <Box
-              key={index}
-              height={item}
-              width={2}
-              backgroundColor={
-                index < (memoLines.length / totalLength) * (totalLength - length)
-                  ? "ink"
-                  : "darkGray"
-              }
-              borderRadius="l"
-            ></Box>
-          ))}
-        </Box>
-        {!local && (
-          <Text variant="bodyLarge">{formatSeconds(length)}</Text>
-        )}
+      {local && <Text variant="bodyLarge">{formatSeconds(length)}</Text>}
+      <Box flexDirection="row" gap="xs" alignItems="center">
+        {memoLines.map((item, index) => (
+          <Box
+            key={index}
+            height={item}
+            width={2}
+            backgroundColor={
+              index < (memoLines.length / totalLength) * (totalLength - length) ? "ink" : "darkGray"
+            }
+            borderRadius="l"
+          ></Box>
+        ))}
+      </Box>
+      {!local && <Text variant="bodyLarge">{formatSeconds(length)}</Text>}
     </Box>
   );
 };
