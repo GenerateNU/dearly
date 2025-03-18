@@ -17,6 +17,7 @@ import { OnboardingProvider } from "@/contexts/onboarding";
 import { queryClient } from "@/auth/client";
 import { useVerifyInviteToken } from "@/hooks/api/group";
 import * as Linking from "expo-linking";
+import AddMemberLoading from "@/design-system/components/shared/add-member";
 
 const InitialLayout = () => {
   const { isAuthenticated, clearError, completeOnboarding, setInviteToken, inviteToken } =
@@ -26,7 +27,6 @@ const InitialLayout = () => {
   const [deeplinkToken, setDeeplinkToken] = useState<string | undefined>(undefined);
   const [hasProcessedInitialLink, setHasProcessedInitialLink] = useState(false);
 
-  // TODO: handle loading screen while adding user into group
   const { mutate, isPending, error } = useVerifyInviteToken();
 
   const [fontsLoaded] = useFonts({
@@ -141,7 +141,14 @@ const InitialLayout = () => {
   // return the slot to ensure navigation container is mounted first
   return (
     <ThemeProvider theme={getTheme(scaleRatio)}>
-      {showSplash ? <SplashScreenAnimation /> : <Slot />}
+      {showSplash ? (
+        <SplashScreenAnimation />
+      ) : (
+        <>
+          <Slot />
+          {isPending && <AddMemberLoading />}
+        </>
+      )}
     </ThemeProvider>
   );
 };
