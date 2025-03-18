@@ -4,6 +4,7 @@ import { DEFAULT_PROFILE_PHOTO } from "@/constants/photo";
 import { Text } from "@/design-system/base/text";
 import { formatTime } from "@/utilities/time";
 import { Avatar } from "../shared/avatar";
+import { Playback } from "./playback";
 
 export const CommentCard: React.FC<Required<Comment>> = ({
   id,
@@ -28,6 +29,7 @@ export const CommentCard: React.FC<Required<Comment>> = ({
         </Box>
       </Box>
       <Box>{content && <Text>{content}</Text>}</Box>
+      {voiceMemo && <Playback local={false} location="voiceMemo"/>}
     </Box>
   );
 };
