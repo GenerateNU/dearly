@@ -67,7 +67,7 @@ export class MemberServiceImpl implements MemberService {
         return {
           ...member,
           profilePhoto: profileURLs[index] ? profileURLs[index].profilePhoto : null,
-        }
+        };
       });
       return membersWithProfileURLs;
     };

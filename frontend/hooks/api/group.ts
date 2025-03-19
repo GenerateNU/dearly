@@ -1,7 +1,8 @@
-import { Group, InvitationToken } from "@/types/group";
-import { useMutationBase, useQueryBase } from "./base";
+import { Group, GroupMember, InvitationToken } from "@/types/group";
+import { useMutationBase, useQueryBase, useQueryPagination } from "./base";
 import { createGroup, getGroup } from "@/api/group";
 import { getInviteToken, verifyInviteToken } from "@/api/invite";
+import { getAllMembers } from "@/api/member";
 
 export interface CreateGroupPayload {
   name: string;
@@ -52,4 +53,17 @@ export const useGetInviteToken = (id: string, options: any = {}) => {
     enabled: !!id,
     ...options,
   });
+};
+
+/**
+ * Hook to get all group members
+ *
+ * @param options - Additional options for the query
+ * @returns Query result containing the group members
+ */
+export const useGroupMembers = (id: string, options: any = {}) => {
+  const wrappedQuery = (limit: number, page: number) => {
+    return getAllMembers(id, limit, page);
+  };
+  return useQueryPagination<GroupMember[]>(["groups", id, "members"], wrappedQuery, options, 10);
 };
