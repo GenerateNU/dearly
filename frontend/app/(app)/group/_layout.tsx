@@ -52,6 +52,16 @@ const Layout = () => {
             headerLeft: () => <BackIcon />,
           }}
         />
+        <Stack.Screen
+          name="delete"
+          options={{
+            headerShown: true,
+            headerTitle: "",
+            headerTransparent: true,
+            gestureEnabled: false,
+            headerLeft: () => <BackIcon />,
+          }}
+        />
       </Stack>
       <OptionsPopup ref={settingRef} />
     </>

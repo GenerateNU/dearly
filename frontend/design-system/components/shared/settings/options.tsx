@@ -43,7 +43,11 @@ const GroupOptionContent = () => {
             label="Set Recurring Nudge"
             variant="text"
           />
-          <RedTextButton onPress={() => null} label="Delete Group" icon="trash-can-outline" />
+          <RedTextButton
+            onPress={() => router.push("/(app)/group/delete")}
+            label="Delete Group"
+            icon="trash-can-outline"
+          />
         </Box>
       ) : (
         <RedTextButton onPress={() => null} label="Leave Group" icon="logout" />

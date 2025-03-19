@@ -33,6 +33,7 @@ const NudgeMember = () => {
     return (
       <ViewGroupProfile
         id={item.id}
+        username={item.username}
         name={item.name}
         profilePhoto={item?.profilePhoto}
         managerView={isManager}
