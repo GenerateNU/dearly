@@ -1,7 +1,8 @@
-import { Group, InvitationToken } from "@/types/group";
+import { Group, GroupCalendar, InvitationToken } from "@/types/group";
 import { useMutationBase, useQueryBase } from "./base";
-import { createGroup, getGroup } from "@/api/group";
+import { createGroup, getGroup, getGroupCalendar } from "@/api/group";
 import { getInviteToken, verifyInviteToken } from "@/api/invite";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
 export interface CreateGroupPayload {
   name: string;
@@ -36,6 +37,42 @@ export const useVerifyInviteToken = () => {
 export const useGetGroup = (id: string, options: any = {}) => {
   return useQueryBase<Group>(["groups", id], () => getGroup(id), {
     enabled: !!id,
+    ...options,
+  });
+};
+
+/**
+ * Hook to get group's calendar in a date range
+ *
+ * @param id - Group ID
+ * @param pivot - Starting date to fetch from (as Date object)
+ * @param range - Number of months to fetch (negative for past months)
+ * @param options - Additional options for the query
+ * @returns Query result containing the group calendar data
+ */
+/**
+ * Hook to get group's calendar with endless scroll
+ */
+export const useGroupCalendar = (id: string, pivot: Date, range: number, options: any = {}) => {
+  const formatDateToMonthYear = (date: Date): string => {
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${month}-${year}`;
+  };
+
+  return useInfiniteQuery<GroupCalendar, Error>({
+    queryKey: ["groups", id, "calendar"],
+    queryFn: async ({ pageParam }) => {
+      const currentPivot = pageParam as Date;
+      const formattedDate = formatDateToMonthYear(currentPivot);
+      return getGroupCalendar(id, formattedDate, range);
+    },
+    initialPageParam: pivot,
+    getNextPageParam: (_, __, lastPageParam) => {
+      const nextPivot = new Date(lastPageParam as Date);
+      nextPivot.setMonth(nextPivot.getMonth() - Math.abs(range));
+      return nextPivot;
+    },
     ...options,
   });
 };
