@@ -1,6 +1,6 @@
-import { Group, GroupMember, InvitationToken } from "@/types/group";
+import { Group, GroupMember, InvitationToken, UpdateGroupPayload } from "@/types/group";
 import { useMutationBase, useQueryBase, useQueryPagination } from "./base";
-import { createGroup, getGroup } from "@/api/group";
+import { createGroup, deleteGroup, getGroup, updateGroup } from "@/api/group";
 import { getInviteToken, verifyInviteToken } from "@/api/invite";
 import { getAllMembers } from "@/api/member";
 
@@ -16,6 +16,27 @@ export interface CreateGroupPayload {
  */
 export const useCreateGroup = () => {
   return useMutationBase<CreateGroupPayload, Group>(createGroup, ["users", "groups"]);
+};
+
+/**
+ * Hook to update a group
+ *
+ * @returns Mutation object for updating a group
+ */
+export const useUpdateGroup = (id: string) => {
+  return useMutationBase<UpdateGroupPayload, Group>(
+    (payload) => updateGroup(id, payload),
+    ["users", "groups"],
+  );
+};
+
+/**
+ * Hook to delete a group
+ *
+ * @returns Mutation object for deleting a group
+ */
+export const useDeleteGroup = (id: string) => {
+  return useMutationBase<object, void>(() => deleteGroup(id), ["users", "groups"]);
 };
 
 /**

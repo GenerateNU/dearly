@@ -1,6 +1,6 @@
 import { Member, NotificationConfigPayload } from "@/types/group";
 import { useMutationBase, useQueryBase } from "./base";
-import { configNotification, getMember } from "@/api/member";
+import { configNotification, getMember, removeMember } from "@/api/member";
 
 /**
  * Hook to change notification config for group
@@ -24,4 +24,16 @@ export const useMemberInfo = (id: string, options: any = {}) => {
     enabled: !!id,
     ...options,
   });
+};
+
+/**
+ * Hook to remove a member from group
+ *
+ * @returns Mutation object for removing a member of a group
+ */
+export const useRemoveMember = (groupId: string, userId: string) => {
+  return useMutationBase<object, void>(
+    () => removeMember(groupId, userId),
+    ["groups", groupId, "members"],
+  );
 };
