@@ -13,6 +13,14 @@ const baseIcon = {
   aspectRatio: 1,
 };
 
+const baseIconBorder = {
+  width: "auto",
+  borderRadius: "full",
+  aspectRatio: 1,
+  borderWidth: 2,
+  borderColor: "ink",
+};
+
 const createButtonStyle = (
   color: ColorName,
   borderRadius: string | undefined = undefined,
@@ -30,6 +38,18 @@ export const buttonVariants = {
   icon: {
     ...baseIcon,
     backgroundColor: "honey",
+  },
+  iconGray: {
+    ...baseIcon,
+    backgroundColor: "gray",
+  },
+  iconPearl: {
+    ...baseIcon,
+    backgroundColor: "pearl",
+  },
+  smallIconPearlBorder: {
+    ...baseIconBorder,
+    backgroundColor: "pearl",
   },
   text: {
     width: "auto",
