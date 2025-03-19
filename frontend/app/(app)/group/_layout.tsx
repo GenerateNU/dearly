@@ -1,15 +1,22 @@
 import Setting from "@/design-system/components/shared/buttons/setting";
 import { BackIcon } from "@/design-system/components/shared/icons/back-icon";
 import OptionsPopup from "@/design-system/components/shared/settings/options-popup";
+import RemoveMemberPopUp from "@/design-system/components/shared/settings/remove-member-popup";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { Stack } from "expo-router";
 import { useRef } from "react";
 
 const Layout = () => {
   const settingRef = useRef<BottomSheet>(null);
+  const removeMemberRef = useRef<BottomSheet>(null);
 
   const onSettingPressed = () => {
     settingRef.current?.snapToIndex(0);
+  };
+
+  const onRemoveMemberPressed = () => {
+    console.log("remove member bottom sheet pressed");
+    removeMemberRef.current?.snapToIndex(0);
   };
 
   return (
@@ -84,6 +91,7 @@ const Layout = () => {
         />
       </Stack>
       <OptionsPopup ref={settingRef} />
+      <RemoveMemberPopUp ref={removeMemberRef} />
     </>
   );
 };
