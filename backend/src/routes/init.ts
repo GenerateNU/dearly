@@ -15,6 +15,7 @@ import { ExpoPushService } from "../services/notification/expo";
 import { AppService } from "../types/api/internal/services";
 import { NudgeSchedulerService } from "../services/nudgeScheduler";
 import { redirectPage } from "../utilities/redirect";
+import { serveStatic } from "@hono/node-server/serve-static";
 
 export const setUpRoutes = (
   app: Hono,
@@ -45,6 +46,17 @@ export const setUpRoutes = (
   const { expoService, mediaService, nudgeSchedulerService } = services;
   app.route("/api/v1", apiRoutes(db, mediaService, expoService, nudgeSchedulerService));
 
+  app.get(
+    ".well-known/apple-app-site-association",
+    async (c, next) => {
+      await next();
+      c.res.headers.set("Content-Type", "application/json");
+      c.status(200);
+    },
+    serveStatic({
+      root: "src/static",
+    }),
+  );
   // State website redirect page.
   app.get("/group", (c) => {
     return c.html(redirectPage());
