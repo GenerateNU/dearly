@@ -5,6 +5,7 @@ import { Post } from "@/types/post";
 import { useGroupFeed } from "@/hooks/api/post";
 import PostSkeleton from "./skeleton";
 import { useToggleLike } from "@/hooks/api/like";
+import { CommentInput } from "./comment-input";
 
 const Feed = () => {
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage } = useGroupFeed();
@@ -30,7 +31,7 @@ const Feed = () => {
 
   const renderItem = ({ item }: { item: Post }) => {
     return (
-      <Box paddingBottom="m">
+      <Box paddingBottom="m" gap="s">
         <ImagePost
           profilePhoto={item.profilePhoto}
           username={item.username}
@@ -47,6 +48,7 @@ const Feed = () => {
           onCommentClicked={() => null}
           onLikeClicked={() => onLikeClicked(item.id)}
         />
+        <CommentInput/>
       </Box>
     );
   };
