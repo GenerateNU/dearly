@@ -62,6 +62,26 @@ const Layout = () => {
             headerLeft: () => <BackIcon />,
           }}
         />
+        <Stack.Screen
+          name="remove"
+          options={{
+            headerShown: true,
+            headerTitle: "",
+            headerTransparent: true,
+            gestureEnabled: false,
+            headerLeft: () => <BackIcon />,
+          }}
+        />
+        <Stack.Screen
+          name="leave"
+          options={{
+            headerShown: true,
+            headerTitle: "",
+            headerTransparent: true,
+            gestureEnabled: false,
+            headerLeft: () => <BackIcon />,
+          }}
+        />
       </Stack>
       <OptionsPopup ref={settingRef} />
     </>
