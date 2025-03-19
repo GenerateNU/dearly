@@ -2,7 +2,7 @@ import { Comment } from "../../types/api/internal/comments";
 import { CreateGroupPayload, Group } from "../../types/api/internal/groups";
 import { Post } from "../../types/api/internal/posts";
 import { CreateUserPayload, SearchedUser, User } from "../../types/api/internal/users";
-import { GroupMember, Member } from "../../types/api/internal/members";
+import { GroupMember } from "../../types/api/internal/members";
 import { Like } from "../../types/api/internal/like";
 import {
   groupsTable,
@@ -160,7 +160,6 @@ export const GROUP_MANAGER_ALICE: GroupMember = {
   username: USER_ALICE["username"],
   profilePhoto: null,
   role: "MANAGER",
-  notificationsEnabled: true,
   lastNudgedAt: null,
 };
 
@@ -170,7 +169,6 @@ export const GROUP_MEMBER_ALICE: GroupMember = {
   username: USER_ALICE["username"],
   profilePhoto: null,
   role: "MEMBER",
-  notificationsEnabled: true,
   lastNudgedAt: null,
 };
 
@@ -196,7 +194,6 @@ export const GROUP_MEMBER_BOB: GroupMember = {
   username: USER_BOB["username"],
   profilePhoto: null,
   role: "MEMBER",
-  notificationsEnabled: true,
   lastNudgedAt: null,
 };
 
@@ -223,7 +220,6 @@ export const GROUP_MEMBER_ANA: GroupMember = {
   username: USER_ANA["username"],
   profilePhoto: "https://mocked-url.com",
   role: "MEMBER",
-  notificationsEnabled: true,
   lastNudgedAt: null,
 };
 
@@ -233,7 +229,6 @@ export const GROUP_MANAGER_ANA: GroupMember = {
   username: USER_ANA["username"],
   profilePhoto: "https://mocked-url.com",
   role: "MANAGER",
-  notificationsEnabled: true,
   lastNudgedAt: null,
 };
 
@@ -365,15 +360,6 @@ export const BIG_THEIF_GROUP: Group = {
   id: BIG_THIEF_GROUP_ID,
   description: null,
   managerId: USER_BUCK_ID,
-};
-
-export const ADRIENNE_MEMBER: Member = {
-  userId: USER_ADRIENNE_ID,
-  groupId: BIG_THIEF_GROUP_ID,
-  joinedAt: new Date(),
-  role: "MEMBER",
-  notificationsEnabled: false,
-  lastManualNudge: null,
 };
 
 export const USER_BUCK: User = {

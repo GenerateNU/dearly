@@ -9,14 +9,14 @@ import {
   mediaTable,
   notificationsTable,
 } from "../schema";
-import { eq, and, sql, desc, or } from "drizzle-orm";
+import { eq, and, desc, or } from "drizzle-orm";
 import {
   ForbiddenError,
   InternalServerError,
   NotFoundError,
 } from "../../utilities/errors/app-error";
 import { AddMemberPayload, Member, GroupMember } from "../../types/api/internal/members";
-import { Pagination, SearchedUser } from "../../types/api/internal/users";
+import { Pagination } from "../../types/api/internal/users";
 import { PostWithMedia } from "../../types/api/internal/posts";
 import { getPostMetadata } from "../../utilities/query";
 import { Transaction } from "../../types/api/internal/transaction";
@@ -152,7 +152,6 @@ export class MemberTransactionImpl implements MemberTransaction {
         username: usersTable.username,
         profilePhoto: usersTable.profilePhoto,
         role: membersTable.role,
-        notificationsEnabled: membersTable.notificationsEnabled,
         lastNudgedAt: membersTable.lastManualNudge,
       })
       .from(usersTable)
