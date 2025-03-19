@@ -94,6 +94,7 @@ export const useUserStore = create<UserState>()(
             isPending: false,
             mode: user.mode as Mode,
             completeOnboarding: true,
+            inviteToken: null,
           });
         };
         const failureImpl = async (err: unknown) => {
@@ -119,6 +120,7 @@ export const useUserStore = create<UserState>()(
             isPending: false,
             completeOnboarding: true,
             group: null,
+            inviteToken: null,
           });
           await authService.storeLocalSessionToDevice(email, password);
         };
@@ -153,6 +155,7 @@ export const useUserStore = create<UserState>()(
             isAuthenticated: true,
             userId: session.user.id,
             isPending: false,
+            inviteToken: null,
           });
           await authService.storeLocalSessionToDevice(data.email, data.password);
         };
@@ -222,6 +225,7 @@ export const useUserStore = create<UserState>()(
             completeOnboarding: false,
             email: null,
             group: null,
+            inviteToken: null,
           });
         };
         const errorImpl = async (err: unknown) => {

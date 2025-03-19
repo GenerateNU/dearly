@@ -184,9 +184,6 @@ export class SupabaseAuth implements AuthService {
       password,
     });
 
-    console.log("Data", data);
-    console.log("Error", error);
-
     if (error) {
       throw new Error(error.message);
     }
