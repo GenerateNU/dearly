@@ -105,7 +105,6 @@ const InitialLayout = () => {
     if (showSplash || !isReady) return;
 
     if (!isAuthenticated) {
-      console.log("Deeplink:", deeplinkToken);
       if (deeplinkToken) {
         setInviteToken(deeplinkToken);
       }
