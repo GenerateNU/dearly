@@ -1,12 +1,10 @@
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
-import { useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { useUserStore } from "@/auth/store";
 import { useGetInviteToken } from "@/hooks/api/group";
-import { Share } from "react-native";
-import * as Linking from "expo-linking";
 import { TextButton } from "../shared/buttons/text-button";
+import { showSharePopup } from "@/utilities/invite";
 
 interface InviteLinkProps {
   nextPageNavigate?: () => void;
@@ -17,23 +15,8 @@ const InviteLinkComponent: React.FC<InviteLinkProps> = ({ nextPageNavigate }) =>
   const { finishOnboarding } = useUserStore();
   const groupId = params.id;
   const groupName = params.name;
+
   const { data, isLoading, isError, error } = useGetInviteToken(groupId! as string);
-  const [inviteLink, setInviteLink] = useState<string | null>(null);
-
-  const invite = async () => {
-    const url = Linking.createURL(`/app/tabs?token=${data?.token}`);
-    setInviteLink(url);
-
-    if (inviteLink) {
-      try {
-        await Share.share({
-          message: `Join my group on Dearly 💛: ${inviteLink}`,
-        });
-      } catch (error) {
-        console.error("Error sharing link:", error);
-      }
-    }
-  };
 
   return (
     <Box
@@ -56,7 +39,7 @@ const InviteLinkComponent: React.FC<InviteLinkProps> = ({ nextPageNavigate }) =>
           <TextButton
             disabled={isLoading}
             label={"Copy Link"}
-            onPress={invite}
+            onPress={() => showSharePopup(data?.token)}
             variant="secondary"
           />
           {isError && <Text color="error">{error.message}</Text>}

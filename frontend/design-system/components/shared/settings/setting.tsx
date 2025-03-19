@@ -1,8 +1,8 @@
 import { Box } from "@/design-system/base/box";
 import { router } from "expo-router";
 import { TextButton } from "@/design-system/components/shared/buttons/text-button";
-import { Icon } from "@/design-system/components/shared/icons/icon";
 import { useUserStore } from "@/auth/store";
+import RedTextButton from "../buttons/red-text-button";
 
 const SettingContent = () => {
   const { group } = useUserStore();
@@ -26,22 +26,13 @@ const SettingContent = () => {
           />
           <TextButton
             textVariant="bodyLargeBold"
-            onPress={() => null}
+            onPress={() => router.push("/(app)/group/member")}
             label="View Group"
             variant="text"
           />
         </Box>
       )}
-      <Box alignItems="center" flexDirection="row" gap="xs">
-        <TextButton
-          colorVariant="error"
-          textVariant="bodyLargeBold"
-          onPress={() => router.push("/(app)/logout")}
-          label="Logout"
-          variant="text"
-        />
-        <Icon color="error" name="logout" />
-      </Box>
+      <RedTextButton onPress={() => router.push("/(app)/logout")} label="Logout" icon="logout" />
     </Box>
   );
 };

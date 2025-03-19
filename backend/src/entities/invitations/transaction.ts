@@ -26,18 +26,21 @@ export class InvitationTransactionImpl implements InvitationTransaction {
   constructor(db: PostgresJsDatabase) {
     this.db = db;
   }
+
   async getGroupIdFromToken(token: string): Promise<string> {
     return await this.db.transaction(async (tx) => {
       const [result] = await tx
         .select({ groupId: linksTable.groupId })
         .from(linksTable)
         .where(eq(linksTable.token, token));
+
       if (!result) {
         throw new NotFoundError("Invalid Token");
       }
       return result.groupId;
     });
   }
+
   async verifyToken(token: string, groupId: string): Promise<boolean> {
     return await this.db.transaction(async (tx) => {
       const match = and(eq(linksTable.token, token), eq(linksTable.groupId, groupId));

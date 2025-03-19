@@ -1,7 +1,7 @@
 import { Group, InvitationToken } from "@/types/group";
 import { useMutationBase, useQueryBase } from "./base";
 import { createGroup, getGroup } from "@/api/group";
-import { getInviteToken } from "@/api/invite";
+import { getInviteToken, verifyInviteToken } from "@/api/invite";
 
 export interface CreateGroupPayload {
   name: string;
@@ -15,6 +15,15 @@ export interface CreateGroupPayload {
  */
 export const useCreateGroup = () => {
   return useMutationBase<CreateGroupPayload, Group>(createGroup, ["users", "groups"]);
+};
+
+/**
+ * Hook to verify invite token and add user to group
+ *
+ * @returns Mutation object for verifying invite token
+ */
+export const useVerifyInviteToken = () => {
+  return useMutationBase<string, void>((token) => verifyInviteToken(token), ["users", "groups"]);
 };
 
 /**
