@@ -27,6 +27,7 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
   caption,
   media,
   onCommentClicked,
+  groupId
 }) => {
   const [like, setLike] = useState(isLiked);
   const data = media
@@ -36,7 +37,7 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
     )
     .map((item:any) => item.url);
 
-  const { mutate } = useToggleLike(id);
+  const { mutate } = useToggleLike(id, groupId);
   const { data: like_data, refetch } = useGetAllLikeUsers(id);
 
   const likePost = useCallback(() => {

@@ -48,6 +48,7 @@ const Feed = () => {
           likes={item.likes}
           caption={item.caption}
           media={item.media}
+          groupId={item.groupId}
           onCommentClicked={() => null}
         />
         <CommentInput onPress ={() => onClickComment(item.id)}/>

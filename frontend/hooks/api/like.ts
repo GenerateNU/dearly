@@ -7,8 +7,8 @@ import { LikePostUsers } from "@/types/post";
  *
  * @returns a mutation object for toggling the like.
  */
-export const useToggleLike = (postId: string) => {
-  return useMutationBase<void, void>(() => toggleLike(postId), ["posts", postId]);
+export const useToggleLike = (postId: string, groupId: string) => {
+  return useMutationBase<void, void>(() => toggleLike(postId), ["groups", groupId, "feed"]);
 };
 
 export const useGetAllLikeUsers = (postId: string, limit?: number, page?: number) => {
