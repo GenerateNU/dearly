@@ -22,9 +22,9 @@ import { Like } from "../../types/api/internal/like";
 import { Comment } from "../../types/api/internal/comments";
 
 export interface NotificationTransaction {
-  getPostMetadata(post: Post): Promise<PostNotificationMetadata>;
-  getLikeMetadata(like: Like): Promise<LikeCommentNotificationMetadata>;
-  getCommentMetadata(comment: Comment): Promise<LikeCommentNotificationMetadata>;
+  getPostMetadata(post: Post): Promise<PostNotificationMetadata | null>;
+  getLikeMetadata(like: Like): Promise<LikeCommentNotificationMetadata | null>;
+  getCommentMetadata(comment: Comment): Promise<LikeCommentNotificationMetadata | null>;
   insertNotifications(notifications: Notification[]): Promise<Notification[]>;
 }
 
@@ -35,7 +35,7 @@ export class NotificationTransactionImpl implements NotificationTransaction {
     this.db = db;
   }
 
-  async getPostMetadata(post: Post): Promise<PostNotificationMetadata> {
+  async getPostMetadata(post: Post): Promise<PostNotificationMetadata | null> {
     const getPostMetadataImpl = async () => {
       const [result] = await this.db
         .select({
@@ -57,15 +57,12 @@ export class NotificationTransactionImpl implements NotificationTransaction {
         .where(and(eq(postsTable.id, post.id), ne(membersTable.userId, post.userId)))
         .groupBy(usersTable.username, groupsTable.name);
 
-      if (!result) {
-        throw new InternalServerError("Failed to retrieve post metadata");
-      }
-      return result;
+      return result ?? null;
     };
     return await handleServiceError(getPostMetadataImpl)();
   }
 
-  async getLikeMetadata(like: Like): Promise<LikeCommentNotificationMetadata> {
+  async getLikeMetadata(like: Like): Promise<LikeCommentNotificationMetadata | null> {
     const getLikeMetadataImpl = async () => {
       const [result] = await this.db
         .select({
@@ -92,15 +89,12 @@ export class NotificationTransactionImpl implements NotificationTransaction {
           membersTable.likeNotificationEnabled,
         );
 
-      if (!result) {
-        throw new InternalServerError("Failed to retrieve like metadata");
-      }
-      return result;
+      return result ?? null;
     };
     return await handleServiceError(getLikeMetadataImpl)();
   }
 
-  async getCommentMetadata(comment: Comment): Promise<LikeCommentNotificationMetadata> {
+  async getCommentMetadata(comment: Comment): Promise<LikeCommentNotificationMetadata | null> {
     const getCommentMetadataImpl = async () => {
       const [result] = await this.db
         .select({
@@ -126,10 +120,7 @@ export class NotificationTransactionImpl implements NotificationTransaction {
           membersTable.commentNotificationEnabled,
         );
 
-      if (!result) {
-        throw new InternalServerError("Failed to retrieve comment metadata");
-      }
-      return result;
+      return result ?? null;
     };
     return await handleServiceError(getCommentMetadataImpl)();
   }

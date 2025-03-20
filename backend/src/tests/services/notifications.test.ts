@@ -154,12 +154,7 @@ describe("Notification server test", () => {
   });
 
   it("notifyLike: Should insert and notify - like their own post", async () => {
-    try {
-      await notifService.notifyLike(JOSH_LIKE_POST);
-    } catch {
-      /* empty */
-    }
-
+    await notifService.notifyLike(JOSH_LIKE_POST);
     await assertNotificationLength(JOSH_LIKE_POST.userId, 0);
     await sendPushNotificationCalled(0);
   });
@@ -188,12 +183,7 @@ describe("Notification server test", () => {
   });
 
   it("notifyComment: Should insert and notify - comment on their own post", async () => {
-    try {
-      await notifService.notifyComment(JOSH_COMMENT_POST);
-    } catch {
-      /* empty */
-    }
-
+    await notifService.notifyComment(JOSH_COMMENT_POST);
     await assertNotificationLength(JOSH_COMMENT_POST.userId, 0);
     await sendPushNotificationCalled(0);
   });
@@ -204,11 +194,7 @@ describe("Notification server test", () => {
       likeNotificationEnabled: false,
     });
 
-    try {
-      await notifService.notifyLike(LIKE_EXAMPLE);
-    } catch {
-      /* empty */
-    }
+    await notifService.notifyLike(LIKE_EXAMPLE);
 
     const results = await db
       .select()
@@ -228,11 +214,7 @@ describe("Notification server test", () => {
       commentNotificationEnabled: false,
     });
 
-    try {
-      await notifService.notifyComment(SINGLE_COMMENT);
-    } catch {
-      /* empty */
-    }
+    await notifService.notifyComment(SINGLE_COMMENT);
 
     const results = await db
       .select()
