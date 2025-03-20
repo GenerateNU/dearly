@@ -3,8 +3,8 @@
         "apps": [],
         "details": [
             {
-                "appids": [
-                    "w3pr3x4xd2.com.generate.dearly"
+                "appIDs": [
+                    "B49LQ49UB7.com.generate.dearly"
                 ],
                 "components": [
                     {
@@ -13,16 +13,6 @@
                     }
                 ]
             }
-        ]
-    },
-    "webcredentials": {
-        "apps": [
-            "w3pr3x4xd2.com.generate.dearly"
-        ]
-    },
-    "activitycontinuation": {
-        "apps": [
-            "w3pr3x4xd2.com.generate.dearly"
         ]
     }
 }

@@ -3,6 +3,7 @@ import { html } from "hono/html";
 export const redirectPage = () => html`
   <html>
     <head>
+      <meta name="apple-itunes-app" content="app-id=6741783805" />
       <style>
         body {
           display: flex;
