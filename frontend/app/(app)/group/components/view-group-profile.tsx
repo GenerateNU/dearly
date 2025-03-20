@@ -3,10 +3,13 @@ import { Text } from "@/design-system/base/text";
 import { DEFAULT_PROFILE_PHOTO } from "@/constants/photo";
 import { Avatar } from "@/design-system/components/shared/avatar";
 import { TextButton } from "@/design-system/components/shared/buttons/text-button";
-import React from "react";
+import React, { useEffect, useMemo } from "react";
 import { GroupMember } from "@/types/group";
 import { Icon } from "@/design-system/components/shared/icons/icon";
 import { useRemoveMemberContext } from "@/contexts/remove-meber";
+import { useManualNudge } from "@/hooks/api/member";
+import { useUserStore } from "@/auth/store";
+import { Alert } from "react-native";
 
 interface MemberProps extends GroupMember {
   managerView: boolean;
@@ -21,13 +24,33 @@ const ViewGroupProfile: React.FC<MemberProps> = ({
   managerView,
   role,
   onPress,
+  lastNudgedAt,
 }) => {
   const profile = profilePhoto ? profilePhoto : DEFAULT_PROFILE_PHOTO;
   const { setUser } = useRemoveMemberContext();
+  const { group } = useUserStore();
+  const { mutate, isPending, error } = useManualNudge(group?.id as string);
+
+  const isCoolingDown = useMemo(() => {
+    if (!lastNudgedAt) return false;
+
+    const lastNudgeDate = new Date(lastNudgedAt);
+    const currentDate = new Date();
+    const timeDifference = currentDate.getTime() - lastNudgeDate.getTime();
+    const hoursDifference = timeDifference / (1000 * 60 * 60);
+
+    return hoursDifference < 24;
+  }, [lastNudgedAt]);
 
   const nudge = () => {
-    console.log(`Nudging ${name}`);
+    mutate([id!]);
   };
+
+  useEffect(() => {
+    if (error) {
+      Alert.alert("Error", "Failed to send nudge. Please try again later.");
+    }
+  }, [error]);
 
   const removeMemberPressed = () => {
     setUser({
@@ -61,7 +84,12 @@ const ViewGroupProfile: React.FC<MemberProps> = ({
             flexShrink={1}
             paddingRight="s"
           >
-            <TextButton onPress={nudge} label="Nudge" disabled={false} variant="primary" />
+            <TextButton
+              onPress={nudge}
+              label="Nudge"
+              disabled={isPending || isCoolingDown}
+              variant="primary"
+            />
             <Icon onPress={removeMemberPressed} name="dots-vertical" />
           </Box>
         </>

@@ -34,7 +34,7 @@ const NudgeMember = () => {
     removeMemberRef.current?.snapToIndex(0);
   };
 
-  if (!group) return; // should never happen
+  if (!group) return null; // should never happen
 
   const isManager = group.managerId === userId;
 
@@ -49,6 +49,7 @@ const NudgeMember = () => {
           profilePhoto={item?.profilePhoto}
           managerView={isManager}
           role={item.role}
+          lastNudgedAt={item.lastNudgedAt}
         />
       </Box>
     );
