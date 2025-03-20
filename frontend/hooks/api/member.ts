@@ -29,11 +29,12 @@ export const useMemberInfo = (id: string, options: any = {}) => {
 /**
  * Hook to remove a member from group
  *
- * @returns Mutation object for removing a member of a group
+ * @param groupId The ID of the group
+ * @returns Mutation object for removing a member from a group
  */
-export const useRemoveMember = (groupId: string, userId: string) => {
-  return useMutationBase<object, void>(
-    () => removeMember(groupId, userId),
+export const useRemoveMember = (groupId: string) => {
+  return useMutationBase<string, void>(
+    (userId) => removeMember(groupId, userId),
     ["groups", groupId, "members"],
   );
 };

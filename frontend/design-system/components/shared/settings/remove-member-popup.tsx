@@ -15,7 +15,7 @@ const RemoveMemberPopUp = forwardRef<BottomSheetMethods, object>((_, ref) => {
   if (!group || !user) return;
 
   return (
-    <BottomSheetModal snapPoints={["30%"]} ref={ref}>
+    <BottomSheetModal snapPoints={["25%"]} ref={ref}>
       <Box margin="l">
         <Text variant="caption">@{user.username}</Text>
         <RedTextButton

@@ -8,7 +8,7 @@ const AddMember = () => {
   const { group } = useUserStore();
   const { data, isLoading, isError, error } = useGetInviteToken(group?.id as string);
 
-  if (!group) return; // should never happen
+  if (!group) return null; // should never happen
 
   return (
     <SafeAreaView className="flex-1 mt-[15%]">

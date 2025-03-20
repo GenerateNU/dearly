@@ -76,16 +76,17 @@ const NudgeMember = () => {
       // ListFooterComponent={renderFooter}
       onEndReached={onEndReached}
       onEndReachedThreshold={0.5}
+      showsVerticalScrollIndicator={false}
     />
   );
 
   return (
     <>
-      <SafeAreaView className="flex-1">
+      <SafeAreaView edges={["top"]} className="flex-1">
         <Box
           width="100%"
           paddingTop="xl"
-          padding="m"
+          paddingHorizontal="m"
           flex={1}
           justifyContent="flex-start"
           alignItems="flex-start"

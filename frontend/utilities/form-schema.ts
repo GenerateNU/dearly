@@ -26,3 +26,9 @@ export const CREATE_POST_SCHEMA = z.object({
     required_error: "Group is required",
   }),
 });
+
+export const GROUP_SCHEMA = z.object({
+  name: z.string().min(1, { message: "Group name is required" }),
+});
+
+export type GroupFormData = z.infer<typeof GROUP_SCHEMA>;

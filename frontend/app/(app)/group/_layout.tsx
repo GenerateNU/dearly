@@ -26,6 +26,16 @@ const Layout = () => {
             }}
           />
           <Stack.Screen
+            name="change-name"
+            options={{
+              headerShown: true,
+              headerTitle: "",
+              headerTransparent: true,
+              gestureEnabled: false,
+              headerLeft: () => <BackIcon />,
+            }}
+          />
+          <Stack.Screen
             name="invite"
             options={{
               headerShown: false,

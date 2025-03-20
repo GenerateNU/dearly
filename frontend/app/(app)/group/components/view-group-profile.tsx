@@ -6,7 +6,6 @@ import { TextButton } from "@/design-system/components/shared/buttons/text-butto
 import React from "react";
 import { GroupMember } from "@/types/group";
 import { Icon } from "@/design-system/components/shared/icons/icon";
-import { BaseButton } from "@/design-system/base/button";
 import { useRemoveMemberContext } from "@/contexts/remove-meber";
 
 interface MemberProps extends GroupMember {
@@ -46,13 +45,7 @@ const ViewGroupProfile: React.FC<MemberProps> = ({
         </Box>
         <Box>
           {name && <Text variant="bodyBold">{name}</Text>}
-          <Box
-            alignContent="center"
-            justifyContent="center"
-            alignItems="center"
-            flexDirection="row"
-            gap="xxs"
-          >
+          <Box alignContent="center" alignItems="center" flexDirection="row" gap="xxs">
             <Text variant="caption">@{username}</Text>
             {role === "MANAGER" && <Icon size={20} name="account-outline" />}
           </Box>

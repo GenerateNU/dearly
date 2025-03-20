@@ -2,21 +2,18 @@ import { Alert } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z, ZodError } from "zod";
-import { RelativePathString, router } from "expo-router";
+import { router } from "expo-router";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
-import { useCreateGroup } from "@/hooks/api/group";
-import BackNextButtons from "../shared/buttons/back-next-buttons";
-import Input from "../shared/controls/input";
+import { useUpdateGroup } from "@/hooks/api/group";
 import { useUserStore } from "@/auth/store";
+import Input from "@/design-system/components/shared/controls/input";
+import { TextButton } from "@/design-system/components/shared/buttons/text-button";
 import { GROUP_SCHEMA, GroupFormData } from "@/utilities/form-schema";
 
-interface CreateGroupProps {
-  nextPageNavigate: string;
-}
-
-const CreateGroupForm: React.FC<CreateGroupProps> = ({ nextPageNavigate }) => {
-  const { mutateAsync, isPending, isError, error } = useCreateGroup();
+const ChangeNameForm = () => {
+  const { group } = useUserStore();
+  const { mutateAsync, isPending, isError, error } = useUpdateGroup(group?.id as string);
   const { setSelectedGroup } = useUserStore();
 
   const {
@@ -27,32 +24,32 @@ const CreateGroupForm: React.FC<CreateGroupProps> = ({ nextPageNavigate }) => {
   } = useForm<GroupFormData>({
     resolver: zodResolver(GROUP_SCHEMA),
     mode: "onTouched",
+    defaultValues: {
+      name: group?.name,
+    },
   });
 
-  const onCreateGroupPress = async (data: GroupFormData) => {
+  const onUpdateGroupPress = async (data: GroupFormData) => {
     try {
-      const newGroup = await mutateAsync({
+      const updatedGroup = await mutateAsync({
         name: data.name,
       });
       if (!isError && !error) {
-        setSelectedGroup(newGroup);
-        router.push({
-          pathname: nextPageNavigate as RelativePathString,
-          params: { id: newGroup.id, name: newGroup.name },
-        });
+        setSelectedGroup(updatedGroup);
+        router.back();
       }
     } catch (err: unknown) {
       if (err instanceof ZodError) {
         const errorMessages = err.errors.map((error) => error.message).join("\n");
         Alert.alert("Validation Errors", errorMessages);
       } else {
-        console.error("Error creating group:", err);
+        console.error("Error updating group:", err);
       }
     }
   };
 
   return (
-    <Box flexDirection="column" justifyContent="space-between" gap="l" flex={1} className="w-full">
+    <Box flexDirection="column" gap="l" flex={1} className="w-full">
       <Box>
         <Controller
           name="name"
@@ -77,15 +74,17 @@ const CreateGroupForm: React.FC<CreateGroupProps> = ({ nextPageNavigate }) => {
         )}
       </Box>
       <Box alignItems="center" className="w-full">
-        <BackNextButtons
-          disablePrev={isPending}
-          disableNext={isPending || !isValid}
-          onPrev={() => router.back()}
-          onNext={handleSubmit(onCreateGroupPress)}
-        />
+        <Box width="25%">
+          <TextButton
+            label="Save"
+            onPress={handleSubmit(onUpdateGroupPress)}
+            variant="primary"
+            disabled={isPending || !isValid}
+          />
+        </Box>
       </Box>
     </Box>
   );
 };
 
-export default CreateGroupForm;
+export default ChangeNameForm;
