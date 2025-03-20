@@ -1,70 +1,50 @@
-import { forwardRef } from "react";
+import React, {forwardRef} from "react";
 import { CommentCard } from "./comment";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import BottomSheetModal from "../shared/bottom-sheet";
+import { Comment } from "@/types/post";
+import { useComments } from "@/hooks/api/post";
 
-const commentsData = [
-  {
-    id: "1",
-    userId: "1",
-    postId: "1",
-    voiceMemo: "",
-    content: "This is the first comment 💬",
-    createdAt: new Date().toISOString(),
-    username: "quokka",
-    profilePhoto: "https://avatars.githubusercontent.com/u/123816878?v=4",
-  },
-  {
-    id: "2",
-    userId: "2",
-    postId: "1",
-    voiceMemo: "",
-    content: "Second comment! 👍",
-    createdAt: new Date().toISOString(),
-    username: "quokka",
-    profilePhoto: "https://avatars.githubusercontent.com/u/123816878?v=4",
-  },
-  {
-    id: "3",
-    userId: "3",
-    postId: "1",
-    voiceMemo: "",
-    content: "Nice post, I agree! 💬",
-    createdAt: new Date().toISOString(),
-    username: "quokka",
-    profilePhoto: "https://avatars.githubusercontent.com/u/123816878?v=4",
-  },
-  {
-    id: "4",
-    userId: "4",
-    postId: "1",
-    voiceMemo: "",
-    content: "I love this post! 😍",
-    createdAt: new Date().toISOString(),
-    username: "quokka",
-    profilePhoto: "https://avatars.githubusercontent.com/u/123816878?v=4",
-  },
-  {
-    id: "5",
-    userId: "5",
-    postId: "1",
-    voiceMemo: "",
-    content: "Great work on this! 🌟",
-    createdAt: new Date().toISOString(),
-    username: "quokka",
-    profilePhoto: "https://avatars.githubusercontent.com/u/123816878?v=4",
-  },
-];
 
 interface CommentPopUpProps {
   id: string; // postId
 }
 
 export const CommentPopUp = forwardRef<BottomSheetMethods, CommentPopUpProps>((props, ref) => {
-  const renderItem = ({ item }: { item: (typeof commentsData)[0] }) => (
+  console.log(props.id)
+  return (
+    <BottomSheetModal ref={ref} snapPoints={["50%", "90%"]}>
+      {props.id == "" ? <CommentPopUpBlank/> : <CommentPopUpData id={props.id}/>}
+    </BottomSheetModal>
+  );
+});
+
+const CommentPopUpBlank = (() => {
+  return (
+    <></>
+  )
+});
+
+const CommentPopUpData: React.FC<CommentPopUpProps> = ({id}) => {
+  const { data, isFetchingNextPage, fetchNextPage, hasNextPage } = useComments(id);
+  const comments = data?.pages.flatMap((page) => page) || [];
+
+  const onEndReached = () => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  };
+
+  // TODO: add notification when all posts are seen
+  const renderFooter = () => {
+    if (!isFetchingNextPage) return null;
+    return <> </>;
+  };
+
+  const renderItem = ({ item }: {item: Comment}) => (
     <CommentCard
       id={item.id}
       userId={item.userId}
@@ -78,14 +58,13 @@ export const CommentPopUp = forwardRef<BottomSheetMethods, CommentPopUpProps>((p
   );
 
   return (
-    <BottomSheetModal ref={ref} snapPoints={["50%", "90%"]}>
       <Box flex={1} width="100%" padding="s">
         <Text paddingBottom="s" variant="body" textAlign="center">
           Welcome to Dearly 💛
         </Text>
 
         <BottomSheetFlatList
-          data={commentsData}
+          data={comments}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           contentContainerStyle={{
@@ -96,8 +75,20 @@ export const CommentPopUp = forwardRef<BottomSheetMethods, CommentPopUpProps>((p
           style={{ flex: 1 }}
         />
       </Box>
-    </BottomSheetModal>
   );
-});
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 CommentPopUp.displayName = "CommentPopUp";

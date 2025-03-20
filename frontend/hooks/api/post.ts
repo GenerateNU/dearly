@@ -37,9 +37,8 @@ export const useGroupFeed = (options: any = {}) => {
 };
 
 export const useComments = (id:string, options: any = {}) => {
-
   return useQueryPagination<Comment[]>(
-    ["users", "feed"],
+    ["users", "comments"],
     (page, limit) => {
       if (!id) {
         throw new Error("Post ID is undefined");

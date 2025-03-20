@@ -31,7 +31,7 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
   const [like, setLike] = useState(isLiked);
   const data = media
     .filter(
-      (item): item is Required<Pick<Media, "url">> =>
+      (item:any): item is Required<Pick<Media, "url">> =>
         typeof item.url === "string" && item.url !== "",
     )
     .map((item) => item.url);

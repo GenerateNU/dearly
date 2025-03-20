@@ -6,11 +6,15 @@ import { useGroupFeed } from "@/hooks/api/post";
 import PostSkeleton from "./skeleton";
 import { useToggleLike } from "@/hooks/api/like";
 import { CommentInput } from "./comment-input";
+import { useRef, useState } from "react";
+import BottomSheet from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheet/BottomSheet";
+import { CommentPopUp } from "@/design-system/components/comments/comment-popup";
 
 const Feed = () => {
-  const { data, isFetchingNextPage, fetchNextPage, hasNextPage } = useGroupFeed();
-
+  const { data, isFetchingNextPage, fetchNextPage, hasNextPage, isLoading } = useGroupFeed();
   const posts = data?.pages.flatMap((page) => page) || [];
+  const [currentId, setCurrentId] = useState<string>("");
+  const ref = useRef<BottomSheet>(null);
 
   const onEndReached = () => {
     if (hasNextPage && !isFetchingNextPage) {
@@ -18,9 +22,14 @@ const Feed = () => {
     }
   };
 
+  const onClickComment = (id: string) => {
+    setCurrentId(id)
+    ref.current?.snapToIndex(0);
+  }
+
   // TODO: add notification when all posts are seen
   const renderFooter = () => {
-    if (!isFetchingNextPage) return null;
+    if (!isFetchingNextPage || isLoading) return null;
     return <PostSkeleton />;
   };
 
@@ -42,12 +51,14 @@ const Feed = () => {
           media={item.media}
           onCommentClicked={() => null}
         />
-        <CommentInput />
+        <CommentInput onPress ={() => onClickComment(item.id)}/>
+   
       </Box>
     );
   };
 
   return (
+    <>
     <FlatList
       onEndReached={onEndReached}
       showsVerticalScrollIndicator={false}
@@ -55,7 +66,10 @@ const Feed = () => {
       renderItem={renderItem}
       ListFooterComponent={renderFooter}
       onEndReachedThreshold={0.5}
-    />
+    ></FlatList>
+     <CommentPopUp ref={ref} id={currentId}/>
+    </>
+    
   );
 };
 

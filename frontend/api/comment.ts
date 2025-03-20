@@ -30,6 +30,7 @@ export const getComments = async (id: string, limit?: number, page?: number): Pr
         },
       },
     });
+    console.log("comments", data)
     return data!
   };
   return authWrapper<Comment[]>()(req);
