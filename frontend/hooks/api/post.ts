@@ -1,8 +1,9 @@
-import { CreatePostPayload, Post } from "@/types/post";
+import { Comment, CreatePostPayload, Post } from "@/types/post";
 import { useMutationBase, useQueryPagination } from "./base";
 import { createPost } from "@/api/post";
 import { useUserStore } from "@/auth/store";
 import { getGroupFeed } from "@/api/group";
+import { getComments } from "@/api/comment";
 
 /**
  * Hook to create a new post
@@ -34,3 +35,18 @@ export const useGroupFeed = (options: any = {}) => {
     10,
   );
 };
+
+export const useComments = (id:string, options: any = {}) => {
+
+  return useQueryPagination<Comment[]>(
+    ["users", "feed"],
+    (page, limit) => {
+      if (!id) {
+        throw new Error("Post ID is undefined");
+      }
+      return getComments(id, page, limit) as Promise<Comment[]>;
+    },
+    options,
+    10,
+  );
+}
