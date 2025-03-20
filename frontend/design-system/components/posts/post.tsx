@@ -34,7 +34,7 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
       (item:any): item is Required<Pick<Media, "url">> =>
         typeof item.url === "string" && item.url !== "",
     )
-    .map((item) => item.url);
+    .map((item:any) => item.url);
 
   const { mutate } = useToggleLike(id);
   const { data: like_data, refetch } = useGetAllLikeUsers(id);
