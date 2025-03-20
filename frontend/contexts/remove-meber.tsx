@@ -1,8 +1,8 @@
 import React, { createContext, useState, ReactNode, useContext } from "react";
 
 export interface MemberToBeRemoved {
-  username: string;
-  id: string;
+  username: string | undefined;
+  id: string | undefined;
 }
 
 interface RemoveMemberContextType {
@@ -34,7 +34,7 @@ export const RemoveMemberProvider: React.FC<RemoveMemberProviderProps> = ({ chil
   );
 };
 
-export const useRemoveMember = () => {
+export const useRemoveMemberContext = () => {
   const context = useContext(RemoveMemberContext);
 
   if (!context) {

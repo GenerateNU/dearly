@@ -3,21 +3,21 @@ import { forwardRef } from "react";
 import BottomSheetModal from "../bottom-sheet";
 import { Box } from "@/design-system/base/box";
 import { useUserStore } from "@/auth/store";
-import { useRemoveMember } from "@/contexts/remove-meber";
+import { useRemoveMemberContext } from "@/contexts/remove-meber";
 import { Text } from "@/design-system/base/text";
 import RedTextButton from "../buttons/red-text-button";
 import { router } from "expo-router";
 
 const RemoveMemberPopUp = forwardRef<BottomSheetMethods, object>((_, ref) => {
   const { group } = useUserStore();
-  const { user } = useRemoveMember();
+  const { user } = useRemoveMemberContext();
 
   if (!group || !user) return;
 
   return (
     <BottomSheetModal snapPoints={["30%"]} ref={ref}>
       <Box margin="l">
-        <Text variant="caption">{user.username}</Text>
+        <Text variant="caption">@{user.username}</Text>
         <RedTextButton
           onPress={() => router.push("/(app)/group/remove")}
           label="Remove From Group"

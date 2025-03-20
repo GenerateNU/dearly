@@ -27,12 +27,6 @@ const GroupOptionContent = () => {
           />
           <TextButton
             textVariant="bodyLargeBold"
-            onPress={() => null}
-            label="Nudge All"
-            variant="text"
-          />
-          <TextButton
-            textVariant="bodyLargeBold"
             onPress={() => router.push("/(app)/group/add-member")}
             label="Add New Member"
             variant="text"

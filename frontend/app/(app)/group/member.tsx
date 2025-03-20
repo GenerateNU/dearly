@@ -9,9 +9,13 @@ import ResourceView from "@/design-system/components/utilities/resource-view";
 import { GroupMember } from "@/types/group";
 import ErrorDisplay from "@/design-system/components/shared/states/error";
 import EmptyDataDisplay from "@/design-system/components/shared/states/empty";
+import RemoveMemberPopUp from "@/design-system/components/shared/settings/remove-member-popup";
+import BottomSheet from "@gorhom/bottom-sheet";
+import { useRef } from "react";
 
 const NudgeMember = () => {
   const { group, userId } = useUserStore();
+
   const {
     data,
     isLoading,
@@ -24,6 +28,11 @@ const NudgeMember = () => {
   } = useGroupMembers(group?.id as string);
 
   const members = data?.pages?.flatMap((page) => page) || [];
+  const removeMemberRef = useRef<BottomSheet>(null);
+
+  const onPress = () => {
+    removeMemberRef.current?.snapToIndex(0);
+  };
 
   if (!group) return; // should never happen
 
@@ -31,14 +40,17 @@ const NudgeMember = () => {
 
   const renderItem = ({ item }: { item: GroupMember }) => {
     return (
-      <ViewGroupProfile
-        id={item.id}
-        username={item.username}
-        name={item.name}
-        profilePhoto={item?.profilePhoto}
-        managerView={isManager}
-        role={item.role}
-      />
+      <Box paddingBottom="m">
+        <ViewGroupProfile
+          id={item.id}
+          onPress={onPress}
+          username={item.username}
+          name={item.name}
+          profilePhoto={item?.profilePhoto}
+          managerView={isManager}
+          role={item.role}
+        />
+      </Box>
     );
   };
 
@@ -54,7 +66,6 @@ const NudgeMember = () => {
     error: error ? error.message : null,
   };
 
-  // TODO: create loading skeleton
   const SuccessComponent = () => (
     <FlatList
       style={{ width: "100%" }}
@@ -69,25 +80,28 @@ const NudgeMember = () => {
   );
 
   return (
-    <SafeAreaView className="flex-1">
-      <Box
-        width="100%"
-        paddingTop="xl"
-        padding="m"
-        flex={1}
-        justifyContent="flex-start"
-        alignItems="flex-start"
-      >
-        <Text variant="bodyLargeBold">{group.name}</Text>
-        <ResourceView
-          resourceState={membersState}
-          successComponent={<SuccessComponent />}
-          loadingComponent={null}
-          errorComponent={<ErrorDisplay refresh={refetch} />}
-          emptyComponent={<EmptyDataDisplay />}
-        />
-      </Box>
-    </SafeAreaView>
+    <>
+      <SafeAreaView className="flex-1">
+        <Box
+          width="100%"
+          paddingTop="xl"
+          padding="m"
+          flex={1}
+          justifyContent="flex-start"
+          alignItems="flex-start"
+        >
+          <Text variant="bodyLargeBold">{group.name}</Text>
+          <ResourceView
+            resourceState={membersState}
+            successComponent={<SuccessComponent />}
+            loadingComponent={null}
+            errorComponent={<ErrorDisplay refresh={refetch} />}
+            emptyComponent={<EmptyDataDisplay />}
+          />
+        </Box>
+      </SafeAreaView>
+      <RemoveMemberPopUp ref={removeMemberRef} />
+    </>
   );
 };
 
