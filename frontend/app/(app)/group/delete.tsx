@@ -1,13 +1,20 @@
 import { useUserStore } from "@/auth/store";
 import { SafeAreaView } from "react-native";
 import SimplePage from "@/design-system/components/shared/simple-page";
-import { deleteGroup } from "@/api/group";
+import { router } from "expo-router";
 import { useDeleteGroup } from "@/hooks/api/group";
 
 const DeleteGroup = () => {
-  const { group } = useUserStore();
+  const { group, setSelectedGroup } = useUserStore();
   
-  const { mutate: deleteGroup, isPending, error, isError} = useDeleteGroup(group?.id as string);
+  const { mutate: mutateGroup, isPending, error, isError} = useDeleteGroup();
+
+  const deleteGroup = () => {
+    mutateGroup(group?.id as String);
+    router.back();
+    router.back();
+    setSelectedGroup(null);
+  }
   
   if (!group) return; // should never happen
   
@@ -19,7 +26,7 @@ const DeleteGroup = () => {
         isLoading={isPending}
         isError={isError}
         error={error}
-        onPress={() => deleteGroup}
+        onPress={deleteGroup}
         buttonLabel="Delete Group"
         description="Deleting a group cannot be undone. All photos uploaded in this group will deleted."
       />
