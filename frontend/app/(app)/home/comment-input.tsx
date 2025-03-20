@@ -4,12 +4,16 @@ import React, { useState } from "react";
 import MultitrackAudio from "@/assets/audio.svg"
 import { Recording } from "@/design-system/components/comments/recording";
 import { Box } from "@/design-system/base/box";
+import { CommentPopUp } from "@/design-system/components/comments/comment-popup";
 
-export const CommentInput = () => {
+
+interface Props {
+    onPress: () => void;
+}
+
+export const CommentInput: React.FC<Props> = ({onPress})=> {
     const [recording, setRecording] = useState<boolean>(false);
-
     const sendComment = (uri : string) => {
-
     }
 
     return (
@@ -17,7 +21,7 @@ export const CommentInput = () => {
             {recording ?  
             <Recording onSend={sendComment} onClose={() => setRecording(false)} />
             :
-            <Input placeholder="Write or record a message..." rightIcon={<MultitrackAudio onPress={() => setRecording(true)}/>}/>
+            <Input onPress={onPress} isButton placeholder="Write or record a message..." rightIcon={<MultitrackAudio onPress={() => setRecording(true)}/>}/>
             } 
         </Box>
     )
