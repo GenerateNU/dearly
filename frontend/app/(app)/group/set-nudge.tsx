@@ -7,7 +7,7 @@ import { useState } from "react";
 import { Text } from "@/design-system/base/text";
 
 const SetRecurringNudge = () => {
-  const FREQUENCY_OPTIONS = ["Off", "Daily", "Weekly", "Biweekly", "Monthly"];
+  const FREQUENCY_OPTIONS = ["Disabled", "Daily", "Twice a Week", "Weekly", "Biweekly", "Monthly"];
   const [option, setOption] = useState<string | null>(null);
   const [items, setItems] = useState<DropdownItem[]>(
     FREQUENCY_OPTIONS.map((item) => ({ value: item, label: item })),
