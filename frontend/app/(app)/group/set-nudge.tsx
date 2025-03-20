@@ -5,6 +5,7 @@ import { Dropdown } from "@/design-system/components/shared/controls/dropdown";
 import { DropdownItem } from "@/types/dropdown";
 import { useState } from "react";
 import { Text } from "@/design-system/base/text";
+import WeeklyNudgeSettings from "./components/weekly-nudge-settings";
 
 const SetRecurringNudge = () => {
   const FREQUENCY_OPTIONS = ["Disabled", "Daily", "Twice a Week", "Weekly", "Biweekly", "Monthly"];
@@ -25,11 +26,15 @@ const SetRecurringNudge = () => {
         gap="m"
       >
         <Text variant="bodyLargeBold">Set Recurring Nudges</Text>
+        <Text variant="caption">SELECT FREQUENCY</Text>
         <Dropdown value={option} items={items} setValue={setOption} setItems={setItems} />
         <Box width="100%" alignItems="center">
           <Box width="25%">
             <TextButton onPress={() => null} label="Save" variant="primary" />
           </Box>
+          {option === "Weekly" && (
+            <WeeklyNudgeSettings/>
+          )}
         </Box>
       </Box>
     </SafeAreaView>
