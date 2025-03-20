@@ -57,39 +57,6 @@ export const useQueryPagination = <T>(
   });
 };
 
-/**
- * Custom hook for paginated queries with id paramter.
- * TODO: should this be combines with upper function for less repeated code?
- *
- * @param key - The query key used for caching and tracking.
- * @param id - the related id queries should be made from
- * @param queryFunction - The query function that fetches paginated data.
- * @param options - Additional options for the query.
- * @param limit - The number of items to fetch per page.
- * @returns The result from the useInfiniteQuery hook.
-
- */
-export const useQueryPaginationWithID = <T>(
-  key: string[],
-  id: string,
-  queryFunction: (id: string, limit: number, page: number) => Promise<T>,
-  options: any = {},
-  limit: number = 10,
-) => {
-  return useInfiniteQuery<T, Error>({
-    queryKey: key,
-    queryFn: async ({ pageParam = 1 }) => {
-      return queryFunction(id, limit, pageParam as number);
-    },
-    initialPageParam: 1,
-    keepPreviousData: true,
-    getNextPageParam: (lastPage, allPages) => {
-      return Array.isArray(lastPage) && lastPage.length > 0 ? allPages.length + 1 : undefined;
-    },
-    ...options,
-  });
-};
-
 interface ToggleBaseOptions<T, P> {
   initialState: boolean;
   data: T | undefined;

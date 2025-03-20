@@ -1,8 +1,8 @@
 import { CreatePostPayload, Post } from "@/types/post";
-import { useMutationBase, useQueryPaginationWithID } from "./base";
+import { useMutationBase, useQueryPagination } from "./base";
 import { createPost } from "@/api/post";
-import { getGroupFeed } from "@/api/group";
 import { useUserStore } from "@/auth/store";
+import { getGroupFeed } from "@/api/group";
 
 /**
  * Hook to create a new post
@@ -18,5 +18,19 @@ export const useCreatePost = (groupId: string) => {
 
 export const useGroupFeed = (options: any = {}) => {
   const { group } = useUserStore();
-  return useQueryPaginationWithID<Post>(["users", "feed"], group.id, getGroupFeed, options, 10);
+  if (!group) {
+    throw new Error("Group not found");
+  }
+
+  return useQueryPagination<Post[]>(
+    ["users", "feed"],
+    (page, limit) => {
+      if (!group.id) {
+        throw new Error("Group ID is undefined");
+      }
+      return getGroupFeed(group.id, page, limit) as Promise<Post[]>;
+    },
+    options,
+    10,
+  );
 };
