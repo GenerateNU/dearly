@@ -17,6 +17,10 @@ const SwitchGroupButton: React.FC<SwitchGroupProps> = ({ onPress }) => {
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
+
+    if (!group) {
+      setIsInitialized(false)
+    }
     if (isInitialized || isLoading || error) {
       return;
     }
@@ -26,7 +30,6 @@ const SwitchGroupButton: React.FC<SwitchGroupProps> = ({ onPress }) => {
     }
 
     const shouldUpdateGroup = !group || !groups.some((g) => g.id === group.id);
-
     if (shouldUpdateGroup && groups[0]) {
       setSelectedGroup(groups[0]);
     }
@@ -36,7 +39,7 @@ const SwitchGroupButton: React.FC<SwitchGroupProps> = ({ onPress }) => {
 
   if (!group || groups.length === 0) {
     return null;
-  }
+  } 
 
   const displayName = group.name.length > 10 ? `${group.name.substring(0, 8)}...` : group.name;
 

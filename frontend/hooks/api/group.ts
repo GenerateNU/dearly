@@ -35,8 +35,8 @@ export const useUpdateGroup = (id: string) => {
  *
  * @returns Mutation object for deleting a group
  */
-export const useDeleteGroup = (id: string) => {
-  return useMutationBase<object, void>(() => deleteGroup(id), ["users", "groups"]);
+export const useDeleteGroup = () => {
+  return useMutationBase<string, void>((id) => deleteGroup(id), ["users", "groups"]);
 };
 
 /**
