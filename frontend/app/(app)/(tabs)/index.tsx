@@ -4,9 +4,8 @@ import { useUserGroups } from "@/hooks/api/user";
 import ResourceView from "@/design-system/components/utilities/resource-view";
 import ErrorDisplay from "@/design-system/components/shared/states/error";
 import Spinner from "@/design-system/components/shared/spinner";
-import { useInvitations } from "@/hooks/api/invite";
-import { TextButton } from "@/design-system/components/shared/buttons/text-button";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Text } from "@/design-system/base/text";
 
 const Home = () => {
   const { data, isLoading, error, refetch } = useUserGroups();
@@ -18,12 +17,6 @@ const Home = () => {
     error: error ? error.message : null,
   };
 
-  const SuccessComponent = () => (
-    <>
-      <TextButton variant="text" label="Send Message" onPress={useInvitations} />
-    </>
-  );
-
   return (
     <SafeAreaView className="flex-1 pt-[35%]">
       <Box
@@ -34,12 +27,13 @@ const Home = () => {
         backgroundColor="pearl"
         flex={1}
       >
+        <Box></Box>
         <ResourceView
           resourceState={groupsResource}
           loadingComponent={<Spinner />}
           errorComponent={<ErrorDisplay refresh={refetch} />}
           emptyComponent={<EmptyHomePage />}
-          successComponent={<SuccessComponent />}
+          successComponent={<Text>Home Feed</Text>}
         />
       </Box>
     </SafeAreaView>
