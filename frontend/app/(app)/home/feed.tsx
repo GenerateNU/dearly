@@ -4,7 +4,6 @@ import { Box } from "@/design-system/base/box";
 import { Post } from "@/types/post";
 import { useGroupFeed } from "@/hooks/api/post";
 import PostSkeleton from "./skeleton";
-import { useToggleLike } from "@/hooks/api/like";
 import { CommentInput } from "./comment-input";
 import { useRef, useState } from "react";
 import BottomSheet from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheet/BottomSheet";

@@ -70,7 +70,7 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
         likes={likes}
         comments={comments}
       />
-      <Box gap="s" flexDirection="row" justifyContent="flex-start" alignItems="flex-start">
+      <Box gap="s" flexDirection="row" justifyContent="flex-start" alignItems="center" >
         <Box>
           <Text>💬</Text>
         </Box>

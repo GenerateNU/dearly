@@ -14,7 +14,6 @@ interface CommentPopUpProps {
 }
 
 export const CommentPopUp = forwardRef<BottomSheetMethods, CommentPopUpProps>((props, ref) => {
-  console.log(props.id)
   return (
     <BottomSheetModal ref={ref} snapPoints={["50%", "90%"]}>
       {props.id == "" ? <CommentPopUpBlank/> : <CommentPopUpData id={props.id}/>}

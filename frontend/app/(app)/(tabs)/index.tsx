@@ -24,7 +24,7 @@ const Home = () => {
   };
 
   const SuccessComponent = () => (
-    <Box flexDirection="column" gap="m">
+    <Box flexDirection="column" gap="m" paddingTop="m" paddingHorizontal="m">
       <HomeMenu
         categories={["Feed", "Calendar"]}
         selected={selectedView}
@@ -37,8 +37,6 @@ const Home = () => {
   return (
     <SafeAreaView edges={["top"]} className="flex-1 pt-[35%]">
       <Box
-        paddingHorizontal="m"
-        paddingTop="m"
         gap="xl"
         alignItems="center"
         justifyContent="flex-start"
