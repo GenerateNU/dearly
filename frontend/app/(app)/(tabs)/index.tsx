@@ -35,7 +35,7 @@ const Home = () => {
   );
 
   return (
-    <SafeAreaView className="flex-1 pt-[35%]">
+    <SafeAreaView edges={["top"]} className="flex-1 pt-[35%]">
       <Box
         paddingHorizontal="m"
         paddingTop="m"

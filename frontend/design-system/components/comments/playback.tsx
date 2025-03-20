@@ -29,7 +29,7 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
   const [sound, setSound] = useState<Audio.Sound>();
   const [length, setLength] = useState<number>(0);
   const [memoLines, setMemoLines] = useState<number[]>([]);
-  const numLines = 25;
+  const numLines = 23;
   const [totalLength, setTotalLength] = useState<number>(0);
 
   useEffect(() => {
@@ -99,7 +99,7 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
       backgroundColor={local ? "pearl" : "honey"}
       paddingLeft="s"
       gap="s"
-      width="70%"
+      width="100%"
       height={50}
       borderRadius="l"
       flexDirection="row"
@@ -116,7 +116,7 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
       ) : (
         <IconButton variant="smallIconPearlBorder" onPress={playRecording} icon="play" size={20} />
       )}
-      {local && <Text variant="bodyLarge">{formatSeconds(length)}</Text>}
+      <Text variant="bodyLarge">{formatSeconds(length)}</Text>
       <Box flexDirection="row" gap="xs" alignItems="center">
         {memoLines.map((item, index) => (
           <Box
@@ -130,7 +130,6 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
           ></Box>
         ))}
       </Box>
-      {!local && <Text variant="bodyLarge">{formatSeconds(length)}</Text>}
     </Box>
   );
 };
