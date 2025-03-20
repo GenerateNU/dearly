@@ -12,6 +12,8 @@ import EmptyDataDisplay from "@/design-system/components/shared/states/empty";
 import RemoveMemberPopUp from "@/design-system/components/shared/settings/remove-member-popup";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { useRef } from "react";
+import LoadingMembers from "./components/loading-member";
+import MemberSkeleton from "./components/member-skeleton";
 
 const NudgeMember = () => {
   const { group, userId } = useUserStore();
@@ -67,6 +69,11 @@ const NudgeMember = () => {
     error: error ? error.message : null,
   };
 
+  const renderFooter = () => {
+    if (!isFetchingNextPage) return null;
+    return <MemberSkeleton />;
+  };
+
   const SuccessComponent = () => (
     <FlatList
       style={{ width: "100%" }}
@@ -74,7 +81,7 @@ const NudgeMember = () => {
       data={members}
       renderItem={renderItem}
       keyExtractor={(_, index) => `member-${index}`}
-      // ListFooterComponent={renderFooter}
+      ListFooterComponent={renderFooter}
       onEndReached={onEndReached}
       onEndReachedThreshold={0.5}
       showsVerticalScrollIndicator={false}
@@ -96,7 +103,7 @@ const NudgeMember = () => {
           <ResourceView
             resourceState={membersState}
             successComponent={<SuccessComponent />}
-            loadingComponent={null}
+            loadingComponent={<LoadingMembers />}
             errorComponent={<ErrorDisplay refresh={refetch} />}
             emptyComponent={<EmptyDataDisplay />}
           />
