@@ -1,5 +1,6 @@
-import { toggleLike } from "@/api/like";
-import { useMutationBase } from "./base";
+import { getAllLikeUsers, toggleLike } from "@/api/like";
+import { useMutationBase, useQueryPagination } from "./base";
+import { LikePostUsers } from "@/types/post";
 
 /**
  * Hook to toggle the like of a given postId.
@@ -8,4 +9,10 @@ import { useMutationBase } from "./base";
  */
 export const useToggleLike = (postId: string) => {
   return useMutationBase<void, void>(() => toggleLike(postId), ["posts", postId]);
+};
+
+export const useGetAllLikeUsers = (postId: string, limit?: number, page?: number) => {
+  return useQueryPagination<LikePostUsers>(["posts", postId, "likes"], () =>
+    getAllLikeUsers(postId, limit, page),
+  );
 };

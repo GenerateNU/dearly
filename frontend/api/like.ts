@@ -22,7 +22,7 @@ export const getAllLikeUsers = async (
   page?: number,
 ): Promise<LikePostUsers> => {
   const req = async (token: string): Promise<LikePostUsers> => {
-    const { data } = await fetchClient.GET("/api/v1/groups/{id}/members", {
+    const { data } = await fetchClient.GET("/api/v1/posts/{id}/likes", {
       headers: getHeaders(token),
       params: {
         path: {

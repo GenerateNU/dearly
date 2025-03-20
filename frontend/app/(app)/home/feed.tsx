@@ -24,11 +24,6 @@ const Feed = () => {
     return <PostSkeleton />;
   };
 
-  const onLikeClicked = (postId: string) => {
-    const { mutate } = useToggleLike(postId);
-    mutate();
-  };
-
   const renderItem = ({ item }: { item: Post }) => {
     return (
       <Box paddingBottom="m" gap="s">
@@ -46,9 +41,8 @@ const Feed = () => {
           caption={item.caption}
           media={item.media}
           onCommentClicked={() => null}
-          onLikeClicked={() => onLikeClicked(item.id)}
         />
-        <CommentInput/>
+        <CommentInput />
       </Box>
     );
   };
@@ -61,7 +55,7 @@ const Feed = () => {
       renderItem={renderItem}
       ListFooterComponent={renderFooter}
       onEndReachedThreshold={0.5}
-    ></FlatList>
+    />
   );
 };
 

@@ -5,7 +5,8 @@ import { PostHeader } from "./header";
 import { Media } from "@/types/media";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { useGetAllLikeUsers, useToggleLike } from "@/hooks/api/like";
 
 interface Props {
   onCommentClicked: () => void;
@@ -22,11 +23,10 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
   location,
   isLiked,
   comments,
-  likes,
+  // likes,
   caption,
   media,
   onCommentClicked,
-  onLikeClicked,
 }) => {
   const [like, setLike] = useState(isLiked);
   const data = media
@@ -35,6 +35,22 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
         typeof item.url === "string" && item.url !== "",
     )
     .map((item) => item.url);
+
+  const { mutate } = useToggleLike(id);
+  const { data: like_data, refetch } = useGetAllLikeUsers(id);
+
+  const likePost = useCallback(() => {
+    mutate();
+    setLike(!like);
+    refetch();
+  }, [mutate, refetch]);
+
+  const likes = like_data?.pages?.reduce((total, page) => total + page.length, 0) || 0;
+
+  const onLikeClick = () => {
+    null;
+  };
+
   return (
     <Box flexDirection="column" gap="s">
       <PostHeader
@@ -45,10 +61,10 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
         createdAt={createdAt}
         onPress={() => null}
       />
-      <ImageCarousel setLike={() => setLike(!like)} like={like} data={data} />
+      <ImageCarousel setLike={likePost} like={like} data={data} />
       <CommentLike
         onCommentClicked={onCommentClicked}
-        onLikeClicked={onLikeClicked}
+        onLikeClicked={onLikeClick}
         liked={like}
         postId={id}
         likes={likes}
