@@ -51,10 +51,14 @@ export const Dropdown: React.FC<DropdownProps> = ({
         }}
         style={{
           backgroundColor: pearlColor,
+          overflow: "hidden",
+        }}
+        dropDownContainerStyle={{
+          backgroundColor: pearlColor,
         }}
         listItemContainerStyle={{
           backgroundColor: pearlColor,
-          borderRadius: 8,
+          borderRadius: 20,
         }}
         disabled={isLoading}
         ListEmptyComponent={() =>
@@ -86,6 +90,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
         flatListProps={{
           onEndReached: onEndReached,
           onEndReachedThreshold: 0.5,
+          showsVerticalScrollIndicator: false,
         }}
         bottomOffset={80}
       />

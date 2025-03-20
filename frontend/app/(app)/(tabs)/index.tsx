@@ -27,7 +27,6 @@ const Home = () => {
         backgroundColor="pearl"
         flex={1}
       >
-        <Box></Box>
         <ResourceView
           resourceState={groupsResource}
           loadingComponent={<Spinner />}

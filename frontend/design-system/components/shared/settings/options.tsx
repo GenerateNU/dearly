@@ -13,7 +13,8 @@ type AppRoute =
   | "/(app)/group/add-member"
   | "/(app)/group/delete"
   | "/(app)/group/leave"
-  | "/(app)/group/change-name";
+  | "/(app)/group/change-name"
+  | "/(app)/group/set-nudge";
 
 const GroupOptionContent: React.FC<CloseModalProps> = ({ close }) => {
   const { group, userId } = useUserStore();
@@ -48,7 +49,7 @@ const GroupOptionContent: React.FC<CloseModalProps> = ({ close }) => {
           />
           <TextButton
             textVariant="bodyLargeBold"
-            onPress={() => null}
+            onPress={() => handleNavigation("/(app)/group/set-nudge")}
             label="Set Recurring Nudge"
             variant="text"
           />

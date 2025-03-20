@@ -36,6 +36,16 @@ const Layout = () => {
             }}
           />
           <Stack.Screen
+            name="set-nudge"
+            options={{
+              headerShown: true,
+              headerTitle: "",
+              headerTransparent: true,
+              gestureEnabled: false,
+              headerLeft: () => <BackIcon />,
+            }}
+          />
+          <Stack.Screen
             name="invite"
             options={{
               headerShown: false,
