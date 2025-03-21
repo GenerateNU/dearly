@@ -2,7 +2,7 @@ import { Box } from "@/design-system/base/box";
 import { BaseButton } from "@/design-system/base/button";
 import { Text } from "@/design-system/base/text";
 import { useUserStore } from "@/auth/store";
-import { Icon } from "@/design-system/components/ui/icon";
+import { Icon } from "@/design-system/components/shared/icons/icon";
 
 const InfoBar = () => {
   const { group } = useUserStore();

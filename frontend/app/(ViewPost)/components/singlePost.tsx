@@ -1,5 +1,5 @@
 import { Box } from "@/design-system/base/box";
-import { IconButton } from "@/design-system/components/ui/icon-button";
+import { IconButton } from "@/design-system/components/shared/buttons/icon-button";
 import { router } from "expo-router";
 import { Text } from "@/design-system/base/text";
 import { CommentPopUp } from "@/design-system/components/comments/comment-popup";

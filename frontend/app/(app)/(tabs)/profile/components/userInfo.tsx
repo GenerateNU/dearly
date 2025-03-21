@@ -1,5 +1,5 @@
 import { Box } from "@/design-system/base/box";
-import { Profile } from "@/design-system/components/ui/profile";
+import { Profile } from "@/design-system/components/profiles/profile";
 
 interface UserInfoProps {
   username: string;
