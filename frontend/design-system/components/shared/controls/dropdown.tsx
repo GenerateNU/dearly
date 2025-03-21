@@ -14,6 +14,7 @@ interface DropdownProps {
   setItems: Dispatch<SetStateAction<DropdownItem[]>>;
   isLoading?: boolean;
   onEndReached?: () => void;
+  direction?: "BOTTOM" | "TOP" | "DEFAULT";
 }
 
 export const Dropdown: React.FC<DropdownProps> = ({
@@ -23,8 +24,9 @@ export const Dropdown: React.FC<DropdownProps> = ({
   setItems,
   isLoading = false,
   onEndReached,
+  direction
 }) => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false); // TODO: on press to control from outside
 
   const theme = useTheme<Theme>();
 
@@ -35,9 +37,10 @@ export const Dropdown: React.FC<DropdownProps> = ({
   };
 
   return (
-    <Box>
+    <Box zIndex={10}>
       <DropDownPicker
         open={open}
+        dropDownDirection={direction}
         value={value}
         items={items}
         setOpen={setOpen}

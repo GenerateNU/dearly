@@ -1,4 +1,4 @@
-import React, { createContext, useState, ReactNode, useContext } from "react";
+import { createContext, useState, ReactNode, useContext, SetStateAction, Dispatch } from "react";
 
 export interface NudgeSettings {
   group: string;
@@ -10,21 +10,17 @@ export interface NudgeSettings {
 }
 
 interface NudgeSettingsContextType {
-  nudgeSettings: NudgeSettings | null;
-  setRecurringNudge: (updatedNudgeSetting: NudgeSettings | null) => void;
   frequency: string | null;
-  setFrequency: (frequency: string | null) => void;
+  setFrequency: Dispatch<SetStateAction<string | null>>;
   dayOfWeek: string | null;
-  setDayOfWeek: (dayOfWeek: string | null) => void;
+  setDayOfWeek: Dispatch<SetStateAction<string | null>>;
   dayOfMonth: number | null;
-  setDayOfMonth: (dayOfMonth: number | null) => void;
+  setDayOfMonth: Dispatch<SetStateAction<number | null>>;
   nudgeAt: Date | null;
-  setNudgeAt: (updatedNudgeTime: Date | null) => void;
+  setNudgeAt: Dispatch<SetStateAction<Date | null>>;
 }
 
 export const NudgeSettingsContext = createContext<NudgeSettingsContextType>({
-  nudgeSettings: null,
-  setRecurringNudge: () => {},
   frequency: null,
   setFrequency: () => {},
   dayOfWeek: null,
@@ -49,8 +45,6 @@ export const NudgeSettingsProvider: React.FC<NudgeSettingsProviderProps> = ({ ch
   return (
     <NudgeSettingsContext.Provider
       value={{
-        nudgeSettings,
-        setRecurringNudge,
         frequency,
         setFrequency,
         dayOfWeek,

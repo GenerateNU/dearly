@@ -5,21 +5,64 @@ import { Dropdown } from "@/design-system/components/shared/controls/dropdown";
 import { DropdownItem } from "@/types/dropdown";
 import { useEffect, useState } from "react";
 import { Text } from "@/design-system/base/text";
-import WeeklyNudgeSettings from "./components/weekly-nudge-settings";
 import { useNudgeSettings } from "@/contexts/nudge-settings";
+import NudgeSettings from "./components/nudge-settings";
+import NudgeAtTimePicker from "./components/nudge-time-settings";
+
+const WEEKLY_OPTIONS = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+const MONTHLY_OPTIONS = Array.from({ length: 31 }, (_, i) => String(i + 1));
+const FREQUENCY_OPTIONS = ["Disabled", "Daily", "Twice a Week", "Weekly", "Biweekly", "Monthly"];
 
 const SetRecurringNudge = () => {
-  const FREQUENCY_OPTIONS = ["Disabled", "Daily", "Twice a Week", "Weekly", "Biweekly", "Monthly"];
   const [items, setItems] = useState<DropdownItem[]>(
     FREQUENCY_OPTIONS.map((item) => ({ value: item, label: item })),
   );
 
-  const { frequency, setFrequency } = useNudgeSettings();
+  const { frequency, setFrequency, dayOfWeek, setDayOfWeek, dayOfMonth, setDayOfMonth } = useNudgeSettings();
 
   // Sets the schedule
   const onPress = () => {
     // TODO: call nudge endpoint
   };
+
+  const renderSettings = () => {
+    switch (frequency) {
+      case "Disabled":
+        return <></>
+      case "Daily":
+        return <NudgeAtTimePicker/>
+      case "Weekly":
+        return <NudgeSettings options={WEEKLY_OPTIONS} curOption={dayOfWeek} setOption={setDayOfWeek}/>
+      case "Twice a Week":
+        return (
+          <>
+            <Box>
+              <Text>First Nudge</Text>
+              <NudgeSettings options={WEEKLY_OPTIONS} curOption={dayOfWeek} setOption={setDayOfWeek}/>
+            </Box>
+            <Box>
+              <Text>Second Nudge</Text>
+              <NudgeSettings options={WEEKLY_OPTIONS} curOption={dayOfWeek} setOption={setDayOfWeek}/>
+            </Box>
+          </>
+        )
+      case "Biweekly":
+        return <NudgeSettings options={WEEKLY_OPTIONS} curOption={dayOfWeek} setOption={setDayOfWeek}/>
+      case "Monthly":
+        return <NudgeSettings options={MONTHLY_OPTIONS} curOption={String(dayOfMonth)} setOption={setDayOfWeek}/> // TODO: Update to generic type to accept number options
+      default:
+        return <></>
+      
+    }
+  }
 
   return (
     <SafeAreaView className="flex-1">
@@ -34,12 +77,12 @@ const SetRecurringNudge = () => {
       >
         <Text variant="bodyLargeBold">Set Recurring Nudges</Text>
         <Text variant="caption">SELECT FREQUENCY</Text>
-        <Dropdown value={frequency} items={items} setValue={setFrequency} setItems={setItems} />
+        <Dropdown direction="BOTTOM" value={frequency} items={items} setValue={setFrequency} setItems={setItems} />
         <Box width="100%" alignItems="center">
+          {renderSettings()}
           <Box width="25%">
             <TextButton onPress={() => null} label="Save" variant="primary" />
           </Box>
-          {frequency === "Weekly" && <WeeklyNudgeSettings />}
         </Box>
       </Box>
     </SafeAreaView>
