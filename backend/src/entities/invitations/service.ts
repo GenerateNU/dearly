@@ -1,8 +1,6 @@
 import { nanoid } from "nanoid";
 import {
-  ForbiddenError,
   InternalServerError,
-  NotFoundError,
 } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
 import { InvitationTransaction } from "./transaction";
@@ -23,13 +21,7 @@ export class InvitationServiceImpl implements InvitationService {
 
   async verifyInviteToken(token: string, userId: string): Promise<void> {
     const verifyInviteTokenImpl = async () => {
-      const groupId = await this.invitationTransaction.getGroupIdFromToken(token);
-      if (await this.invitationTransaction.isManager(userId, groupId)) {
-        throw new NotFoundError("Group");
-      }
-      if (!(await this.invitationTransaction.verifyToken(token, groupId))) {
-        throw new ForbiddenError("Token is invalid");
-      }
+      const groupId = await this.invitationTransaction.getGroupIdFromToken(token, userId);
       const payload: AddMemberPayload = {
         groupId: groupId,
         userId: userId,
@@ -46,9 +38,6 @@ export class InvitationServiceImpl implements InvitationService {
       const token = nanoid();
       const sevenDaysFromToday = new Date();
       sevenDaysFromToday.setDate(sevenDaysFromToday.getDate() + 7);
-      if (!(await this.invitationTransaction.isManager(userId, groupId))) {
-        throw new NotFoundError("Group");
-      }
       const uploadedEncoding = await this.invitationTransaction.insertInvitation(
         {
           groupId: groupId,

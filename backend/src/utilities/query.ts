@@ -1,4 +1,4 @@
-import { sql, eq } from "drizzle-orm";
+import { sql, eq, and } from "drizzle-orm";
 import {
   commentsTable,
   likesTable,
@@ -47,3 +47,21 @@ export const getSharedGroups = (db: PostgresJsDatabase, viewee: string, viewer: 
         .where(eq(membersTable.userId, viewer)),
     );
 };
+
+/**
+ * Determines if a given user is the manager of the given group.
+ */
+export const isManager = async (db : PostgresJsDatabase, userId : string, groupId : string) => {
+    const managerTx = await db.transaction(async (tx) => {
+      const [manager] = await tx
+        .select()
+        .from(membersTable)
+        .where(and(eq(membersTable.userId, userId), eq(membersTable.groupId, groupId)));
+      if (!manager) {
+        return false;
+      } else {
+        return manager.role === "MANAGER";
+      }
+    });
+    return managerTx;
+}
