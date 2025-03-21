@@ -24,7 +24,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
   setItems,
   isLoading = false,
   onEndReached,
-  direction
+  direction,
 }) => {
   const [open, setOpen] = useState(false); // TODO: on press to control from outside
 
