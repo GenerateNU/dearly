@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Box } from "@/design-system/base/box";
 import { Icon } from "@/design-system/components/shared/icons/icon";
 import { getUser } from "@/api/user";
@@ -99,6 +100,16 @@ const UserInfo = ({ username, name, profilePhoto, bio, birthday }: UserInfoProps
   );
 };
 
+=======
+
+import { Text } from "@/design-system/base/text";
+import { useQuery } from "@tanstack/react-query";
+import { useUserStore } from "@/auth/store";
+import { getMemberPosts } from "@/api/member";
+import { MasonryList } from "@/design-system/components/posts/masonry";
+import { Box } from "@/design-system/base/box";
+import { Post } from "@/types/post";
+>>>>>>> 3da5119fc8c4422787058dee7ef7a0da6212c9a6
 const UserPosts = () => {
   const { userId, group } = useUserStore();
   const p1: Post = {
