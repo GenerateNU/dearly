@@ -51,7 +51,11 @@ export class ExpoNotificationService implements NotificationService {
   private likeChannel: RealtimeChannel | null;
   private commentChannel: RealtimeChannel | null;
 
-  constructor(client: SupabaseClient, transaction: NotificationTransaction, expo: ExpoPushService) {
+  constructor(
+    client: SupabaseClient,
+    transaction: NotificationTransaction,
+    expo: PushNotificationService,
+  ) {
     this.expoService = expo;
     this.supabaseClient = client;
     this.transaction = transaction;
