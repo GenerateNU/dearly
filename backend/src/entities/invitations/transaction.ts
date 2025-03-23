@@ -13,6 +13,7 @@ import {
   GroupInvitation,
 } from "../../types/api/internal/invite";
 import { isManager } from "../../utilities/api/query";
+import { Transaction } from "../../types/api/internal/transaction";
 
 /**
  * Interface defining the operations related to group invitations and member management in the transaction layer.
@@ -68,25 +69,24 @@ export class InvitationTransactionImpl implements InvitationTransaction {
       }
       const groupId = result.groupId;
 
-      if (await isManager(this.db, userId, groupId)) {
+      if (await isManager(tx, userId, groupId)) {
         throw new NotFoundError("Group");
       }
-      if (!(await this.verifyToken(token, groupId))) {
+
+      if (!(await this.verifyToken(tx, token, groupId))) {
         throw new ForbiddenError("Token is invalid");
       }
       return groupId;
     });
   }
 
-  private async verifyToken(token: string, groupId: string): Promise<boolean> {
-    return await this.db.transaction(async (tx) => {
-      const match = and(eq(linksTable.token, token), eq(linksTable.groupId, groupId));
-      const [query] = await tx.select().from(linksTable).where(match);
-      if (!query || query.expiresAt < new Date()) {
-        return false;
-      }
-      return true;
-    });
+  private async verifyToken(tx: Transaction, token: string, groupId: string): Promise<boolean> {
+    const match = and(eq(linksTable.token, token), eq(linksTable.groupId, groupId));
+    const [query] = await tx.select().from(linksTable).where(match);
+    if (!query || query.expiresAt < new Date()) {
+      return false;
+    }
+    return true;
   }
 
   async insertUserByInvitation(payload: AddMemberPayload): Promise<void> {
@@ -102,10 +102,10 @@ export class InvitationTransactionImpl implements InvitationTransaction {
     payload: CreateLinkPayload,
     userId: string,
   ): Promise<GroupInvitation | null> {
-    if (!(await isManager(this.db, userId, payload.groupId))) {
-      throw new NotFoundError("Group");
-    }
     const createdInvitation = await this.db.transaction(async (tx) => {
+      if (!(await isManager(tx, userId, payload.groupId))) {
+        throw new NotFoundError("Group");
+      }
       const [link] = await tx.insert(linksTable).values(payload).returning();
       if (!link) {
         return null;

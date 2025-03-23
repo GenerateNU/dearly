@@ -9,6 +9,7 @@ import {
 } from "../../entities/schema";
 import { Media } from "../../types/api/internal/media";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import { Transaction } from "../../types/api/internal/transaction";
 
 export const getPostMetadata = (userId: string) => {
   return {
@@ -51,17 +52,15 @@ export const getSharedGroups = (db: PostgresJsDatabase, viewee: string, viewer: 
 /**
  * Determines if a given user is the manager of the given group.
  */
-export const isManager = async (db: PostgresJsDatabase, userId: string, groupId: string) => {
-  const managerTx = await db.transaction(async (tx) => {
-    const [manager] = await tx
-      .select()
-      .from(membersTable)
-      .where(and(eq(membersTable.userId, userId), eq(membersTable.groupId, groupId)));
-    if (!manager) {
-      return false;
-    } else {
-      return manager.role === "MANAGER";
-    }
-  });
-  return managerTx;
+export const isManager = async (tx: Transaction, userId: string, groupId: string) => {
+  const [manager] = await tx
+    .select()
+    .from(membersTable)
+    .where(and(eq(membersTable.userId, userId), eq(membersTable.groupId, groupId)));
+
+  if (!manager) {
+    return false;
+  } else {
+    return manager.role === "MANAGER";
+  }
 };
