@@ -11,10 +11,42 @@ import {
 import { CreateCommentPayload, createCommentValidate } from "../../types/api/internal/comments";
 import { paginationSchema } from "../../utilities/api/pagination";
 
+/**
+ * Interface defining the methods for interacting with comments.
+ * These methods allow toggling likes of comments, creating, deleting, and retrieving comments.
+ * Implementations of this interface handle the logic for these operations and manage interactions with the comment service.
+ */
 export interface CommentController {
+  /**
+   * Toggles the like status of a comment (like/unlike).
+   *
+   * @param ctx - The request context containing the necessary parameters and user details.
+   * @returns A response indicating the result of the like/unlike action.
+   */
   toggleLikeComment(ctx: Context): Promise<PatchCommentResponse>;
+
+  /**
+   * Creates a new comment for a specific post.
+   *
+   * @param ctx - The request context containing the data for the comment and user details.
+   * @returns A response containing the created comment and an HTTP status of 201.
+   */
   createComment(ctx: Context): Promise<CreateCommentResponse>;
+
+  /**
+   * Deletes a specific comment.
+   *
+   * @param ctx - The request context containing the necessary parameters (comment ID) and user details.
+   * @returns A response confirming the successful deletion of the comment.
+   */
   deleteComment(ctx: Context): Promise<DeleteCommentResponse>;
+
+  /**
+   * Retrieves a list of comments for a specific post with pagination.
+   *
+   * @param ctx - The request context containing the post ID, pagination details, and user details.
+   * @returns A response containing the comments for the post.
+   */
   getComments(ctx: Context): Promise<GetCommentResponse>;
 }
 

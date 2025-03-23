@@ -9,11 +9,42 @@ import { handleServiceError } from "../../utilities/errors/service-error";
 import { MediaService } from "../media/service";
 import { CommentTransaction } from "./transaction";
 
+/**
+ * Interface defining the operations related to comment services such as liking comment, creating, deleting, and fetching comments.
+ * The methods in this interface interact with a database or storage mechanism to perform the required actions.
+ */
 export interface CommentService {
+  /**
+   * Toggles the like status of a comment.
+   *
+   * @param payload - An object containing the ID of the comment and commenter ID to toggle the like status.
+   * @returns A boolean indicating whether the comment is now liked (true) or unliked (false).
+   */
   toggleLikeComment(payload: IDPayload): Promise<boolean>;
+
+  /**
+   * Creates a new comment.
+   *
+   * @param payload - An object containing the necessary data to create a new comment.
+   * @returns The created comment object.
+   */
   createComment(payload: CreateCommentPayload): Promise<Comment>;
+
+  /**
+   * Deletes a comment by its ID given comment id and user id.
+   *
+   * @param payload - An object containing the user ID of commenter and ID of the comment to be deleted.
+   * @returns A void response, confirming the deletion of the comment.
+   */
   deleteComment(payload: IDPayload): Promise<void>;
-  getComments(payload: CommentPagination): Promise<Comment[]>;
+
+  /**
+   * Retrieves a list of comments with pagination.
+   *
+   * @param payload - An object containing pagination details (e.g., page number, limit, post ID, user ID).
+   * @returns A list of comments with metadata (such as signed URLs for media files).
+   */
+  getComments(payload: CommentPagination): Promise<CommentWithMetadata[]>;
 }
 
 export class CommentServiceImpl implements CommentService {

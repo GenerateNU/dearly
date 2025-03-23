@@ -5,7 +5,19 @@ import { and, eq, desc } from "drizzle-orm";
 import { MediaService } from "../media/service";
 import { NotificationWithMedia as Notification } from "../../types/api/internal/notification";
 
+/**
+ * Interface defining the operations related to notifications in the transaction layer.
+ * These operations allow fetching notifications with media URLs, given a specific user's ID and pagination details.
+ */
 export interface NotificationTransactions {
+  /**
+   * Fetches a list of notifications for a specific user, including related media URLs and user profile photos.
+   * The results are paginated according to the provided limit and page.
+   *
+   * @param payload - An object containing `id` (receiver's user ID), `limit` (number of notifications to fetch), and `page` (page number for pagination).
+   * @param mediaService - An instance of the `MediaService` to fetch signed URLs for media objects.
+   * @returns A list of `Notification` objects, including media URLs and profile photo URLs, for the given user.
+   */
   getNotifications(payload: Pagination, mediaService: MediaService): Promise<Notification[]>;
 }
 

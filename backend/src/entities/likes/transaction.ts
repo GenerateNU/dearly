@@ -6,8 +6,27 @@ import { PaginationParams } from "../../utilities/api/pagination";
 import { IDPayload } from "../../types/api/internal/id";
 import { SearchedUser } from "../../types/api/internal/users";
 
+/**
+ * Interface defining the operations related to the transaction layer for handling likes on posts.
+ * This includes toggling likes and fetching users who liked a post, along with checking user membership.
+ */
 export interface LikeTransaction {
+  /**
+   * Toggles the like status for a specific post by a user.
+   * If the user has already liked the post, it will remove the like; otherwise, it will add the like.
+   *
+   * @param payload - An object containing the `id` (post ID) of the post and `userId` of the user performing the action.
+   * @returns A boolean indicating whether the like was successfully added (true) or removed (false).
+   */
   toggleLike(payload: IDPayload): Promise<boolean>;
+
+  /**
+   * Retrieves a list of users who have liked a specific post, with pagination support.
+   * The result includes user information such as name, username, profile photo, and a membership status flag.
+   *
+   * @param payload - An object containing the `id` (post ID), `userId` (to check user's membership), and pagination details (`limit` and `page`).
+   * @returns A list of `SearchedUser` objects representing the users who liked the post, including their profile photos and membership status.
+   */
   getLikeUsers(payload: IDPayload & PaginationParams): Promise<SearchedUser[]>;
 }
 
