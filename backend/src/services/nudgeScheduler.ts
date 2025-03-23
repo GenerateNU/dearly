@@ -12,9 +12,34 @@ import { NudgeSchedulePayload, SchedulePayload } from "../types/api/internal/nud
 import { getConfigurations } from "../config/init";
 
 export interface NudgeSchedulerService {
+  /**
+   * Adds a new schedule to the AWS EventBridge Scheduler with the provided payload.
+   * @param id - The identifier for the schedule.
+   * @param payload - The payload containing the schedule information.
+   * @returns The HTTP status code returned by AWS, or null if the request fails.
+   */
   addSchedule(id: string, payload: SchedulePayload): Promise<number | null>;
+
+  /**
+   * Updates an existing schedule with the given ID and payload.
+   * @param id - The identifier for the schedule to update.
+   * @param payload - The new schedule data to update.
+   * @returns The HTTP status code returned by AWS, or null if the request fails.
+   */
   updateSchedule(id: string, payload: SchedulePayload): Promise<number | null>;
+
+  /**
+   * Disables the schedule with the given ID, preventing further executions.
+   * @param id - The identifier of the schedule to disable.
+   * @returns The HTTP status code returned by AWS, or null if the request fails.
+   */
   disableSchedule(id: string): Promise<number | null>;
+
+  /**
+   * Removes the schedule with the given ID from the AWS EventBridge Scheduler.
+   * @param id - The identifier of the schedule to remove.
+   * @returns The HTTP status code returned by AWS, or null if the request fails.
+   */
   removeSchedule(id: string): Promise<number | null>;
 }
 
