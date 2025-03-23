@@ -4,8 +4,23 @@ import { BadRequestError, handleAppError } from "../../utilities/errors/app-erro
 import { parseUUID } from "../../utilities/api/uuid";
 import { GroupMediaResponse, UserMediaResponse } from "../../types/api/routes/media";
 
+/**
+ * Interface for handling media upload operations.
+ * Provides methods for uploading media files for posts and user profiles.
+ */
 export interface MediaController {
+  /**
+   * Uploads media files for a post.
+   * @param ctx - The context object containing the request and response information
+   * @returns Promise resolving to the GroupMediaResponse object
+   */
   uploadPostMedia(ctx: Context): Promise<GroupMediaResponse>;
+
+  /**
+   * Uploads media files for a user profile.
+   * @param ctx - The context object containing the request and response information
+   * @returns Promise resolving to the UserMediaResponse object
+   */
   uploadUserMedia(ctx: Context): Promise<UserMediaResponse>;
 }
 

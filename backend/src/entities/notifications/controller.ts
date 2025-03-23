@@ -6,6 +6,10 @@ import { parseUUID } from "../../utilities/api/uuid";
 import { Status } from "../../constants/http";
 import { handleAppError } from "../../utilities/errors/app-error";
 
+/**
+ * Interface for handling notification-related controller operations.
+ * Provides methods for retrieving notifications for a user.
+ */
 export interface NotificationController {
   /**
    * Get notifications for a user, along with pre-signed urls.

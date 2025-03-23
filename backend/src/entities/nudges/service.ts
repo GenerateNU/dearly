@@ -1,27 +1,59 @@
 import { NudgeTransaction } from "./transaction";
 import { handleServiceError } from "../../utilities/errors/service-error";
-import { ExpoPushService } from "../../services/notification/expo";
+import { PushNotificationService } from "../../services/notification/expo";
 import { getNotificationBody } from "../../utilities/time/nudge";
 import { InternalServerError } from "../../utilities/errors/app-error";
 import { NudgeSchedulePayload, NudgeSchedule } from "../../types/api/internal/nudges";
-import { NudgeScheduler } from "../../services/nudgeScheduler";
+import { NudgeSchedulerService } from "../../services/nudgeScheduler";
 
+/**
+ * Interface defining the operations related to nudge functionality in the service layer.
+ * Provides methods for managing manual and automated nudges, as well as nudge schedule management.
+ */
 export interface NudgeService {
+  /**
+   * Sends a manual nudge to specific users in a group.
+   * @param userIds - Array of user IDs to be nudged
+   * @param groupId - ID of the group where the nudge is being sent
+   * @param managerId - ID of the manager sending the nudge
+   * @returns Promise resolving to void
+   */
   manualNudge(userIds: string[], groupId: string, managerId: string): Promise<void>;
+
+  /**
+   * Creates or updates a nudge schedule for a group.
+   * @param managerId - ID of the manager configuring the schedule
+   * @param payload - Schedule configuration including group ID, frequency, and timing
+   * @returns Promise resolving to the updated schedule payload
+   */
   upsertSchedule(managerId: string, payload: NudgeSchedulePayload): Promise<NudgeSchedulePayload>;
+
+  /**
+   * Retrieves the current nudge schedule for a group.
+   * @param groupId - ID of the group to get the schedule for
+   * @param managerId - ID of the manager requesting the schedule
+   * @returns Promise resolving to the schedule payload or null if no schedule exists
+   */
   getSchedule(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null>;
+
+  /**
+   * Deactivates a nudge schedule for a group.
+   * @param groupId - ID of the group to deactivate nudges for
+   * @param managerId - ID of the manager deactivating the schedule
+   * @returns Promise resolving to the deactivated schedule payload or null if no schedule exists
+   */
   deactivateNudge(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null>;
 }
 
 export class NudgeServiceImpl implements NudgeService {
   private nudgeTransaction: NudgeTransaction;
-  private expoService: ExpoPushService;
-  private scheduler: NudgeScheduler;
+  private expoService: PushNotificationService;
+  private scheduler: NudgeSchedulerService;
 
   constructor(
     nudgeTransaction: NudgeTransaction,
-    expoService: ExpoPushService,
-    scheduler: NudgeScheduler,
+    expoService: PushNotificationService,
+    scheduler: NudgeSchedulerService,
   ) {
     this.nudgeTransaction = nudgeTransaction;
     this.expoService = expoService;

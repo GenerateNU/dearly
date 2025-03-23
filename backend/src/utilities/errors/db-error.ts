@@ -12,7 +12,12 @@ import { DatabaseErrorSchema, DatabaseErrorType } from "../../constants/db-error
 
 type DatabaseError = z.infer<typeof DatabaseErrorSchema>;
 
-// check if error is database error
+/**
+ * Checks if an error is a database error.
+ *
+ * @param error - The error to check
+ * @returns True if the error is a database error, false otherwise
+ */
 const isDatabaseError = (error: unknown): error is DatabaseError => {
   try {
     DatabaseErrorSchema.parse(error);
@@ -22,7 +27,11 @@ const isDatabaseError = (error: unknown): error is DatabaseError => {
   }
 };
 
-// object that maps database error code to handler that converts it into app error
+/**
+ * Maps database error codes to handlers that convert them into app errors.
+ *
+ * @type {Partial<Record<DatabaseErrorType, (error: DatabaseError) => AppError>}
+ */
 const DB_ERROR_TO_APP_ERROR_MAP: Partial<
   Record<DatabaseErrorType, (error: DatabaseError) => AppError>
 > = {
@@ -41,7 +50,12 @@ const DB_ERROR_TO_APP_ERROR_MAP: Partial<
     new InternalServerError(`Database connection failure. Please try again later.`),
 };
 
-// function that maps a database error to app error
+/**
+ * Maps a database error to an app error.
+ *
+ * @param error - The database error to map
+ * @returns The mapped app error
+ */
 const mapDBErrorToAppError = (error: unknown): AppError => {
   const dbError = DatabaseErrorSchema.safeParse(error);
   const fallbackServerError = new InternalServerError("An unexpected database error occurred.");
@@ -64,7 +78,13 @@ const mapDBErrorToAppError = (error: unknown): AppError => {
   return fallbackServerError;
 };
 
-// logging database error for more details
+/**
+ * Formats a database error for logging.
+ *
+ * @param code - The database error code
+ * @param detail - The database error detail
+ * @param message - The database error message
+ */
 const formatDBLogError = (code: string, detail: string, message: string) => {
   return `
 [DATABASE ERROR]

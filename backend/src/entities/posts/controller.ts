@@ -16,10 +16,37 @@ import {
   updatePostValidate,
 } from "../../types/api/internal/posts";
 
+/**
+ * Interface for handling post-related controller operations.
+ * Provides methods for creating, retrieving, updating, and deleting posts.
+ */
 export interface PostController {
+  /**
+   * Creates a new post.
+   * @param ctx - The context of the HTTP request
+   * @returns Promise resolving to the created post
+   */
   createPost(ctx: Context): Promise<CreatePostResponse>;
+
+  /**
+   * Retrieves a post by its ID.
+   * @param ctx - The context of the HTTP request
+   * @returns Promise resolving to the retrieved post
+   */
   getPost(ctx: Context): Promise<GetPostResponse>;
+
+  /**
+   * Updates an existing post.
+   * @param ctx - The context of the HTTP request
+   * @returns Promise resolving to the updated post
+   */
   updatePost(ctx: Context): Promise<UpdatePostResponse>;
+
+  /**
+   * Deletes a post by its ID.
+   * @param ctx - The context of the HTTP request
+   * @returns Promise resolving to the deleted post
+   */
   deletePost(ctx: Context): Promise<DeletePostResponse>;
 }
 

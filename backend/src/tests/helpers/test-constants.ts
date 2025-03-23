@@ -2,7 +2,6 @@ import { Comment } from "../../types/api/internal/comments";
 import { CreateGroupPayload, Group } from "../../types/api/internal/groups";
 import { Post } from "../../types/api/internal/posts";
 import { CreateUserPayload, SearchedUser, User } from "../../types/api/internal/users";
-import { Member } from "../../types/api/internal/members";
 import { Like } from "../../types/api/internal/like";
 import {
   groupsTable,

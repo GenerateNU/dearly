@@ -21,14 +21,77 @@ import {
   updateUserValidate,
 } from "../../types/api/internal/users";
 
+/**
+ * Interface for handling user-related controller operations.
+ * Provides methods for creating, retrieving, updating, deleting users,
+ * registering and removing device tokens, and searching by username.
+ */
 export interface UserController {
+  /**
+   * Creates a new user in the system.
+   * @param ctx - The Hono context containing the request data
+   * @returns Promise resolving to CreateUserResponse with the created user
+   * @throws BadRequestError if validation fails
+   */
   createUser(ctx: Context): Promise<CreateUserResponse>;
+
+  /**
+   * Retrieves a user's profile data.
+   * @param ctx - The Hono context containing the user ID parameter
+   * @returns Promise resolving to GetUserResponse with the user data
+   * @throws BadRequestError if invalid UUID format
+   * @throws NotFoundError if user does not exist
+   */
   getUser(ctx: Context): Promise<GetUserResponse>;
+
+  /**
+   * Updates an existing user's profile data.
+   * @param ctx - The Hono context containing the update payload
+   * @returns Promise resolving to UpdateUserResponse with updated user
+   * @throws BadRequestError if validation fails
+   * @throws NotFoundError if user does not exist
+   */
   updateUser(ctx: Context): Promise<UpdateUserResponse>;
+
+  /**
+   * Deletes a user from the system.
+   * @param ctx - The Hono context containing the user ID
+   * @returns Promise resolving to DeleteUserResponse
+   * @throws BadRequestError if invalid UUID format
+   * @throws NotFoundError if user does not exist
+   */
   deleteUser(ctx: Context): Promise<DeleteUserResponse>;
+
+  /**
+   * Registers a device token for push notifications.
+   * @param ctx - The Hono context containing the token
+   * @returns Promise resolving to AddDeviceTokenResponse with token array
+   * @throws BadRequestError if validation fails
+   */
   registerDevice(ctx: Context): Promise<AddDeviceTokenResponse>;
+
+  /**
+   * Removes a device token from push notification registration.
+   * @param ctx - The Hono context containing the token
+   * @returns Promise resolving to RemoveDeviceTokenResponse with remaining tokens
+   * @throws BadRequestError if validation fails
+   */
   removeDevice(ctx: Context): Promise<RemoveDeviceTokenResponse>;
+
+  /**
+   * Retrieves paginated groups for a user.
+   * @param ctx - The Hono context containing pagination params
+   * @returns Promise resolving to UserGroupsResponse with groups array
+   * @throws BadRequestError if validation fails
+   */
   getGroups(ctx: Context): Promise<UserGroupsResponse>;
+
+  /**
+   * Searches for users by username.
+   * @param ctx - The Hono context containing search params
+   * @returns Promise resolving to SearchedUsersResponse with matching users
+   * @throws BadRequestError if validation fails
+   */
   searchByUsername(ctx: Context): Promise<SearchedUsersResponse>;
 }
 

@@ -10,10 +10,41 @@ import {
 } from "../../types/api/internal/posts";
 import { MediaService } from "../media/service";
 
+/**
+ * Interface for handling post-related service operations.
+ * Provides methods for creating, retrieving, updating, and deleting posts.
+ */
 export interface PostService {
+  /**
+   * Creates a new post.
+   * @param payload - The payload containing post data and media
+   * @returns Promise resolving to the created post
+   * @throws InternalServerError if post creation fails
+   */
   createPost(payload: CreatePostPayload): Promise<PostWithMedia>;
+
+  /**
+   * Retrieves a post by its ID.
+   * @param payload - The ID payload containing post ID and user ID
+   * @returns Promise resolving to the post with media URLs
+   * @throws NotFoundError if post does not exist
+   */
   getPost(payload: IDPayload): Promise<PostWithMediaURL>;
+
+  /**
+   * Updates an existing post.
+   * @param payload - The payload containing updated post data
+   * @returns Promise resolving to the updated post
+   * @throws NotFoundError if post does not exist
+   */
   updatePost(payload: UpdatePostPayload): Promise<PostWithMedia>;
+
+  /**
+   * Deletes a post.
+   * @param payload - The ID payload containing post ID and user ID
+   * @returns Promise resolving to void
+   * @throws NotFoundError if post does not exist
+   */
   deletePost(payload: IDPayload): Promise<void>;
 }
 

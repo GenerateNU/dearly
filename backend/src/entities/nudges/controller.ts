@@ -10,10 +10,38 @@ import {
 } from "../../types/api/routes/nudges";
 import { nudgeScheduleValidate, userIDValidate } from "../../types/api/internal/nudges";
 
+/**
+ * Interface defining the operations available for managing nudges in the application.
+ * It includes methods for sending manual nudges, creating or updating nudge schedules,
+ * retrieving the current schedule, and deactivating a schedule.
+ */
 export interface NudgeController {
+  /**
+   * Sends a manual nudge to specific users in a group.
+   * @param ctx - The context of the HTTP request
+   * @returns Promise resolving to the response indicating the success of the manual nudge
+   */
   manualNudge(ctx: Context): Promise<ManualNudgeResponse>;
+
+  /**
+   * Creates or updates a nudge schedule for a group.
+   * @param ctx - The context of the HTTP request
+   * @returns Promise resolving to the response indicating the success of the schedule update
+   */
   upsertSchedule(ctx: Context): Promise<AutoNudgeResponse>;
+
+  /**
+   * Retrieves the current nudge schedule for a group.
+   * @param ctx - The context of the HTTP request
+   * @returns Promise resolving to the response indicating the success of the schedule retrieval
+   */
   getSchedule(ctx: Context): Promise<GetNudgeConfigResponse>;
+
+  /**
+   * Deactivates a nudge schedule for a group.
+   * @param ctx - The context of the HTTP request
+   * @returns Promise resolving to the response indicating the success of the schedule deactivation
+   */
   deactivateSchedule(ctx: Context): Promise<DeactivateNudgeResponse>;
 }
 

@@ -15,12 +15,52 @@ import { MemberRole } from "../../constants/database";
 import { paginationSchema } from "../../utilities/api/pagination";
 import { notificationValidate } from "../../types/api/internal/notification";
 
+/**
+ * Interface defining the operations available for managing members in the application.
+ * It includes methods for adding a member, retrieving a member, deleting a member,
+ * retrieving members of a group, toggling notification settings, and retrieving posts of a member.
+ */
 export interface MemberController {
+  /**
+   * Adds a member to a group.
+   * @param ctx - The context object containing the request and response information
+   * @returns Promise resolving to the added Member object
+   */
   addMember(ctx: Context): Promise<AddMemberResponse>;
+
+  /**
+   * Retrieves a member by their ID.
+   * @param ctx - The context object containing the request and response information
+   * @returns Promise resolving to the Member object
+   */
   getMember(ctx: Context): Promise<GetAMemberResponse>;
+
+  /**
+   * Deletes a member from a group.
+   * @param ctx - The context object containing the request and response information
+   * @returns Promise resolving to void
+   */
   deleteMember(ctx: Context): Promise<DeleteMemberResponse>;
+
+  /**
+   * Retrieves members of a group.
+   * @param ctx - The context object containing the request and response information
+   * @returns Promise resolving to the Members object
+   */
   getMembers(ctx: Context): Promise<GetMembersResponse>;
+
+  /**
+   * Retrieves posts of a member.
+   * @param ctx - The context object containing the request and response information
+   * @returns Promise resolving to the Posts object
+   */
   getMemberPosts(ctx: Context): Promise<GetMemberPostsResponse>;
+
+  /**
+   * Toggles notification settings for a member in a group.
+   * @param ctx - The context object containing the request and response information
+   * @returns Promise resolving to the Updated Notification object
+   */
   toggleNotification(ctx: Context): Promise<UpdateNotificationResponse>;
 }
 

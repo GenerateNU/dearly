@@ -21,22 +21,62 @@ import {
   NudgeTarget,
 } from "../../types/api/internal/nudges";
 
+/**
+ * Interface defining the operations related to nudge functionality in the transaction layer.
+ * These operations handle both manual and automated nudges, as well as nudge schedule management.
+ */
 export interface NudgeTransaction {
+  /**
+   * Retrieves notification metadata for manual nudges sent to specific users in a group.
+   *
+   * @param userIds - Array of user IDs to be nudged
+   * @param groupId - ID of the group where the nudge is being sent
+   * @param managerId - ID of the manager sending the nudge
+   * @returns Notification metadata including target users and group information
+   */
   getManualNudgeNotificationMetadata(
     userIds: string[],
     groupId: string,
     managerId: string,
   ): Promise<NotificationMetadata>;
 
+  /**
+   * Retrieves notification metadata for automated nudges in a group.
+   *
+   * @param groupId - ID of the group where the auto-nudge is being sent
+   * @param managerId - ID of the manager who configured the auto-nudge
+   * @returns Notification metadata including target users and group information
+   */
   getAutoNudgeNotificationMetadata(
     groupId: string,
     managerId: string,
   ): Promise<NotificationMetadata>;
 
+  /**
+   * Creates or updates a nudge schedule for a group.
+   *
+   * @param managerId - ID of the manager configuring the schedule
+   * @param payload - Schedule configuration including group ID, frequency, and timing
+   * @returns The created or updated nudge schedule configuration
+   */
   upsertSchedule(managerId: string, payload: NudgeSchedulePayload): Promise<NudgeSchedule | null>;
 
+  /**
+   * Retrieves the current nudge schedule configuration for a group.
+   *
+   * @param groupId - ID of the group to get the schedule for
+   * @param managerId - ID of the manager requesting the schedule
+   * @returns The current nudge schedule configuration if it exists
+   */
   getNudgeSchedule(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null>;
 
+  /**
+   * Deactivates an existing nudge schedule for a group.
+   *
+   * @param groupId - ID of the group to deactivate nudges for
+   * @param managerId - ID of the manager deactivating the schedule
+   * @returns The deactivated nudge schedule configuration
+   */
   deactivateNudge(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null>;
 }
 

@@ -12,14 +12,73 @@ import {
 import { MediaService } from "../media/service";
 import { Group } from "../../types/api/internal/groups";
 
+/**
+ * Interface for handling user-related business logic and service operations.
+ * Provides methods for managing users, their devices, groups, and search functionality.
+ */
 export interface UserService {
+  /**
+   * Creates a new user in the system.
+   * @param payload - User creation data including id, name, username, etc.
+   * @returns Promise resolving to the created User
+   * @throws InternalServerError if user creation fails
+   */
   createUser(payload: CreateUserPayload): Promise<User>;
+
+  /**
+   * Retrieves a user's profile data, considering viewer permissions.
+   * @param viewee - ID of the user being viewed
+   * @param viewer - ID of the user viewing the profile
+   * @returns Promise resolving to the User data with signed profile photo URL
+   * @throws NotFoundError if user does not exist
+   */
   getUser(viewee: string, viewer: string): Promise<User>;
+
+  /**
+   * Updates an existing user's profile data.
+   * @param id - ID of the user to update
+   * @param payload - Updated user data
+   * @returns Promise resolving to the updated User
+   * @throws NotFoundError if user does not exist
+   */
   updateUser(id: string, payload: UpdateUserPayload): Promise<User>;
+
+  /**
+   * Deletes a user from the system.
+   * @param id - ID of the user to delete
+   * @returns Promise resolving when deletion is complete
+   * @throws NotFoundError if user does not exist
+   */
   deleteUser(id: string): Promise<void>;
+
+  /**
+   * Registers a device token for push notifications.
+   * @param id - User ID to associate the token with
+   * @param expoToken - Expo push notification token
+   * @returns Promise resolving to array of user's device tokens
+   */
   registerDevice(id: string, expoToken: string): Promise<string[]>;
+
+  /**
+   * Removes a device token from push notification registration.
+   * @param id - User ID associated with the token
+   * @param expoToken - Expo push notification token to remove
+   * @returns Promise resolving to remaining array of user's device tokens
+   */
   removeDevice(id: string, expoToken: string): Promise<string[]>;
+
+  /**
+   * Retrieves groups with pagination.
+   * @param payload - Pagination parameters
+   * @returns Promise resolving to array of Groups
+   */
   getGroups(payload: Pagination): Promise<Group[]>;
+
+  /**
+   * Searches for users by username.
+   * @param payload - Search parameters including query string
+   * @returns Promise resolving to array of matching SearchedUsers
+   */
   searchByUsername(payload: SearchedInfo): Promise<SearchedUser[]>;
 }
 
