@@ -9,7 +9,7 @@ import {
 } from "@aws-sdk/client-scheduler";
 import { handleAWSServiceError } from "../utilities/errors/aws-error";
 import { NudgeSchedulePayload, SchedulePayload } from "../types/api/internal/nudges";
-import { getConfigurations } from "../config/config";
+import { getConfigurations } from "../config/init";
 
 export interface NudgeSchedulerService {
   addSchedule(id: string, payload: SchedulePayload): Promise<number | null>;

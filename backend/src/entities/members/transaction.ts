@@ -18,10 +18,10 @@ import {
 import { AddMemberPayload, Member } from "../../types/api/internal/members";
 import { Pagination, SearchedUser } from "../../types/api/internal/users";
 import { PostWithMedia } from "../../types/api/internal/posts";
-import { getPostMetadata } from "../../utilities/query";
+import { getPostMetadata } from "../../utilities/api/query";
 import { Transaction } from "../../types/api/internal/transaction";
 import { NotificationConfigPayload } from "../../types/api/internal/notification";
-import { IDPayload } from "../../types/id";
+import { IDPayload } from "../../types/api/internal/id";
 
 export interface MemberTransaction {
   insertMember(payload: AddMemberPayload): Promise<Member | null>;

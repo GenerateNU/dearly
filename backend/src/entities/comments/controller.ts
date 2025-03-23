@@ -1,16 +1,15 @@
 import { Context } from "hono";
 import { CommentService } from "./service";
 import { handleAppError } from "../../utilities/errors/app-error";
-import { parseUUID } from "../../utilities/uuid";
+import { parseUUID } from "../../utilities/api/uuid";
 import {
   PatchCommentResponse,
   CreateCommentResponse,
   GetCommentResponse,
   DeleteCommentResponse,
 } from "../../types/api/routes/comment";
-import { createCommentValidate } from "./validator";
-import { CreateCommentPayload } from "../../types/api/internal/comments";
-import { paginationSchema } from "../../utilities/pagination";
+import { CreateCommentPayload, createCommentValidate } from "../../types/api/internal/comments";
+import { paginationSchema } from "../../utilities/api/pagination";
 
 export interface CommentController {
   toggleLikeComment(ctx: Context): Promise<PatchCommentResponse>;

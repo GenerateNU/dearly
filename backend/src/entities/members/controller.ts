@@ -1,6 +1,6 @@
 import { Context } from "hono";
 import { MemberService } from "./service";
-import { parseUUID } from "../../utilities/uuid";
+import { parseUUID } from "../../utilities/api/uuid";
 import { handleAppError } from "../../utilities/errors/app-error";
 import { Status } from "../../constants/http";
 import {
@@ -12,8 +12,8 @@ import {
   UpdateNotificationResponse,
 } from "../../types/api/routes/members";
 import { MemberRole } from "../../constants/database";
-import { paginationSchema } from "../../utilities/pagination";
-import { notificationValidate } from "./validator";
+import { paginationSchema } from "../../utilities/api/pagination";
+import { notificationValidate } from "../../types/api/internal/notification";
 
 export interface MemberController {
   addMember(ctx: Context): Promise<AddMemberResponse>;

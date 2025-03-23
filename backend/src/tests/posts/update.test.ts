@@ -12,7 +12,7 @@ import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
-import { MAX_MEDIA_COUNT, TEXT_MAX_LIMIT } from "../../constants/database";
+import { MediaLimit, TEXT_MAX_LIMIT } from "../../constants/database";
 
 describe("PATCH /posts/:id", () => {
   let app: Hono;
@@ -108,7 +108,7 @@ describe("PATCH /posts/:id", () => {
       ]);
   });
 
-  it(`should return 400 if media count > ${MAX_MEDIA_COUNT} limit`, async () => {
+  it(`should return 400 if media count > ${MediaLimit.MAX_COUNT} limit`, async () => {
     (
       await testBuilder.request({
         app,
@@ -143,7 +143,7 @@ describe("PATCH /posts/:id", () => {
       .assertStatusCode(Status.BadRequest)
       .assertError([
         {
-          message: `At most ${MAX_MEDIA_COUNT} media items are allowed.`,
+          message: `At most ${MediaLimit.MAX_COUNT} media items are allowed.`,
           path: "media",
         },
       ]);

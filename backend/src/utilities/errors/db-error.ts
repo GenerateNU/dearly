@@ -6,7 +6,7 @@ import {
   InternalServerError,
   NotFoundError,
 } from "./app-error";
-import logger from "../logger";
+import logger from "../monitoring/logger";
 import { getFriendlyErrorMessage } from "./friendly-errors";
 import { DatabaseErrorSchema, DatabaseErrorType } from "../../constants/db-error";
 

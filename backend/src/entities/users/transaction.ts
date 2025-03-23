@@ -10,7 +10,7 @@ import {
   User,
 } from "../../types/api/internal/users";
 import { Group } from "../../types/api/internal/groups";
-import { getSharedGroups } from "../../utilities/query";
+import { getSharedGroups } from "../../utilities/api/query";
 
 export interface UserTransaction {
   insertUser(payload: CreateUserPayload): Promise<User | null>;

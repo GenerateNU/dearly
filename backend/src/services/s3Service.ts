@@ -11,7 +11,7 @@ import ffmpeg from "fluent-ffmpeg";
 import { MediaType } from "../constants/database";
 import { Configuration } from "../types/config";
 import { v4 as uuidv4 } from "uuid";
-import logger from "../utilities/logger";
+import logger from "../utilities/monitoring/logger";
 import { PassThrough, Readable } from "stream";
 import ffmpegInstaller from "@ffmpeg-installer/ffmpeg";
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);

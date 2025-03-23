@@ -1,5 +1,5 @@
 import { validate } from "uuid";
-import { BadRequestError } from "./errors/app-error";
+import { BadRequestError } from "../errors/app-error";
 
 export const parseUUID = (id: string, entity?: string): string => {
   const trimmedId = id.trim();

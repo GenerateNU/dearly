@@ -1,14 +1,14 @@
 import { Context } from "hono";
 import { NudgeService } from "./service";
 import { handleAppError } from "../../utilities/errors/app-error";
-import { nudgeScheduleValidate, userIDValidate } from "./validator";
-import { parseUUID } from "../../utilities/uuid";
+import { parseUUID } from "../../utilities/api/uuid";
 import {
   AutoNudgeResponse,
   DeactivateNudgeResponse,
   ManualNudgeResponse,
   GetNudgeConfigResponse,
 } from "../../types/api/routes/nudges";
+import { nudgeScheduleValidate, userIDValidate } from "../../types/api/internal/nudges";
 
 export interface NudgeController {
   manualNudge(ctx: Context): Promise<ManualNudgeResponse>;

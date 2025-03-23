@@ -1,8 +1,7 @@
 import { Context } from "hono";
 import { PostService } from "./service";
 import { handleAppError } from "../../utilities/errors/app-error";
-import { parseUUID } from "../../utilities/uuid";
-import { createPostValidate, updatePostValidate } from "./validator";
+import { parseUUID } from "../../utilities/api/uuid";
 import { Status } from "../../constants/http";
 import {
   DeletePostResponse,
@@ -10,7 +9,12 @@ import {
   CreatePostResponse,
   UpdatePostResponse,
 } from "../../types/api/routes/posts";
-import { CreatePostPayload, UpdatePostPayload } from "../../types/api/internal/posts";
+import {
+  CreatePostPayload,
+  createPostValidate,
+  UpdatePostPayload,
+  updatePostValidate,
+} from "../../types/api/internal/posts";
 
 export interface PostController {
   createPost(ctx: Context): Promise<CreatePostResponse>;

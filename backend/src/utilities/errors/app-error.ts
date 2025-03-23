@@ -2,7 +2,7 @@ import { ZodError } from "zod";
 import { Context } from "hono";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import { Status } from "../../constants/http";
-import logger from "../logger";
+import logger from "../monitoring/logger";
 
 interface AppError extends Error {
   getStatusCode: () => ContentfulStatusCode;

@@ -1,11 +1,5 @@
 import { Context } from "hono";
 import { GroupService } from "./service";
-import {
-  calendarParamsValidate,
-  createGroupValidate,
-  feedParamValidate,
-  updateGroupValidate,
-} from "./validator";
 import { Status } from "../../constants/http";
 import { handleAppError } from "../../utilities/errors/app-error";
 import {
@@ -16,8 +10,14 @@ import {
   UpdateGroupResponse,
   GroupFeedResponse,
 } from "../../types/api/routes/groups";
-import { parseUUID } from "../../utilities/uuid";
-import { UpdateGroupPayload } from "../../types/api/internal/groups";
+import { parseUUID } from "../../utilities/api/uuid";
+import {
+  calendarParamsValidate,
+  createGroupValidate,
+  feedParamValidate,
+  UpdateGroupPayload,
+  updateGroupValidate,
+} from "../../types/api/internal/groups";
 
 export interface GroupController {
   createGroup(ctx: Context): Promise<CreateGroupResponse>;

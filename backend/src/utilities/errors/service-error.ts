@@ -1,4 +1,4 @@
-import logger from "../logger";
+import logger from "../monitoring/logger";
 import { InternalServerError, isAppError } from "./app-error";
 import { isDatabaseError, mapDBErrorToAppError } from "./db-error";
 

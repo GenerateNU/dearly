@@ -1,5 +1,5 @@
 import { createInsertSchema } from "drizzle-zod";
-import { scheduledNudgesTable } from "../entities/schema";
+import { scheduledNudgesTable } from "../../entities/schema";
 import { z } from "zod";
 
 const getNotificationBody = (groupName: string) => {

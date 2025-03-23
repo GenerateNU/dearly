@@ -1,10 +1,10 @@
 import { Context } from "hono";
 import { LikeService } from "./service";
 import { handleAppError } from "../../utilities/errors/app-error";
-import { parseUUID } from "../../utilities/uuid";
+import { parseUUID } from "../../utilities/api/uuid";
 import { Status } from "../../constants/http";
 import { LikeUsersResponse, ToggleLikeResponse } from "../../types/api/routes/posts";
-import { paginationSchema } from "../../utilities/pagination";
+import { paginationSchema } from "../../utilities/api/pagination";
 
 export interface LikeController {
   toggleLike(ctx: Context): Promise<ToggleLikeResponse>;

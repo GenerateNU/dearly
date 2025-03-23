@@ -1,7 +1,5 @@
 import { nanoid } from "nanoid";
-import {
-  InternalServerError,
-} from "../../utilities/errors/app-error";
+import { InternalServerError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
 import { InvitationTransaction } from "./transaction";
 import { GroupInvitation } from "../../types/api/internal/invite";

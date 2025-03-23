@@ -1,12 +1,6 @@
 import { Context } from "hono";
 import { UserService } from "./service";
-import {
-  createUserValidate,
-  expoTokenValidate,
-  querySchema,
-  updateUserValidate,
-} from "./validator";
-import { parseUUID } from "../../utilities/uuid";
+import { parseUUID } from "../../utilities/api/uuid";
 import { handleAppError } from "../../utilities/errors/app-error";
 import { Status } from "../../constants/http";
 import {
@@ -19,7 +13,13 @@ import {
   UpdateUserResponse,
   AddDeviceTokenResponse,
 } from "../../types/api/routes/users";
-import { paginationSchema } from "../../utilities/pagination";
+import { paginationSchema } from "../../utilities/api/pagination";
+import {
+  createUserValidate,
+  expoTokenValidate,
+  querySchema,
+  updateUserValidate,
+} from "../../types/api/internal/users";
 
 export interface UserController {
   createUser(ctx: Context): Promise<CreateUserResponse>;

@@ -1,7 +1,7 @@
 import { NudgeTransaction } from "./transaction";
 import { handleServiceError } from "../../utilities/errors/service-error";
 import { ExpoPushService } from "../../services/notification/expo";
-import { getNotificationBody } from "../../utilities/nudge";
+import { getNotificationBody } from "../../utilities/time/nudge";
 import { InternalServerError } from "../../utilities/errors/app-error";
 import { NudgeSchedulePayload, NudgeSchedule } from "../../types/api/internal/nudges";
 import { NudgeScheduler } from "../../services/nudgeScheduler";

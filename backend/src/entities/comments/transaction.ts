@@ -1,5 +1,5 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { IDPayload } from "../../types/id";
+import { IDPayload } from "../../types/api/internal/id";
 import {
   commentsTable,
   groupsTable,

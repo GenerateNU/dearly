@@ -4,7 +4,7 @@ import {
   CommentWithMetadata,
   CreateCommentPayload,
 } from "../../types/api/internal/comments";
-import { IDPayload } from "../../types/id";
+import { IDPayload } from "../../types/api/internal/id";
 import { handleServiceError } from "../../utilities/errors/service-error";
 import { MediaService } from "../media/service";
 import { CommentTransaction } from "./transaction";

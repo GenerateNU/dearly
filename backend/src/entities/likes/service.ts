@@ -1,7 +1,7 @@
 import { LikeTransaction } from "./transaction";
 import { handleServiceError } from "../../utilities/errors/service-error";
-import { PaginationParams } from "../../utilities/pagination";
-import { IDPayload } from "../../types/id";
+import { PaginationParams } from "../../utilities/api/pagination";
+import { IDPayload } from "../../types/api/internal/id";
 import { SearchedUser } from "../../types/api/internal/users";
 import { MediaService } from "../media/service";
 

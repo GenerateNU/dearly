@@ -7,8 +7,8 @@ import {
   InternalServerError,
 } from "../utilities/errors/app-error";
 import * as crypto from "crypto";
-import { getSlackMessage } from "../utilities/slack";
-import logger from "../utilities/logger";
+import { getSlackMessage } from "../utilities/monitoring/slack";
+import logger from "../utilities/monitoring/logger";
 
 interface ExpoBuildWebhookPayload {
   status: "errored" | "finished" | "canceled";

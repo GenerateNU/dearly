@@ -1,8 +1,8 @@
 import { Context } from "hono";
 import { UserNotificationResponses } from "../../types/api/routes/users";
 import { NotificationService } from "./service";
-import { paginationSchema } from "../../utilities/pagination";
-import { parseUUID } from "../../utilities/uuid";
+import { paginationSchema } from "../../utilities/api/pagination";
+import { parseUUID } from "../../utilities/api/uuid";
 import { Status } from "../../constants/http";
 import { handleAppError } from "../../utilities/errors/app-error";
 

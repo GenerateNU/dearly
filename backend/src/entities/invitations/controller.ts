@@ -1,7 +1,7 @@
 import { Context } from "hono";
 import { Status } from "../../constants/http";
 import { handleAppError } from "../../utilities/errors/app-error";
-import { parseUUID } from "../../utilities/uuid";
+import { parseUUID } from "../../utilities/api/uuid";
 import { InvitationService } from "./service";
 import { CreateInviteResponse, VerifyTokenResponse } from "../../types/api/routes/invite";
 

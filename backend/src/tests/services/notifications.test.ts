@@ -1,5 +1,5 @@
 import { NotificationConfig } from "./../../types/api/internal/notification";
-import { getConfigurations } from "./../../config/config";
+import { getConfigurations } from "../../config/init";
 import { connectDB } from "../../database/connect";
 import {
   FULL_SNAPPER_POST_EXAMPLE,

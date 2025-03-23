@@ -1,10 +1,10 @@
-import { Configuration } from "./../types/config";
+import { Configuration } from "../types/config";
 import { Context, Hono } from "hono";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { userRoutes } from "../entities/users/route";
 import { apiReference } from "@scalar/hono-api-reference";
-import { getOpenAPISpecification } from "../utilities/docs";
-import { HEALTHCHECK } from "../types/api/routes/healthcheck";
+import { getOpenAPISpecification } from "../utilities/server/docs";
+import { HealthcheckResponse } from "../types/api/routes/healthcheck";
 import { groupRoutes } from "../entities/groups/route";
 import { postRoutes } from "../entities/posts/route";
 import { MediaService } from "../entities/media/service";
@@ -14,7 +14,7 @@ import { mediaRoutes } from "../entities/media/route";
 import { ExpoPushService } from "../services/notification/expo";
 import { AppService } from "../types/api/internal/services";
 import { NudgeSchedulerService } from "../services/nudgeScheduler";
-import { redirectPage } from "../utilities/redirect";
+import { redirectPage } from "../utilities/server/redirect";
 import { serveStatic } from "@hono/node-server/serve-static";
 
 export const setUpRoutes = (
@@ -23,7 +23,23 @@ export const setUpRoutes = (
   config: Configuration,
   services: AppService,
 ) => {
-  // api documentation
+  setUpApiDocsRoute(app);
+
+  setUpHealthcheckRoute(app);
+
+  setUpSlackWebhookRoute(app, config);
+
+  setUpApiV1Routes(app, db, services);
+
+  setUpAppleAppSiteAssociationRoute(app);
+
+  setUpGroupRedirectRoute(app);
+
+  setUpNotFoundRoute(app);
+};
+
+// Set up the API documentation route
+const setUpApiDocsRoute = (app: Hono) => {
   app.get(
     "/",
     apiReference({
@@ -33,19 +49,30 @@ export const setUpRoutes = (
       },
     }),
   );
+};
 
-  app.get("/healthcheck", (ctx: Context): HEALTHCHECK => {
+// Set up the healthcheck route
+const setUpHealthcheckRoute = (app: Hono) => {
+  app.get("/healthcheck", (ctx: Context): HealthcheckResponse => {
     return ctx.json({ message: "OK" }, 200);
   });
+};
 
-  // webhook to send to slack channel for CI message
+// Set up the Slack webhook route
+const setUpSlackWebhookRoute = (app: Hono, config: Configuration) => {
   const slackController: SlackController = new SlackControllerImpl(config.slackConfig);
   app.post("/slack", (ctx: Context) => slackController.receiveBuildEvent(ctx));
+};
 
-  // initialize routes
+// Set up version 1 API routes
+const setUpApiV1Routes = (app: Hono, db: PostgresJsDatabase, services: AppService) => {
   const { expoService, mediaService, nudgeSchedulerService } = services;
-  app.route("/api/v1", apiRoutes(db, mediaService, expoService, nudgeSchedulerService));
 
+  app.route("/api/v1", apiRoutes(db, mediaService, expoService, nudgeSchedulerService));
+};
+
+// Set up the Apple App Site Association static file route
+const setUpAppleAppSiteAssociationRoute = (app: Hono) => {
   app.get(
     ".well-known/apple-app-site-association",
     async (c, next) => {
@@ -57,17 +84,23 @@ export const setUpRoutes = (
       root: "src/static",
     }),
   );
-  // State website redirect page.
+};
+
+// Set up the group redirect route
+const setUpGroupRedirectRoute = (app: Hono) => {
   app.get("/group", (c) => {
     return c.html(redirectPage());
   });
+};
 
-  // unsupported route
+// Set up the 404 not found route
+const setUpNotFoundRoute = (app: Hono) => {
   app.notFound((ctx: Context) => {
     return ctx.json({ error: "The requested route does not exist" }, 404);
   });
 };
 
+// Consolidate and group API routes
 const apiRoutes = (
   db: PostgresJsDatabase,
   mediaService: MediaService,
@@ -76,6 +109,7 @@ const apiRoutes = (
 ): Hono => {
   const api = new Hono();
 
+  // Group the entity routes
   api.route("/users", userRoutes(db, mediaService));
   api.route("/groups", groupRoutes(db, mediaService, expoService, nudgeService));
   api.route("/", postRoutes(db, mediaService));

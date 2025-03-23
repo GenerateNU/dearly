@@ -2,7 +2,7 @@ import { AddMemberPayload, Member } from "../../types/api/internal/members";
 import { NotificationConfigPayload } from "../../types/api/internal/notification";
 import { PostWithMediaURL } from "../../types/api/internal/posts";
 import { Pagination, SearchedUser } from "../../types/api/internal/users";
-import { IDPayload } from "../../types/id";
+import { IDPayload } from "../../types/api/internal/id";
 import { InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
 import { MediaService } from "../media/service";

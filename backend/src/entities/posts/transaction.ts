@@ -10,13 +10,13 @@ import {
 } from "../schema";
 import { eq, and, sql, count } from "drizzle-orm";
 import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
-import { IDPayload } from "../../types/id";
+import { IDPayload } from "../../types/api/internal/id";
 import {
   CreatePostPayload,
   PostWithMedia,
   UpdatePostPayload,
 } from "../../types/api/internal/posts";
-import { getPostMetadata } from "../../utilities/query";
+import { getPostMetadata } from "../../utilities/api/query";
 
 export interface PostTransaction {
   createPost(post: CreatePostPayload): Promise<PostWithMedia | null>;

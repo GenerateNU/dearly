@@ -1,6 +1,10 @@
 import { and, eq } from "drizzle-orm";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { ForbiddenError, InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
+import {
+  ForbiddenError,
+  InternalServerError,
+  NotFoundError,
+} from "../../utilities/errors/app-error";
 import { linksTable, membersTable, invitationsTable } from "../schema";
 import { AddMemberPayload } from "../../types/api/internal/members";
 import {
@@ -8,7 +12,7 @@ import {
   CreateLinkPayload,
   GroupInvitation,
 } from "../../types/api/internal/invite";
-import { isManager } from "../../utilities/query";
+import { isManager } from "../../utilities/api/query";
 
 export interface InvitationTransaction {
   insertUserByInvitation(payload: AddMemberPayload): Promise<void>;
@@ -22,7 +26,7 @@ export class InvitationTransactionImpl implements InvitationTransaction {
     this.db = db;
   }
 
-  async getGroupIdFromToken(token: string, userId : string): Promise<string> {
+  async getGroupIdFromToken(token: string, userId: string): Promise<string> {
     return await this.db.transaction(async (tx) => {
       const [result] = await tx
         .select({ groupId: linksTable.groupId })

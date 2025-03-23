@@ -317,15 +317,6 @@ export const BIG_THEIF_GROUP: Group = {
   managerId: USER_BUCK_ID,
 };
 
-export const ADRIENNE_MEMBER: Member = {
-  userId: USER_ADRIENNE_ID,
-  groupId: BIG_THIEF_GROUP_ID,
-  joinedAt: new Date(),
-  role: "MEMBER",
-  notificationsEnabled: false,
-  lastManualNudge: null,
-};
-
 export const USER_BUCK: User = {
   name: "Buck",
   id: USER_BUCK_ID,

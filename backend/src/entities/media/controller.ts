@@ -1,7 +1,7 @@
 import { Context } from "hono";
 import { MediaService } from "./service";
 import { BadRequestError, handleAppError } from "../../utilities/errors/app-error";
-import { parseUUID } from "../../utilities/uuid";
+import { parseUUID } from "../../utilities/api/uuid";
 import { GroupMediaResponse, UserMediaResponse } from "../../types/api/routes/media";
 
 export interface MediaController {

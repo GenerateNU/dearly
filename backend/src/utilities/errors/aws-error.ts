@@ -1,5 +1,5 @@
 import { InternalServerError } from "./app-error";
-import logger from "../logger";
+import logger from "../monitoring/logger";
 
 export const handleAWSServiceError = <T>(fn: () => T, message: string) => {
   return async () => {
