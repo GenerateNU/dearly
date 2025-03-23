@@ -10,23 +10,26 @@ import { parseUUID } from "../../utilities/uuid";
 import { handleAppError } from "../../utilities/errors/app-error";
 import { Status } from "../../constants/http";
 import {
-  DEL_USER,
-  DEVICE_RESPONSE,
-  USER_GROUPS,
-  SEARCHED_USERS,
-  USER_RESPONSE,
+  DeleteUserResponse,
+  RemoveDeviceTokenResponse,
+  UserGroupsResponse,
+  SearchedUsersResponse,
+  CreateUserResponse,
+  GetUserResponse,
+  UpdateUserResponse,
+  AddDeviceTokenResponse,
 } from "../../types/api/routes/users";
 import { paginationSchema } from "../../utilities/pagination";
 
 export interface UserController {
-  createUser(ctx: Context): Promise<USER_RESPONSE>;
-  getUser(ctx: Context): Promise<USER_RESPONSE>;
-  updateUser(ctx: Context): Promise<USER_RESPONSE>;
-  deleteUser(ctx: Context): Promise<DEL_USER>;
-  registerDevice(ctx: Context): Promise<DEVICE_RESPONSE>;
-  removeDevice(ctx: Context): Promise<DEVICE_RESPONSE>;
-  getGroups(ctx: Context): Promise<USER_GROUPS>;
-  searchByUsername(ctx: Context): Promise<SEARCHED_USERS>;
+  createUser(ctx: Context): Promise<CreateUserResponse>;
+  getUser(ctx: Context): Promise<GetUserResponse>;
+  updateUser(ctx: Context): Promise<UpdateUserResponse>;
+  deleteUser(ctx: Context): Promise<DeleteUserResponse>;
+  registerDevice(ctx: Context): Promise<AddDeviceTokenResponse>;
+  removeDevice(ctx: Context): Promise<RemoveDeviceTokenResponse>;
+  getGroups(ctx: Context): Promise<UserGroupsResponse>;
+  searchByUsername(ctx: Context): Promise<SearchedUsersResponse>;
 }
 
 export class UserControllerImpl implements UserController {
@@ -36,7 +39,7 @@ export class UserControllerImpl implements UserController {
     this.userService = service;
   }
 
-  async createUser(ctx: Context): Promise<USER_RESPONSE> {
+  async createUser(ctx: Context): Promise<CreateUserResponse> {
     const createUserImpl = async () => {
       // get userId from decoded JWT
       const userId = ctx.get("userId");
@@ -51,7 +54,7 @@ export class UserControllerImpl implements UserController {
     return await handleAppError(createUserImpl)(ctx);
   }
 
-  async getUser(ctx: Context): Promise<USER_RESPONSE> {
+  async getUser(ctx: Context): Promise<GetUserResponse> {
     const getUserImpl = async () => {
       const id = ctx.req.param("id");
       const viewee = parseUUID(id);
@@ -62,7 +65,7 @@ export class UserControllerImpl implements UserController {
     return await handleAppError(getUserImpl)(ctx);
   }
 
-  async updateUser(ctx: Context): Promise<USER_RESPONSE> {
+  async updateUser(ctx: Context): Promise<UpdateUserResponse> {
     const updateUserImpl = async () => {
       // get the userId from decoding JWT
       const userId = ctx.get("userId");
@@ -74,7 +77,7 @@ export class UserControllerImpl implements UserController {
     return await handleAppError(updateUserImpl)(ctx);
   }
 
-  async deleteUser(ctx: Context): Promise<DEL_USER> {
+  async deleteUser(ctx: Context): Promise<DeleteUserResponse> {
     // get the userId from decoding JWT
     const deleteUserImpl = async () => {
       const userId = ctx.get("userId");
@@ -85,7 +88,7 @@ export class UserControllerImpl implements UserController {
     return await handleAppError(deleteUserImpl)(ctx);
   }
 
-  async registerDevice(ctx: Context): Promise<DEVICE_RESPONSE> {
+  async registerDevice(ctx: Context): Promise<AddDeviceTokenResponse> {
     const registerDeviceImpl = async () => {
       const userId = ctx.get("userId");
       const idAsUUID = parseUUID(userId);
@@ -96,7 +99,7 @@ export class UserControllerImpl implements UserController {
     return await handleAppError(registerDeviceImpl)(ctx);
   }
 
-  async removeDevice(ctx: Context): Promise<DEVICE_RESPONSE> {
+  async removeDevice(ctx: Context): Promise<RemoveDeviceTokenResponse> {
     const removeDeviceImpl = async () => {
       const userId = ctx.get("userId");
       const idAsUUID = parseUUID(userId);
@@ -107,7 +110,7 @@ export class UserControllerImpl implements UserController {
     return await handleAppError(removeDeviceImpl)(ctx);
   }
 
-  async getGroups(ctx: Context): Promise<USER_GROUPS> {
+  async getGroups(ctx: Context): Promise<UserGroupsResponse> {
     const getGroupsImpl = async () => {
       const { limit, page } = ctx.req.query();
       const queryParams = paginationSchema.parse({ limit, page });
@@ -118,7 +121,7 @@ export class UserControllerImpl implements UserController {
     return await handleAppError(getGroupsImpl)(ctx);
   }
 
-  async searchByUsername(ctx: Context): Promise<SEARCHED_USERS> {
+  async searchByUsername(ctx: Context): Promise<SearchedUsersResponse> {
     const search = async () => {
       const { username, groupId, limit, page } = ctx.req.query();
       const userId = ctx.get("userId");

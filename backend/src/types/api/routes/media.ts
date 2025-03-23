@@ -1,13 +1,12 @@
 import { TypedResponse } from "hono";
 import { paths } from "../../../gen/openapi";
-import { API_ERROR } from "../schemas/error";
+import { APIError } from "../schemas/error";
 
-export type GROUP_MEDIA = TypedResponse<
+export type GroupMediaResponse = TypedResponse<
   | paths["/api/v1/groups/{id}/media"]["post"]["responses"]["201"]["content"]["application/json"]
-  | API_ERROR
+  | APIError
 >;
 
-export type USER_MEDIA = TypedResponse<
-  | paths["/api/v1/users/media"]["post"]["responses"]["201"]["content"]["application/json"]
-  | API_ERROR
+export type UserMediaResponse = TypedResponse<
+  paths["/api/v1/users/media"]["post"]["responses"]["201"]["content"]["application/json"] | APIError
 >;

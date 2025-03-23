@@ -4,17 +4,17 @@ import { handleAppError } from "../../utilities/errors/app-error";
 import { nudgeScheduleValidate, userIDValidate } from "./validator";
 import { parseUUID } from "../../utilities/uuid";
 import {
-  AUTO_NUDGE,
-  DEACTIVE_NUDGE,
-  MANUAL_NUDGE,
-  NUDGES_API,
+  AutoNudgeResponse,
+  DeactivateNudgeResponse,
+  ManualNudgeResponse,
+  GetNudgeConfigResponse,
 } from "../../types/api/routes/nudges";
 
 export interface NudgeController {
-  manualNudge(ctx: Context): Promise<MANUAL_NUDGE>;
-  upsertSchedule(ctx: Context): Promise<AUTO_NUDGE>;
-  getSchedule(ctx: Context): Promise<NUDGES_API>;
-  deactivateSchedule(ctx: Context): Promise<DEACTIVE_NUDGE>;
+  manualNudge(ctx: Context): Promise<ManualNudgeResponse>;
+  upsertSchedule(ctx: Context): Promise<AutoNudgeResponse>;
+  getSchedule(ctx: Context): Promise<GetNudgeConfigResponse>;
+  deactivateSchedule(ctx: Context): Promise<DeactivateNudgeResponse>;
 }
 
 export class NudgeControllerImpl implements NudgeController {
@@ -24,7 +24,7 @@ export class NudgeControllerImpl implements NudgeController {
     this.nudgeService = nudgeService;
   }
 
-  async manualNudge(ctx: Context): Promise<MANUAL_NUDGE> {
+  async manualNudge(ctx: Context): Promise<ManualNudgeResponse> {
     const manualNudgeImpl = async () => {
       const groupId = parseUUID(ctx.req.param("id"));
       const managerId = ctx.get("userId");
@@ -36,7 +36,7 @@ export class NudgeControllerImpl implements NudgeController {
     return await handleAppError(manualNudgeImpl)(ctx);
   }
 
-  async upsertSchedule(ctx: Context): Promise<AUTO_NUDGE> {
+  async upsertSchedule(ctx: Context): Promise<AutoNudgeResponse> {
     const upsertScheduleImpl = async () => {
       const groupId = parseUUID(ctx.req.param("id"));
       const managerId = ctx.get("userId");
@@ -51,7 +51,7 @@ export class NudgeControllerImpl implements NudgeController {
     return await handleAppError(upsertScheduleImpl)(ctx);
   }
 
-  async getSchedule(ctx: Context): Promise<NUDGES_API> {
+  async getSchedule(ctx: Context): Promise<GetNudgeConfigResponse> {
     const getScheduleImpl = async () => {
       const groupId = parseUUID(ctx.req.param("id"));
       const managerId = ctx.get("userId");
@@ -64,7 +64,7 @@ export class NudgeControllerImpl implements NudgeController {
     return await handleAppError(getScheduleImpl)(ctx);
   }
 
-  async deactivateSchedule(ctx: Context): Promise<DEACTIVE_NUDGE> {
+  async deactivateSchedule(ctx: Context): Promise<DeactivateNudgeResponse> {
     const deactivateScheduleImpl = async () => {
       const groupId = parseUUID(ctx.req.param("id"));
       const managerId = ctx.get("userId");

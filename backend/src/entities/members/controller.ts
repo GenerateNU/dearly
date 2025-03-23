@@ -4,24 +4,24 @@ import { parseUUID } from "../../utilities/uuid";
 import { handleAppError } from "../../utilities/errors/app-error";
 import { Status } from "../../constants/http";
 import {
-  ADD_MEMBER,
-  DEL_MEMBER,
-  MEMBER,
-  MEMBER_POSTS,
-  MEMBERS_API,
-  NOTIFICATION,
+  AddMemberResponse,
+  GetAMemberResponse,
+  DeleteMemberResponse,
+  GetMemberPostsResponse,
+  GetMembersResponse,
+  UpdateNotificationResponse,
 } from "../../types/api/routes/members";
 import { MemberRole } from "../../constants/database";
 import { paginationSchema } from "../../utilities/pagination";
 import { notificationValidate } from "./validator";
 
 export interface MemberController {
-  addMember(ctx: Context): Promise<ADD_MEMBER>;
-  getMember(ctx: Context): Promise<MEMBER>;
-  deleteMember(ctx: Context): Promise<DEL_MEMBER>;
-  getMembers(ctx: Context): Promise<MEMBERS_API>;
-  getMemberPosts(ctx: Context): Promise<MEMBER_POSTS>;
-  toggleNotification(ctx: Context): Promise<NOTIFICATION>;
+  addMember(ctx: Context): Promise<AddMemberResponse>;
+  getMember(ctx: Context): Promise<GetAMemberResponse>;
+  deleteMember(ctx: Context): Promise<DeleteMemberResponse>;
+  getMembers(ctx: Context): Promise<GetMembersResponse>;
+  getMemberPosts(ctx: Context): Promise<GetMemberPostsResponse>;
+  toggleNotification(ctx: Context): Promise<UpdateNotificationResponse>;
 }
 
 export class MemberControllerImpl implements MemberController {
@@ -31,7 +31,7 @@ export class MemberControllerImpl implements MemberController {
     this.memberService = service;
   }
 
-  async addMember(ctx: Context): Promise<ADD_MEMBER> {
+  async addMember(ctx: Context): Promise<AddMemberResponse> {
     const addMemberImp = async () => {
       // get userId from decoded JWT
       const userId = parseUUID(ctx.req.param("userId"));
@@ -49,7 +49,7 @@ export class MemberControllerImpl implements MemberController {
     return await handleAppError(addMemberImp)(ctx);
   }
 
-  async getMember(ctx: Context): Promise<ADD_MEMBER> {
+  async getMember(ctx: Context): Promise<GetAMemberResponse> {
     const getMemberImp = async () => {
       const userId = parseUUID(ctx.get("userId"));
       const groupId = parseUUID(ctx.req.param("id"));
@@ -60,7 +60,7 @@ export class MemberControllerImpl implements MemberController {
     return await handleAppError(getMemberImp)(ctx);
   }
 
-  async deleteMember(ctx: Context): Promise<DEL_MEMBER> {
+  async deleteMember(ctx: Context): Promise<DeleteMemberResponse> {
     const deleteMemberImpl = async () => {
       const clientId = parseUUID(ctx.get("userId"));
       const groupId = parseUUID(ctx.req.param("id"));
@@ -73,8 +73,8 @@ export class MemberControllerImpl implements MemberController {
     return await handleAppError(deleteMemberImpl)(ctx);
   }
 
-  async getMembers(ctx: Context): Promise<MEMBERS_API> {
-    const getMembers = async () => {
+  async getMembers(ctx: Context): Promise<GetMembersResponse> {
+    const getMembersImpl = async () => {
       // get userId from decoded JWT
       const { limit, page } = ctx.req.query();
       const queryParams = paginationSchema.parse({ limit, page });
@@ -84,10 +84,10 @@ export class MemberControllerImpl implements MemberController {
       return ctx.json(members, Status.OK);
     };
 
-    return await handleAppError(getMembers)(ctx);
+    return await handleAppError(getMembersImpl)(ctx);
   }
 
-  async getMemberPosts(ctx: Context): Promise<MEMBER_POSTS> {
+  async getMemberPosts(ctx: Context): Promise<GetMemberPostsResponse> {
     const getMemberPostsImpl = async () => {
       const { limit, page } = ctx.req.query();
       const queryParams = paginationSchema.parse({ limit, page });
@@ -105,7 +105,7 @@ export class MemberControllerImpl implements MemberController {
     return await handleAppError(getMemberPostsImpl)(ctx);
   }
 
-  async toggleNotification(ctx: Context): Promise<NOTIFICATION> {
+  async toggleNotification(ctx: Context): Promise<UpdateNotificationResponse> {
     const toggleNotificationImpl = async () => {
       const userId = ctx.get("userId");
       const groupId = parseUUID(ctx.req.param("id"));

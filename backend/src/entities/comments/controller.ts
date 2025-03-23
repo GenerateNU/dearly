@@ -3,20 +3,20 @@ import { CommentService } from "./service";
 import { handleAppError } from "../../utilities/errors/app-error";
 import { parseUUID } from "../../utilities/uuid";
 import {
-  COMMENT_API,
-  CREATE_COMMENT_API,
-  DELETE_COMMENT_API,
-  GET_COMMENT_API,
+  PatchCommentResponse,
+  CreateCommentResponse,
+  GetCommentResponse,
+  DeleteCommentResponse,
 } from "../../types/api/routes/comment";
 import { createCommentValidate } from "./validator";
 import { CreateCommentPayload } from "../../types/api/internal/comments";
 import { paginationSchema } from "../../utilities/pagination";
 
 export interface CommentController {
-  toggleLikeComment(ctx: Context): Promise<COMMENT_API>;
-  createComment(ctx: Context): Promise<CREATE_COMMENT_API>;
-  deleteComment(ctx: Context): Promise<DELETE_COMMENT_API>;
-  getComments(ctx: Context): Promise<GET_COMMENT_API>;
+  toggleLikeComment(ctx: Context): Promise<PatchCommentResponse>;
+  createComment(ctx: Context): Promise<CreateCommentResponse>;
+  deleteComment(ctx: Context): Promise<DeleteCommentResponse>;
+  getComments(ctx: Context): Promise<GetCommentResponse>;
 }
 
 export class CommentControllerImpl implements CommentController {
@@ -26,7 +26,7 @@ export class CommentControllerImpl implements CommentController {
     this.commentService = commentService;
   }
 
-  async toggleLikeComment(ctx: Context): Promise<COMMENT_API> {
+  async toggleLikeComment(ctx: Context): Promise<PatchCommentResponse> {
     const toggleLikeCommentImpl = async () => {
       const userId = ctx.get("userId");
       const id = parseUUID(ctx.req.param("id"));
@@ -37,7 +37,7 @@ export class CommentControllerImpl implements CommentController {
     return await handleAppError(toggleLikeCommentImpl)(ctx);
   }
 
-  async createComment(ctx: Context): Promise<CREATE_COMMENT_API> {
+  async createComment(ctx: Context): Promise<CreateCommentResponse> {
     const createCommentImpl = async () => {
       const userId = ctx.get("userId");
       const postId = parseUUID(ctx.req.param("id"));
@@ -53,7 +53,7 @@ export class CommentControllerImpl implements CommentController {
     return await handleAppError(createCommentImpl)(ctx);
   }
 
-  async deleteComment(ctx: Context): Promise<CREATE_COMMENT_API> {
+  async deleteComment(ctx: Context): Promise<DeleteCommentResponse> {
     const deleteCommentImpl = async () => {
       const userId = ctx.get("userId");
       const id = parseUUID(ctx.req.param("id"));
@@ -63,7 +63,7 @@ export class CommentControllerImpl implements CommentController {
     return await handleAppError(deleteCommentImpl)(ctx);
   }
 
-  async getComments(ctx: Context): Promise<GET_COMMENT_API> {
+  async getComments(ctx: Context): Promise<GetCommentResponse> {
     const getCommentImpl = async () => {
       const postId = parseUUID(ctx.req.param("id"));
       const userId = ctx.get("userId");

@@ -2,11 +2,11 @@ import { Context } from "hono";
 import { MediaService } from "./service";
 import { BadRequestError, handleAppError } from "../../utilities/errors/app-error";
 import { parseUUID } from "../../utilities/uuid";
-import { GROUP_MEDIA, USER_MEDIA } from "../../types/api/routes/media";
+import { GroupMediaResponse, UserMediaResponse } from "../../types/api/routes/media";
 
 export interface MediaController {
-  uploadPostMedia(ctx: Context): Promise<GROUP_MEDIA>;
-  uploadUserMedia(ctx: Context): Promise<USER_MEDIA>;
+  uploadPostMedia(ctx: Context): Promise<GroupMediaResponse>;
+  uploadUserMedia(ctx: Context): Promise<UserMediaResponse>;
 }
 
 export class MediaControllerImpl implements MediaController {
@@ -16,7 +16,7 @@ export class MediaControllerImpl implements MediaController {
     this.mediaService = mediaService;
   }
 
-  async uploadPostMedia(ctx: Context): Promise<GROUP_MEDIA> {
+  async uploadPostMedia(ctx: Context): Promise<GroupMediaResponse> {
     const uploadMediaImpl = async () => {
       const groupId = parseUUID(ctx.req.param("id"));
       const userId = ctx.get("userId");
@@ -35,7 +35,7 @@ export class MediaControllerImpl implements MediaController {
     return await handleAppError(uploadMediaImpl)(ctx);
   }
 
-  async uploadUserMedia(ctx: Context): Promise<USER_MEDIA> {
+  async uploadUserMedia(ctx: Context): Promise<UserMediaResponse> {
     const uploadMediaImpl = async () => {
       const userId = ctx.get("userId");
       const body = await ctx.req.parseBody();

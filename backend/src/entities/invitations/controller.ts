@@ -1,13 +1,13 @@
 import { Context } from "hono";
 import { Status } from "../../constants/http";
-import { CREATE_GROUP_INVITE, VERIFY_GROUP_INVITE } from "../../types/api/schemas/groups";
 import { handleAppError } from "../../utilities/errors/app-error";
 import { parseUUID } from "../../utilities/uuid";
 import { InvitationService } from "./service";
+import { CreateInviteResponse, VerifyTokenResponse } from "../../types/api/routes/invite";
 
 export interface InvitationController {
-  createInviteToken(ctx: Context): Promise<CREATE_GROUP_INVITE>;
-  verifyInviteToken(ctx: Context): Promise<VERIFY_GROUP_INVITE>;
+  createInviteToken(ctx: Context): Promise<CreateInviteResponse>;
+  verifyInviteToken(ctx: Context): Promise<VerifyTokenResponse>;
 }
 
 export class InvitationControllerImpl implements InvitationController {
@@ -16,7 +16,8 @@ export class InvitationControllerImpl implements InvitationController {
   constructor(invitationService: InvitationService) {
     this.invitationService = invitationService;
   }
-  async verifyInviteToken(ctx: Context): Promise<VERIFY_GROUP_INVITE> {
+
+  async verifyInviteToken(ctx: Context): Promise<VerifyTokenResponse> {
     const verifyInviteTokenImpl = async () => {
       const userId = ctx.get("userId");
       const token = ctx.req.param("token");
@@ -26,7 +27,7 @@ export class InvitationControllerImpl implements InvitationController {
     return await handleAppError(verifyInviteTokenImpl)(ctx);
   }
 
-  async createInviteToken(ctx: Context): Promise<CREATE_GROUP_INVITE> {
+  async createInviteToken(ctx: Context): Promise<CreateInviteResponse> {
     const createInviteTokenImpl = async () => {
       const groupId = ctx.req.param("groupId");
       const groupIdAsUUID = parseUUID(groupId);

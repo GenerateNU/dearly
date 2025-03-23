@@ -3,12 +3,12 @@ import { LikeService } from "./service";
 import { handleAppError } from "../../utilities/errors/app-error";
 import { parseUUID } from "../../utilities/uuid";
 import { Status } from "../../constants/http";
-import { LIKE_USERS, TOGGLE_LIKE } from "../../types/api/routes/posts";
+import { LikeUsersResponse, ToggleLikeResponse } from "../../types/api/routes/posts";
 import { paginationSchema } from "../../utilities/pagination";
 
 export interface LikeController {
-  toggleLike(ctx: Context): Promise<TOGGLE_LIKE>;
-  getLikeUsers(ctx: Context): Promise<LIKE_USERS>;
+  toggleLike(ctx: Context): Promise<ToggleLikeResponse>;
+  getLikeUsers(ctx: Context): Promise<LikeUsersResponse>;
 }
 
 export class LikeControllerImpl implements LikeController {
@@ -18,7 +18,7 @@ export class LikeControllerImpl implements LikeController {
     this.likeService = likeService;
   }
 
-  async toggleLike(ctx: Context): Promise<TOGGLE_LIKE> {
+  async toggleLike(ctx: Context): Promise<ToggleLikeResponse> {
     const toggleLikeImpl = async () => {
       const postId = parseUUID(ctx.req.param("id"));
       const userId = ctx.get("userId");
@@ -29,7 +29,7 @@ export class LikeControllerImpl implements LikeController {
     return await handleAppError(toggleLikeImpl)(ctx);
   }
 
-  async getLikeUsers(ctx: Context): Promise<LIKE_USERS> {
+  async getLikeUsers(ctx: Context): Promise<LikeUsersResponse> {
     const getLikeUsersImpl = async () => {
       const { limit, page } = ctx.req.query();
       const postId = parseUUID(ctx.req.param("id"));

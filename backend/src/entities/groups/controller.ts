@@ -9,23 +9,23 @@ import {
 import { Status } from "../../constants/http";
 import { handleAppError } from "../../utilities/errors/app-error";
 import {
-  CALENDAR_API,
-  DELETE_GROUP,
-  FEED_API,
-  GET_GROUP,
-  GROUP_API,
-  PATCH_GROUP,
+  GroupCalendarResponse,
+  DeleteGroupResponse,
+  GetGroupResponse,
+  CreateGroupResponse,
+  UpdateGroupResponse,
+  GroupFeedResponse,
 } from "../../types/api/routes/groups";
 import { parseUUID } from "../../utilities/uuid";
 import { UpdateGroupPayload } from "../../types/api/internal/groups";
 
 export interface GroupController {
-  createGroup(ctx: Context): Promise<GROUP_API>;
-  deleteGroup(ctx: Context): Promise<DELETE_GROUP>;
-  getGroup(ctx: Context): Promise<GET_GROUP>;
-  updateGroup(ctx: Context): Promise<PATCH_GROUP>;
-  getCalendar(ctx: Context): Promise<CALENDAR_API>;
-  getAllPosts(ctx: Context): Promise<FEED_API>;
+  createGroup(ctx: Context): Promise<CreateGroupResponse>;
+  deleteGroup(ctx: Context): Promise<DeleteGroupResponse>;
+  getGroup(ctx: Context): Promise<GetGroupResponse>;
+  updateGroup(ctx: Context): Promise<UpdateGroupResponse>;
+  getCalendar(ctx: Context): Promise<GroupCalendarResponse>;
+  getAllPosts(ctx: Context): Promise<GroupFeedResponse>;
 }
 
 export class GroupControllerImpl implements GroupController {
@@ -34,7 +34,8 @@ export class GroupControllerImpl implements GroupController {
   constructor(groupService: GroupService) {
     this.groupService = groupService;
   }
-  async createGroup(ctx: Context): Promise<GROUP_API> {
+
+  async createGroup(ctx: Context): Promise<CreateGroupResponse> {
     const createGroupImpl = async () => {
       const body = await ctx.req.json();
       const payload = createGroupValidate.parse(body);
@@ -50,7 +51,7 @@ export class GroupControllerImpl implements GroupController {
     return await handleAppError(createGroupImpl)(ctx);
   }
 
-  async getCalendar(ctx: Context): Promise<CALENDAR_API> {
+  async getCalendar(ctx: Context): Promise<GroupCalendarResponse> {
     const getCalendarImpl = async () => {
       const { pivot, range } = ctx.req.query();
       const groupId = parseUUID(ctx.req.param("id"));
@@ -65,7 +66,7 @@ export class GroupControllerImpl implements GroupController {
     return await handleAppError(getCalendarImpl)(ctx);
   }
 
-  async getAllPosts(ctx: Context): Promise<FEED_API> {
+  async getAllPosts(ctx: Context): Promise<GroupFeedResponse> {
     const getAllPostsImpl = async () => {
       const { date, limit, page } = ctx.req.query();
       const groupId = parseUUID(ctx.req.param("id"));
@@ -80,7 +81,7 @@ export class GroupControllerImpl implements GroupController {
     return await handleAppError(getAllPostsImpl)(ctx);
   }
 
-  async updateGroup(ctx: Context): Promise<PATCH_GROUP> {
+  async updateGroup(ctx: Context): Promise<UpdateGroupResponse> {
     const updateGroupImpl = async () => {
       // pull out essential IDs
       const userId = parseUUID(ctx.get("userId"));
@@ -101,7 +102,7 @@ export class GroupControllerImpl implements GroupController {
     return await handleAppError(updateGroupImpl)(ctx);
   }
 
-  async getGroup(ctx: Context): Promise<GET_GROUP> {
+  async getGroup(ctx: Context): Promise<GetGroupResponse> {
     const getGroupImpl = async () => {
       // pull out essential IDs
       const groupId = parseUUID(ctx.req.param("id"));
@@ -113,7 +114,7 @@ export class GroupControllerImpl implements GroupController {
     return await handleAppError(getGroupImpl)(ctx);
   }
 
-  async deleteGroup(ctx: Context): Promise<DELETE_GROUP> {
+  async deleteGroup(ctx: Context): Promise<DeleteGroupResponse> {
     const deleteGroupImpl = async () => {
       // pull out essential IDs
       const groupId = parseUUID(ctx.req.param("id"));

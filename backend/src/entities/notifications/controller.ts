@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { NOTIFICATIONS } from "../../types/api/routes/users";
+import { UserNotificationResponses } from "../../types/api/routes/users";
 import { NotificationService } from "./service";
 import { paginationSchema } from "../../utilities/pagination";
 import { parseUUID } from "../../utilities/uuid";
@@ -11,7 +11,7 @@ export interface NotificationController {
    * Get notifications for a user, along with pre-signed urls.
    * @param payload - The user id and pagination details.
    */
-  getNotifications(ctx: Context): Promise<NOTIFICATIONS>;
+  getNotifications(ctx: Context): Promise<UserNotificationResponses>;
 }
 
 export class NotificationControllerImpl implements NotificationController {
@@ -21,7 +21,7 @@ export class NotificationControllerImpl implements NotificationController {
     this.notifService = service;
   }
 
-  async getNotifications(ctx: Context): Promise<NOTIFICATIONS> {
+  async getNotifications(ctx: Context): Promise<UserNotificationResponses> {
     const getNotifications = async () => {
       const { limit, page } = ctx.req.query();
       const queryParams = paginationSchema.parse({ limit: limit ?? 10, page: page ?? 1 });

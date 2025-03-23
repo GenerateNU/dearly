@@ -4,14 +4,19 @@ import { handleAppError } from "../../utilities/errors/app-error";
 import { parseUUID } from "../../utilities/uuid";
 import { createPostValidate, updatePostValidate } from "./validator";
 import { Status } from "../../constants/http";
-import { DEL_POST, GET_POST, POST_API } from "../../types/api/routes/posts";
+import {
+  DeletePostResponse,
+  GetPostResponse,
+  CreatePostResponse,
+  UpdatePostResponse,
+} from "../../types/api/routes/posts";
 import { CreatePostPayload, UpdatePostPayload } from "../../types/api/internal/posts";
 
 export interface PostController {
-  createPost(ctx: Context): Promise<POST_API>;
-  getPost(ctx: Context): Promise<GET_POST>;
-  updatePost(ctx: Context): Promise<POST_API>;
-  deletePost(ctx: Context): Promise<DEL_POST>;
+  createPost(ctx: Context): Promise<CreatePostResponse>;
+  getPost(ctx: Context): Promise<GetPostResponse>;
+  updatePost(ctx: Context): Promise<UpdatePostResponse>;
+  deletePost(ctx: Context): Promise<DeletePostResponse>;
 }
 
 export class PostControllerImpl implements PostController {
@@ -21,7 +26,7 @@ export class PostControllerImpl implements PostController {
     this.postService = postService;
   }
 
-  async createPost(ctx: Context): Promise<POST_API> {
+  async createPost(ctx: Context): Promise<CreatePostResponse> {
     const createPostImpl = async () => {
       // pull out essential IDs
       const groupId = parseUUID(ctx.req.param("id"));
@@ -42,7 +47,7 @@ export class PostControllerImpl implements PostController {
     return await handleAppError(createPostImpl)(ctx);
   }
 
-  async getPost(ctx: Context): Promise<POST_API> {
+  async getPost(ctx: Context): Promise<GetPostResponse> {
     const getPostImpl = async () => {
       // pull out essential IDs
       const id = parseUUID(ctx.req.param("id"));
@@ -54,7 +59,7 @@ export class PostControllerImpl implements PostController {
     return await handleAppError(getPostImpl)(ctx);
   }
 
-  async updatePost(ctx: Context): Promise<POST_API> {
+  async updatePost(ctx: Context): Promise<UpdatePostResponse> {
     const updatePostImpl = async () => {
       // pull out essential IDs
       const userId = parseUUID(ctx.get("userId"));
@@ -75,7 +80,7 @@ export class PostControllerImpl implements PostController {
     return await handleAppError(updatePostImpl)(ctx);
   }
 
-  async deletePost(ctx: Context): Promise<DEL_POST> {
+  async deletePost(ctx: Context): Promise<DeletePostResponse> {
     const deletePostImpl = async () => {
       // pull out essential IDs
       const id = parseUUID(ctx.req.param("id"));
