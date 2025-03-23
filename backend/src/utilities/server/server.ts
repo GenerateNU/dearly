@@ -1,4 +1,4 @@
-import { NotificationService } from "../services/notification/service";
+import { NotificationService } from "../../services/notification/service";
 
 export const handleServerShuttingDown = (notificationService: NotificationService) => {
   process.on("SIGINT", () => {
