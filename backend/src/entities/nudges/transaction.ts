@@ -54,13 +54,12 @@ export class NudgeTransactionImpl implements NudgeTransaction {
     return await this.db.transaction(async (tx) => {
       // validate group existence and manager permissions
       await this.validateGroup(tx, payload.groupId, managerId);
-
       // insert the value into the database
       const [nudgeSchedule] = await tx
         .insert(scheduledNudgesTable)
         .values(payload)
         .onConflictDoUpdate({
-          target: [scheduledNudgesTable.id, groupsTable.id],
+          target: scheduledNudgesTable.groupId,
           set: { ...payload, updatedAt: new Date() },
         })
         .returning();
@@ -70,17 +69,19 @@ export class NudgeTransactionImpl implements NudgeTransaction {
   }
 
   async getNudgeSchedule(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null> {
-    return await this.db.transaction(async (tx) => {
+    const transactionPromise = await this.db.transaction(async (tx) => {
       // validate group existence and manager permissions
       await this.validateGroup(tx, groupId, managerId);
-
+      
       const [nudgeSchedule] = await this.db
-        .select()
-        .from(scheduledNudgesTable)
-        .where(eq(scheduledNudgesTable.groupId, groupId));
-
+      .select()
+      .from(scheduledNudgesTable)
+      .where(eq(scheduledNudgesTable.groupId, groupId));
+      
       return nudgeSchedule ?? null;
     });
+
+    return transactionPromise;
   }
 
   async deactivateNudge(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null> {
