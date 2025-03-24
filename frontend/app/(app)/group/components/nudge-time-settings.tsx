@@ -7,7 +7,6 @@ const NudgeAtTimePicker = () => {
     <DateTimePicker
       mode="time"
       onChange={(_, date) => {
-        console.log(`Time given: ${date}`);
         setNudgeAt(date ?? null);
       }}
       textColor="black"

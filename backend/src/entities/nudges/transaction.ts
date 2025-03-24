@@ -72,12 +72,12 @@ export class NudgeTransactionImpl implements NudgeTransaction {
     const transactionPromise = await this.db.transaction(async (tx) => {
       // validate group existence and manager permissions
       await this.validateGroup(tx, groupId, managerId);
-      
+
       const [nudgeSchedule] = await this.db
-      .select()
-      .from(scheduledNudgesTable)
-      .where(eq(scheduledNudgesTable.groupId, groupId));
-      
+        .select()
+        .from(scheduledNudgesTable)
+        .where(eq(scheduledNudgesTable.groupId, groupId));
+
       return nudgeSchedule ?? null;
     });
 

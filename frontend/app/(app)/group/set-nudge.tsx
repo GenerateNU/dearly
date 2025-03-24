@@ -15,7 +15,7 @@ import { useGroupNudgeConfig, useUpdateNudgeConfig } from "@/hooks/api/nudge";
 import { ConfigNudgeSchedulePayload } from "@/types/nudge";
 import SaveNudgeScheduleButton from "./components/save-nudge";
 
-const WEEKLY_OPTIONS = [
+export const WEEKLY_OPTIONS = [
   "Monday",
   "Tuesday",
   "Wednesday",
@@ -24,8 +24,28 @@ const WEEKLY_OPTIONS = [
   "Saturday",
   "Sunday",
 ];
+
+const FREQUENCY_LABEL_MAPPING = {
+  DAILY: "Daily",
+  WEEKLY: "Weekly",
+  BIWEEKLY: "Biweekly",
+  MONTHLY: "Monthly",
+};
+enum FREQUENCY {
+  "DAILY",
+  "WEEKLY",
+  "BIWEEKLY",
+  "MONTHLY",
+}
+export const FREQUENCY_OPTIONS = [
+  "Disabled",
+  "Daily",
+  "Twice a Week",
+  "Weekly",
+  "Biweekly",
+  "Monthly",
+];
 const MONTHLY_OPTIONS = Array.from({ length: 31 }, (_, i) => String(i + 1));
-const FREQUENCY_OPTIONS = ["Disabled", "Daily", "Twice a Week", "Weekly", "Biweekly", "Monthly"];
 
 const SetRecurringNudge = () => {
   const [items, setItems] = useState<DropdownItem[]>(
@@ -33,28 +53,28 @@ const SetRecurringNudge = () => {
   );
 
   const {
+    nudgeSettings,
+    setRecurringNudge,
     frequency,
     setFrequency,
     dayOfWeek,
     setDayOfWeek,
     dayOfMonth,
     setDayOfMonth,
-    nudgeAt,
     setNudgeAt,
   } = useNudgeSettings();
   const { group } = useUserStore();
-  console.log(group);
-  console.log(group.id);
-  const { data, isPending, error } = useGroupNudgeConfig(group.id);
+  const { data, isPending, error, isError } = useGroupNudgeConfig(group.id);
 
   useEffect(() => {
-    if (data && !(frequency || dayOfWeek || dayOfMonth || nudgeAt)) {
-      setFrequency(data.frequency ?? null);
+    if (!isPending && !isError && data && !nudgeSettings) {
+      setFrequency(FREQUENCY_LABEL_MAPPING[data.frequency as string]);
       setDayOfWeek(data.dayOfWeek ?? null);
       setDayOfMonth(data.dayOfMonth ?? null);
-      setNudgeAt(data.nudgeAt ?? null);
+      setNudgeAt(new Date(data.nudgeAt));
+      setRecurringNudge(data);
     }
-  });
+  }, [data]);
 
   const renderSettings = () => {
     switch (frequency) {

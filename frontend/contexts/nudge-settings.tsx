@@ -1,15 +1,20 @@
 import { createContext, useState, ReactNode, useContext, SetStateAction, Dispatch } from "react";
+import { boolean } from "zod";
 
 export interface NudgeSettings {
   group: string;
   frequency: "DAILY" | "WEEKLY" | "BIWEEKLY" | "MONTHLY" | "YEARLY";
   daysOfWeek: ("MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT" | "SUN")[] | null;
   dayOfMonth: number | null;
-  nudgeAt: string;
+  nudgeAt: Date;
   isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 interface NudgeSettingsContextType {
+  nudgeSettings: NudgeSettings | null;
+  setRecurringNudge: Dispatch<SetStateAction<NudgeSettings | null>>;
   frequency: string | null;
   setFrequency: Dispatch<SetStateAction<string | null>>;
   dayOfWeek: string | null;
@@ -18,9 +23,15 @@ interface NudgeSettingsContextType {
   setDayOfMonth: Dispatch<SetStateAction<number | null>>;
   nudgeAt: Date | null;
   setNudgeAt: Dispatch<SetStateAction<Date | null>>;
+  isValidated: boolean;
+  setIsValidated: Dispatch<SetStateAction<boolean>>;
+  validationMessage: string | null;
+  setValidationMessage: Dispatch<SetStateAction<string | null>>;
 }
 
 export const NudgeSettingsContext = createContext<NudgeSettingsContextType>({
+  nudgeSettings: null,
+  setRecurringNudge: () => {},
   frequency: null,
   setFrequency: () => {},
   dayOfWeek: null,
@@ -29,6 +40,10 @@ export const NudgeSettingsContext = createContext<NudgeSettingsContextType>({
   setDayOfMonth: () => {},
   nudgeAt: null,
   setNudgeAt: () => {},
+  isValidated: false,
+  setIsValidated: () => {},
+  validationMessage: null,
+  setValidationMessage: () => {},
 });
 
 interface NudgeSettingsProviderProps {
@@ -41,10 +56,14 @@ export const NudgeSettingsProvider: React.FC<NudgeSettingsProviderProps> = ({ ch
   const [dayOfWeek, setDayOfWeek] = useState<string | null>(null);
   const [dayOfMonth, setDayOfMonth] = useState<number | null>(null);
   const [nudgeAt, setNudgeAt] = useState<Date | null>(null);
+  const [isValidated, setIsValidated] = useState<boolean>(false);
+  const [validationMessage, setValidationMessage] = useState<string | null>(null);
 
   return (
     <NudgeSettingsContext.Provider
       value={{
+        nudgeSettings,
+        setRecurringNudge,
         frequency,
         setFrequency,
         dayOfWeek,
@@ -53,6 +72,10 @@ export const NudgeSettingsProvider: React.FC<NudgeSettingsProviderProps> = ({ ch
         setDayOfMonth,
         nudgeAt,
         setNudgeAt,
+        isValidated,
+        setIsValidated,
+        validationMessage,
+        setValidationMessage,
       }}
     >
       {children}
