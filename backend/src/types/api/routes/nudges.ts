@@ -1,23 +1,23 @@
 import { TypedResponse } from "hono";
 import { paths } from "../../../gen/openapi";
-import { API_ERROR } from "../schemas/error";
+import { APIError } from "../schemas/error";
 
-export type MANUAL_NUDGE = TypedResponse<
+export type ManualNudgeResponse = TypedResponse<
   | paths["/api/v1/groups/{id}/nudges/manual"]["post"]["responses"]["200"]["content"]["application/json"]
-  | API_ERROR
+  | APIError
 >;
 
-export type AUTO_NUDGE = TypedResponse<
+export type AutoNudgeResponse = TypedResponse<
   | paths["/api/v1/groups/{id}/nudges/auto"]["put"]["responses"]["200"]["content"]["application/json"]
-  | API_ERROR
+  | APIError
 >;
 
-export type NUDGES_API = TypedResponse<
+export type GetNudgeConfigResponse = TypedResponse<
   | paths["/api/v1/groups/{id}/nudges/auto"]["get"]["responses"]["200"]["content"]["application/json"]
-  | API_ERROR
+  | APIError
 >;
 
-export type DEACTIVE_NUDGE = TypedResponse<
+export type DeactivateNudgeResponse = TypedResponse<
   | paths["/api/v1/groups/{id}/nudges/auto/off"]["put"]["responses"]["200"]["content"]["application/json"]
-  | API_ERROR
+  | APIError
 >;

@@ -1,5 +1,5 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { IDPayload } from "../../types/id";
+import { IDPayload } from "../../types/api/internal/id";
 import {
   commentsTable,
   groupsTable,
@@ -21,10 +21,42 @@ import {
   CreateCommentPayload,
 } from "../../types/api/internal/comments";
 
+/**
+ * Interface defining the operations for handling comment transactions in the database.
+ * These methods are responsible for interacting with the database to perform actions related to comments,
+ * including liking, creating, deleting, and fetching comments.
+ */
 export interface CommentTransaction {
+  /**
+   * Toggles the like status of a comment for a specific user.
+   *
+   * @param payload - An object containing the comment ID and the user ID.
+   * @returns A boolean indicating whether the comment is now liked (true) or unliked (false).
+   */
   toggleLikeComment(payload: IDPayload): Promise<boolean>;
+
+  /**
+   * Creates a new comment for a specified post.
+   *
+   * @param payload - An object containing the necessary data to create a new comment (e.g., post ID, user ID, and content).
+   * @returns The newly created comment object.
+   */
   createComment(payload: CreateCommentPayload): Promise<Comment>;
+
+  /**
+   * Retrieves a list of comments for a specified post, with pagination.
+   *
+   * @param payload - An object containing the pagination details (e.g., limit, page number, user ID, and post ID).
+   * @returns A list of comments with metadata such as username and profile photo URLs.
+   */
   getComments(payload: CommentPagination): Promise<CommentWithMetadata[]>;
+
+  /**
+   * Deletes a comment by its ID, ensuring the user is the owner of the comment.
+   *
+   * @param payload - An object containing the comment ID and the user ID.
+   * @returns A void response confirming the deletion of the comment.
+   */
   deleteComment(payload: IDPayload): Promise<void>;
 }
 

@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { defineConfig } from "drizzle-kit";
-import { getConfigurations } from "./src/config/config";
+import { getConfigurations } from "./src/config/init";
 import { formatConnString } from "./src/database/connect";
 
 const config = getConfigurations();

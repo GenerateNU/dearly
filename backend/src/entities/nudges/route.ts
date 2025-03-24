@@ -3,13 +3,13 @@ import { Hono } from "hono";
 import { NudgeController, NudgeControllerImpl } from "./controller";
 import { NudgeTransaction, NudgeTransactionImpl } from "./transaction";
 import { NudgeService, NudgeServiceImpl } from "./service";
-import { ExpoPushService } from "../../services/notification/expo";
-import { NudgeScheduler } from "../../services/nudgeScheduler";
+import { PushNotificationService } from "../../services/notification/expo";
+import { NudgeSchedulerService } from "../../services/nudgeScheduler";
 
 export const nudgeRoutes = (
   db: PostgresJsDatabase,
-  expoService: ExpoPushService,
-  scheduler: NudgeScheduler,
+  expoService: PushNotificationService,
+  scheduler: NudgeSchedulerService,
 ): Hono => {
   const nudge = new Hono();
   const nudgeTransaction: NudgeTransaction = new NudgeTransactionImpl(db);

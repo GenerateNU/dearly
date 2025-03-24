@@ -21,7 +21,7 @@ import {
   DayWithObjectKey,
   UpdateGroupPayload,
 } from "../../types/api/internal/groups";
-import { getPostMetadata } from "../../utilities/query";
+import { getPostMetadata } from "../../utilities/api/query";
 
 export interface GroupTransaction {
   insertGroup(payload: CreateGroupPayload): Promise<Group | null>;

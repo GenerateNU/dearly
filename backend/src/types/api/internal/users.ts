@@ -1,5 +1,31 @@
+import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
 import { usersTable } from "../../../entities/schema";
-import { PaginationParams } from "../../../utilities/pagination";
+import { PaginationParams, paginationSchema } from "../../../utilities/api/pagination";
+import { MIN_LIMIT } from "../../../constants/database";
+import { z } from "zod";
+import Expo from "expo-server-sdk";
+
+export const createUserValidate = createInsertSchema(usersTable, {
+  username: (schema) => schema.min(MIN_LIMIT),
+}).omit({ id: true });
+
+export const updateUserValidate = createUpdateSchema(usersTable, {
+  name: (schema) => schema.min(MIN_LIMIT),
+  username: (schema) => schema.min(MIN_LIMIT),
+}).omit({ id: true });
+
+export const expoTokenValidate = z.object({
+  expoToken: z.string().refine((token) => Expo.isExpoPushToken(token), {
+    message: "Invalid Expo Push Token",
+  }),
+});
+
+export const querySchema = z
+  .object({
+    username: z.string(),
+    groupId: z.string().uuid({ message: "Invalid ID format" }),
+  })
+  .merge(paginationSchema);
 
 export interface SearchedUser {
   id: string;

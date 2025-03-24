@@ -1,13 +1,11 @@
 import { RealtimeChannel, SupabaseClient } from "@supabase/supabase-js";
-import { postValidate } from "../../entities/posts/validator";
-import { Post } from "../../types/api/internal/posts";
+import { Post, postValidate } from "../../types/api/internal/posts";
 import { Comment, commentValidate } from "../../types/api/internal/comments";
 import { Notification } from "../../types/api/internal/notification";
 import { NotificationType } from "../../constants/database";
-import { Like } from "../../types/api/internal/like";
-import { ExpoPushService, PushNotificationService } from "./expo";
+import { Like, likeValidate } from "../../types/api/internal/like";
+import { PushNotificationService } from "./expo";
 import { NotificationTransaction } from "./transaction";
-import { likeValidate } from "../../entities/likes/validator";
 
 export interface NotificationService {
   /**
@@ -51,7 +49,11 @@ export class ExpoNotificationService implements NotificationService {
   private likeChannel: RealtimeChannel | null;
   private commentChannel: RealtimeChannel | null;
 
-  constructor(client: SupabaseClient, transaction: NotificationTransaction, expo: ExpoPushService) {
+  constructor(
+    client: SupabaseClient,
+    transaction: NotificationTransaction,
+    expo: PushNotificationService,
+  ) {
     this.expoService = expo;
     this.supabaseClient = client;
     this.transaction = transaction;

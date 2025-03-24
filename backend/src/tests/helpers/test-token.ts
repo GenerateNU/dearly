@@ -1,6 +1,6 @@
 import * as jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
-import { getConfigurations } from "../../config/config";
+import { getConfigurations } from "../../config/init";
 
 export const generateJWTToken = (
   validDuration: number,

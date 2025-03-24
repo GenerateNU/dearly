@@ -7,7 +7,7 @@ import {
   generateUUID,
 } from "../helpers/test-token";
 import { Configuration } from "../../types/config";
-import { getConfigurations } from "../../config/config";
+import { getConfigurations } from "../../config/init";
 import { TestBuilder } from "../helpers/test-builder";
 import * as jwt from "jsonwebtoken";
 import { Context } from "hono";

@@ -1,12 +1,27 @@
 import { Context } from "hono";
 import { MediaService } from "./service";
 import { BadRequestError, handleAppError } from "../../utilities/errors/app-error";
-import { parseUUID } from "../../utilities/uuid";
-import { GROUP_MEDIA, USER_MEDIA } from "../../types/api/routes/media";
+import { parseUUID } from "../../utilities/api/uuid";
+import { GroupMediaResponse, UserMediaResponse } from "../../types/api/routes/media";
 
+/**
+ * Interface for handling media upload operations.
+ * Provides methods for uploading media files for posts and user profiles.
+ */
 export interface MediaController {
-  uploadPostMedia(ctx: Context): Promise<GROUP_MEDIA>;
-  uploadUserMedia(ctx: Context): Promise<USER_MEDIA>;
+  /**
+   * Uploads media files for a post.
+   * @param ctx - The context object containing the request and response information
+   * @returns Promise resolving to the GroupMediaResponse object
+   */
+  uploadPostMedia(ctx: Context): Promise<GroupMediaResponse>;
+
+  /**
+   * Uploads media files for a user profile.
+   * @param ctx - The context object containing the request and response information
+   * @returns Promise resolving to the UserMediaResponse object
+   */
+  uploadUserMedia(ctx: Context): Promise<UserMediaResponse>;
 }
 
 export class MediaControllerImpl implements MediaController {
@@ -16,7 +31,7 @@ export class MediaControllerImpl implements MediaController {
     this.mediaService = mediaService;
   }
 
-  async uploadPostMedia(ctx: Context): Promise<GROUP_MEDIA> {
+  async uploadPostMedia(ctx: Context): Promise<GroupMediaResponse> {
     const uploadMediaImpl = async () => {
       const groupId = parseUUID(ctx.req.param("id"));
       const userId = ctx.get("userId");
@@ -35,7 +50,7 @@ export class MediaControllerImpl implements MediaController {
     return await handleAppError(uploadMediaImpl)(ctx);
   }
 
-  async uploadUserMedia(ctx: Context): Promise<USER_MEDIA> {
+  async uploadUserMedia(ctx: Context): Promise<UserMediaResponse> {
     const uploadMediaImpl = async () => {
       const userId = ctx.get("userId");
       const body = await ctx.req.parseBody();
