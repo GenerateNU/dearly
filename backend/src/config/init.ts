@@ -19,48 +19,48 @@ dotenv.config({ path: resolve(__dirname, "../../../", envFile) });
 export const getConfigurations = (): Configuration => {
   const config: Configuration = {
     server: {
-      port: parseEnv("APP_PORT"), // Port for the server to listen on
+      port: parseEnv("APP_PORT"),
     },
     database: {
-      user: parseEnv("DB_USER"), // Database username
-      password: parseEnv("DB_PASSWORD"), // Database password
-      host: parseEnv("DB_HOST"), // Database host (e.g., localhost or DB server)
-      port: parseInt(parseEnv("DB_PORT")), // Database port
-      database: parseEnv("DB_NAME"), // Database name
-      ssl: parseSSL(parseEnv("DB_SSL")), // SSL configuration for database connection
+      user: parseEnv("DB_USER"),
+      password: parseEnv("DB_PASSWORD"),
+      host: parseEnv("DB_HOST"),
+      port: parseInt(parseEnv("DB_PORT")),
+      database: parseEnv("DB_NAME"),
+      ssl: parseSSL(parseEnv("DB_SSL")),
     },
     authorization: {
-      jwtSecretKey: parseEnv("JWT_SECRET_KEY"), // Secret key for JWT authorization
+      jwtSecretKey: parseEnv("JWT_SECRET_KEY"),
     },
     cors: {
-      origin: "*", // Allowed origins for cross-origin resource sharing (CORS)
-      allowMethods: ["GET", "POST", "PUT", "DELETE", "PATCH"], // Allowed HTTP methods
-      allowHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization"], // Allowed headers
+      origin: "*",
+      allowMethods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+      allowHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization"],
     },
     automigrate: {
-      migrationsFolder: "./src/migrations", // Path to migration files for automatic migration
+      migrationsFolder: "./src/migrations",
     },
     s3Config: {
-      secretKey: parseEnv("AWS_SECRET_KEY"), // AWS secret key for S3
-      publicKey: parseEnv("AWS_PUBLIC_KEY"), // AWS public key for S3
-      region: parseEnv("AWS_REGION"), // AWS region for S3 bucket
-      name: parseEnv("AWS_BUCKET_NAME"), // AWS S3 bucket name
+      secretKey: parseEnv("AWS_SECRET_KEY"),
+      publicKey: parseEnv("AWS_PUBLIC_KEY"),
+      region: parseEnv("AWS_REGION"),
+      name: parseEnv("AWS_BUCKET_NAME"),
     },
     lambdaConfig: {
-      lambdaARN: parseEnv("NUDGE_LAMBDA_ARN"), // ARN for the AWS Lambda function
-      lambdaRoleARN: parseEnv("NUDGE_LAMBDA_ROLE_ARN"), // ARN for the IAM role associated with the Lambda function
+      lambdaARN: parseEnv("NUDGE_LAMBDA_ARN"),
+      lambdaRoleARN: parseEnv("NUDGE_LAMBDA_ROLE_ARN"),
     },
     slackConfig: {
-      expoSignature: parseEnv("SECRET_WEBHOOK_KEY"), // Secret key for Slack webhook verification
-      slackWebhookUrl: parseEnv("SLACK_WEBHOOK_URL"), // Slack webhook URL for sending notifications
-      slackChannelID: parseEnv("SLACK_CHANNEL_ID"), // Slack channel ID for notifications
-      slackUserID: parseEnv("SLACK_USER_GROUP_ID"), // Slack user group ID for notifications
-      qrCodeGenerator: parseEnv("BUILD_QR_CODE_GENERATOR"), // URL or service for generating QR codes
+      expoSignature: parseEnv("SECRET_WEBHOOK_KEY"),
+      slackWebhookUrl: parseEnv("SLACK_WEBHOOK_URL"),
+      slackChannelID: parseEnv("SLACK_CHANNEL_ID"),
+      slackUserID: parseEnv("SLACK_USER_GROUP_ID"),
+      qrCodeGenerator: parseEnv("BUILD_QR_CODE_GENERATOR"),
     },
-    environment: nodeEnv, // The current environment (e.g., "development", "production", "test")
+    environment: nodeEnv,
     supabase: {
-      url: parseEnv("SUPABASE_URL"), // Supabase instance URL
-      key: parseEnv("SUPABASE_KEY"), // Supabase API key
+      url: parseEnv("SUPABASE_URL"),
+      key: parseEnv("SUPABASE_KEY"),
     },
   };
   return config;
