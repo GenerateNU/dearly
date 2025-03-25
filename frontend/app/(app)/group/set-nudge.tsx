@@ -3,7 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { TextButton } from "@/design-system/components/shared/buttons/text-button";
 import { Dropdown } from "@/design-system/components/shared/controls/dropdown";
 import { DropdownItem } from "@/types/dropdown";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Text } from "@/design-system/base/text";
 import { useNudgeSettings } from "@/contexts/nudge-settings";
 import NudgeSettings from "./components/nudge-settings";
@@ -14,38 +14,13 @@ import { useUserStore } from "@/auth/store";
 import { useGroupNudgeConfig, useUpdateNudgeConfig } from "@/hooks/api/nudge";
 import { ConfigNudgeSchedulePayload } from "@/types/nudge";
 import SaveNudgeScheduleButton from "./components/save-nudge";
-
-export const WEEKLY_OPTIONS = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-];
-
-const FREQUENCY_LABEL_MAPPING = {
-  DAILY: "Daily",
-  WEEKLY: "Weekly",
-  BIWEEKLY: "Biweekly",
-  MONTHLY: "Monthly",
-};
-enum FREQUENCY {
-  "DAILY",
-  "WEEKLY",
-  "BIWEEKLY",
-  "MONTHLY",
-}
-export const FREQUENCY_OPTIONS = [
-  "Disabled",
-  "Daily",
-  "Twice a Week",
-  "Weekly",
-  "Biweekly",
-  "Monthly",
-];
-const MONTHLY_OPTIONS = Array.from({ length: 31 }, (_, i) => String(i + 1));
+import {
+  FREQUENCY_LABEL_MAPPING,
+  FREQUENCY_OPTIONS,
+  MONTHLY_OPTIONS,
+  WEEKLY_OPTIONS,
+  WEEKLY_OPTIONS_MAPPING,
+} from "./constants/constants";
 
 const SetRecurringNudge = () => {
   const [items, setItems] = useState<DropdownItem[]>(
@@ -55,11 +30,13 @@ const SetRecurringNudge = () => {
   const {
     nudgeSettings,
     setRecurringNudge,
-    frequency,
+    frequencySettings,
     setFrequency,
-    dayOfWeek,
+    dayOfWeekSettings,
     setDayOfWeek,
-    dayOfMonth,
+    dayOfWeek2Settings,
+    setDayOfWeek2,
+    dayOfMonthSettings,
     setDayOfMonth,
     setNudgeAt,
   } = useNudgeSettings();
@@ -67,41 +44,75 @@ const SetRecurringNudge = () => {
   const { data, isPending, error, isError } = useGroupNudgeConfig(group.id);
 
   useEffect(() => {
+    // Initialize previous nudge settings
     if (!isPending && !isError && data && !nudgeSettings) {
-      setFrequency(FREQUENCY_LABEL_MAPPING[data.frequency as string]);
-      setDayOfWeek(data.dayOfWeek ?? null);
-      setDayOfMonth(data.dayOfMonth ?? null);
+      console.log(`Data: ${JSON.stringify(data)}`);
+      // TODO: deal with disable
+      setFrequency(FREQUENCY_LABEL_MAPPING[data.frequency as keyof typeof FREQUENCY_LABEL_MAPPING]);
+      if (data.daysOfWeek && data.daysOfWeek.length > 0) {
+        setDayOfWeek(
+          WEEKLY_OPTIONS_MAPPING[data.daysOfWeek[0] as keyof typeof WEEKLY_OPTIONS_MAPPING],
+        );
+        if (data.daysOfWeek.length == 2) {
+          setDayOfWeek2(
+            WEEKLY_OPTIONS_MAPPING[data.daysOfWeek[1] as keyof typeof WEEKLY_OPTIONS_MAPPING],
+          );
+        }
+      }
+      setDayOfMonth(data.day);
       setNudgeAt(new Date(data.nudgeAt));
       setRecurringNudge(data);
     }
   }, [data]);
 
+  useEffect(() => {
+    // Reset settings accordingly
+    if (nudgeSettings) {
+      switch (frequencySettings) {
+        case "Weekly":
+        case "Biweekly":
+          setDayOfWeek2(null);
+        case "Twice a Week":
+          setDayOfMonth(null);
+          console.log(dayOfWeekSettings);
+          break;
+        case "Monthly":
+          setDayOfWeek(null);
+          break;
+        case "Daily":
+          setDayOfWeek(null);
+          setDayOfWeek2(null);
+          setDayOfMonth(null);
+          break;
+        default:
+          break;
+      }
+    }
+  }, [frequencySettings, data]);
+
+  // Render setting view based on frequency
   const renderSettings = () => {
-    switch (frequency) {
+    switch (frequencySettings) {
       case "Disabled":
         return <></>;
       case "Daily":
         return <NudgeAtTimePicker />;
       case "Weekly":
         return (
-          <NudgeSettings options={WEEKLY_OPTIONS} curOption={dayOfWeek} setOption={setDayOfWeek} />
+          <NudgeSettings
+            options={WEEKLY_OPTIONS}
+            curOption={dayOfWeekSettings}
+            setOption={setDayOfWeek}
+          />
         );
-      case "Twice a Week":
+      case "Twice a Week": //TODO:
         return (
           <>
             <Box>
               <Text>First Nudge</Text>
               <NudgeSettings
                 options={WEEKLY_OPTIONS}
-                curOption={dayOfWeek}
-                setOption={setDayOfWeek}
-              />
-            </Box>
-            <Box>
-              <Text>Second Nudge</Text>
-              <NudgeSettings
-                options={WEEKLY_OPTIONS}
-                curOption={dayOfWeek}
+                curOption={dayOfWeekSettings}
                 setOption={setDayOfWeek}
               />
             </Box>
@@ -109,16 +120,20 @@ const SetRecurringNudge = () => {
         );
       case "Biweekly":
         return (
-          <NudgeSettings options={WEEKLY_OPTIONS} curOption={dayOfWeek} setOption={setDayOfWeek} />
+          <NudgeSettings
+            options={WEEKLY_OPTIONS}
+            curOption={dayOfWeekSettings}
+            setOption={setDayOfWeek}
+          />
         );
       case "Monthly":
         return (
           <NudgeSettings
             options={MONTHLY_OPTIONS}
-            curOption={String(dayOfMonth)}
-            setOption={setDayOfWeek}
+            curOption={dayOfMonthSettings}
+            setOption={setDayOfMonth}
           />
-        ); // TODO: Update to generic type to accept number options
+        );
       default:
         return <></>;
     }
@@ -139,7 +154,7 @@ const SetRecurringNudge = () => {
         <Text variant="caption">SELECT FREQUENCY</Text>
         <Dropdown
           direction="BOTTOM"
-          value={frequency}
+          value={frequencySettings}
           items={items}
           setValue={setFrequency}
           setItems={setItems}

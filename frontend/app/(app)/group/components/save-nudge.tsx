@@ -6,7 +6,8 @@ import { TextButton } from "@/design-system/components/shared/buttons/text-butto
 import { useDisableNudge, useUpdateNudgeConfig } from "@/hooks/api/nudge";
 import { ConfigNudgeSchedulePayload } from "@/types/nudge";
 import { router } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { convertData } from "../constants/constants";
 
 const FREQUENCY_LABEL_MAPPING = {
   Daily: "DAILY",
@@ -27,70 +28,105 @@ const WEEKLY_LABEL_MAPPING = {
 
 const SaveNudgeScheduleButton = () => {
   const {
-    frequency,
-    dayOfWeek,
-    dayOfMonth,
-    nudgeAt,
-    isValidated,
-    setIsValidated,
-    validationMessage,
-    setValidationMessage,
+    setRecurringNudge,
+    frequencySettings,
+    setFrequency,
+    dayOfWeekSettings,
+    setDayOfWeek,
+    dayOfWeek2Settings,
+    setDayOfWeek2,
+    dayOfMonthSettings,
+    setDayOfMonth,
+    nudgeAtSettings,
+    setNudgeAt,
   } = useNudgeSettings();
   const { group } = useUserStore();
-  const { mutate, isPending, error, isError } = useUpdateNudgeConfig(group.id);
+  const { mutate, isPending, error, isError, isSuccess } = useUpdateNudgeConfig(group.id);
   const disableNudgeHook = useDisableNudge(group.id);
-  const [isDisabled, setIsDisabled] = useState(false);
-
-  const validate = () => {
-    // TODO: validate for each frequency and create appropriate message
-    if (!nudgeAt) {
-      // Should not happen
-      setIsValidated(false);
-      setValidationMessage("No time set");
-    }
-
-    setIsValidated(true); // TODO: if statement for if all valid values
-  };
+  const [isSaving, setIsSaving] = useState(false); // Controls disabled button if schedule is saving
+  const [daysOfWeekArr, setDayOfWeekArr] = useState<string[]>([]);
+  // const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const isMissingFields = () => {
-    if (frequency && frequency !== "Disabled") {
-      if (!nudgeAt) return true;
-      switch (frequency) {
-        case "Daily":
-          return false;
-        case "Weekly":
-          return !dayOfWeek;
-        case "Twice a week":
-          return !dayOfWeek;
-        case "Biweekly":
-          return !dayOfWeek;
-        case "Monthly":
-          return !dayOfMonth;
+    // Check if any fields are null
+    if (frequencySettings == "Disabled") return false;
+    if (!nudgeAtSettings) return true;
+    switch (frequencySettings) {
+      case "Daily":
+        return false;
+      case "Weekly":
+        return !dayOfWeekSettings;
+      case "Twice a week":
+        return !dayOfWeekSettings;
+      case "Biweekly":
+        return !dayOfWeekSettings;
+      case "Monthly":
+        return !dayOfMonthSettings;
+      default:
+        return true;
+    }
+  };
+
+  useEffect(() => {
+    if (!isPending) {
+      if (isSuccess || disableNudgeHook.isSuccess) {
+        resetSettings();
+        setIsSaving(false);
+        router.back();
+      } else {
+        console.log("Error saving changes");
+        // setErrorMessage("Error saving changes. Please try again.")
       }
     }
+  }, [isPending, isSuccess, disableNudgeHook.isSuccess]);
 
-    return false;
+  // reset all values to null
+  const resetSettings = () => {
+    setRecurringNudge(null);
+    setFrequency(null);
+    setDayOfWeek(null);
+    setDayOfWeek2(null);
+    setDayOfMonth(null);
+    setNudgeAt(null);
   };
+
+  useEffect(() => {
+    if (isSaving) {
+      if (frequencySettings) {
+        const payload: ConfigNudgeSchedulePayload = {
+          group: group.id,
+          frequency: convertData(FREQUENCY_LABEL_MAPPING, frequencySettings),
+          daysOfWeek: daysOfWeekArr,
+          day: dayOfMonthSettings,
+          nudgeAt: nudgeAtSettings?.toUTCString(),
+        };
+        mutate(payload);
+      }
+    }
+  }, [isSaving]);
 
   // Sets the schedule
   const onPress = async () => {
-    setIsDisabled(true);
-    if (frequency === "Disabled") {
+    setIsSaving(true);
+    if (frequencySettings === "Disabled") {
       await disableNudgeHook.mutate(group.id);
     } else {
-      validate();
-      if (isValidated && frequency) {
-        const payload: ConfigNudgeSchedulePayload = {
-          group: group,
-          frequency: FREQUENCY_LABEL_MAPPING[frequency],
-          dayOfWeek: dayOfWeek,
-          day: dayOfMonth,
-          nudgeAt: nudgeAt,
-        };
-        const data = await mutate(payload);
+      // validate();
+      console.log("setting up params");
+      if (
+        frequencySettings &&
+        ["Weekly", "Twice a Week", "Biweekly"].includes(frequencySettings) &&
+        dayOfWeekSettings
+      ) {
+        if (frequencySettings === "Twice a Week" && dayOfWeek2Settings) {
+          setDayOfWeekArr([
+            convertData(WEEKLY_LABEL_MAPPING, dayOfWeekSettings),
+            convertData(WEEKLY_LABEL_MAPPING, dayOfWeek2Settings),
+          ]);
+        } else {
+          setDayOfWeekArr([convertData(WEEKLY_LABEL_MAPPING, dayOfWeekSettings)]);
+        }
       }
-      setIsDisabled(false);
-      router.back();
     }
   };
 
@@ -100,9 +136,10 @@ const SaveNudgeScheduleButton = () => {
         onPress={onPress}
         label="Save"
         variant="primary"
-        disabled={isMissingFields() || isDisabled}
+        disabled={isMissingFields() || isSaving}
       />
-      {validationMessage && <Text color="warning">Error: {validationMessage}</Text>}
+      {/* {errorMessage && 
+      <Text color="error">{errorMessage}</Text>} */}
     </Box>
   );
 };

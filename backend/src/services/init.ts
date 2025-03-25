@@ -22,7 +22,13 @@ export const initIntegration = (
     },
   }),
   expoClient: Expo = new Expo(),
-  schedulerClient: SchedulerClient = new SchedulerClient(),
+  schedulerClient: SchedulerClient = new SchedulerClient({
+    region: config.s3Config.region,
+    credentials: {
+      accessKeyId: config.s3Config.publicKey,
+      secretAccessKey: config.s3Config.secretKey,
+    },
+  }),
   supabaseClient: ReturnType<typeof createClient> = createClient(
     config.supabase.url,
     config.supabase.key,

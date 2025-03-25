@@ -15,35 +15,39 @@ export interface NudgeSettings {
 interface NudgeSettingsContextType {
   nudgeSettings: NudgeSettings | null;
   setRecurringNudge: Dispatch<SetStateAction<NudgeSettings | null>>;
-  frequency: string | null;
+  frequencySettings: string | null;
   setFrequency: Dispatch<SetStateAction<string | null>>;
-  dayOfWeek: string | null;
+  dayOfWeekSettings: string | null;
   setDayOfWeek: Dispatch<SetStateAction<string | null>>;
-  dayOfMonth: number | null;
-  setDayOfMonth: Dispatch<SetStateAction<number | null>>;
-  nudgeAt: Date | null;
+  dayOfWeek2Settings: string | null;
+  setDayOfWeek2: Dispatch<SetStateAction<string | null>>;
+  daysOfWeekArr: string[] | null;
+  setDaysOfWeekArr: Dispatch<SetStateAction<string[] | null>>;
+  dayOfMonthSettings: string | null;
+  setDayOfMonth: Dispatch<SetStateAction<string | null>>;
+  nudgeAtSettings: Date | null;
   setNudgeAt: Dispatch<SetStateAction<Date | null>>;
-  isValidated: boolean;
-  setIsValidated: Dispatch<SetStateAction<boolean>>;
-  validationMessage: string | null;
-  setValidationMessage: Dispatch<SetStateAction<string | null>>;
+  isActiveSettings: boolean;
+  setIsActive: Dispatch<SetStateAction<boolean>>;
 }
 
 export const NudgeSettingsContext = createContext<NudgeSettingsContextType>({
   nudgeSettings: null,
   setRecurringNudge: () => {},
-  frequency: null,
+  frequencySettings: null,
   setFrequency: () => {},
-  dayOfWeek: null,
+  dayOfWeekSettings: null,
   setDayOfWeek: () => {},
-  dayOfMonth: null,
+  dayOfWeek2Settings: null,
+  setDayOfWeek2: () => {},
+  daysOfWeekArr: null,
+  setDaysOfWeekArr: () => {},
+  dayOfMonthSettings: null,
   setDayOfMonth: () => {},
-  nudgeAt: null,
+  nudgeAtSettings: null,
   setNudgeAt: () => {},
-  isValidated: false,
-  setIsValidated: () => {},
-  validationMessage: null,
-  setValidationMessage: () => {},
+  isActiveSettings: false,
+  setIsActive: () => {},
 });
 
 interface NudgeSettingsProviderProps {
@@ -52,30 +56,33 @@ interface NudgeSettingsProviderProps {
 
 export const NudgeSettingsProvider: React.FC<NudgeSettingsProviderProps> = ({ children }) => {
   const [nudgeSettings, setRecurringNudge] = useState<NudgeSettings | null>(null);
-  const [frequency, setFrequency] = useState<string | null>(null);
-  const [dayOfWeek, setDayOfWeek] = useState<string | null>(null);
-  const [dayOfMonth, setDayOfMonth] = useState<number | null>(null);
-  const [nudgeAt, setNudgeAt] = useState<Date | null>(null);
-  const [isValidated, setIsValidated] = useState<boolean>(false);
-  const [validationMessage, setValidationMessage] = useState<string | null>(null);
+  const [frequencySettings, setFrequency] = useState<string | null>(null);
+  const [dayOfWeekSettings, setDayOfWeek] = useState<string | null>(null);
+  const [dayOfWeek2Settings, setDayOfWeek2] = useState<string | null>(null);
+  const [dayOfMonthSettings, setDayOfMonth] = useState<string | null>(null);
+  const [daysOfWeekArr, setDaysOfWeekArr] = useState<string[] | null>(null);
+  const [nudgeAtSettings, setNudgeAt] = useState<Date | null>(new Date());
+  const [isActiveSettings, setIsActive] = useState<boolean>(false);
 
   return (
     <NudgeSettingsContext.Provider
       value={{
         nudgeSettings,
         setRecurringNudge,
-        frequency,
+        frequencySettings,
         setFrequency,
-        dayOfWeek,
+        dayOfWeekSettings,
         setDayOfWeek,
-        dayOfMonth,
+        dayOfWeek2Settings,
+        setDayOfWeek2,
+        daysOfWeekArr,
+        setDaysOfWeekArr,
+        dayOfMonthSettings,
         setDayOfMonth,
-        nudgeAt,
+        nudgeAtSettings,
         setNudgeAt,
-        isValidated,
-        setIsValidated,
-        validationMessage,
-        setValidationMessage,
+        isActiveSettings,
+        setIsActive,
       }}
     >
       {children}
