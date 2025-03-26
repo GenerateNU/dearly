@@ -4,13 +4,11 @@ import { Box } from "@/design-system/base/box";
 import { Post } from "@/types/post";
 import { useGroupFeed } from "@/hooks/api/post";
 import PostSkeleton from "./skeleton";
-import { CommentInput } from "./comment-input";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect} from "react";
 import BottomSheet from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheet/BottomSheet";
 import { CommentPopUp } from "@/design-system/components/comments/comment-popup";
 import Input from "@/design-system/components/shared/controls/input";
 import MultitrackAudio from "@/assets/audio.svg";
-import { set } from "zod";
 
 const Feed = () => {
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage, isLoading } = useGroupFeed();
@@ -25,12 +23,15 @@ const Feed = () => {
     }
   };
 
+  useEffect(() => {
+
+  }, [ref.current])
+
   const onClickComment = (id: string) => {
     setCurrentId(id);
     ref.current?.snapToIndex(0);
   };
 
-  // TODO: add notification when all posts are seen
   const renderFooter = () => {
     if (!isFetchingNextPage || isLoading) return null;
     return <PostSkeleton />;
@@ -55,15 +56,12 @@ const Feed = () => {
           groupId={item.groupId}
           onCommentClicked={() => null}
         />
-        {button? 
         <Input
             isButton
             onPress={() => onClickComment(item.id)}
             placeholder="Write or record a message..."
             rightIcon={<MultitrackAudio />}
-        />:
-        <CommentInput/>
-        }
+        />
       </Box>
     );
   };

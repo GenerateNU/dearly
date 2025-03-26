@@ -14,15 +14,16 @@ interface RecordingProps {
 }
 
 export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
+  const numLines = 36;
   const [status, setStatus] = useState<recordingStatus>({ recording: true, done: false });
   const [attributes, setAttributes] = useState<recordingAttributes>({
     recording: null,
     audioLevels: [],
     length: 0,
-    memoLines: new Array(50).fill(5),
+    memoLines: new Array(numLines).fill(5),
     uri: "",
   });
-  const numLines = 36;
+
 
   useEffect(() => {
     if (status.recording) {
