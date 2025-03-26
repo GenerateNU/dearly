@@ -1,13 +1,13 @@
 import { useUserStore } from "@/auth/store";
 import { useNudgeSettings } from "@/contexts/nudge-settings";
 import { Box } from "@/design-system/base/box";
-import { Text } from "@/design-system/base/text";
 import { TextButton } from "@/design-system/components/shared/buttons/text-button";
 import { useDisableNudge, useUpdateNudgeConfig } from "@/hooks/api/nudge";
 import { ConfigNudgeSchedulePayload } from "@/types/nudge";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { convertData } from "../constants/constants";
+import { Alert } from "react-native";
 
 const FREQUENCY_LABEL_MAPPING = {
   Daily: "DAILY",
@@ -47,7 +47,6 @@ const SaveNudgeScheduleButton = () => {
   const disableNudgeHook = useDisableNudge(group?.id as string);
   const [isSaving, setIsSaving] = useState(false); // Controls disabled button if schedule is saving
   const [daysOfWeekArr, setDaysOfWeekArr] = useState<string[] | null>(null);
-  // const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const isMissingFields = () => {
     // Check if any fields are null
@@ -77,7 +76,6 @@ const SaveNudgeScheduleButton = () => {
         router.back();
       } else {
         console.log("Error saving changes");
-        // setErrorMessage("Error saving changes. Please try again.")
       }
     }
   }, [isPending, isSuccess, disableNudgeHook.isSuccess]);
@@ -93,9 +91,11 @@ const SaveNudgeScheduleButton = () => {
     setNudgeAt(null);
   };
 
-  const validate = () => {
-    // checks all fields are correct
-  };
+  useEffect(() => {
+    if (error) {
+      Alert.alert("Error", "Failed to update nudge schedule. Please try again.", [{ text: "OK" }]);
+    }
+  }, [error]);
 
   useEffect(() => {
     if (isSaving) {
@@ -107,9 +107,6 @@ const SaveNudgeScheduleButton = () => {
           day: dayOfMonthSettings ? Number(dayOfMonthSettings) : null,
           nudgeAt: nudgeAtSettings?.toUTCString(),
         };
-
-        console.log(`check payload before sending ${JSON.stringify(payload)}`);
-
         mutate(payload);
       }
     }
@@ -121,8 +118,6 @@ const SaveNudgeScheduleButton = () => {
     if (frequencySettings === "Disabled") {
       await disableNudgeHook.mutate(group?.id as string);
     } else {
-      // validate();
-      console.log("setting up params");
       if (
         frequencySettings &&
         ["Weekly", "Twice a Week", "Biweekly"].includes(frequencySettings) &&
@@ -148,8 +143,6 @@ const SaveNudgeScheduleButton = () => {
         variant="primary"
         disabled={isMissingFields() || isSaving}
       />
-      {/* {errorMessage && 
-      <Text color="error">{errorMessage}</Text>} */}
     </Box>
   );
 };
