@@ -103,7 +103,7 @@ const SaveNudgeScheduleButton = () => {
           group: group.id,
           frequency: convertData(FREQUENCY_LABEL_MAPPING, frequencySettings),
           daysOfWeek: daysOfWeekArr,
-          day: dayOfMonthSettings,
+          day: dayOfMonthSettings ? Number(dayOfMonthSettings) : null,
           nudgeAt: nudgeAtSettings?.toUTCString(),
         };
 

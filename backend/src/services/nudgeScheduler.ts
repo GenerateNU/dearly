@@ -79,9 +79,9 @@ export class AWSEventBridgeScheduler implements NudgeSchedulerService {
     const min = payload.nudgeAt.getMinutes();
     const dayOfMonth = payload.day ?? "?";
     const month = payload.month ?? "*";
-    const dayOfWeek = payload.daysOfWeek?.join() ?? "*";
+    const dayOfWeek = payload.daysOfWeek?.join() ?? ((payload.frequency == "MONTHLY") ? "?" : "*");
 
-    const cronExpression = `cron(${min} ${hour} ${dayOfMonth} ${month} ${dayOfWeek} *)`;
+    const cronExpression = `cron(${min} ${hour} ${dayOfMonth} ${month} ${dayOfWeek})`;
 
     return cronExpression;
   }

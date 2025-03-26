@@ -69,7 +69,7 @@ const SetRecurringNudge = () => {
           );
         }
       }
-      setDayOfMonth(data.day);
+      if (data.day) setDayOfMonth(String(data.day));
       setNudgeAt(new Date(data.nudgeAt));
       setRecurringNudge(data);
     }
@@ -158,7 +158,7 @@ const SetRecurringNudge = () => {
             options={MONTHLY_OPTIONS}
             curOption={dayOfMonthSettings}
             setOption={setDayOfMonth}
-          />
+            />
         );
       default:
         return <></>;
