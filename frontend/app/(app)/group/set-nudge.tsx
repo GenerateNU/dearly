@@ -24,6 +24,7 @@ import {
 import Toggle from "@/design-system/components/shared/toggle";
 import { isEnabled } from "react-native/Libraries/Performance/Systrace";
 import { useFocusEffect } from "expo-router";
+import RenderNudgeSettings from "./components/render-nudge-settings";
 
 const SetRecurringNudge = () => {
   const [items, setItems] = useState<DropdownItem[]>(
@@ -53,7 +54,6 @@ const SetRecurringNudge = () => {
   const [isDefault, setIsDefault] = useState(false);
 
   useEffect(() => {
-    // const setDefault = () => {
     // Initialize previous nudge settings
     if (!isPending && !isError && data && !nudgeSettings) {
       console.log(`Data: ${JSON.stringify(data)}`);
@@ -71,6 +71,7 @@ const SetRecurringNudge = () => {
       }
       if (data.day) setDayOfMonth(String(data.day));
       setNudgeAt(new Date(data.nudgeAt));
+      setIsActive(data.isActive);
       setRecurringNudge(data);
     }
   }, [isDefault]);
@@ -114,56 +115,16 @@ const SetRecurringNudge = () => {
     }
   }, [frequencySettings, data]);
 
-  // Render setting view based on frequency
-  const renderSettings = () => {
-    switch (frequencySettings) {
-      case "Disabled":
-        return <></>;
-      case "Daily":
-        return <NudgeAtTimePicker />;
-      case "Weekly":
-        return (
-          <NudgeSettings
-            options={WEEKLY_OPTIONS}
-            curOption={dayOfWeekSettings}
-            setOption={setDayOfWeek}
-          />
-        );
-      case "Twice a Week": //TODO:
-        return (
-          <>
-            <Box>
-              <Text>First Nudge</Text>
-              {/* TODO: insert first nudge */}
-              <Text>Second Nudge</Text>
-              <NudgeSettings
-                options={WEEKLY_OPTIONS}
-                curOption={dayOfWeek2Settings}
-                setOption={setDayOfWeek2}
-              />
-            </Box>
-          </>
-        );
-      case "Biweekly":
-        return (
-          <NudgeSettings
-            options={WEEKLY_OPTIONS}
-            curOption={dayOfWeekSettings}
-            setOption={setDayOfWeek}
-          />
-        );
-      case "Monthly":
-        return (
-          <NudgeSettings
-            options={MONTHLY_OPTIONS}
-            curOption={dayOfMonthSettings}
-            setOption={setDayOfMonth}
-            />
-        );
-      default:
-        return <></>;
+
+  const toggleActivate = () => {
+    if (isActiveSettings) { // if active, disable settings
+      setIsActive(false);
+      mutate(group.id);
+    } else {
+      setIsActive(true);
+      // TODO: upsert true
     }
-  };
+  }
 
   return (
     <SafeAreaView className="flex-1">
@@ -178,7 +139,7 @@ const SetRecurringNudge = () => {
       >
         <Text variant="bodyLargeBold">Set Recurring Nudges</Text>
         <Text variant="caption">Disable</Text>
-        {/* <Toggle onToggle={() => mutate(group.id) isEnabled={isActiveSettings} }></Toggle> */}
+        <Toggle onToggle={toggleActivate} enabled={isActiveSettings}></Toggle>
         <Text variant="caption">SELECT FREQUENCY</Text>
         <Dropdown
           direction="BOTTOM"
@@ -188,7 +149,7 @@ const SetRecurringNudge = () => {
           setItems={setItems}
         />
         <Box width="100%" alignItems="center">
-          {renderSettings()}
+          <RenderNudgeSettings frequency={frequencySettings} dayOfWeek={dayOfWeekSettings} setDayOfWeek={setDayOfWeek} dayOfMonth={dayOfMonthSettings} setDayOfMonth={setDayOfMonth}/>
           <SaveNudgeScheduleButton />
         </Box>
       </Box>
