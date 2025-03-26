@@ -39,6 +39,8 @@ const SetRecurringNudge = () => {
     setDayOfWeek,
     dayOfWeek2Settings,
     setDayOfWeek2,
+    daysOfWeekArr,
+    setDaysOfWeekArr,
     dayOfMonthSettings,
     setDayOfMonth,
     isActiveSettings,
@@ -79,6 +81,8 @@ const SetRecurringNudge = () => {
       setFrequency(null);
       setDayOfWeek(null);
       setDayOfMonth(null);
+      setDaysOfWeekArr(null);
+      setNudgeAt(new Date());
       setIsActive(true);
       refetch();
       setIsDefault(true);

@@ -4,7 +4,7 @@ import { ExpoPushService } from "../../services/notification/expo";
 import { getNotificationBody } from "../../utilities/nudge";
 import { InternalServerError } from "../../utilities/errors/app-error";
 import { NudgeSchedulePayload, NudgeSchedule } from "../../types/api/internal/nudges";
-import { NudgeSchedulerService } from "../../services/nudgeScheduler";
+import { AWSEventBridgeScheduler, NudgeSchedulerService } from "../../services/nudgeScheduler";
 
 export interface NudgeService {
   manualNudge(userIds: string[], groupId: string, managerId: string): Promise<void>;
@@ -52,12 +52,21 @@ export class NudgeServiceImpl implements NudgeService {
   async upsertSchedule(managerId: string, payload: NudgeSchedulePayload): Promise<NudgeSchedule> {
     const upsertScheduleImpl = async () => {
       // check if in database already
-      const update = !(await this.nudgeTransaction.getNudgeSchedule(payload.groupId, managerId));
+      console.log(`Fetching old schedule...`)
+      const prev_schedule = await this.nudgeTransaction.getNudgeSchedule(
+        payload.groupId,
+        managerId,
+      );
+
+      console.log(`Previous schedule: ${JSON.stringify(prev_schedule)}`)
+      const toAdd = !prev_schedule;
       // upsert schedule into database
       const schedule = await this.nudgeTransaction.upsertSchedule(managerId, payload);
       if (!schedule) {
         throw new InternalServerError("Failed to add schedule");
       }
+
+      console.log(`New scheduler: ${JSON.stringify(schedule)}`)
 
       const notificationMetadata = await this.nudgeTransaction.getAutoNudgeNotificationMetadata(
         schedule.groupId,
@@ -80,12 +89,26 @@ export class NudgeServiceImpl implements NudgeService {
 
         // Add to EventBridge Scheduler
         let response;
-        if (update) {
-          response = await this.scheduler.updateSchedule(managerId, schedulePayload);
+        if (toAdd) {
+          console.log("adding scheduler...");
+          try {
+            response = await this.scheduler.addSchedule(schedule.id, schedulePayload);
+          } catch (err) {
+            console.log(`Error adding schedule: ${JSON.stringify(err)}`)
+            const removedNudge = this.nudgeTransaction.deleteNudge(schedule.id, managerId);
+            console.log(`Removed Nudge scheduler: ${JSON.stringify(removedNudge)}`)
+          }
         } else {
-          response = await this.scheduler.addSchedule(managerId, schedulePayload);
+          console.log("updating scheduler...");
+          try {
+            response = await this.scheduler.updateSchedule(schedule.id, schedulePayload);
+          } catch (err) {
+            console.log(`Error updating schedule: ${err}`)
+            const previous = this.nudgeTransaction.upsertSchedule(managerId, schedule);
+            console.log(`Previous Nudge schedule reverted: ${previous}`)
+          }
         }
-
+        console.log("done");
         if (response != 200) {
           throw new InternalServerError("Failed to add/update schedule in EventBridge");
         }
@@ -98,7 +121,9 @@ export class NudgeServiceImpl implements NudgeService {
 
   async getSchedule(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null> {
     const getScheduleImpl = async () => {
-      return await this.nudgeTransaction.getNudgeSchedule(groupId, managerId);
+      const schedule = await this.nudgeTransaction.getNudgeSchedule(groupId, managerId);
+      console.log(`Retrieved schedule ${JSON.stringify(schedule)}`);
+      return schedule;
     };
     return await handleServiceError(getScheduleImpl)();
   }

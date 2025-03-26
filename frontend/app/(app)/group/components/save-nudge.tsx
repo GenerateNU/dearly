@@ -8,6 +8,7 @@ import { ConfigNudgeSchedulePayload } from "@/types/nudge";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { convertData } from "../constants/constants";
+import { validatePathConfig } from "expo-router/build/fork/getPathFromState-forks";
 
 const FREQUENCY_LABEL_MAPPING = {
   Daily: "DAILY",
@@ -44,7 +45,7 @@ const SaveNudgeScheduleButton = () => {
   const { mutate, isPending, error, isError, isSuccess } = useUpdateNudgeConfig(group.id);
   const disableNudgeHook = useDisableNudge(group.id);
   const [isSaving, setIsSaving] = useState(false); // Controls disabled button if schedule is saving
-  const [daysOfWeekArr, setDayOfWeekArr] = useState<string[]>([]);
+  const [daysOfWeekArr, setDaysOfWeekArr] = useState<string[] | null>(null);
   // const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const isMissingFields = () => {
@@ -86,9 +87,14 @@ const SaveNudgeScheduleButton = () => {
     setFrequency(null);
     setDayOfWeek(null);
     setDayOfWeek2(null);
+    setDaysOfWeekArr(null);
     setDayOfMonth(null);
     setNudgeAt(null);
   };
+
+  const validate = () => { // checks all fields are correct
+    
+  }
 
   useEffect(() => {
     if (isSaving) {
@@ -100,6 +106,9 @@ const SaveNudgeScheduleButton = () => {
           day: dayOfMonthSettings,
           nudgeAt: nudgeAtSettings?.toUTCString(),
         };
+
+        console.log(`check payload before sending ${JSON.stringify(payload)}`)
+        
         mutate(payload);
       }
     }
@@ -119,12 +128,12 @@ const SaveNudgeScheduleButton = () => {
         dayOfWeekSettings
       ) {
         if (frequencySettings === "Twice a Week" && dayOfWeek2Settings) {
-          setDayOfWeekArr([
+          setDaysOfWeekArr([
             convertData(WEEKLY_LABEL_MAPPING, dayOfWeekSettings),
             convertData(WEEKLY_LABEL_MAPPING, dayOfWeek2Settings),
           ]);
         } else {
-          setDayOfWeekArr([convertData(WEEKLY_LABEL_MAPPING, dayOfWeekSettings)]);
+          setDaysOfWeekArr([convertData(WEEKLY_LABEL_MAPPING, dayOfWeekSettings)]);
         }
       }
     }

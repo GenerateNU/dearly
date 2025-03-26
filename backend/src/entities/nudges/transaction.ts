@@ -38,6 +38,8 @@ export interface NudgeTransaction {
   getNudgeSchedule(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null>;
 
   deactivateNudge(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null>;
+
+  deleteNudge(groupId: string, managerId: string): Promise<NudgeSchedule | null>;
 }
 
 export class NudgeTransactionImpl implements NudgeTransaction {
@@ -53,7 +55,12 @@ export class NudgeTransactionImpl implements NudgeTransaction {
   ): Promise<NudgeSchedule | null> {
     return await this.db.transaction(async (tx) => {
       // validate group existence and manager permissions
-      await this.validateGroup(tx, payload.groupId, managerId);
+      try {
+        await this.validateGroup(tx, payload.groupId, managerId);
+      } catch (err) {
+        console.log(`Error validating group: ${err}`);
+        return null;
+      }
       // insert the value into the database
       const [nudgeSchedule] = await tx
         .insert(scheduledNudgesTable)
@@ -97,6 +104,37 @@ export class NudgeTransactionImpl implements NudgeTransaction {
 
       return nudgeSchedule ?? null;
     });
+  }
+
+  async deleteNudge(groupId: string, managerId: string): Promise<NudgeSchedule | null> {
+    console.log("deleting schedule...")
+    return await this.db.transaction(async (tx) => {
+      console.log(`in transaction`)
+      await this.validateGroup(tx, groupId, managerId);
+
+      console.log("group not validated")
+
+       // check current user is the userId/member being removed or is the manager of the group
+      const [schedule] = await this.db
+      .select()
+      .from(scheduledNudgesTable)
+      .where(eq(scheduledNudgesTable.groupId, groupId))
+      .limit(1);
+
+      if (!schedule) {
+        console.log(`Error removing group: group not found`)
+        throw new NotFoundError("Group");
+      }
+
+      if (schedule) {
+        console.log("removing schedule...")
+        const [removedSchedule] = await this.db.delete(scheduledNudgesTable).where(eq(scheduledNudgesTable.groupId, groupId)).returning();
+        return removedSchedule ?? null;
+      } 
+
+      console.log("schedule not found...")
+      return null
+    })
   }
 
   async getManualNudgeNotificationMetadata(
