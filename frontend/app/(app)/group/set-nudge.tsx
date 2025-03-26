@@ -3,15 +3,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { TextButton } from "@/design-system/components/shared/buttons/text-button";
 import { Dropdown } from "@/design-system/components/shared/controls/dropdown";
 import { DropdownItem } from "@/types/dropdown";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Text } from "@/design-system/base/text";
 import { useNudgeSettings } from "@/contexts/nudge-settings";
 import NudgeSettings from "./components/nudge-settings";
 import NudgeAtTimePicker from "./components/nudge-time-settings";
 import { getAuthToken } from "@/utilities/auth-token";
-import { getAutoNudgeSchedule } from "@/api/nudge";
+import { disableNudge, getAutoNudgeSchedule } from "@/api/nudge";
 import { useUserStore } from "@/auth/store";
-import { useGroupNudgeConfig, useUpdateNudgeConfig } from "@/hooks/api/nudge";
+import { useDisableNudge, useGroupNudgeConfig, useUpdateNudgeConfig } from "@/hooks/api/nudge";
 import { ConfigNudgeSchedulePayload } from "@/types/nudge";
 import SaveNudgeScheduleButton from "./components/save-nudge";
 import {
@@ -21,6 +21,9 @@ import {
   WEEKLY_OPTIONS,
   WEEKLY_OPTIONS_MAPPING,
 } from "./constants/constants";
+import Toggle from "@/design-system/components/shared/toggle";
+import { isEnabled } from "react-native/Libraries/Performance/Systrace";
+import { useFocusEffect } from "expo-router";
 
 const SetRecurringNudge = () => {
   const [items, setItems] = useState<DropdownItem[]>(
@@ -38,12 +41,18 @@ const SetRecurringNudge = () => {
     setDayOfWeek2,
     dayOfMonthSettings,
     setDayOfMonth,
+    isActiveSettings,
+    setIsActive,
     setNudgeAt,
   } = useNudgeSettings();
   const { group } = useUserStore();
-  const { data, isPending, error, isError } = useGroupNudgeConfig(group.id);
+  const { data, isPending, error, refetch, isError } = useGroupNudgeConfig(group.id);
+  const { mutate, isSuccess} = useDisableNudge(group.id);
+  const [isDefault, setIsDefault] = useState(false);
 
+  
   useEffect(() => {
+    // const setDefault = () => {
     // Initialize previous nudge settings
     if (!isPending && !isError && data && !nudgeSettings) {
       console.log(`Data: ${JSON.stringify(data)}`);
@@ -63,8 +72,20 @@ const SetRecurringNudge = () => {
       setNudgeAt(new Date(data.nudgeAt));
       setRecurringNudge(data);
     }
-  }, [data]);
-
+  }, [isDefault]);
+  
+  useFocusEffect(
+    useCallback(() => {
+      setRecurringNudge(null);
+      setFrequency(null);
+      setDayOfWeek(null);
+      setDayOfMonth(null);
+      setIsActive(true);
+      refetch();
+      setIsDefault(true);
+      // setDefault();
+    }, [refetch]),
+  );
   useEffect(() => {
     // Reset settings accordingly
     if (nudgeSettings) {
@@ -110,10 +131,12 @@ const SetRecurringNudge = () => {
           <>
             <Box>
               <Text>First Nudge</Text>
+              {/* TODO: insert first nudge */}
+              <Text>Second Nudge</Text>
               <NudgeSettings
                 options={WEEKLY_OPTIONS}
-                curOption={dayOfWeekSettings}
-                setOption={setDayOfWeek}
+                curOption={dayOfWeek2Settings}
+                setOption={setDayOfWeek2}
               />
             </Box>
           </>
@@ -151,6 +174,8 @@ const SetRecurringNudge = () => {
         gap="m"
       >
         <Text variant="bodyLargeBold">Set Recurring Nudges</Text>
+        <Text variant="caption">Disable</Text>
+        {/* <Toggle onToggle={() => mutate(group.id) isEnabled={isActiveSettings} }></Toggle> */}
         <Text variant="caption">SELECT FREQUENCY</Text>
         <Dropdown
           direction="BOTTOM"
