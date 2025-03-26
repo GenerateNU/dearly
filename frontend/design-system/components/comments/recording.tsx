@@ -24,7 +24,6 @@ export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
   });
   const numLines = 36;
 
-
   useEffect(() => {
     if (status.recording) {
       setAttributes((prevAttributes) => ({
@@ -87,11 +86,18 @@ export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
   }
 
   useEffect(() => {
-    startRecording()
-  }, [])
+    startRecording();
+  }, []);
 
   return (
-    <Box gap="s" flexDirection="row" justifyContent="center" alignItems="center" height={50} borderRadius="l">
+    <Box
+      gap="s"
+      flexDirection="row"
+      justifyContent="center"
+      alignItems="center"
+      height={50}
+      borderRadius="l"
+    >
       {status.done && (
         <Box>
           <IconButton variant="iconGray" onPress={onClose} icon="close" size={30} />
@@ -140,9 +146,9 @@ export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
       )}
 
       {status.done ? (
-        <IconButton variant="icon" onPress={() => onSend(attributes.uri)} icon="send" size={30}/>
+        <IconButton variant="icon" onPress={() => onSend(attributes.uri)} icon="send" size={30} />
       ) : (
-        <IconButton variant="icon" onPress={stopRecording} icon="square-rounded" size={30}/>
+        <IconButton variant="icon" onPress={stopRecording} icon="square-rounded" size={30} />
       )}
     </Box>
   );

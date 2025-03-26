@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback } from "react";
+import React, { forwardRef, useCallback, useEffect } from "react";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 import { Keyboard } from "react-native";
@@ -9,6 +9,7 @@ interface BottomSheetModalProps {
   initialIndex?: number;
   onClose?: () => void;
   scrollEnabled?: boolean;
+  setSnapPoint?:  React.Dispatch<React.SetStateAction<number>>
 }
 
 type Ref = BottomSheetMethods;
@@ -19,7 +20,7 @@ const BottomSheetModal = forwardRef<Ref, BottomSheetModalProps>(
       (props: any) => <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} />,
       [],
     );
-
+    
     const handleClose = useCallback(() => {
       Keyboard.dismiss();
       if (onClose) {
@@ -32,6 +33,7 @@ const BottomSheetModal = forwardRef<Ref, BottomSheetModalProps>(
         ref={ref}
         index={initialIndex}
         snapPoints={snapPoints}
+      
         backdropComponent={renderBackdrop}
         enableDynamicSizing={false}
         enablePanDownToClose

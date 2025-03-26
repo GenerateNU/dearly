@@ -27,15 +27,15 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
   caption,
   media,
   onCommentClicked,
-  groupId
+  groupId,
 }) => {
   const [like, setLike] = useState(isLiked);
   const data = media
     .filter(
-      (item:any): item is Required<Pick<Media, "url">> =>
+      (item: any): item is Required<Pick<Media, "url">> =>
         typeof item.url === "string" && item.url !== "",
     )
-    .map((item:any) => item.url);
+    .map((item: any) => item.url);
 
   const { mutate } = useToggleLike(id, groupId);
   const { data: like_data, refetch } = useGetAllLikeUsers(id);
@@ -71,7 +71,7 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
         likes={likes}
         comments={comments}
       />
-      <Box gap="s" flexDirection="row" justifyContent="flex-start" alignItems="center" >
+      <Box gap="s" flexDirection="row" justifyContent="flex-start" alignItems="center">
         <Box>
           <Text>💬</Text>
         </Box>

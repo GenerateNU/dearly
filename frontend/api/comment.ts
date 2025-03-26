@@ -16,9 +16,13 @@ export const toggleLikeComment = async (id: string): Promise<void> => {
   return authWrapper<void>()(req);
 };
 
-export const getComments = async (id: string, limit?: number, page?: number): Promise<Comment[]> => {
+export const getComments = async (
+  id: string,
+  limit?: number,
+  page?: number,
+): Promise<Comment[]> => {
   const req = async (token: string): Promise<Comment[]> => {
-    const {data} = await fetchClient.GET("/api/v1/posts/{id}/comments", {
+    const { data } = await fetchClient.GET("/api/v1/posts/{id}/comments", {
       headers: getHeaders(token),
       params: {
         path: {
@@ -30,7 +34,7 @@ export const getComments = async (id: string, limit?: number, page?: number): Pr
         },
       },
     });
-    return data!
+    return data!;
   };
   return authWrapper<Comment[]>()(req);
 };

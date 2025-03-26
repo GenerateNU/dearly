@@ -19,16 +19,9 @@ export const useCreatePost = (groupId: string) => {
 
 export const useGroupFeed = (options: any = {}) => {
   const { group } = useUserStore();
-  if (!group) {
-    throw new Error("Group not found");
-  }
-
   return useQueryPagination<Post[]>(
     ["users", "feed"],
     (page, limit) => {
-      if (!group.id) {
-        throw new Error("Group ID is undefined");
-      }
       return getGroupFeed(group.id, page, limit) as Promise<Post[]>;
     },
     options,
@@ -36,16 +29,13 @@ export const useGroupFeed = (options: any = {}) => {
   );
 };
 
-export const useComments = (id:string, options: any = {}) => {
+export const useComments = (id: string, options: any = {}) => {
   return useQueryPagination<Comment[]>(
     ["users", "comments"],
     (page, limit) => {
-      if (!id) {
-        throw new Error("Post ID is undefined");
-      }
       return getComments(id, page, limit) as Promise<Comment[]>;
     },
     options,
     10,
   );
-}
+};

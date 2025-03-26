@@ -1,13 +1,13 @@
-import React, {forwardRef} from "react";
+import React, { forwardRef, useRef } from "react";
 import { CommentCard } from "./comment";
 import { Box } from "@/design-system/base/box";
-import { Text } from "@/design-system/base/text";
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import BottomSheetModal from "../shared/bottom-sheet";
 import { Comment } from "@/types/post";
 import { useComments } from "@/hooks/api/post";
-
+import { KeyboardAvoidingView, Platform, TextInput } from "react-native";
+import { CommentInput } from "@/app/(app)/home/comment-input";
 
 interface CommentPopUpProps {
   id: string; // postId
@@ -15,19 +15,19 @@ interface CommentPopUpProps {
 
 export const CommentPopUp = forwardRef<BottomSheetMethods, CommentPopUpProps>((props, ref) => {
   return (
-    <BottomSheetModal ref={ref} snapPoints={["50%", "90%"]}>
-      {props.id == "" ? <CommentPopUpBlank/> : <CommentPopUpData id={props.id}/>}
+    <BottomSheetModal ref={ref} snapPoints={["50%", "90%"]} >
+      {props.id == "" ? <CommentPopUpBlank /> : <CommentPopUpData id={props.id} />}
     </BottomSheetModal>
   );
 });
 
-const CommentPopUpBlank = (() => {
-  return (
-    <></>
-  )
-});
+const CommentPopUpBlank = () => {
+  return <></>;
+};
 
-const CommentPopUpData: React.FC<CommentPopUpProps> = ({id}) => {
+const CommentPopUpData: React.FC<CommentPopUpProps> = ({ id }) => {
+  const ref = useRef<TextInput>(null);
+  ref.current?.focus();
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage } = useComments(id);
   const comments = data?.pages.flatMap((page) => page) || [];
 
@@ -43,7 +43,7 @@ const CommentPopUpData: React.FC<CommentPopUpProps> = ({id}) => {
     return <> </>;
   };
 
-  const renderItem = ({ item }: {item: Comment}) => (
+  const renderItem = ({ item }: { item: Comment }) => (
     <CommentCard
       id={item.id}
       userId={item.userId}
@@ -57,11 +57,12 @@ const CommentPopUpData: React.FC<CommentPopUpProps> = ({id}) => {
   );
 
   return (
-      <Box flex={1} width="100%" padding="s">
-        <Text paddingBottom="s" variant="body" textAlign="center">
-          Welcome to Dearly 💛
-        </Text>
-
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      keyboardVerticalOffset={180}
+    >
+      <Box height={"100%"} width={"100%"} padding="s">
         <BottomSheetFlatList
           data={comments}
           renderItem={renderItem}
@@ -73,21 +74,12 @@ const CommentPopUpData: React.FC<CommentPopUpProps> = ({id}) => {
           showsVerticalScrollIndicator
           style={{ flex: 1 }}
         />
+        <Box ref={ref} position="relative">
+          <CommentInput />
+        </Box>
       </Box>
+    </KeyboardAvoidingView>
   );
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 CommentPopUp.displayName = "CommentPopUp";

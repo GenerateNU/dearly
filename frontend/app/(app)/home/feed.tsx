@@ -8,11 +8,15 @@ import { CommentInput } from "./comment-input";
 import { useRef, useState } from "react";
 import BottomSheet from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheet/BottomSheet";
 import { CommentPopUp } from "@/design-system/components/comments/comment-popup";
+import Input from "@/design-system/components/shared/controls/input";
+import MultitrackAudio from "@/assets/audio.svg";
+import { set } from "zod";
 
 const Feed = () => {
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage, isLoading } = useGroupFeed();
   const posts = data?.pages.flatMap((page) => page) || [];
   const [currentId, setCurrentId] = useState<string>("");
+  const [button, setButton] = useState<boolean>(true);
   const ref = useRef<BottomSheet>(null);
 
   const onEndReached = () => {
@@ -22,9 +26,9 @@ const Feed = () => {
   };
 
   const onClickComment = (id: string) => {
-    setCurrentId(id)
+    setCurrentId(id);
     ref.current?.snapToIndex(0);
-  }
+  };
 
   // TODO: add notification when all posts are seen
   const renderFooter = () => {
@@ -51,25 +55,31 @@ const Feed = () => {
           groupId={item.groupId}
           onCommentClicked={() => null}
         />
-        <CommentInput onPress ={() => onClickComment(item.id)}/>
-   
+        {button? 
+        <Input
+            isButton
+            onPress={() => onClickComment(item.id)}
+            placeholder="Write or record a message..."
+            rightIcon={<MultitrackAudio />}
+        />:
+        <CommentInput/>
+        }
       </Box>
     );
   };
 
   return (
     <>
-    <FlatList
-      onEndReached={onEndReached}
-      showsVerticalScrollIndicator={false}
-      data={posts}
-      renderItem={renderItem}
-      ListFooterComponent={renderFooter}
-      onEndReachedThreshold={0.5}
-    ></FlatList>
-     <CommentPopUp ref={ref} id={currentId}/>
+      <FlatList
+        onEndReached={onEndReached}
+        showsVerticalScrollIndicator={false}
+        data={posts}
+        renderItem={renderItem}
+        ListFooterComponent={renderFooter}
+        onEndReachedThreshold={0.5}
+      ></FlatList>
+      <CommentPopUp ref={ref} id={currentId}/>
     </>
-    
   );
 };
 
