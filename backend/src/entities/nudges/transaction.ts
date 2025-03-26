@@ -58,7 +58,6 @@ export class NudgeTransactionImpl implements NudgeTransaction {
       try {
         await this.validateGroup(tx, payload.groupId, managerId);
       } catch (err) {
-        console.log(`Error validating group: ${err}`);
         return null;
       }
       // insert the value into the database
@@ -107,32 +106,21 @@ export class NudgeTransactionImpl implements NudgeTransaction {
   }
 
   async deleteNudge(groupId: string, managerId: string): Promise<NudgeSchedule | null> {
-    console.log("deleting schedule...")
     return await this.db.transaction(async (tx) => {
-      console.log(`in transaction`)
       await this.validateGroup(tx, groupId, managerId);
 
-      console.log("group not validated")
-
-       // check current user is the userId/member being removed or is the manager of the group
+       // check schedule exists
       const [schedule] = await this.db
       .select()
       .from(scheduledNudgesTable)
       .where(eq(scheduledNudgesTable.groupId, groupId))
       .limit(1);
 
-      if (!schedule) {
-        console.log(`Error removing group: group not found`)
-        throw new NotFoundError("Group");
-      }
-
       if (schedule) {
-        console.log("removing schedule...")
         const [removedSchedule] = await this.db.delete(scheduledNudgesTable).where(eq(scheduledNudgesTable.groupId, groupId)).returning();
         return removedSchedule ?? null;
       } 
 
-      console.log("schedule not found...")
       return null
     })
   }
