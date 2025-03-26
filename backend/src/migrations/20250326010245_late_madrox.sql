@@ -1,0 +1,1 @@
+ALTER TABLE "scheduledNudges" ADD CONSTRAINT "scheduledNudges_groupId_unique" UNIQUE("groupId");
