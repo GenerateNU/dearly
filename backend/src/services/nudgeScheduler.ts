@@ -106,7 +106,10 @@ export class AWSEventBridgeScheduler implements NudgeSchedulerService {
     }
     const lambda_config = getConfigurations().lambdaConfig;
 
-    const FLEXIBLE_TIME_WINDOW: FlexibleTimeWindow = { Mode: "FLEXIBLE", MaximumWindowInMinutes: 5}
+    const FLEXIBLE_TIME_WINDOW: FlexibleTimeWindow = {
+      Mode: "FLEXIBLE",
+      MaximumWindowInMinutes: 5,
+    };
 
     const input = {
       Name: id,

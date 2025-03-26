@@ -47,10 +47,9 @@ const SetRecurringNudge = () => {
   } = useNudgeSettings();
   const { group } = useUserStore();
   const { data, isPending, error, refetch, isError } = useGroupNudgeConfig(group.id);
-  const { mutate, isSuccess} = useDisableNudge(group.id);
+  const { mutate, isSuccess } = useDisableNudge(group.id);
   const [isDefault, setIsDefault] = useState(false);
 
-  
   useEffect(() => {
     // const setDefault = () => {
     // Initialize previous nudge settings
@@ -73,7 +72,7 @@ const SetRecurringNudge = () => {
       setRecurringNudge(data);
     }
   }, [isDefault]);
-  
+
   useFocusEffect(
     useCallback(() => {
       setRecurringNudge(null);

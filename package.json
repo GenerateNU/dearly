@@ -4,5 +4,8 @@
   },
   "devDependencies": {
     "lint-staged": "^15.2.11"
+  },
+  "dependencies": {
+    "@aws-sdk/client-iam": "^3.774.0"
   }
 }
