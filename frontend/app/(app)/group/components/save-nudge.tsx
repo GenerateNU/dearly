@@ -8,7 +8,6 @@ import { ConfigNudgeSchedulePayload } from "@/types/nudge";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { convertData } from "../constants/constants";
-import { validatePathConfig } from "expo-router/build/fork/getPathFromState-forks";
 
 const FREQUENCY_LABEL_MAPPING = {
   Daily: "DAILY",
@@ -42,8 +41,10 @@ const SaveNudgeScheduleButton = () => {
     setNudgeAt,
   } = useNudgeSettings();
   const { group } = useUserStore();
-  const { mutate, isPending, error, isError, isSuccess } = useUpdateNudgeConfig(group.id);
-  const disableNudgeHook = useDisableNudge(group.id);
+  const { mutate, isPending, error, isError, isSuccess } = useUpdateNudgeConfig(
+    group?.id as string,
+  );
+  const disableNudgeHook = useDisableNudge(group?.id as string);
   const [isSaving, setIsSaving] = useState(false); // Controls disabled button if schedule is saving
   const [daysOfWeekArr, setDaysOfWeekArr] = useState<string[] | null>(null);
   // const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -92,23 +93,23 @@ const SaveNudgeScheduleButton = () => {
     setNudgeAt(null);
   };
 
-  const validate = () => { // checks all fields are correct
-    
-  }
+  const validate = () => {
+    // checks all fields are correct
+  };
 
   useEffect(() => {
     if (isSaving) {
       if (frequencySettings) {
         const payload: ConfigNudgeSchedulePayload = {
-          group: group.id,
+          group: group?.id as string,
           frequency: convertData(FREQUENCY_LABEL_MAPPING, frequencySettings),
           daysOfWeek: daysOfWeekArr,
           day: dayOfMonthSettings ? Number(dayOfMonthSettings) : null,
           nudgeAt: nudgeAtSettings?.toUTCString(),
         };
 
-        console.log(`check payload before sending ${JSON.stringify(payload)}`)
-        
+        console.log(`check payload before sending ${JSON.stringify(payload)}`);
+
         mutate(payload);
       }
     }
@@ -118,7 +119,7 @@ const SaveNudgeScheduleButton = () => {
   const onPress = async () => {
     setIsSaving(true);
     if (frequencySettings === "Disabled") {
-      await disableNudgeHook.mutate(group.id);
+      await disableNudgeHook.mutate(group?.id as string);
     } else {
       // validate();
       console.log("setting up params");

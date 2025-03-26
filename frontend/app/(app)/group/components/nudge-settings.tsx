@@ -3,11 +3,9 @@ import { Dropdown } from "@/design-system/components/shared/controls/dropdown";
 import { DropdownItem } from "@/types/dropdown";
 import { Text } from "@/design-system/base/text";
 import { useState } from "react";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import { useNudgeSettings } from "@/contexts/nudge-settings";
 import NudgeAtTimePicker from "./nudge-time-settings";
-// Component to render Day of Week drop down and time scroll
 
+// Component to render Day of Week drop down and time scroll
 interface NudgeSettingProp {
   options: string[] | null;
   curOption: string | null;
@@ -24,7 +22,13 @@ const NudgeSettings: React.FC<NudgeSettingProp> = ({ options, curOption, setOpti
       {options && items && (
         <Box>
           <Text variant="caption">SELECT DAY</Text>
-          <Dropdown value={curOption} items={items} setValue={setOption} setItems={setItems} />
+          <Dropdown
+            id="nudge"
+            value={curOption}
+            items={items}
+            setValue={setOption}
+            setItems={setItems}
+          />
         </Box>
       )}
       <NudgeAtTimePicker />

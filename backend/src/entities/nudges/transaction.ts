@@ -109,20 +109,23 @@ export class NudgeTransactionImpl implements NudgeTransaction {
     return await this.db.transaction(async (tx) => {
       await this.validateGroup(tx, groupId, managerId);
 
-       // check schedule exists
+      // check schedule exists
       const [schedule] = await this.db
-      .select()
-      .from(scheduledNudgesTable)
-      .where(eq(scheduledNudgesTable.groupId, groupId))
-      .limit(1);
+        .select()
+        .from(scheduledNudgesTable)
+        .where(eq(scheduledNudgesTable.groupId, groupId))
+        .limit(1);
 
       if (schedule) {
-        const [removedSchedule] = await this.db.delete(scheduledNudgesTable).where(eq(scheduledNudgesTable.groupId, groupId)).returning();
+        const [removedSchedule] = await this.db
+          .delete(scheduledNudgesTable)
+          .where(eq(scheduledNudgesTable.groupId, groupId))
+          .returning();
         return removedSchedule ?? null;
-      } 
+      }
 
-      return null
-    })
+      return null;
+    });
   }
 
   async getManualNudgeNotificationMetadata(

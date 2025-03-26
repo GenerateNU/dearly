@@ -23,21 +23,15 @@ export const FREQUENCY_LABEL_MAPPING = {
   BIWEEKLY: "Biweekly",
   MONTHLY: "Monthly",
 };
+
 export enum FREQUENCY {
   "DAILY",
   "WEEKLY",
   "BIWEEKLY",
   "MONTHLY",
 }
-export const FREQUENCY_OPTIONS = [
-  "Disabled",
-  "Daily",
-  "Twice a Week",
-  "Weekly",
-  "Biweekly",
-  "Monthly",
-];
-export const MONTHLY_OPTIONS = Array.from({ length: 31 }, (_, i) => String(i + 1));
+export const FREQUENCY_OPTIONS = ["Daily", "Twice a Week", "Weekly", "Biweekly", "Monthly"];
+export const MONTHLY_OPTIONS = Array.from({ length: 28 }, (_, i) => String(i + 1));
 
 export const convertData = (mapping: {}, key: string) => {
   const data = mapping[key as keyof typeof mapping];

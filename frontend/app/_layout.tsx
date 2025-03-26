@@ -18,6 +18,7 @@ import { queryClient } from "@/auth/client";
 import { useVerifyInviteToken } from "@/hooks/api/group";
 import * as Linking from "expo-linking";
 import AddMemberLoading from "@/design-system/components/shared/add-member";
+import { DropdownProvider } from "@/contexts/nudge-dropdown";
 
 const InitialLayout = () => {
   const { isAuthenticated, clearError, completeOnboarding, setInviteToken, inviteToken } =
@@ -157,12 +158,14 @@ const RootLayout = () => {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <NotificationProvider>
         <UserProvider>
-          <QueryClientProvider client={queryClient}>
-            <OnboardingProvider>
-              <StatusBar />
-              <InitialLayout />
-            </OnboardingProvider>
-          </QueryClientProvider>
+          <DropdownProvider>
+            <QueryClientProvider client={queryClient}>
+              <OnboardingProvider>
+                <StatusBar />
+                <InitialLayout />
+              </OnboardingProvider>
+            </QueryClientProvider>
+          </DropdownProvider>
         </UserProvider>
       </NotificationProvider>
     </GestureHandlerRootView>
