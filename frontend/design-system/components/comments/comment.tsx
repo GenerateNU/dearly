@@ -27,7 +27,7 @@ export const CommentCard: React.FC<Required<Comment>> = ({
           <Text variant="caption" color="slate">{formatTime(createdAt)}</Text>
       </Box>
       <Box>{content && <Text>{content}</Text>}</Box>
-      {voiceMemo && <Playback local={false} location="voiceMemo" />}
+      {voiceMemo && <Playback local={false} location={voiceMemo} />}
     </Box>
   );
 };

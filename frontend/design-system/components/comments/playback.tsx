@@ -7,7 +7,7 @@ import { formatSeconds } from "@/utilities/time";
 import { condenseAudioBarHeights, getDBLevels } from "@/utilities/audio";
 import { decoders } from "audio-decode";
 import { playbackStates } from "@/types/comment";
-
+import * as FileSystem from "expo-file-system"
 interface PlaybackPropsWhenLocal {
   local: true; // is the audio message being stored locally or in s3
   dbLevels: number[];
@@ -31,6 +31,7 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
   const [memoLines, setMemoLines] = useState<number[]>([]);
   const numLines = 23;
   const [totalLength, setTotalLength] = useState<number>(0);
+  const [soundLocation, setLocation] = useState<string>(location);
 
   useEffect(() => {
     async function initializeValues() {
@@ -39,15 +40,12 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
         setLength(audioLength);
         setTotalLength(audioLength);
       } else {
-        const response = await fetch(location); // initally fetch the mp3 file
-        const arrayBuffer = await response.arrayBuffer(); // convert to array buffer
-        const uint8Array = new Uint8Array(arrayBuffer); // convert to unit8Array
-        const audioBuffer = await decoders.mp3(uint8Array); // get AudioBuffer format
-        const channelData = audioBuffer.getChannelData(0); // get the channel data which is the amplitude
-
-        setMemoLines(getDBLevels(channelData));
-        setLength(audioBuffer.duration);
-        setTotalLength(audioBuffer.duration);
+        const downloadResult = await FileSystem.downloadAsync(
+          location,
+          FileSystem.documentDirectory + 'temp-audio.mp3'
+        );
+        const localUri = downloadResult.uri;
+        setLocation(localUri)
       }
     }
     initializeValues();
@@ -67,7 +65,7 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
       await sound?.playAsync();
     } else {
       setStatus({ ...status, playing: true });
-      const { sound } = await Audio.Sound.createAsync({ uri: location });
+      const { sound } = await Audio.Sound.createAsync({ uri: soundLocation });
       sound.setOnPlaybackStatusUpdate(onPlayingUpdate);
       sound.setProgressUpdateIntervalAsync(500);
       setSound(sound);
@@ -96,11 +94,11 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
     <Box
       borderWidth={1}
       borderColor="ink"
-      backgroundColor={local ? "pearl" : "honey"}
+      backgroundColor={local ? "pearl" : "pearl"}
       paddingLeft="s"
       gap="s"
       width="100%"
-      height={50}
+      height={local? 50: 40}
       borderRadius="l"
       flexDirection="row"
       alignContent="center"
