@@ -9,6 +9,8 @@ import * as FileSystem from 'expo-file-system';
 import { useUserStore } from "@/auth/store";
 import { useUploadGroupMedia } from "@/hooks/api/media";
 import { Buffer } from "buffer";
+import { Platform } from "react-native";
+
 
 interface Props {
   onPress?: () => void;
@@ -36,24 +38,25 @@ export const CommentInput: React.FC<Props> = ({ onPress, isButton = false, postI
 
   const sendRecording = async (uri: string) => {
     try {
-    
-      const response = await fetch(uri);
-      const blob = await response.blob();
+      const base64Audio = await FileSystem.readAsStringAsync(uri, {
+        encoding: FileSystem.EncodingType.Base64
+      });
+      
       const formData = new FormData();
-      formData.append("media", blob, "audio.m4a");
-
+      
+      formData.append('media', {
+        uri: `data:audio/aac;base64,${base64Audio}`,
+        name: 'recording.m4a',
+        type: 'audio/aac',
+      } as any);
       const keys = await uploadMedia(formData);
-      console.log("hey!")
       await createPost({
-        voiceMemo: keys[0],
+        voiceMemo: keys[0].objectKey,
       })
-      console.log(createPostError)
       setRecording(false)
     } catch (error) {
       console.error('Error', error);
     }
-    
-
   };
 
   
