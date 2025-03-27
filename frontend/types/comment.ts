@@ -17,3 +17,10 @@ export type recordingAttributes = {
   memoLines: number[];
   uri: string;
 };
+
+export type commentPopUpAttributes = {
+  commentId: string;
+  likes: number;
+  comments: number;
+  caption: string;
+};

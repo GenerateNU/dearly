@@ -9,16 +9,29 @@ import { useComments } from "@/hooks/api/post";
 import { KeyboardAvoidingView, Platform, TextInput } from "react-native";
 import { CommentInput } from "@/app/(app)/home/comment-input";
 import { CommentSkeleton } from "./comment-skeleton";
+import { Text } from "@/design-system/base/text";
+import { commentPopUpAttributes } from "@/types/comment";
+import { Line } from "react-native-svg";
 
 interface CommentPopUpProps {
-  id: string; // postId
+  attributes: commentPopUpAttributes;
 }
 
 export const CommentPopUp = forwardRef<BottomSheetMethods, CommentPopUpProps>((props, ref) => {
   const [index, setIndex] = useState<number>(0);
   return (
-    <BottomSheetModal ref={ref} snapPoints={["50%", "90%"]} onChange={(index) => {setIndex(index)}} >
-      {props.id == "" ? <CommentPopUpBlank /> : <CommentPopUpData id={props.id} />}
+    <BottomSheetModal
+      ref={ref}
+      snapPoints={["50%", "90%"]}
+      onChange={(index) => {
+        setIndex(index);
+      }}
+    >
+      {props.attributes.commentId == "" ? (
+        <CommentPopUpBlank />
+      ) : (
+        <CommentPopUpData attributes={props.attributes} />
+      )}
     </BottomSheetModal>
   );
 });
@@ -27,10 +40,12 @@ const CommentPopUpBlank = () => {
   return <></>;
 };
 
-const CommentPopUpData: React.FC<CommentPopUpProps> = ({ id}) => {
+const CommentPopUpData: React.FC<CommentPopUpProps> = ({ attributes }) => {
   const ref = useRef<TextInput>(null);
   ref.current?.focus();
-  const { data, isFetchingNextPage, fetchNextPage, hasNextPage } = useComments(id);
+  const { data, isFetchingNextPage, fetchNextPage, hasNextPage } = useComments(
+    attributes.commentId,
+  );
   const comments = data?.pages.flatMap((page) => page) || [];
 
   const onEndReached = () => {
@@ -42,7 +57,7 @@ const CommentPopUpData: React.FC<CommentPopUpProps> = ({ id}) => {
   // TODO: add notification when all posts are seen
   const renderFooter = () => {
     if (!isFetchingNextPage) return null;
-    return <CommentSkeleton/>;
+    return <CommentSkeleton />;
   };
 
   const renderItem = ({ item }: { item: Comment }) => (
@@ -64,7 +79,22 @@ const CommentPopUpData: React.FC<CommentPopUpProps> = ({ id}) => {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       keyboardVerticalOffset={180}
     >
-      <Box position="relative" height={"100%"} width={"100%"} padding="s">
+      <Box position="relative" height={"100%"} width={"100%"} paddingHorizontal="l" paddingTop="s">
+        <Box flexDirection="column" gap="s">
+          <Box flexDirection="row" gap="s">
+            <Text>💬</Text>
+            <Text>{attributes.caption}</Text>
+          </Box>
+          <Box flexDirection="row" gap="xs" alignItems="center">
+            <Text variant="bodyBold">{attributes.likes} likes </Text>
+            <Box height={4} width={4} backgroundColor="ink" borderRadius="xl">
+              {" "}
+            </Box>
+            <Text variant="bodyBold">{attributes.comments} comments </Text>
+          </Box>
+
+          <Box borderRadius="xl" backgroundColor="slate" height={1}></Box>
+        </Box>
         <BottomSheetFlatList
           data={comments}
           renderItem={renderItem}

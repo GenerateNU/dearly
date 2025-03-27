@@ -24,7 +24,6 @@ export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
     uri: "",
   });
 
-
   useEffect(() => {
     if (status.recording) {
       setAttributes((prevAttributes) => ({

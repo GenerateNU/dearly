@@ -9,7 +9,7 @@ interface BottomSheetModalProps {
   initialIndex?: number;
   onClose?: () => void;
   scrollEnabled?: boolean;
-  onChange?: (index:number) => void;
+  onChange?: (index: number) => void;
 }
 
 type Ref = BottomSheetMethods;
@@ -20,7 +20,7 @@ const BottomSheetModal = forwardRef<Ref, BottomSheetModalProps>(
       (props: any) => <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} />,
       [],
     );
-    
+
     const handleClose = useCallback(() => {
       Keyboard.dismiss();
       if (onClose) {
@@ -34,7 +34,6 @@ const BottomSheetModal = forwardRef<Ref, BottomSheetModalProps>(
         ref={ref}
         index={initialIndex}
         snapPoints={snapPoints}
-      
         backdropComponent={renderBackdrop}
         enableDynamicSizing={false}
         enablePanDownToClose

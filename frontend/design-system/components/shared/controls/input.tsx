@@ -49,7 +49,7 @@ const Input: React.FC<TextboxProps> = ({
   onPress,
   isButton = false,
   onPressIn,
-  onPressOut
+  onPressOut,
 }) => {
   const theme = useTheme<Theme>();
 
