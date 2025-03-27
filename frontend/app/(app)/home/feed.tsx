@@ -14,7 +14,6 @@ import Spinner from "@/design-system/components/shared/spinner";
 import { Dimensions } from "react-native";
 import { Animated } from "react-native";
 
-
 const Feed = () => {
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage, isLoading } = useGroupFeed();
   const [refreshing, setRefreshing] = useState<boolean>(false);
@@ -83,23 +82,24 @@ const Feed = () => {
   }, []);
 
   return (
-    <Box >
-      {refreshing && 
-      <Animated.View
-      style={{
-        width: "100%",
-        position: "absolute",
-        alignItems: "center",
-        justifyContent: "center",
-        opacity: scrollY.interpolate({
-          inputRange: [0, 50], 
-          outputRange: [1, 0],
-          extrapolate: "clamp",
-        }),
-      }}
-    >
-      <Spinner size={25} topOffset={30} />
-    </Animated.View>}
+    <Box>
+      {refreshing && (
+        <Animated.View
+          style={{
+            width: "100%",
+            position: "absolute",
+            alignItems: "center",
+            justifyContent: "center",
+            opacity: scrollY.interpolate({
+              inputRange: [0, 50],
+              outputRange: [1, 0],
+              extrapolate: "clamp",
+            }),
+          }}
+        >
+          <Spinner size={25} topOffset={30} />
+        </Animated.View>
+      )}
       <FlatList
         onEndReached={onEndReached}
         showsVerticalScrollIndicator={false}
@@ -107,15 +107,17 @@ const Feed = () => {
         renderItem={renderItem}
         ListFooterComponent={renderFooter}
         onEndReachedThreshold={0.5}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false }
-        )}
+        contentContainerStyle={{
+          paddingBottom: 100,
+        }}
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+          useNativeDriver: false,
+        })}
         refreshControl={
           <RefreshControl
             tintColor="transparent"
             colors={["transparent"]}
-            style={{ backgroundColor: "transparent"}}
+            style={{ backgroundColor: "transparent" }}
             refreshing={refreshing}
             onRefresh={onRefresh}
           ></RefreshControl>
