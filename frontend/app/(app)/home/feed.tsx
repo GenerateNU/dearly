@@ -12,10 +12,13 @@ import MultitrackAudio from "@/assets/audio.svg";
 import { commentPopUpAttributes } from "@/types/comment";
 import Spinner from "@/design-system/components/shared/spinner";
 import { Dimensions } from "react-native";
+import { Animated } from "react-native";
+
+
 const Feed = () => {
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage, isLoading } = useGroupFeed();
   const [refreshing, setRefreshing] = useState<boolean>(false);
-
+  const [scrollY] = useState(new Animated.Value(0));
   const posts = data?.pages.flatMap((page) => page) || [];
   const [commentAttributes, setCommentAttributes] = useState<commentPopUpAttributes>({
     commentId: "",
@@ -82,9 +85,21 @@ const Feed = () => {
   return (
     <Box >
       {refreshing && 
-        <Box width="100%" position="absolute" justifyContent="center" alignItems="center">
-          <Spinner/>
-        </Box>}
+      <Animated.View
+      style={{
+        width: "100%",
+        position: "absolute",
+        alignItems: "center",
+        justifyContent: "center",
+        opacity: scrollY.interpolate({
+          inputRange: [0, 50], 
+          outputRange: [1, 0],
+          extrapolate: "clamp",
+        }),
+      }}
+    >
+      <Spinner size={25} topOffset={30} />
+    </Animated.View>}
       <FlatList
         onEndReached={onEndReached}
         showsVerticalScrollIndicator={false}
@@ -92,6 +107,10 @@ const Feed = () => {
         renderItem={renderItem}
         ListFooterComponent={renderFooter}
         onEndReachedThreshold={0.5}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: false }
+        )}
         refreshControl={
           <RefreshControl
             tintColor="transparent"

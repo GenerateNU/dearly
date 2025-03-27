@@ -41,3 +41,5 @@ export const CommentInput: React.FC<Props> = ({ onPress, isButton = false }) => 
     </Box>
   );
 };
+
+export default CommentInput;
