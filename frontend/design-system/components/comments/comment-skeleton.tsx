@@ -4,12 +4,12 @@ import { DEFAULT_PROFILE_PHOTO } from "@/constants/photo";
 
 export const CommentSkeleton = () => {
   return (
-    <Box width="100%" gap="s">
-      <Box gap="s" flexDirection="row" justifyContent="flex-start" alignItems="center">
-        <Box>
-          <Avatar variant="small" profilePhoto={DEFAULT_PROFILE_PHOTO} />
-        </Box>
+    <Box width="100%" >
+    <Box gap="s" flexDirection="row" justifyContent="flex-start" alignItems="center" paddingBottom="xs">
+      <Box>
+        <Avatar variant="xsmall" profilePhoto={ DEFAULT_PROFILE_PHOTO} />
       </Box>
     </Box>
+  </Box>
   );
 };
