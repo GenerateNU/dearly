@@ -8,6 +8,7 @@ import { condenseAudioBarHeights, getDBLevels } from "@/utilities/audio";
 import { decoders } from "audio-decode";
 import { playbackStates } from "@/types/comment";
 import * as FileSystem from "expo-file-system"
+
 interface PlaybackPropsWhenLocal {
   local: true; // is the audio message being stored locally or in s3
   dbLevels: number[];
@@ -28,10 +29,11 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
   const [status, setStatus] = useState<playbackStates>({ playing: false, pausing: false });
   const [sound, setSound] = useState<Audio.Sound>();
   const [length, setLength] = useState<number>(0);
+  const [uri, setUri] = useState<string>("");
   const [memoLines, setMemoLines] = useState<number[]>([]);
   const numLines = 23;
   const [totalLength, setTotalLength] = useState<number>(0);
-  const [soundLocation, setLocation] = useState<string>(location);
+
 
   useEffect(() => {
     async function initializeValues() {
@@ -45,7 +47,7 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
           FileSystem.documentDirectory + 'temp-audio.mp3'
         );
         const localUri = downloadResult.uri;
-        setLocation(localUri)
+        setUri(localUri)
       }
     }
     initializeValues();
@@ -65,7 +67,7 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
       await sound?.playAsync();
     } else {
       setStatus({ ...status, playing: true });
-      const { sound } = await Audio.Sound.createAsync({ uri: soundLocation });
+      const { sound } = await Audio.Sound.createAsync({ uri: local? location : uri });
       sound.setOnPlaybackStatusUpdate(onPlayingUpdate);
       sound.setProgressUpdateIntervalAsync(500);
       setSound(sound);
@@ -94,11 +96,11 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
     <Box
       borderWidth={1}
       borderColor="ink"
-      backgroundColor={local ? "pearl" : "pearl"}
+      backgroundColor={local ? "pearl" : "white"}
       paddingLeft="s"
       gap="s"
       width="100%"
-      height={local? 50: 40}
+      height={local? 50 : 40}
       borderRadius="l"
       flexDirection="row"
       alignContent="center"

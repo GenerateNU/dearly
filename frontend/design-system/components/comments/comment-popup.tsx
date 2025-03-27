@@ -99,9 +99,9 @@ const CommentPopUpData: React.FC<CommentPopUpProps> = ({ attributes }) => {
           showsVerticalScrollIndicator={false}
           style={{ flex: 1 }}
         />
-        <Box ref={ref} zIndex={10} position="absolute" bottom={150} left={0} right={0} backgroundColor="pearl">
-          <CommentInput postID={attributes.commentId}/>
-        </Box>
+          <Box ref={ref} zIndex={10} position="absolute" bottom={150} right={0} left={0} backgroundColor="white" padding="s">
+            <CommentInput postID={attributes.commentId}/>
+          </Box>
       </Box>
     </KeyboardAvoidingView>
   );
