@@ -249,7 +249,7 @@ describe("Notification server test", () => {
 
   it("notifyComment: Should insert and notify - comment on their own post", async () => {
     await notifService.notifyComment(JOSH_COMMENT_POST);
-    const result = await transaction.getLikeMetadata(JOSH_LIKE_POST);
+    const result = await transaction.getCommentMetadata(JOSH_COMMENT_POST);
     expect(result).toBeNull();
     await assertNotificationLength(JOSH_COMMENT_POST.userId, 0);
     await sendPushNotificationCalled(0);
