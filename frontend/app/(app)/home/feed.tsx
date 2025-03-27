@@ -100,29 +100,32 @@ const Feed = () => {
           <Spinner size={25} topOffset={30} />
         </Animated.View>
       )}
-      <FlatList
-        onEndReached={onEndReached}
-        showsVerticalScrollIndicator={false}
-        data={posts}
-        renderItem={renderItem}
-        ListFooterComponent={renderFooter}
-        onEndReachedThreshold={0.5}
-        contentContainerStyle={{
-          paddingBottom: 100,
-        }}
-        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
-          useNativeDriver: false,
-        })}
-        refreshControl={
-          <RefreshControl
-            tintColor="transparent"
-            colors={["transparent"]}
-            style={{ backgroundColor: "transparent" }}
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-          ></RefreshControl>
-        }
-      ></FlatList>
+      <Box>
+        <FlatList
+          onEndReached={onEndReached}
+          showsVerticalScrollIndicator={false}
+          data={posts}
+          renderItem={renderItem}
+          ListFooterComponent={renderFooter}
+          onEndReachedThreshold={0.5}
+          contentContainerStyle={{
+            paddingBottom: 150,
+            paddingHorizontal: 20
+          }}
+          onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+            useNativeDriver: false,
+          })}
+          refreshControl={
+            <RefreshControl
+              tintColor="transparent"
+              colors={["transparent"]}
+              style={{ backgroundColor: "transparent" }}
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+            ></RefreshControl>
+          }
+        ></FlatList>
+      </Box>
       <CommentPopUp ref={ref} attributes={commentAttributes} />
     </Box>
   );

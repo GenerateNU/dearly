@@ -70,7 +70,7 @@ export const CommentInput: React.FC<Props> = ({ onPress, isButton = false, postI
   };
 
   return (
-    <Box backgroundColor="pearl">
+    <Box>
       {recording && <Recording onSend={sendRecording} onClose={() => setRecording(false)} />}
 
       <Box

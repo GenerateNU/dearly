@@ -24,12 +24,14 @@ const Home = () => {
   };
 
   const SuccessComponent = () => (
-    <Box flexDirection="column" gap="s" paddingTop="m" paddingHorizontal="m">
-      <HomeMenu
-        categories={["Feed", "Calendar"]}
-        selected={selectedView}
-        setSelected={setSelectedView}
-      />
+    <Box flexDirection="column" gap="s" >
+      <Box paddingTop = "m" paddingHorizontal="m">
+        <HomeMenu
+          categories={["Feed", "Calendar"]}
+          selected={selectedView}
+          setSelected={setSelectedView}
+        />
+      </Box>
       {selectedView == "Feed" ? <Feed /> : <Calendar />}
     </Box>
   );

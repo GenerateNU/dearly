@@ -18,7 +18,7 @@ interface CommentPopUpProps {
 
 export const CommentPopUp = forwardRef<BottomSheetMethods, CommentPopUpProps>((props, ref) => {
   return (
-    <BottomSheetModal ref={ref} snapPoints={["50%", "90%"]}>
+    <BottomSheetModal ref={ref} snapPoints={["60%", "90%"]}>
       {props.attributes.commentId == "" ? (
         <CommentPopUpBlank />
       ) : (
@@ -71,9 +71,9 @@ const CommentPopUpData: React.FC<CommentPopUpProps> = ({ attributes }) => {
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={150}
+      keyboardVerticalOffset={43}
     >
-      <Box position="relative" paddingHorizontal="l" height={"100%"} width={"100%"}>
+      <Box position="relative" paddingHorizontal="m" height={"100%"} width={"100%"}>
         <Box flexDirection="column" gap="s">
           <Box flexDirection="row" gap="s">
             <Text>💬</Text>
@@ -94,13 +94,13 @@ const CommentPopUpData: React.FC<CommentPopUpProps> = ({ attributes }) => {
           ListFooterComponent={renderFooter}
           contentContainerStyle={{
             paddingTop: 5,
-            paddingBottom: 180,
+            paddingBottom: 200,
           }}
           showsVerticalScrollIndicator={false}
           style={{ flex: 1 }}
         />
-        <Box ref={ref} zIndex={10} position="absolute" bottom={120} left={5} right={5}>
-          <CommentInput postID={attributes.commentId} />
+        <Box ref={ref} zIndex={10} position="absolute" bottom={150} left={0} right={0} backgroundColor="pearl">
+          <CommentInput postID={attributes.commentId}/>
         </Box>
       </Box>
     </KeyboardAvoidingView>
