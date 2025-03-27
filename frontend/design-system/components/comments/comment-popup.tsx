@@ -11,7 +11,6 @@ import { CommentInput } from "@/app/(app)/home/comment-input";
 import { CommentSkeleton } from "./comment-skeleton";
 import { Text } from "@/design-system/base/text";
 import { commentPopUpAttributes } from "@/types/comment";
-import { Line } from "react-native-svg";
 
 interface CommentPopUpProps {
   attributes: commentPopUpAttributes;
@@ -19,10 +18,7 @@ interface CommentPopUpProps {
 
 export const CommentPopUp = forwardRef<BottomSheetMethods, CommentPopUpProps>((props, ref) => {
   return (
-    <BottomSheetModal
-      ref={ref}
-      snapPoints={["50%", "90%"]}
-    >
+    <BottomSheetModal ref={ref} snapPoints={["50%", "90%"]}>
       {props.attributes.commentId == "" ? (
         <CommentPopUpBlank />
       ) : (
@@ -83,10 +79,10 @@ const CommentPopUpData: React.FC<CommentPopUpProps> = ({ attributes }) => {
           </Box>
           <Box flexDirection="row" gap="xs" alignItems="center">
             <Text variant="bodyBold">{attributes.likes + " likes"}</Text>
-            <Box height={4} width={4} backgroundColor="ink" borderRadius="xl"/>
+            <Box height={4} width={4} backgroundColor="ink" borderRadius="xl" />
             <Text variant="bodyBold"> {attributes.comments + " comments"} </Text>
           </Box>
-          <Box borderRadius="xl" backgroundColor="slate" height={1}></Box>
+          <Box borderRadius="xl" backgroundColor="slate" height={1} ></Box>
         </Box>
         <BottomSheetFlatList
           data={comments}
@@ -95,14 +91,14 @@ const CommentPopUpData: React.FC<CommentPopUpProps> = ({ attributes }) => {
           onEndReached={onEndReached}
           ListFooterComponent={renderFooter}
           contentContainerStyle={{
-            paddingHorizontal: 16,
+            paddingTop: 5,
             paddingBottom: 20,
           }}
           showsVerticalScrollIndicator
           style={{ flex: 1 }}
         />
         <Box ref={ref} zIndex={10} position="absolute" bottom={120} left={5} right={5}>
-          <CommentInput />
+          <CommentInput postID={attributes.commentId} />
         </Box>
       </Box>
     </KeyboardAvoidingView>
