@@ -86,13 +86,10 @@ const CommentPopUpData: React.FC<CommentPopUpProps> = ({ attributes }) => {
             <Text>{attributes.caption}</Text>
           </Box>
           <Box flexDirection="row" gap="xs" alignItems="center">
-            <Text variant="bodyBold">{attributes.likes} likes </Text>
-            <Box height={4} width={4} backgroundColor="ink" borderRadius="xl">
-              {" "}
-            </Box>
-            <Text variant="bodyBold">{attributes.comments} comments </Text>
+            <Text variant="bodyBold">{attributes.likes + " likes"}</Text>
+            <Box height={4} width={4} backgroundColor="ink" borderRadius="xl"/>
+            <Text variant="bodyBold"> {attributes.comments + " comments"} </Text>
           </Box>
-
           <Box borderRadius="xl" backgroundColor="slate" height={1}></Box>
         </Box>
         <BottomSheetFlatList

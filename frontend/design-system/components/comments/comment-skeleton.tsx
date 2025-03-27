@@ -1,5 +1,4 @@
 import { Box } from "@/design-system/base/box";
-import { Text } from "@/design-system/base/text";
 import { Avatar } from "../shared/avatar";
 import { DEFAULT_PROFILE_PHOTO } from "@/constants/photo";
 
