@@ -1,20 +1,9 @@
+import { NudgeScheduleConfig } from "@/types/nudge";
 import { createContext, useState, ReactNode, useContext, SetStateAction, Dispatch } from "react";
-import { boolean } from "zod";
-
-export interface NudgeSettings {
-  group: string;
-  frequency: "DAILY" | "WEEKLY" | "BIWEEKLY" | "MONTHLY" | "YEARLY";
-  daysOfWeek: ("MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT" | "SUN")[] | null;
-  dayOfMonth: number | null;
-  nudgeAt: Date;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
 
 interface NudgeSettingsContextType {
-  nudgeSettings: NudgeSettings | null;
-  setRecurringNudge: Dispatch<SetStateAction<NudgeSettings | null>>;
+  nudgeSettings: NudgeScheduleConfig | null;
+  setRecurringNudge: Dispatch<SetStateAction<NudgeScheduleConfig | null>>;
   frequencySettings: string | null;
   setFrequency: Dispatch<SetStateAction<string | null>>;
   dayOfWeekSettings: string | null;
@@ -55,7 +44,7 @@ interface NudgeSettingsProviderProps {
 }
 
 export const NudgeSettingsProvider: React.FC<NudgeSettingsProviderProps> = ({ children }) => {
-  const [nudgeSettings, setRecurringNudge] = useState<NudgeSettings | null>(null);
+  const [nudgeSettings, setRecurringNudge] = useState<NudgeScheduleConfig | null>(null);
   const [frequencySettings, setFrequency] = useState<string | null>(null);
   const [dayOfWeekSettings, setDayOfWeek] = useState<string | null>(null);
   const [dayOfWeek2Settings, setDayOfWeek2] = useState<string | null>(null);

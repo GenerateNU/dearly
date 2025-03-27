@@ -5,29 +5,22 @@ import { DropdownItem } from "@/types/dropdown";
 import { useCallback, useEffect, useState } from "react";
 import { Text } from "@/design-system/base/text";
 import { useNudgeSettings } from "@/contexts/nudge-settings";
-import NudgeSettings from "./components/nudge-settings";
-import NudgeAtTimePicker from "./components/nudge-time-settings";
 import { useUserStore } from "@/auth/store";
 import { useDisableNudge, useGroupNudgeConfig } from "@/hooks/api/nudge";
-import { isNoNudgeConfig, isNudgeScheduleConfig, NudgeScheduleConfig } from "@/types/nudge";
+import { isNoNudgeConfig, isNudgeScheduleConfig } from "@/types/nudge";
 import SaveNudgeScheduleButton from "./components/save-nudge";
 import {
-  FREQUENCY_LABEL_MAPPING,
-  FREQUENCY_OPTIONS,
-  MONTHLY_OPTIONS,
-  WEEKLY_OPTIONS,
-  WEEKLY_OPTIONS_MAPPING,
+  FREQUENCY_DROPDOWN_OPTIONS,
 } from "./constants/constants";
 import Toggle from "@/design-system/components/shared/toggle";
 import { useFocusEffect } from "expo-router";
 import ResourceView from "@/design-system/components/utilities/resource-view";
 import Spinner from "@/design-system/components/shared/spinner";
 import ErrorDisplay from "@/design-system/components/shared/states/error";
+import RenderNudgeSettings from "./components/render-nudge-settings";
 
 const SetRecurringNudge = () => {
-  const [items, setItems] = useState<DropdownItem[]>(
-    FREQUENCY_OPTIONS.map((item) => ({ value: item, label: item })),
-  );
+  const [items, setItems] = useState<DropdownItem[]>(FREQUENCY_DROPDOWN_OPTIONS);
 
   const {
     nudgeSettings,
@@ -54,7 +47,7 @@ const SetRecurringNudge = () => {
     group?.id as string,
   );
 
-  const [isDefault, setIsDefault] = useState(false);
+  const [isDefault, setIsDefault] = useState(true);
   const [enable, setEnable] = useState(false);
 
   useEffect(() => {
@@ -62,25 +55,18 @@ const SetRecurringNudge = () => {
       try {
         if (isNoNudgeConfig(data)) {
           setEnable(false);
-        } else if (isNudgeScheduleConfig(data)) {
+        } else if (isNudgeScheduleConfig(data) && !isDefault) {
           if (data.isActive) {
             setEnable(true);
           } else {
             setEnable(false);
           }
-          console.log(`Data: ${JSON.stringify(data)}`);
-          setFrequency(
-            FREQUENCY_LABEL_MAPPING[data.frequency as keyof typeof FREQUENCY_LABEL_MAPPING],
-          );
-          if (data.daysOfWeek && data.daysOfWeek.length > 0) {
-            setDayOfWeek(
-              WEEKLY_OPTIONS_MAPPING[data.daysOfWeek[0] as keyof typeof WEEKLY_OPTIONS_MAPPING],
-            );
-            if (data.daysOfWeek.length == 2) {
-              setDayOfWeek2(
-                WEEKLY_OPTIONS_MAPPING[data.daysOfWeek[1] as keyof typeof WEEKLY_OPTIONS_MAPPING],
-              );
-            }
+          setFrequency(data.frequency);
+          if (data.frequency === "BIWEEKLY" && data.daysOfWeek) {
+            setDayOfWeek(data.daysOfWeek[0] ?? null);
+          }
+          if (data.frequency === "WEEKLY" && data.daysOfWeek) {
+            setDaysOfWeekArr(data.daysOfWeek);
           }
           if (data.day) setDayOfMonth(String(data.day));
           setNudgeAt(new Date(data.nudgeAt));
@@ -91,7 +77,7 @@ const SetRecurringNudge = () => {
         console.error("Error parsing data:", error);
       }
     }
-  }, [data, isDefault]);
+  }, [data, isDefault, isActiveSettings]);
 
   useEffect(() => {}, [error, disableNudgeError]);
 
@@ -104,86 +90,45 @@ const SetRecurringNudge = () => {
       setDaysOfWeekArr(null);
       setNudgeAt(new Date());
       setIsActive(true);
+      setIsDefault(false);
       refetch();
-      setIsDefault(true);
     }, [refetch]),
   );
 
   useEffect(() => {
     // Reset settings accordingly
-    if (nudgeSettings) {
+    if (nudgeSettings?.frequency !== frequencySettings) {
       switch (frequencySettings) {
-        case "Weekly":
-        case "Biweekly":
-          setDayOfWeek2(null);
-        case "Twice a Week":
+        case "BIWEEKLY":
+          setDaysOfWeekArr(null);
+        case "WEEKLY":
+          setDayOfWeek(null);
           setDayOfMonth(null);
-          console.log(dayOfWeekSettings);
           break;
-        case "Monthly":
+        case "MONTHLY":
           setDayOfWeek(null);
+          setDaysOfWeekArr(null);
           break;
-        case "Daily":
+        case "DAILY":
           setDayOfWeek(null);
-          setDayOfWeek2(null);
+          setDaysOfWeekArr(null);
           setDayOfMonth(null);
           break;
         default:
           break;
       }
     }
-  }, [frequencySettings, data]);
+  }, [frequencySettings]);
+
+  useEffect(() => {
+    if (dayOfWeekSettings) {
+      setDaysOfWeekArr([dayOfWeekSettings]);
+    }
+  }, [dayOfWeekSettings]);
 
   if (!group) {
     return null;
   }
-
-  const renderSettings = () => {
-    switch (frequencySettings) {
-      case "Daily":
-        return <NudgeAtTimePicker />;
-      case "Weekly":
-        return (
-          <NudgeSettings
-            options={WEEKLY_OPTIONS}
-            curOption={dayOfWeekSettings}
-            setOption={setDayOfWeek}
-          />
-        );
-      case "Twice a Week":
-        return (
-          <>
-            <Box>
-              <Text>First Nudge</Text>
-              <Text>Second Nudge</Text>
-              <NudgeSettings
-                options={WEEKLY_OPTIONS}
-                curOption={dayOfWeek2Settings}
-                setOption={setDayOfWeek2}
-              />
-            </Box>
-          </>
-        );
-      case "Biweekly":
-        return (
-          <NudgeSettings
-            options={WEEKLY_OPTIONS}
-            curOption={dayOfWeekSettings}
-            setOption={setDayOfWeek}
-          />
-        );
-      case "Monthly":
-        return (
-          <NudgeSettings
-            options={MONTHLY_OPTIONS}
-            curOption={dayOfMonthSettings}
-            setOption={setDayOfMonth}
-          />
-        );
-      default:
-        return <></>;
-    }
-  };
 
   const nudgeState = {
     loading: isLoading || isRefetching,
@@ -216,7 +161,16 @@ const SetRecurringNudge = () => {
             setItems={setItems}
           />
           <Box width="100%" alignItems="center">
-            {renderSettings()}
+            <RenderNudgeSettings
+              frequency={frequencySettings}
+              dayOfWeek={dayOfWeekSettings}
+              setDayOfWeek={setDayOfWeek}
+              dayOfMonth={dayOfMonthSettings}
+              setDayOfMonth={setDayOfMonth}
+              daysOfWeekArr={daysOfWeekArr}
+              setDaysOfWeekArr={setDaysOfWeekArr}
+            />
+            {/* {renderSettings()} */}
             <SaveNudgeScheduleButton />
           </Box>
         </>

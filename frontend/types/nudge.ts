@@ -14,7 +14,7 @@ export type NudgeScheduleConfig = {
   id: string;
   groupId: string;
   frequency: string;
-  daysOfWeek?: string;
+  daysOfWeek?: string[];
   day?: string;
   month?: string;
   nudgeAt: string;

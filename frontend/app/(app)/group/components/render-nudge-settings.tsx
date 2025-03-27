@@ -1,12 +1,13 @@
-import { Box } from "@/design-system/base/box";
-import { MONTHLY_OPTIONS, WEEKLY_OPTIONS } from "../constants/constants";
-import NudgeSettings from "./nudge-settings";
+import { MONTHLY_DROPDOWN_OPTIONS, WEEKLY_DROPDOWN_OPTIONS } from "../constants/constants";
+import { NudgeMultipleSelectSettings, NudgeSettings } from "./nudge-settings";
 import NudgeAtTimePicker from "./nudge-time-settings";
 
 interface NudgeSettingProp {
   frequency: string | null;
   dayOfWeek: string | null;
   setDayOfWeek: React.Dispatch<React.SetStateAction<string | null>>;
+  daysOfWeekArr: string[] | null;
+  setDaysOfWeekArr: React.Dispatch<React.SetStateAction<string[] | null>>;
   dayOfMonth: string | null;
   setDayOfMonth: React.Dispatch<React.SetStateAction<string | null>>;
 }
@@ -16,31 +17,37 @@ const RenderNudgeSettings: React.FC<NudgeSettingProp> = ({
   frequency,
   dayOfWeek,
   setDayOfWeek,
+  daysOfWeekArr,
+  setDaysOfWeekArr,
   dayOfMonth,
   setDayOfMonth,
 }) => {
   switch (frequency) {
-    case "Disabled":
-      return <></>;
-    case "Daily":
+    case "DAILY":
       return <NudgeAtTimePicker />;
-    case "Weekly":
+    case "WEEKLY":
       return (
-        <NudgeSettings options={WEEKLY_OPTIONS} curOption={dayOfWeek} setOption={setDayOfWeek} />
+        <NudgeMultipleSelectSettings
+          options={WEEKLY_DROPDOWN_OPTIONS}
+          curOption={daysOfWeekArr}
+          setOption={setDaysOfWeekArr}
+        />
       );
-    case "Twice a Week": //TODO:
+    case "BIWEEKLY":
       return (
-        <>
-          <Box></Box>
-        </>
+        <NudgeSettings
+          options={WEEKLY_DROPDOWN_OPTIONS}
+          curOption={dayOfWeek}
+          setOption={setDayOfWeek}
+        />
       );
-    case "Biweekly":
+    case "MONTHLY":
       return (
-        <NudgeSettings options={WEEKLY_OPTIONS} curOption={dayOfWeek} setOption={setDayOfWeek} />
-      );
-    case "Monthly":
-      return (
-        <NudgeSettings options={MONTHLY_OPTIONS} curOption={dayOfMonth} setOption={setDayOfMonth} />
+        <NudgeSettings
+          options={MONTHLY_DROPDOWN_OPTIONS}
+          curOption={dayOfMonth}
+          setOption={setDayOfMonth}
+        />
       );
     default:
       return <></>;

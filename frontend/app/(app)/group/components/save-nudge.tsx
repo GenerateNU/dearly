@@ -33,8 +33,8 @@ const SaveNudgeScheduleButton = () => {
     setFrequency,
     dayOfWeekSettings,
     setDayOfWeek,
-    dayOfWeek2Settings,
-    setDayOfWeek2,
+    daysOfWeekArr,
+    setDaysOfWeekArr,
     dayOfMonthSettings,
     setDayOfMonth,
     nudgeAtSettings,
@@ -46,22 +46,21 @@ const SaveNudgeScheduleButton = () => {
   );
   const disableNudgeHook = useDisableNudge(group?.id as string);
   const [isSaving, setIsSaving] = useState(false); // Controls disabled button if schedule is saving
-  const [daysOfWeekArr, setDaysOfWeekArr] = useState<string[] | null>(null);
 
   const isMissingFields = () => {
     // Check if any fields are null
     if (frequencySettings == "Disabled") return false;
     if (!nudgeAtSettings) return true;
     switch (frequencySettings) {
-      case "Daily":
+      case "DAILY":
         return false;
-      case "Weekly":
-        return !dayOfWeekSettings;
+      case "WEEKLY":
+        return daysOfWeekArr ? daysOfWeekArr.length == 0 : true;
       case "Twice a week":
+        return daysOfWeekArr ? daysOfWeekArr.length > 1 : false;
+      case "BIWEEKLY":
         return !dayOfWeekSettings;
-      case "Biweekly":
-        return !dayOfWeekSettings;
-      case "Monthly":
+      case "MONTHLY":
         return !dayOfMonthSettings;
       default:
         return true;
@@ -85,7 +84,6 @@ const SaveNudgeScheduleButton = () => {
     setRecurringNudge(null);
     setFrequency(null);
     setDayOfWeek(null);
-    setDayOfWeek2(null);
     setDaysOfWeekArr(null);
     setDayOfMonth(null);
     setNudgeAt(null);
@@ -97,41 +95,18 @@ const SaveNudgeScheduleButton = () => {
     }
   }, [error]);
 
-  useEffect(() => {
-    if (isSaving) {
-      if (frequencySettings) {
-        const payload: ConfigNudgeSchedulePayload = {
-          group: group?.id as string,
-          frequency: convertData(FREQUENCY_LABEL_MAPPING, frequencySettings),
-          daysOfWeek: daysOfWeekArr,
-          day: dayOfMonthSettings ? Number(dayOfMonthSettings) : null,
-          nudgeAt: nudgeAtSettings?.toUTCString(),
-        };
-        mutate(payload);
-      }
-    }
-  }, [isSaving]);
-
   // Sets the schedule
   const onPress = async () => {
     setIsSaving(true);
-    if (frequencySettings === "Disabled") {
-      await disableNudgeHook.mutate(group?.id as string);
-    } else {
-      if (
-        frequencySettings &&
-        ["Weekly", "Twice a Week", "Biweekly"].includes(frequencySettings) &&
-        dayOfWeekSettings
-      ) {
-        if (frequencySettings === "Twice a Week" && dayOfWeek2Settings) {
-          setDaysOfWeekArr([
-            convertData(WEEKLY_LABEL_MAPPING, dayOfWeekSettings),
-            convertData(WEEKLY_LABEL_MAPPING, dayOfWeek2Settings),
-          ]);
-        } else {
-          setDaysOfWeekArr([convertData(WEEKLY_LABEL_MAPPING, dayOfWeekSettings)]);
-        }
-      }
+    if (frequencySettings) {
+      const payload: ConfigNudgeSchedulePayload = {
+        group: group?.id as string,
+        frequency: frequencySettings,
+        daysOfWeek: daysOfWeekArr,
+        day: dayOfMonthSettings ? Number(dayOfMonthSettings) : null,
+        nudgeAt: nudgeAtSettings?.toUTCString(),
+      };
+      mutate(payload);
     }
   };
 
