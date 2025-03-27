@@ -41,15 +41,13 @@ const SaveNudgeScheduleButton = () => {
     setNudgeAt,
   } = useNudgeSettings();
   const { group } = useUserStore();
-  const { mutate, isPending, error, isError, isSuccess } = useUpdateNudgeConfig(
-    group?.id as string,
-  );
+  const { mutate, isPending, error, isSuccess } = useUpdateNudgeConfig(group?.id as string);
   const disableNudgeHook = useDisableNudge(group?.id as string);
   const [isSaving, setIsSaving] = useState(false); // Controls disabled button if schedule is saving
 
   const isMissingFields = () => {
     // Check if any fields are null
-    if (frequencySettings == "Disabled") return false;
+    if (frequencySettings === "Disabled") return false;
     if (!nudgeAtSettings) return true;
     switch (frequencySettings) {
       case "DAILY":

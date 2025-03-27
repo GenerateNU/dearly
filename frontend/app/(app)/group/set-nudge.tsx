@@ -2,7 +2,7 @@ import { Box } from "@/design-system/base/box";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Dropdown } from "@/design-system/components/shared/controls/dropdown";
 import { DropdownItem } from "@/types/dropdown";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, memo, SetStateAction } from "react";
 import { Text } from "@/design-system/base/text";
 import { useNudgeSettings } from "@/contexts/nudge-settings";
 import { useUserStore } from "@/auth/store";
@@ -19,6 +19,125 @@ import Spinner from "@/design-system/components/shared/spinner";
 import ErrorDisplay from "@/design-system/components/shared/states/error";
 import RenderNudgeSettings from "./components/render-nudge-settings";
 
+const FrequencyDropdown = memo(
+  ({
+    value,
+    items,
+    setValue,
+    setItems,
+  }: {
+    value: string | null;
+    items: DropdownItem[];
+    setValue: React.Dispatch<React.SetStateAction<string | null>>;
+    setItems: React.Dispatch<React.SetStateAction<DropdownItem[]>>;
+  }) => (
+    <Box gap="xs">
+      <Text variant="caption">SELECT FREQUENCY</Text>
+      <Dropdown
+        id="frequency"
+        direction="BOTTOM"
+        placeholder="Select frequency"
+        value={value}
+        items={items}
+        setValue={setValue}
+        setItems={setItems}
+      />
+    </Box>
+  ),
+);
+
+FrequencyDropdown.displayName = "FrequencyDropdown";
+
+const NudgeSettingsContent = memo(
+  ({
+    frequencySettings,
+    dayOfWeekSettings,
+    dayOfMonthSettings,
+    setDayOfWeek,
+    setDayOfMonth,
+  }: {
+    frequencySettings: string | null;
+    dayOfWeekSettings: string | null;
+    dayOfWeek2Settings: string | null;
+    dayOfMonthSettings: string | null;
+    setDayOfWeek: React.Dispatch<React.SetStateAction<string | null>>;
+    setDayOfWeek2: React.Dispatch<React.SetStateAction<string | null>>;
+    setDayOfMonth: React.Dispatch<React.SetStateAction<string | null>>;
+  }) => {
+    
+
+    return (
+      <Box width="100%" alignItems="center">
+        <RenderNudgeSettings frequency={frequencySettings} dayOfWeek={dayOfWeekSettings} setDayOfWeek={setDayOfWeek} daysOfWeekArr={null} setDaysOfWeekArr={function (value: SetStateAction<string[] | null>): void {
+          throw new Error("Function not implemented.");
+        } } dayOfMonth={dayOfMonthSettings} setDayOfMonth={setDayOfMonth} />
+        <SaveNudgeScheduleButton />
+      </Box>
+    );
+  },
+);
+
+NudgeSettingsContent.displayName = "NudgeSettingsContent";
+
+const SuccessContent = memo(
+  ({
+    enable,
+    frequencySettings,
+    items,
+    setFrequency,
+    setItems,
+    handleToggle,
+    dayOfWeekSettings,
+    dayOfWeek2Settings,
+    dayOfMonthSettings,
+    setDayOfWeek,
+    setDayOfWeek2,
+    setDayOfMonth,
+    daysOfWeekArr,
+    
+  }: {
+    enable: boolean;
+    frequencySettings: string | null;
+    items: DropdownItem[];
+    setFrequency: React.Dispatch<React.SetStateAction<string | null>>;
+    setItems: React.Dispatch<React.SetStateAction<DropdownItem[]>>;
+    handleToggle: () => void;
+    dayOfWeekSettings: string | null;
+    daysOfWeekArr: string[] | null;
+    dayOfWeek2Settings: string | null;
+    dayOfMonthSettings: string | null;
+    setDayOfWeek: React.Dispatch<React.SetStateAction<string | null>>;
+    setDayOfWeek2: React.Dispatch<React.SetStateAction<string | null>>;
+    setDayOfMonth: React.Dispatch<React.SetStateAction<string | null>>;
+  }) => (
+    <>
+      <Text variant="bodyLargeBold">Set Recurring Nudges</Text>
+      <Toggle onToggle={handleToggle} enabled={enable} label="Recurring Nudges" />
+      {enable && (
+        <>
+          <FrequencyDropdown
+            value={frequencySettings}
+            items={items}
+            setValue={setFrequency}
+            setItems={setItems}
+          />
+          <NudgeSettingsContent
+            frequencySettings={frequencySettings}
+            dayOfWeekSettings={dayOfWeekSettings}
+            dayOfWeek2Settings={dayOfWeek2Settings}
+            dayOfMonthSettings={dayOfMonthSettings}
+            setDayOfWeek={setDayOfWeek}
+            setDayOfWeek2={setDayOfWeek2}
+            setDayOfMonth={setDayOfMonth}
+          />
+        </>
+      )}
+    </>
+  ),
+);
+
+SuccessContent.displayName = "SuccessContent";
+
 const SetRecurringNudge = () => {
   const [items, setItems] = useState<DropdownItem[]>(FREQUENCY_DROPDOWN_OPTIONS);
 
@@ -30,12 +149,11 @@ const SetRecurringNudge = () => {
     dayOfWeekSettings,
     setDayOfWeek,
     dayOfWeek2Settings,
-    setDayOfWeek2,
     daysOfWeekArr,
+    setDayOfWeek2,
     setDaysOfWeekArr,
     dayOfMonthSettings,
     setDayOfMonth,
-    isActiveSettings,
     setIsActive,
     setNudgeAt,
   } = useNudgeSettings();
@@ -43,9 +161,7 @@ const SetRecurringNudge = () => {
   const { data, error, refetch, isLoading, isRefetching } = useGroupNudgeConfig(
     group?.id as string,
   );
-  const { mutateAsync: disableNudge, error: disableNudgeError } = useDisableNudge(
-    group?.id as string,
-  );
+  const { mutateAsync: disableNudge } = useDisableNudge(group?.id as string);
 
   const [isDefault, setIsDefault] = useState(true);
   const [enable, setEnable] = useState(false);
@@ -77,9 +193,7 @@ const SetRecurringNudge = () => {
         console.error("Error parsing data:", error);
       }
     }
-  }, [data, isDefault, isActiveSettings]);
-
-  useEffect(() => {}, [error, disableNudgeError]);
+  }, [data, isDefault]);
 
   useFocusEffect(
     useCallback(() => {
@@ -126,6 +240,15 @@ const SetRecurringNudge = () => {
     }
   }, [dayOfWeekSettings]);
 
+  const handleToggle = useCallback(async () => {
+    if (enable) {
+      await disableNudge(group?.id as string);
+      setEnable(false);
+    } else {
+      setEnable(true);
+    }
+  }, [enable, disableNudge, group?.id]);
+
   if (!group) {
     return null;
   }
@@ -134,56 +257,6 @@ const SetRecurringNudge = () => {
     loading: isLoading || isRefetching,
     error: error ? error.message : null,
     data,
-  };
-
-  const handleToggle = async () => {
-    if (enable) {
-      await disableNudge(group?.id as string);
-      setEnable(false);
-    } else {
-      setEnable(true);
-    }
-  };
-
-  const SuccessComponent = () => (
-    <>
-      <Text variant="bodyLargeBold">Set Recurring Nudges</Text>
-      <Toggle onToggle={handleToggle} enabled={enable} label="Recurring Nudges" />
-      {enable && (
-        <>
-          <Text variant="caption">SELECT FREQUENCY</Text>
-          <Dropdown
-            id="frequency"
-            direction="BOTTOM"
-            value={frequencySettings}
-            items={items}
-            setValue={setFrequency}
-            setItems={setItems}
-          />
-          <Box width="100%" alignItems="center">
-            <RenderNudgeSettings
-              frequency={frequencySettings}
-              dayOfWeek={dayOfWeekSettings}
-              setDayOfWeek={setDayOfWeek}
-              dayOfMonth={dayOfMonthSettings}
-              setDayOfMonth={setDayOfMonth}
-              daysOfWeekArr={daysOfWeekArr}
-              setDaysOfWeekArr={setDaysOfWeekArr}
-            />
-            {/* {renderSettings()} */}
-            <SaveNudgeScheduleButton />
-          </Box>
-        </>
-      )}
-    </>
-  );
-
-  const LoadingComponent = () => {
-    return (
-      <Box width="100%" flex={1} alignItems="center">
-        <Spinner />
-      </Box>
-    );
   };
 
   return (
@@ -199,8 +272,28 @@ const SetRecurringNudge = () => {
       >
         <ResourceView
           resourceState={nudgeState}
-          successComponent={<SuccessComponent />}
-          loadingComponent={<LoadingComponent />}
+          successComponent={
+            <SuccessContent
+              enable={enable}
+              daysOfWeekArr={daysOfWeekArr}
+              frequencySettings={frequencySettings}
+              items={items}
+              setFrequency={setFrequency}
+              setItems={setItems}
+              handleToggle={handleToggle}
+              dayOfWeekSettings={dayOfWeekSettings}
+              dayOfWeek2Settings={dayOfWeek2Settings}
+              dayOfMonthSettings={dayOfMonthSettings}
+              setDayOfWeek={setDayOfWeek}
+              setDayOfWeek2={setDayOfWeek2}
+              setDayOfMonth={setDayOfMonth}
+            />
+          }
+          loadingComponent={
+            <Box width="100%" flex={1} alignItems="center">
+              <Spinner />
+            </Box>
+          }
           errorComponent={<ErrorDisplay refresh={refetch} />}
         />
       </Box>

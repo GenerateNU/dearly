@@ -14,7 +14,6 @@ import {
   PostNotificationMetadata,
 } from "../../types/api/internal/notification";
 import { and, eq, ne, sql } from "drizzle-orm";
-import { InternalServerError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
 import { Notification } from "../../types/api/internal/notification";
 import { Post } from "../../types/api/internal/posts";

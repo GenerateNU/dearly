@@ -17,6 +17,7 @@ interface DropdownProps {
   isLoading?: boolean;
   onEndReached?: () => void;
   direction?: "BOTTOM" | "TOP" | "DEFAULT";
+  placeholder: string;
 }
 
 export const Dropdown: React.FC<DropdownProps> = ({
@@ -28,6 +29,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
   isLoading = false,
   onEndReached,
   direction,
+  placeholder,
 }) => {
   const { openDropdownId, openDropdown, closeDropdown } = useDropdownContext();
   const theme = useTheme<Theme>();
@@ -68,7 +70,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
         items={items}
         setValue={setValue}
         setItems={setItems}
-        placeholder={isLoading ? "Loading groups..." : "Group to post to"}
+        placeholder={isLoading ? "Loading..." : placeholder}
         placeholderStyle={{
           color: theme.colors.gray,
           opacity: 0.5,

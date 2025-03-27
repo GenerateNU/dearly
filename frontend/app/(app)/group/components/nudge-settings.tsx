@@ -6,20 +6,25 @@ import { useState } from "react";
 import NudgeAtTimePicker from "./nudge-time-settings";
 import { SelectMultipleDropdown } from "@/design-system/components/shared/controls/select-multiple";
 
-// Component to render Day of Week drop down and time scroll
 interface NudgeSettingProp {
   options: DropdownItem[];
   curOption: string | null;
   setOption: React.Dispatch<React.SetStateAction<string | null>>;
+  showTimePicker?: boolean;
 }
 
-export const NudgeSettings: React.FC<NudgeSettingProp> = ({ options, curOption, setOption }) => {
+export const NudgeSettings: React.FC<NudgeSettingProp> = ({
+  options,
+  curOption,
+  setOption,
+  showTimePicker,
+}) => {
   const [items, setItems] = useState<DropdownItem[]>(options);
 
   return (
     <Box>
-      {options && items && (
-        <Box>
+      {options && items.length > 0 && (
+        <Box gap="xs">
           <Text variant="caption">SELECT DAY</Text>
           <Dropdown
             id="nudge"
@@ -27,13 +32,16 @@ export const NudgeSettings: React.FC<NudgeSettingProp> = ({ options, curOption, 
             items={items}
             setValue={setOption}
             setItems={setItems}
+            placeholder="Select time"
           />
         </Box>
       )}
-      <NudgeAtTimePicker />
+      {showTimePicker && <NudgeAtTimePicker />}
     </Box>
   );
 };
+
+NudgeSettings.displayName = "NudgeSettings";
 
 interface NudgeMultipleSelectSettingsProp {
   options: DropdownItem[];
