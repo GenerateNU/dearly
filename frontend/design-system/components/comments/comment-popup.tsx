@@ -18,14 +18,10 @@ interface CommentPopUpProps {
 }
 
 export const CommentPopUp = forwardRef<BottomSheetMethods, CommentPopUpProps>((props, ref) => {
-  const [index, setIndex] = useState<number>(0);
   return (
     <BottomSheetModal
       ref={ref}
       snapPoints={["50%", "90%"]}
-      onChange={(index) => {
-        setIndex(index);
-      }}
     >
       {props.attributes.commentId == "" ? (
         <CommentPopUpBlank />
@@ -79,7 +75,7 @@ const CommentPopUpData: React.FC<CommentPopUpProps> = ({ attributes }) => {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       keyboardVerticalOffset={180}
     >
-      <Box position="relative" height={"100%"} width={"100%"} paddingHorizontal="l" paddingTop="s">
+      <Box position="relative" paddingHorizontal="l">
         <Box flexDirection="column" gap="s">
           <Box flexDirection="row" gap="s">
             <Text>💬</Text>
@@ -105,7 +101,7 @@ const CommentPopUpData: React.FC<CommentPopUpProps> = ({ attributes }) => {
           showsVerticalScrollIndicator
           style={{ flex: 1 }}
         />
-        <Box ref={ref} zIndex={10} position="absolute" bottom={8} left={5} right={5}>
+        <Box ref={ref} zIndex={10} position="absolute" bottom={0} left={5} right={5}>
           <CommentInput />
         </Box>
       </Box>
