@@ -5,13 +5,12 @@ import { useTheme } from "@shopify/restyle";
 import { useEffect, useRef } from "react";
 import { Animated, ViewStyle, ColorValue } from "react-native";
 
-
 interface Props {
-  size?:number
-  topOffset?:number
+  size?: number;
+  topOffset?: number;
 }
 
-const Spinner:React.FC<Props> = ({size=30, topOffset=50}) => {
+const Spinner: React.FC<Props> = ({ size = 30, topOffset = 50 }) => {
   const animatedValues = useRef(
     Array.from({ length: 12 }).map(() => new Animated.Value(1)),
   ).current;

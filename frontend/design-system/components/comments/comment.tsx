@@ -18,15 +18,13 @@ export const CommentCard: React.FC<Required<Comment>> = ({
   const profile = profilePhoto ? profilePhoto : DEFAULT_PROFILE_PHOTO;
 
   return (
-    <Box width="100%" gap="s">
-      <Box gap="s" flexDirection="row" justifyContent="flex-start" alignItems="center">
+    <Box width="100%" >
+      <Box gap="s" flexDirection="row" justifyContent="flex-start" alignItems="center" paddingBottom="xs">
         <Box>
-          <Avatar variant="small" profilePhoto={profile} />
+          <Avatar variant="xsmall" profilePhoto={profile} />
         </Box>
-        <Box flexDirection="column" gap="xs">
-          <Text variant="body">{username}</Text>
-          <Text>{formatTime(createdAt)}</Text>
-        </Box>
+          <Text variant="bodyBold">{username}</Text>
+          <Text variant="caption" color="slate">{formatTime(createdAt)}</Text>
       </Box>
       <Box>{content && <Text>{content}</Text>}</Box>
       {voiceMemo && <Playback local={false} location="voiceMemo" />}

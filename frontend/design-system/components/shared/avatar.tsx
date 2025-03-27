@@ -6,7 +6,7 @@ import { Image } from "expo-image";
 
 interface AvatarProps {
   profilePhoto: string | null;
-  variant: "small" | "medium" | "big" | "huge";
+  variant: "xsmall" | "small" | "medium" | "big" | "huge";
 }
 
 export const Avatar: React.FC<AvatarProps> = ({ profilePhoto, variant = "small" }) => {
