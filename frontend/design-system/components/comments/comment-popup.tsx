@@ -53,16 +53,18 @@ const CommentPopUpData: React.FC<CommentPopUpProps> = ({ attributes }) => {
   };
 
   const renderItem = ({ item }: { item: Comment }) => (
-    <CommentCard
-      id={item.id}
-      userId={item.userId}
-      postId={item.postId}
-      voiceMemo={item.voiceMemo}
-      content={item.content}
-      createdAt={item.createdAt}
-      username={item.username}
-      profilePhoto={item.profilePhoto}
-    />
+    <Box paddingBottom="s">
+      <CommentCard
+        id={item.id}
+        userId={item.userId}
+        postId={item.postId}
+        voiceMemo={item.voiceMemo}
+        content={item.content}
+        createdAt={item.createdAt}
+        username={item.username}
+        profilePhoto={item.profilePhoto}
+      />
+    </Box>
   );
 
   return (
@@ -92,9 +94,9 @@ const CommentPopUpData: React.FC<CommentPopUpProps> = ({ attributes }) => {
           ListFooterComponent={renderFooter}
           contentContainerStyle={{
             paddingTop: 5,
-            paddingBottom: 20,
+            paddingBottom: 180,
           }}
-          showsVerticalScrollIndicator
+          showsVerticalScrollIndicator={false}
           style={{ flex: 1 }}
         />
         <Box ref={ref} zIndex={10} position="absolute" bottom={120} left={5} right={5}>
