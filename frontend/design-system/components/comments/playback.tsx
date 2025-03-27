@@ -46,8 +46,18 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
           location,
           FileSystem.documentDirectory + 'temp-audio.mp3'
         );
+
         const localUri = downloadResult.uri;
         setUri(localUri)
+
+        
+        /* Code that break (Web Worker)
+        const response = await fetch(location); // initally fetch the mp3 file
+        const arrayBuffer = await response.arrayBuffer(); // convert to array buffer
+        const uint8Array = new Uint8Array(arrayBuffer); // convert to unit8Array
+        const audioBuffer = await decoders.mp3(uint8Array); // get AudioBuffer format
+        const channelData = audioBuffer.getChannelData(0); // get the channel data which is the amplitude
+        */
       }
     }
     initializeValues();
