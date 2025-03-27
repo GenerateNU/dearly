@@ -73,9 +73,9 @@ const CommentPopUpData: React.FC<CommentPopUpProps> = ({ attributes }) => {
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={180}
+      keyboardVerticalOffset={150}
     >
-      <Box position="relative" paddingHorizontal="l">
+      <Box position="relative" paddingHorizontal="l" height={"100%"} width={"100%"}>
         <Box flexDirection="column" gap="s">
           <Box flexDirection="row" gap="s">
             <Text>💬</Text>
@@ -101,7 +101,7 @@ const CommentPopUpData: React.FC<CommentPopUpProps> = ({ attributes }) => {
           showsVerticalScrollIndicator
           style={{ flex: 1 }}
         />
-        <Box ref={ref} zIndex={10} position="absolute" bottom={0} left={5} right={5}>
+        <Box ref={ref} zIndex={10} position="absolute" bottom={120} left={5} right={5}>
           <CommentInput />
         </Box>
       </Box>
