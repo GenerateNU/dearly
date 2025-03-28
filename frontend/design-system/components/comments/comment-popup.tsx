@@ -1,4 +1,4 @@
-import React, { forwardRef, useRef, useState } from "react";
+import React, { forwardRef, useEffect, useRef, useState } from "react";
 import { CommentCard } from "./comment";
 import { Box } from "@/design-system/base/box";
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
@@ -6,7 +6,7 @@ import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import BottomSheetModal from "../shared/bottom-sheet";
 import { Comment } from "@/types/post";
 import { useComments } from "@/hooks/api/post";
-import { KeyboardAvoidingView, Platform, TextInput } from "react-native";
+import { Keyboard, KeyboardAvoidingView, Platform, TextInput } from "react-native";
 import { CommentInput } from "@/app/(app)/home/comment-input";
 import { CommentSkeleton } from "./comment-skeleton";
 import { Text } from "@/design-system/base/text";
@@ -16,15 +16,41 @@ interface CommentPopUpProps {
   attributes: commentPopUpAttributes;
 }
 
+interface CommentPopUpDataProps {
+  attributes: commentPopUpAttributes;
+  index: number
+}
+
+
 export const CommentPopUp = forwardRef<BottomSheetMethods, CommentPopUpProps>((props, ref) => {
+  const [index, setIndex] = useState<number>(-1)
   return (
-    <BottomSheetModal ref={ref} snapPoints={["60%", "90%"]}>
+    <>
+    <BottomSheetModal ref={ref} snapPoints={["90%"]}  onChange={(index:number) => setIndex(index)}>
       {props.attributes.commentId == "" ? (
         <CommentPopUpBlank />
       ) : (
-        <CommentPopUpData attributes={props.attributes} />
+        <CommentPopUpData attributes={props.attributes} index={index}/>
       )}
     </BottomSheetModal>
+    {index !== -1 && (
+       <KeyboardAvoidingView 
+        behavior="padding" // This makes content move up when keyboard appears
+        keyboardVerticalOffset={Platform.OS === "ios" ? 169 : 0} // Adjust based on platform
+       style={{
+         position: 'absolute',
+         bottom: 150,
+         left: 0,
+         right: 0,
+         zIndex: 10
+       }}
+     >
+       <Box backgroundColor="white" padding="s">
+         <CommentInput postID={props.attributes.commentId} />
+       </Box>
+     </KeyboardAvoidingView>
+    )}
+    </>
   );
 });
 
@@ -32,7 +58,7 @@ const CommentPopUpBlank = () => {
   return <></>;
 };
 
-const CommentPopUpData: React.FC<CommentPopUpProps> = ({ attributes }) => {
+const CommentPopUpData: React.FC<CommentPopUpDataProps> = ({ attributes, index }) => {
   const ref = useRef<TextInput>(null);
   ref.current?.focus();
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage } = useComments(
@@ -68,11 +94,7 @@ const CommentPopUpData: React.FC<CommentPopUpProps> = ({ attributes }) => {
   );
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={43}
-    >
+
       <Box position="relative" paddingHorizontal="m" height={"100%"} width={"100%"}>
         <Box flexDirection="column" gap="s">
           <Box flexDirection="row" gap="s">
@@ -99,11 +121,8 @@ const CommentPopUpData: React.FC<CommentPopUpProps> = ({ attributes }) => {
           showsVerticalScrollIndicator={false}
           style={{ flex: 1 }}
         />
-          <Box ref={ref} zIndex={10} position="absolute" bottom={150} right={0} left={0} backgroundColor="white" padding="s">
-            <CommentInput postID={attributes.commentId}/>
-          </Box>
+  
       </Box>
-    </KeyboardAvoidingView>
   );
 };
 

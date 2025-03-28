@@ -78,6 +78,7 @@ export const CommentInput: React.FC<Props> = ({ onPress, isButton = false, postI
         right={recording ? -100000 : "auto"}
       >
         <Input
+          autoFocus
           placeholder="Write or record a message..."
           value={text}
           onChangeText={(input:string) => setText(input)}
