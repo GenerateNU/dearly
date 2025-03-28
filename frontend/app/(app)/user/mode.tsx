@@ -14,7 +14,7 @@ const SwitchMode = () => {
 
   const switchModeOnPress = async () => {
     const modeToSwitch = isBasic ? Mode.ADVANCED : Mode.BASIC;
-    await mutateAsync({ mode: isBasic ? "ADVANCED" : "BASIC" });
+    await mutateAsync({ mode: modeToSwitch });
     setMode(modeToSwitch);
   };
 
