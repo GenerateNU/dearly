@@ -8,8 +8,6 @@ import { useCreateComment } from "@/hooks/api/post";
 import * as FileSystem from 'expo-file-system';
 import { useUserStore } from "@/auth/store";
 import { useUploadGroupMedia } from "@/hooks/api/media";
-import { Buffer } from "buffer";
-import { Platform } from "react-native";
 
 
 interface Props {

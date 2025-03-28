@@ -62,7 +62,7 @@ const Feed = () => {
           caption={item.caption}
           media={item.media}
           groupId={item.groupId}
-          onCommentClicked={() => null}
+          onCommentClicked={() => onClickComment(item.id, item.caption, item.likes, item.comments)}
         />
         <Input
           isButton
