@@ -1,3 +1,4 @@
+import { SEARCHED_ALICE } from "./../helpers/test-constants";
 import { Hono } from "hono";
 import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
@@ -6,10 +7,9 @@ import { HTTPRequest, Status } from "../../constants/http";
 import {
   INVALID_ID_ARRAY,
   POST_ID,
-  USER_ALICE,
+  SEARCHED_BOB,
   USER_ALICE_ID,
   USER_ANA_ID,
-  USER_BOB,
   USER_BOB_ID,
 } from "../helpers/test-constants";
 
@@ -19,8 +19,8 @@ describe("GET /posts/:id/likes", () => {
   const ALICE_JWT = generateJWTFromID(USER_ALICE_ID);
   const BOB_JWT = generateJWTFromID(USER_BOB_ID);
   const ANA_JWT = generateJWTFromID(USER_ANA_ID);
-  const SEARCHED_ALICE = { ...USER_ALICE, isMember: true, mode: undefined, profilePhoto: null };
-  const SEARCHED_BOB = { ...USER_BOB, isMember: true, mode: undefined, profilePhoto: null };
+  const BOB = { ...SEARCHED_BOB, lastNudgedAt: undefined };
+  const ALICE = { ...SEARCHED_ALICE, lastNudgedAt: undefined };
 
   beforeAll(async () => {
     app = await startTestApp();
@@ -79,7 +79,7 @@ describe("GET /posts/:id/likes", () => {
       })
     )
       .assertStatusCode(Status.OK)
-      .assertBody([SEARCHED_ALICE, SEARCHED_BOB]);
+      .assertBody([ALICE, BOB]);
   });
 
   it("should return 403 if user not member of group", async () => {
@@ -99,12 +99,12 @@ describe("GET /posts/:id/likes", () => {
   });
 
   it.each([
-    ["1", "1", [SEARCHED_ALICE]],
-    ["1", "2", [SEARCHED_BOB]],
+    ["1", "1", [ALICE]],
+    ["1", "2", [BOB]],
     ["1", "3", []],
-    ["2", "1", [SEARCHED_ALICE, SEARCHED_BOB]],
+    ["2", "1", [ALICE, BOB]],
     ["2", "2", []],
-    ["3", "1", [SEARCHED_ALICE, SEARCHED_BOB]],
+    ["3", "1", [ALICE, BOB]],
     ["3", "2", []],
   ])("should return 200 with limit %s and page %s", async (limit, page, expectedBody) => {
     (
@@ -203,7 +203,7 @@ describe("GET /posts/:id/likes", () => {
       })
     )
       .assertStatusCode(Status.OK)
-      .assertBody([SEARCHED_ALICE]);
+      .assertBody([ALICE]);
   });
 
   it.each(

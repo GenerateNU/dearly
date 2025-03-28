@@ -1,11 +1,6 @@
 import { Context } from "hono";
 import { UserService } from "./service";
-import {
-  createUserValidate,
-  expoTokenValidate,
-  querySchema,
-  updateUserValidate,
-} from "./validator";
+import { createUserValidate, expoTokenValidate, updateUserValidate } from "./validator";
 import { parseUUID } from "../../utilities/uuid";
 import { handleAppError } from "../../utilities/errors/app-error";
 import { Status } from "../../constants/http";
@@ -13,7 +8,6 @@ import {
   DEL_USER,
   DEVICE_RESPONSE,
   USER_GROUPS,
-  SEARCHED_USERS,
   USER_RESPONSE,
 } from "../../types/api/routes/users";
 import { paginationSchema } from "../../utilities/pagination";
@@ -26,7 +20,6 @@ export interface UserController {
   registerDevice(ctx: Context): Promise<DEVICE_RESPONSE>;
   removeDevice(ctx: Context): Promise<DEVICE_RESPONSE>;
   getGroups(ctx: Context): Promise<USER_GROUPS>;
-  searchByUsername(ctx: Context): Promise<SEARCHED_USERS>;
 }
 
 export class UserControllerImpl implements UserController {
@@ -116,27 +109,5 @@ export class UserControllerImpl implements UserController {
       return ctx.json(groups, Status.OK);
     };
     return await handleAppError(getGroupsImpl)(ctx);
-  }
-
-  async searchByUsername(ctx: Context): Promise<SEARCHED_USERS> {
-    const search = async () => {
-      const { username, groupId, limit, page } = ctx.req.query();
-      const userId = ctx.get("userId");
-
-      // handle validation using zod
-      const parsedQuery = querySchema.parse({
-        username,
-        limit,
-        page,
-        groupId,
-      });
-
-      const result = await this.userService.searchByUsername({
-        ...parsedQuery,
-        userId,
-      });
-      return ctx.json(result, Status.OK);
-    };
-    return await handleAppError(search)(ctx);
   }
 }

@@ -9,7 +9,7 @@ import {
   mediaTable,
   notificationsTable,
 } from "../schema";
-import { eq, and, sql, desc, or } from "drizzle-orm";
+import { eq, and, desc, or } from "drizzle-orm";
 import {
   ForbiddenError,
   InternalServerError,
@@ -27,8 +27,8 @@ export interface MemberTransaction {
   insertMember(payload: AddMemberPayload): Promise<Member | null>;
   getMember(payload: IDPayload): Promise<Member | null>;
   deleteMember(clientId: string, userId: string, groupId: string): Promise<Member | null>;
-  getMembers(groupId: string, payload: Pagination): Promise<SearchedUser[] | null>;
   toggleNotification(payload: NotificationConfigPayload): Promise<Member>;
+  getMembers(groupId: string, payload: Pagination): Promise<SearchedUser[] | null>;
   getMemberPosts(payload: Pagination, viewer: string, groupId: string): Promise<PostWithMedia[]>;
 }
 
@@ -151,10 +151,7 @@ export class MemberTransactionImpl implements MemberTransaction {
         name: usersTable.name,
         username: usersTable.username,
         profilePhoto: usersTable.profilePhoto,
-        isMember:
-          sql<boolean>`CASE WHEN ${membersTable.groupId} = ${groupId} THEN true ELSE false END`.as(
-            "isMember", // assuming that member includes manager
-          ),
+        role: membersTable.role,
         lastNudgedAt: membersTable.lastManualNudge,
       })
       .from(usersTable)

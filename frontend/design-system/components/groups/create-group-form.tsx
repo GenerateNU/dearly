@@ -9,16 +9,11 @@ import { useCreateGroup } from "@/hooks/api/group";
 import BackNextButtons from "../shared/buttons/back-next-buttons";
 import Input from "../shared/controls/input";
 import { useUserStore } from "@/auth/store";
+import { GROUP_SCHEMA, GroupFormData } from "@/utilities/form-schema";
 
 interface CreateGroupProps {
   nextPageNavigate: string;
 }
-
-const GROUP_SCHEMA = z.object({
-  name: z.string().min(1, { message: "Group name is required" }),
-});
-
-type GroupFormData = z.infer<typeof GROUP_SCHEMA>;
 
 const CreateGroupForm: React.FC<CreateGroupProps> = ({ nextPageNavigate }) => {
   const { mutateAsync, isPending, isError, error } = useCreateGroup();

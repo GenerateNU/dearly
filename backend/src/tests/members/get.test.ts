@@ -5,10 +5,11 @@ import {
   USER_ALICE_ID,
   INVALID_ID_ARRAY,
   ANOTHER_GROUP_ID,
-  SEARCHED_ALICE,
-  SEARCHED_BOB,
-  SEARCHED_ANA,
   POST_ID,
+  GROUP_MEMBER_ALICE,
+  GROUP_MEMBER_BOB,
+  GROUP_MANAGER_ANA,
+  GROUP_MANAGER_ALICE,
 } from "./../helpers/test-constants";
 import { Hono } from "hono";
 import { startTestApp } from "../helpers/test-app";
@@ -48,7 +49,7 @@ describe("GET /groups/:id/members", () => {
     )
       .assertStatusCode(Status.OK)
       .assertArraySize(2)
-      .assertBody([SEARCHED_ALICE, SEARCHED_BOB]);
+      .assertBody([GROUP_MANAGER_ALICE, GROUP_MEMBER_BOB]);
 
     // manager of group
     (
@@ -68,7 +69,7 @@ describe("GET /groups/:id/members", () => {
     )
       .assertStatusCode(Status.OK)
       .assertArraySize(2)
-      .assertBody([SEARCHED_ALICE, SEARCHED_BOB]);
+      .assertBody([GROUP_MANAGER_ALICE, GROUP_MEMBER_BOB]);
   });
 
   it("should return 403 when requested by a non-member", async () => {
@@ -106,11 +107,11 @@ describe("GET /groups/:id/members", () => {
   });
 
   it.each([
-    ["1", "1", [SEARCHED_ALICE]],
-    ["1", "2", [SEARCHED_BOB]],
+    ["1", "1", [GROUP_MANAGER_ALICE]],
+    ["1", "2", [GROUP_MEMBER_BOB]],
     ["1", "3", []],
     ["1", "4", []],
-    ["2", "1", [SEARCHED_ALICE, SEARCHED_BOB]],
+    ["2", "1", [GROUP_MANAGER_ALICE, GROUP_MEMBER_BOB]],
     ["2", "2", []],
   ])("should return 200 with limit %s and page %s", async (limit, page, expectedBody) => {
     (
@@ -146,7 +147,7 @@ describe("GET /groups/:id/members", () => {
     )
       .assertStatusCode(Status.OK)
       .assertArraySize(2)
-      .assertBody([SEARCHED_ALICE, SEARCHED_ANA]);
+      .assertBody([GROUP_MEMBER_ALICE, GROUP_MANAGER_ANA]);
   });
 
   it("should return 400 if limit and page not number", async () => {
@@ -207,11 +208,11 @@ describe("GET /groups/:id/members", () => {
     });
 
     it.each([
-      ["1", "1", [SEARCHED_ALICE]],
-      ["1", "2", [SEARCHED_BOB]],
+      ["1", "1", [GROUP_MANAGER_ALICE]],
+      ["1", "2", [GROUP_MEMBER_BOB]],
       ["1", "3", []],
       ["1", "4", []],
-      ["2", "1", [SEARCHED_ALICE, SEARCHED_BOB]],
+      ["2", "1", [GROUP_MANAGER_ALICE, GROUP_MEMBER_BOB]],
       ["2", "2", []],
     ])("should return 200 with limit %s and page %s", async (limit, page, expectedBody) => {
       await testBuilder.request({

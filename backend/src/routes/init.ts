@@ -11,7 +11,7 @@ import { MediaService } from "../entities/media/service";
 import { commentsRoutes } from "../entities/comments/route";
 import { SlackController, SlackControllerImpl } from "./webhook";
 import { mediaRoutes } from "../entities/media/route";
-import { ExpoPushService } from "../services/notification/expo";
+import { PushNotificationService } from "../services/notification/expo";
 import { AppService } from "../types/api/internal/services";
 import { NudgeSchedulerService } from "../services/nudgeScheduler";
 import { redirectPage } from "../utilities/redirect";
@@ -71,7 +71,7 @@ export const setUpRoutes = (
 const apiRoutes = (
   db: PostgresJsDatabase,
   mediaService: MediaService,
-  expoService: ExpoPushService,
+  expoService: PushNotificationService,
   nudgeService: NudgeSchedulerService,
 ): Hono => {
   const api = new Hono();

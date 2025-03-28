@@ -149,7 +149,24 @@ export const SEARCHED_ALICE: SearchedUser = {
   name: USER_ALICE["name"],
   username: USER_ALICE["username"],
   profilePhoto: null,
-  isMember: true,
+  lastNudgedAt: null,
+};
+
+export const GROUP_MANAGER_ALICE: SearchedUser = {
+  id: USER_ALICE_ID,
+  name: USER_ALICE["name"],
+  username: USER_ALICE["username"],
+  profilePhoto: null,
+  role: "MANAGER",
+  lastNudgedAt: null,
+};
+
+export const GROUP_MEMBER_ALICE: SearchedUser = {
+  id: USER_ALICE_ID,
+  name: USER_ALICE["name"],
+  username: USER_ALICE["username"],
+  profilePhoto: null,
+  role: "MEMBER",
   lastNudgedAt: null,
 };
 
@@ -165,7 +182,15 @@ export const SEARCHED_BOB: SearchedUser = {
   name: USER_BOB["name"],
   username: USER_BOB["username"],
   profilePhoto: null,
-  isMember: true,
+  lastNudgedAt: null,
+};
+
+export const GROUP_MEMBER_BOB: SearchedUser = {
+  id: USER_BOB_ID,
+  name: USER_BOB["name"],
+  username: USER_BOB["username"],
+  profilePhoto: null,
+  role: "MEMBER",
   lastNudgedAt: null,
 };
 
@@ -182,7 +207,24 @@ export const SEARCHED_ANA: SearchedUser = {
   name: USER_ANA["name"],
   username: USER_ANA["username"],
   profilePhoto: "https://mocked-url.com",
-  isMember: true,
+  lastNudgedAt: null,
+};
+
+export const GROUP_MEMBER_ANA: SearchedUser = {
+  id: USER_ANA_ID,
+  name: USER_ANA["name"],
+  username: USER_ANA["username"],
+  profilePhoto: "https://mocked-url.com",
+  role: "MEMBER",
+  lastNudgedAt: null,
+};
+
+export const GROUP_MANAGER_ANA: SearchedUser = {
+  id: USER_ANA_ID,
+  name: USER_ANA["name"],
+  username: USER_ANA["username"],
+  profilePhoto: "https://mocked-url.com",
+  role: "MANAGER",
   lastNudgedAt: null,
 };
 
