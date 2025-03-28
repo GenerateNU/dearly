@@ -184,7 +184,7 @@ const SetRecurringNudge = () => {
           }
           if (data.day) setDayOfMonth(String(data.day));
           setNudgeAt(new Date(data.nudgeAt));
-          setPreviousFrequency(data.frequency)
+          setPreviousFrequency(data.frequency);
         }
       } catch (error) {
         console.error("Error parsing data:", error);

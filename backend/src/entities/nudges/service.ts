@@ -1,3 +1,4 @@
+import { error } from "./../../../../install/cache/ajv/8.17.1@@registry.npmjs.org@@@1/lib/vocabularies/applicator/dependencies";
 import { NudgeTransaction } from "./transaction";
 import { handleServiceError } from "../../utilities/errors/service-error";
 import { ExpoPushService } from "../../services/notification/expo";
@@ -5,6 +6,7 @@ import { getNotificationBody } from "../../utilities/nudge";
 import { InternalServerError } from "../../utilities/errors/app-error";
 import { NudgeSchedulePayload, NudgeSchedule } from "../../types/api/internal/nudges";
 import { NudgeSchedulerService } from "../../services/nudgeScheduler";
+import logger from "../../utilities/logger";
 
 export interface NudgeService {
   manualNudge(userIds: string[], groupId: string, managerId: string): Promise<void>;
@@ -65,7 +67,6 @@ export class NudgeServiceImpl implements NudgeService {
         throw new InternalServerError("Failed to add schedule");
       }
 
-
       const notificationMetadata = await this.nudgeTransaction.getAutoNudgeNotificationMetadata(
         schedule.groupId,
         managerId,
@@ -90,13 +91,15 @@ export class NudgeServiceImpl implements NudgeService {
         if (toAdd) {
           try {
             response = await this.scheduler.addSchedule(schedule.groupId, schedulePayload);
-          } catch (err) {
+          } catch (error) {
+            logger.error(error);
             this.nudgeTransaction.deleteNudge(schedule.groupId, managerId);
           }
         } else {
           try {
             response = await this.scheduler.updateSchedule(schedule.groupId, schedulePayload);
-          } catch (err) {
+          } catch (error) {
+            logger.error(error);
             await this.nudgeTransaction.upsertSchedule(managerId, prev_schedule);
           }
         }

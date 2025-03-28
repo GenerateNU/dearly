@@ -20,7 +20,9 @@ export const NudgeSettings: React.FC<NudgeSettingProp> = ({
   showTimePicker = true,
 }) => {
   const [items, setItems] = useState<DropdownItem[]>(options);
-  useEffect(() => { setItems(options)}, [options] )
+  useEffect(() => {
+    setItems(options);
+  }, [options]);
 
   return (
     <Box>
