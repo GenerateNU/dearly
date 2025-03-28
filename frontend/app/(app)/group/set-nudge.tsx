@@ -16,6 +16,7 @@ import ResourceView from "@/design-system/components/utilities/resource-view";
 import Spinner from "@/design-system/components/shared/spinner";
 import ErrorDisplay from "@/design-system/components/shared/states/error";
 import RenderNudgeSettings from "./components/render-nudge-settings";
+import { Alert } from "react-native";
 
 const FrequencyDropdown = memo(
   ({
@@ -112,8 +113,6 @@ const SuccessContent = memo(
     setDayOfMonth: React.Dispatch<React.SetStateAction<string | null>>;
   }) => (
     <>
-      <Text variant="bodyLargeBold">Set Recurring Nudges</Text>
-      <Toggle onToggle={handleToggle} enabled={enable} label="Recurring Nudges" />
       {enable && (
         <>
           <FrequencyDropdown
@@ -159,10 +158,18 @@ const SetRecurringNudge = () => {
   const { data, error, refetch, isLoading, isRefetching } = useGroupNudgeConfig(
     group?.id as string,
   );
-  const { mutateAsync: disableNudge } = useDisableNudge(group?.id as string);
+  const { mutateAsync: disableNudge, error: disableNudgeError } = useDisableNudge(
+    group?.id as string,
+  );
 
   const [isDefault, setIsDefault] = useState(true);
   const [enable, setEnable] = useState(false);
+
+  useEffect(() => {
+    if (disableNudgeError) {
+      Alert.alert("Error", "Failed to update nudge. Please try again later.", [{ text: "OK" }]);
+    }
+  }, [disableNudgeError]);
 
   useEffect(() => {
     if (data) {
@@ -266,6 +273,8 @@ const SetRecurringNudge = () => {
         alignItems="flex-start"
         gap="m"
       >
+        <Text variant="bodyLargeBold">Set Recurring Nudges</Text>
+        <Toggle onToggle={handleToggle} enabled={enable} label="Recurring Nudges" />
         <ResourceView
           resourceState={nudgeState}
           successComponent={

@@ -65,6 +65,8 @@ export const NudgeMultipleSelectSettings: React.FC<NudgeMultipleSelectSettingsPr
           <Text variant="caption">SELECT DAYS</Text>
           <SelectMultipleDropdown
             id="nudge"
+            max={6}
+            min={1}
             value={curOption}
             items={items}
             setValue={setOption}

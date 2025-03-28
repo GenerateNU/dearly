@@ -17,8 +17,8 @@ import { OnboardingProvider } from "@/contexts/onboarding";
 import { queryClient } from "@/auth/client";
 import { useVerifyInviteToken } from "@/hooks/api/group";
 import * as Linking from "expo-linking";
-import AddMemberLoading from "@/design-system/components/shared/add-member";
 import { DropdownProvider } from "@/contexts/nudge-dropdown";
+import LoadingOverlay from "@/design-system/components/shared/states/loading-overlay";
 
 const InitialLayout = () => {
   const { isAuthenticated, clearError, completeOnboarding, setInviteToken, inviteToken } =
@@ -146,7 +146,7 @@ const InitialLayout = () => {
       ) : (
         <>
           <Slot />
-          {isPending && <AddMemberLoading />}
+          {isPending && <LoadingOverlay message="Adding you to the group..." />}
         </>
       )}
     </ThemeProvider>

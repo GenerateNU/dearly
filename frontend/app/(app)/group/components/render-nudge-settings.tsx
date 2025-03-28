@@ -12,7 +12,6 @@ interface NudgeSettingProp {
   setDayOfMonth: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-// TODO: change name
 const RenderNudgeSettings: React.FC<NudgeSettingProp> = ({
   frequency,
   dayOfWeek,

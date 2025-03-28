@@ -2,10 +2,10 @@ import { useUserStore } from "@/auth/store";
 import { useNudgeSettings } from "@/contexts/nudge-settings";
 import { Box } from "@/design-system/base/box";
 import { TextButton } from "@/design-system/components/shared/buttons/text-button";
-import { useDisableNudge, useUpdateNudgeConfig } from "@/hooks/api/nudge";
+import { useUpdateNudgeConfig } from "@/hooks/api/nudge";
 import { ConfigNudgeSchedulePayload } from "@/types/nudge";
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Alert } from "react-native";
 
 const SaveNudgeScheduleButton = () => {
@@ -24,7 +24,6 @@ const SaveNudgeScheduleButton = () => {
   } = useNudgeSettings();
   const { group } = useUserStore();
   const { mutate, isPending, error, isSuccess } = useUpdateNudgeConfig(group?.id as string);
-  const [isSaving, setIsSaving] = useState(false); // Controls disabled button if schedule is saving
 
   const isMissingFields = () => {
     // Check if any fields are null
@@ -49,7 +48,6 @@ const SaveNudgeScheduleButton = () => {
     if (!isPending) {
       if (isSuccess) {
         resetSettings();
-        setIsSaving(false);
         router.back();
       }
     }
@@ -73,7 +71,6 @@ const SaveNudgeScheduleButton = () => {
 
   // Sets the schedule
   const onPress = async () => {
-    setIsSaving(true);
     if (frequencySettings) {
       const payload: ConfigNudgeSchedulePayload = {
         group: group?.id as string,
@@ -92,7 +89,7 @@ const SaveNudgeScheduleButton = () => {
         onPress={onPress}
         label="Save"
         variant="primary"
-        disabled={isMissingFields() || isSaving}
+        disabled={isMissingFields() || isPending}
       />
     </Box>
   );

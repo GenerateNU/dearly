@@ -17,6 +17,8 @@ interface MultipleSelectDropdownProps {
   isLoading?: boolean;
   onEndReached?: () => void;
   direction?: "BOTTOM" | "TOP" | "DEFAULT";
+  max?: number;
+  min?: number;
 }
 
 export const SelectMultipleDropdown: React.FC<MultipleSelectDropdownProps> = ({
@@ -28,6 +30,8 @@ export const SelectMultipleDropdown: React.FC<MultipleSelectDropdownProps> = ({
   isLoading = false,
   onEndReached,
   direction = "BOTTOM",
+  max,
+  min,
 }) => {
   const { openDropdownId, openDropdown, closeDropdown } = useDropdownContext();
   const theme = useTheme<Theme>();
@@ -71,12 +75,14 @@ export const SelectMultipleDropdown: React.FC<MultipleSelectDropdownProps> = ({
         multiple={true}
         mode="BADGE"
         showBadgeDot={false}
-        max={6}
+        max={max}
+        min={min}
         placeholder={isLoading ? "Loading groups..." : "Days to Nudge"}
         placeholderStyle={{
           color: theme.colors.gray,
           opacity: 0.5,
           width: "80%",
+          overflow: "hidden",
         }}
         style={{
           backgroundColor: pearlColor,
@@ -117,6 +123,12 @@ export const SelectMultipleDropdown: React.FC<MultipleSelectDropdownProps> = ({
             </Box>
           )
         }
+        customItemContainerStyle={{
+          maxWidth: "100%",
+        }}
+        containerStyle={{
+          maxWidth: "100%",
+        }}
         ActivityIndicatorComponent={CustomActivityIndicator}
         showArrowIcon={!isLoading}
         showTickIcon={!isLoading}
