@@ -65,7 +65,6 @@ export class NudgeServiceImpl implements NudgeService {
         throw new InternalServerError("Failed to add schedule");
       }
 
-      console.log(`Schedule added: ${JSON.stringify(schedule)}`);
 
       const notificationMetadata = await this.nudgeTransaction.getAutoNudgeNotificationMetadata(
         schedule.groupId,
@@ -90,21 +89,15 @@ export class NudgeServiceImpl implements NudgeService {
         let response;
         if (toAdd) {
           try {
-            console.log(`Adding shedule...`);
             response = await this.scheduler.addSchedule(schedule.groupId, schedulePayload);
           } catch (err) {
-            console.log(`Error updating: ${err}`);
             this.nudgeTransaction.deleteNudge(schedule.groupId, managerId);
-            console.log(`nudge schedule deleted`);
           }
         } else {
           try {
-            console.log(`Updating shedule...`);
             response = await this.scheduler.updateSchedule(schedule.groupId, schedulePayload);
           } catch (err) {
-            console.log(`Error updating: ${err}`);
-            const previous = await this.nudgeTransaction.upsertSchedule(managerId, prev_schedule);
-            console.log(`Previous schedule reverted: ${JSON.stringify(previous)}`);
+            await this.nudgeTransaction.upsertSchedule(managerId, prev_schedule);
           }
         }
         if (response != 200) {
@@ -120,7 +113,6 @@ export class NudgeServiceImpl implements NudgeService {
   async getSchedule(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null> {
     const getScheduleImpl = async () => {
       const schedule = await this.nudgeTransaction.getNudgeSchedule(groupId, managerId);
-      console.log(`Retrieved schedule: ${JSON.stringify(schedule)}`);
       return schedule;
     };
     return await handleServiceError(getScheduleImpl)();
