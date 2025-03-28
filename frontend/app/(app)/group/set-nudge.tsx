@@ -58,12 +58,10 @@ const NudgeSettingsContent = memo(
   }: {
     frequencySettings: string | null;
     dayOfWeekSettings: string | null;
-    dayOfWeek2Settings: string | null;
     dayOfMonthSettings: string | null;
     daysOfWeekArr: string[] | null;
     setDayOfWeek: React.Dispatch<React.SetStateAction<string | null>>;
     setDaysOfWeekArr: React.Dispatch<React.SetStateAction<string[] | null>>;
-    setDayOfWeek2: React.Dispatch<React.SetStateAction<string | null>>;
     setDayOfMonth: React.Dispatch<React.SetStateAction<string | null>>;
   }) => {
     return (
@@ -94,10 +92,8 @@ const SuccessContent = memo(
     setItems,
     handleToggle,
     dayOfWeekSettings,
-    dayOfWeek2Settings,
     dayOfMonthSettings,
     setDayOfWeek,
-    setDayOfWeek2,
     setDayOfMonth,
     daysOfWeekArr,
     setDaysOfWeekArr,
@@ -110,11 +106,9 @@ const SuccessContent = memo(
     handleToggle: () => void;
     dayOfWeekSettings: string | null;
     daysOfWeekArr: string[] | null;
-    dayOfWeek2Settings: string | null;
     dayOfMonthSettings: string | null;
     setDaysOfWeekArr: React.Dispatch<React.SetStateAction<string[] | null>>;
     setDayOfWeek: React.Dispatch<React.SetStateAction<string | null>>;
-    setDayOfWeek2: React.Dispatch<React.SetStateAction<string | null>>;
     setDayOfMonth: React.Dispatch<React.SetStateAction<string | null>>;
   }) => (
     <>
@@ -133,10 +127,8 @@ const SuccessContent = memo(
             setDaysOfWeekArr={setDaysOfWeekArr}
             frequencySettings={frequencySettings}
             dayOfWeekSettings={dayOfWeekSettings}
-            dayOfWeek2Settings={dayOfWeek2Settings}
             dayOfMonthSettings={dayOfMonthSettings}
             setDayOfWeek={setDayOfWeek}
-            setDayOfWeek2={setDayOfWeek2}
             setDayOfMonth={setDayOfMonth}
           />
         </>
@@ -157,13 +149,10 @@ const SetRecurringNudge = () => {
     setFrequency,
     dayOfWeekSettings,
     setDayOfWeek,
-    dayOfWeek2Settings,
     daysOfWeekArr,
-    setDayOfWeek2,
     setDaysOfWeekArr,
     dayOfMonthSettings,
     setDayOfMonth,
-    setIsActive,
     setNudgeAt,
   } = useNudgeSettings();
   const { group } = useUserStore();
@@ -195,7 +184,6 @@ const SetRecurringNudge = () => {
           }
           if (data.day) setDayOfMonth(String(data.day));
           setNudgeAt(new Date(data.nudgeAt));
-          setIsActive(data.isActive);
           setRecurringNudge(data);
         }
       } catch (error) {
@@ -212,7 +200,6 @@ const SetRecurringNudge = () => {
       setDayOfMonth(null);
       setDaysOfWeekArr(null);
       setNudgeAt(new Date());
-      setIsActive(true);
       setIsDefault(false);
       refetch();
     }, [refetch]),
@@ -292,10 +279,8 @@ const SetRecurringNudge = () => {
               setItems={setItems}
               handleToggle={handleToggle}
               dayOfWeekSettings={dayOfWeekSettings}
-              dayOfWeek2Settings={dayOfWeek2Settings}
               dayOfMonthSettings={dayOfMonthSettings}
               setDayOfWeek={setDayOfWeek}
-              setDayOfWeek2={setDayOfWeek2}
               setDayOfMonth={setDayOfMonth}
             />
           }
