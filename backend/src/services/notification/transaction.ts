@@ -14,7 +14,6 @@ import {
   PostNotificationMetadata,
 } from "../../types/api/internal/notification";
 import { and, eq, ne, sql } from "drizzle-orm";
-import { InternalServerError } from "../../utilities/errors/app-error";
 import { handleServiceError } from "../../utilities/errors/service-error";
 import { Notification } from "../../types/api/internal/notification";
 import { Post } from "../../types/api/internal/posts";
@@ -50,7 +49,7 @@ export class NotificationTransactionImpl implements NotificationTransaction {
           ), NULL)`,
         })
         .from(postsTable)
-        .innerJoin(usersTable, eq(usersTable.id, post.userId))
+        .innerJoin(usersTable, eq(usersTable.id, postsTable.userId))
         .innerJoin(groupsTable, eq(groupsTable.id, postsTable.groupId))
         .innerJoin(membersTable, eq(membersTable.groupId, groupsTable.id))
         .innerJoin(devicesTable, eq(membersTable.userId, devicesTable.userId))
@@ -74,12 +73,12 @@ export class NotificationTransactionImpl implements NotificationTransaction {
           isEnabled: membersTable.likeNotificationEnabled,
         })
         .from(postsTable)
-        .innerJoin(usersTable, eq(usersTable.id, like.userId))
         .innerJoin(devicesTable, eq(postsTable.userId, devicesTable.userId))
         .innerJoin(membersTable, eq(postsTable.groupId, membersTable.groupId))
         .innerJoin(groupsTable, eq(groupsTable.id, postsTable.groupId))
-        .innerJoin(likesTable, eq(likesTable.id, like.id))
-        .where(and(eq(postsTable.id, like.postId), ne(postsTable.userId, like.userId)))
+        .innerJoin(likesTable, eq(likesTable.postId, postsTable.id))
+        .innerJoin(usersTable, eq(usersTable.id, likesTable.userId))
+        .where(and(eq(likesTable.id, like.id), ne(postsTable.userId, like.userId)))
         .groupBy(
           likesTable.id,
           postsTable.userId,
@@ -108,9 +107,9 @@ export class NotificationTransactionImpl implements NotificationTransaction {
         .from(postsTable)
         .innerJoin(devicesTable, eq(postsTable.userId, devicesTable.userId))
         .innerJoin(membersTable, eq(postsTable.groupId, membersTable.groupId))
-        .innerJoin(usersTable, eq(usersTable.id, comment.userId))
         .innerJoin(groupsTable, eq(groupsTable.id, postsTable.groupId))
-        .innerJoin(commentsTable, eq(commentsTable.id, comment.id))
+        .innerJoin(commentsTable, eq(commentsTable.postId, postsTable.id))
+        .innerJoin(usersTable, eq(usersTable.id, commentsTable.userId))
         .where(and(eq(commentsTable.id, comment.id), ne(postsTable.userId, comment.userId)))
         .groupBy(
           postsTable.userId,

@@ -41,11 +41,14 @@ import { SupabaseClient } from "@supabase/supabase-js";
 describe("Notification server test", () => {
   const config = getConfigurations();
   const db = connectDB(config);
+  const transaction = new NotificationTransactionImpl(db);
+
   const notifService = new ExpoNotificationService(
     new SupabaseClient("supabase_url", "supabase_key"),
-    new NotificationTransactionImpl(db),
+    transaction,
     new ExpoPushService(expo),
   );
+
   let app: Hono;
   const testBuilder = new TestBuilder();
 
@@ -85,9 +88,21 @@ describe("Notification server test", () => {
     ]);
   });
 
+  it("should query the database correctly for post", async () => {
+    const result = await transaction.getPostMetadata(POST_EXAMPLE);
+
+    expect(result).toEqual({
+      username: "josh",
+      groupName: "snapper",
+      memberIDs: [USER_Nubs_ID],
+      deviceTokens: [NUBS_DEVICE_TOKEN],
+    });
+  });
+
   it("notifyPost: should insert and notify for a larger group", async () => {
     await notifService.notifyPost(FULL_SNAPPER_POST_EXAMPLE);
 
+    // assert that there are 3 new notifications inserted into notification table
     await assertNotificationLength(FULL_SNAPPER_POST_EXAMPLE.userId, 3);
 
     // Stone did not receive notification since he's the poster
@@ -104,10 +119,32 @@ describe("Notification server test", () => {
     );
   });
 
+  it("should query the database correctly for post for large group", async () => {
+    const result = await transaction.getPostMetadata(FULL_SNAPPER_POST_EXAMPLE);
+
+    expect(result).toEqual({
+      username: "theRock",
+      groupName: "eng snapper",
+      // exactly three users should receive notifications
+      memberIDs: [USER_Josh_ID, USER_MAI_ID, USER_Nubs_ID],
+      deviceTokens: [MAI_DEVICE_TOKEN, NUBS_DEVICE_TOKEN, JOSH_DEVICE_TOKEN],
+    });
+  });
+
   it("notifyPost: should insert and notify for a larger group with notification disabled", async () => {
     // Mai turned off notification for group
     await updateNotificationConfig(GROUP_FULL_SNAPPER_ID, USER_MAI_ID, {
       postNotificationEnabled: false,
+    });
+
+    // check if database query is correct
+    const result = await transaction.getPostMetadata(FULL_SNAPPER_POST_EXAMPLE);
+
+    expect(result).toEqual({
+      username: "theRock",
+      groupName: "eng snapper",
+      memberIDs: [USER_Josh_ID, USER_MAI_ID, USER_Nubs_ID],
+      deviceTokens: [NUBS_DEVICE_TOKEN, JOSH_DEVICE_TOKEN],
     });
 
     await notifService.notifyPost(FULL_SNAPPER_POST_EXAMPLE);
@@ -153,8 +190,23 @@ describe("Notification server test", () => {
     ]);
   });
 
+  it("should query the database correctly for like", async () => {
+    const result = await transaction.getLikeMetadata(LIKE_EXAMPLE);
+
+    expect(result).toEqual({
+      username: "nubs",
+      groupName: "snapper",
+      userId: USER_Josh_ID,
+      groupId: SNAPPER_GROUP_ID,
+      isEnabled: true,
+      deviceTokens: [JOSH_DEVICE_TOKEN],
+    });
+  });
+
   it("notifyLike: Should insert and notify - like their own post", async () => {
     await notifService.notifyLike(JOSH_LIKE_POST);
+    const result = await transaction.getLikeMetadata(JOSH_LIKE_POST);
+    expect(result).toBeNull();
     await assertNotificationLength(JOSH_LIKE_POST.userId, 0);
     await sendPushNotificationCalled(0);
   });
@@ -182,8 +234,23 @@ describe("Notification server test", () => {
     ]);
   });
 
+  it("should query the database correctly for comment", async () => {
+    const result = await transaction.getCommentMetadata(SINGLE_COMMENT);
+
+    expect(result).toEqual({
+      username: "nubs",
+      groupName: "snapper",
+      userId: USER_Josh_ID,
+      groupId: SNAPPER_GROUP_ID,
+      isEnabled: true,
+      deviceTokens: [JOSH_DEVICE_TOKEN],
+    });
+  });
+
   it("notifyComment: Should insert and notify - comment on their own post", async () => {
     await notifService.notifyComment(JOSH_COMMENT_POST);
+    const result = await transaction.getCommentMetadata(JOSH_COMMENT_POST);
+    expect(result).toBeNull();
     await assertNotificationLength(JOSH_COMMENT_POST.userId, 0);
     await sendPushNotificationCalled(0);
   });
@@ -196,6 +263,18 @@ describe("Notification server test", () => {
 
     await notifService.notifyLike(LIKE_EXAMPLE);
 
+    // notification disabled
+    const result = await transaction.getLikeMetadata(LIKE_EXAMPLE);
+    expect(result).toEqual({
+      username: "nubs",
+      groupName: "snapper",
+      userId: USER_Josh_ID,
+      groupId: SNAPPER_GROUP_ID,
+      isEnabled: false,
+      deviceTokens: [JOSH_DEVICE_TOKEN],
+    });
+
+    // insert notfication table
     const results = await db
       .select()
       .from(notificationsTable)
@@ -205,6 +284,7 @@ describe("Notification server test", () => {
     expect(results[0]?.actorId).toBe(LIKE_EXAMPLE.userId);
     expect(results[0]?.receiverId).toBe(POST_EXAMPLE.userId);
 
+    // but do not send push notification
     await sendPushNotificationCalled(0);
   });
 
@@ -216,6 +296,18 @@ describe("Notification server test", () => {
 
     await notifService.notifyComment(SINGLE_COMMENT);
 
+    // notification disabled
+    const result = await transaction.getCommentMetadata(SINGLE_COMMENT);
+    expect(result).toEqual({
+      username: "nubs",
+      groupName: "snapper",
+      userId: USER_Josh_ID,
+      groupId: SNAPPER_GROUP_ID,
+      isEnabled: false,
+      deviceTokens: [JOSH_DEVICE_TOKEN],
+    });
+
+    // insert new notification into the table
     const results = await db
       .select()
       .from(notificationsTable)
@@ -225,6 +317,7 @@ describe("Notification server test", () => {
     expect(results[0]?.receiverId).toBe(POST_EXAMPLE.userId);
     expect(results[0]?.actorId).toBe(SINGLE_COMMENT.userId);
 
+    // but not push notification is sent
     await sendPushNotificationCalled(0);
   });
 

@@ -2,7 +2,6 @@ import { Comment } from "../../types/api/internal/comments";
 import { CreateGroupPayload, Group } from "../../types/api/internal/groups";
 import { Post } from "../../types/api/internal/posts";
 import { CreateUserPayload, SearchedUser, User } from "../../types/api/internal/users";
-import { Member } from "../../types/api/internal/members";
 import { Like } from "../../types/api/internal/like";
 import {
   groupsTable,
@@ -315,15 +314,6 @@ export const BIG_THEIF_GROUP: Group = {
   id: BIG_THIEF_GROUP_ID,
   description: null,
   managerId: USER_BUCK_ID,
-};
-
-export const ADRIENNE_MEMBER: Member = {
-  userId: USER_ADRIENNE_ID,
-  groupId: BIG_THIEF_GROUP_ID,
-  joinedAt: new Date(),
-  role: "MEMBER",
-  notificationsEnabled: false,
-  lastManualNudge: null,
 };
 
 export const USER_BUCK: User = {
