@@ -1,6 +1,6 @@
-import { getNotifications, getUserGroups } from "@/api/user";
-import { Notifications } from "@/types/user";
-import { useQueryPagination } from "./base";
+import { getNotifications, getUserGroups, updateUser } from "@/api/user";
+import { Notifications, UpdateUserPayload, User } from "@/types/user";
+import { useMutationBase, useQueryPagination } from "./base";
 import { Group } from "@/types/group";
 
 /**
@@ -26,4 +26,13 @@ export const useUserNotification = (options: any = {}) => {
  */
 export const useUserGroups = (options: any = {}) => {
   return useQueryPagination<Group[]>(["users", "groups"], getUserGroups, options, 5);
+};
+
+/**
+ * Hook to update a user
+ *
+ * @returns Mutation object for updating a user
+ */
+export const useUpdateUser = (id: string) => {
+  return useMutationBase<UpdateUserPayload, User>((payload) => updateUser(payload), ["users", id]);
 };
