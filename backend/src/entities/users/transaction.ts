@@ -1,11 +1,9 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { devicesTable, groupsTable, membersTable, postsTable, usersTable } from "../schema";
-import { and, eq, sql, not, exists, inArray } from "drizzle-orm";
+import { and, eq, sql, inArray } from "drizzle-orm";
 import {
   CreateUserPayload,
   Pagination,
-  SearchedInfo,
-  SearchedUser,
   UpdateUserPayload,
   User,
 } from "../../types/api/internal/users";

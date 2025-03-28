@@ -4,8 +4,6 @@ import { UserTransaction } from "./transaction";
 import {
   CreateUserPayload,
   Pagination,
-  SearchedInfo,
-  SearchedUser,
   UpdateUserPayload,
   User,
 } from "../../types/api/internal/users";
