@@ -1,7 +1,6 @@
 import { ThumbnailResponse } from "./../../types/api/internal/groups";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import {
-  commentsTable,
   groupsTable,
   likesTable,
   mediaTable,
@@ -78,8 +77,6 @@ export class GroupTransactionImpl implements GroupTransaction {
         and(eq(membersTable.groupId, groupId), eq(membersTable.userId, userId)),
       )
       .innerJoin(usersTable, eq(postsTable.userId, usersTable.id))
-      .leftJoin(likesTable, eq(likesTable.postId, postsTable.id))
-      .leftJoin(commentsTable, eq(commentsTable.postId, postsTable.id))
       .where(
         and(
           date
