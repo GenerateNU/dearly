@@ -16,7 +16,6 @@ export class ExpoPushService implements PushNotificationService {
   async sendPushNotifications({ deviceTokens, message, title, data }: SendNotificationPayload) {
     const messages = this.formatExpoPushMessage({ deviceTokens, message, title, data });
     const chunks = this.expo.chunkPushNotifications(messages);
-
     for (const chunk of chunks) {
       await this.expo.sendPushNotificationsAsync(chunk);
     }
