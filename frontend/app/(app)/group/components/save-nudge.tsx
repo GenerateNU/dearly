@@ -4,7 +4,6 @@ import { Box } from "@/design-system/base/box";
 import { TextButton } from "@/design-system/components/shared/buttons/text-button";
 import { useUpdateNudgeConfig } from "@/hooks/api/nudge";
 import { ConfigNudgeSchedulePayload } from "@/types/nudge";
-import { router } from "expo-router";
 import { useEffect } from "react";
 import { Alert } from "react-native";
 
@@ -31,9 +30,9 @@ const SaveNudgeScheduleButton = () => {
       case "DAILY":
         return false;
       case "WEEKLY":
-        return daysOfWeekArr ? daysOfWeekArr.length == 0 : true;
+        return daysOfWeekArr ? daysOfWeekArr.length === 0 : true;
       case "BIWEEKLY":
-        return daysOfWeekArr ? daysOfWeekArr.length == 0 : true;
+        return daysOfWeekArr ? daysOfWeekArr.length === 0 : true;
       case "MONTHLY":
         return !dayOfMonthSettings;
       default:
@@ -45,7 +44,6 @@ const SaveNudgeScheduleButton = () => {
     if (!isPending) {
       if (isSuccess) {
         resetSettings();
-        router.back();
       }
     }
   }, [isPending, isSuccess]);
