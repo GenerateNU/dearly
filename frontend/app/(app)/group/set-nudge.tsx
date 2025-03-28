@@ -2,16 +2,14 @@ import { Box } from "@/design-system/base/box";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Dropdown } from "@/design-system/components/shared/controls/dropdown";
 import { DropdownItem } from "@/types/dropdown";
-import { useCallback, useEffect, useState, memo, SetStateAction } from "react";
+import { useCallback, useEffect, useState, memo } from "react";
 import { Text } from "@/design-system/base/text";
 import { useNudgeSettings } from "@/contexts/nudge-settings";
 import { useUserStore } from "@/auth/store";
 import { useDisableNudge, useGroupNudgeConfig } from "@/hooks/api/nudge";
 import { isNoNudgeConfig, isNudgeScheduleConfig } from "@/types/nudge";
 import SaveNudgeScheduleButton from "./components/save-nudge";
-import {
-  FREQUENCY_DROPDOWN_OPTIONS,
-} from "./constants/constants";
+import { FREQUENCY_DROPDOWN_OPTIONS } from "./constants/constants";
 import Toggle from "@/design-system/components/shared/toggle";
 import { useFocusEffect } from "expo-router";
 import ResourceView from "@/design-system/components/utilities/resource-view";
@@ -53,24 +51,32 @@ const NudgeSettingsContent = memo(
     frequencySettings,
     dayOfWeekSettings,
     dayOfMonthSettings,
+    daysOfWeekArr,
     setDayOfWeek,
     setDayOfMonth,
+    setDaysOfWeekArr,
   }: {
     frequencySettings: string | null;
     dayOfWeekSettings: string | null;
     dayOfWeek2Settings: string | null;
     dayOfMonthSettings: string | null;
+    daysOfWeekArr: string | null;
     setDayOfWeek: React.Dispatch<React.SetStateAction<string | null>>;
+    setDaysOfWeekArr: React.Dispatch<React.SetStateAction<string[] | null>>;
     setDayOfWeek2: React.Dispatch<React.SetStateAction<string | null>>;
     setDayOfMonth: React.Dispatch<React.SetStateAction<string | null>>;
   }) => {
-    
-
     return (
       <Box width="100%" alignItems="center">
-        <RenderNudgeSettings frequency={frequencySettings} dayOfWeek={dayOfWeekSettings} setDayOfWeek={setDayOfWeek} daysOfWeekArr={null} setDaysOfWeekArr={function (value: SetStateAction<string[] | null>): void {
-          throw new Error("Function not implemented.");
-        } } dayOfMonth={dayOfMonthSettings} setDayOfMonth={setDayOfMonth} />
+        <RenderNudgeSettings
+          frequency={frequencySettings}
+          dayOfWeek={dayOfWeekSettings}
+          setDayOfWeek={setDayOfWeek}
+          daysOfWeekArr={daysOfWeekArr}
+          setDaysOfWeekArr={setDaysOfWeekArr}
+          dayOfMonth={dayOfMonthSettings}
+          setDayOfMonth={setDayOfMonth}
+        />
         <SaveNudgeScheduleButton />
       </Box>
     );
@@ -94,7 +100,7 @@ const SuccessContent = memo(
     setDayOfWeek2,
     setDayOfMonth,
     daysOfWeekArr,
-    
+    setDaysOfWeekArr,
   }: {
     enable: boolean;
     frequencySettings: string | null;
@@ -106,6 +112,7 @@ const SuccessContent = memo(
     daysOfWeekArr: string[] | null;
     dayOfWeek2Settings: string | null;
     dayOfMonthSettings: string | null;
+    setDaysOfWeekArr: React.Dispatch<React.SetStateAction<string[] | null>>;
     setDayOfWeek: React.Dispatch<React.SetStateAction<string | null>>;
     setDayOfWeek2: React.Dispatch<React.SetStateAction<string | null>>;
     setDayOfMonth: React.Dispatch<React.SetStateAction<string | null>>;
@@ -122,6 +129,8 @@ const SuccessContent = memo(
             setItems={setItems}
           />
           <NudgeSettingsContent
+            daysOfWeekArr={daysOfWeekArr}
+            setDaysOfWeekArr={setDaysOfWeekArr}
             frequencySettings={frequencySettings}
             dayOfWeekSettings={dayOfWeekSettings}
             dayOfWeek2Settings={dayOfWeek2Settings}
@@ -276,6 +285,7 @@ const SetRecurringNudge = () => {
             <SuccessContent
               enable={enable}
               daysOfWeekArr={daysOfWeekArr}
+              setDaysOfWeekArr={setDaysOfWeekArr}
               frequencySettings={frequencySettings}
               items={items}
               setFrequency={setFrequency}
