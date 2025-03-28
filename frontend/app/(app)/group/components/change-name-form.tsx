@@ -1,7 +1,7 @@
 import { Alert } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z, ZodError } from "zod";
+import { ZodError } from "zod";
 import { router } from "expo-router";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
