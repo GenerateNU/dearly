@@ -57,7 +57,7 @@ export class NudgeTransactionImpl implements NudgeTransaction {
       // validate group existence and manager permissions
       try {
         await this.validateGroup(tx, payload.groupId, managerId);
-      } catch (err) {
+      } catch {
         return null;
       }
       // insert the value into the database

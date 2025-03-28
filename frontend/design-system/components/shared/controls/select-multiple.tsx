@@ -2,7 +2,7 @@ import { Theme } from "@/design-system/base/theme";
 import { DropdownItem } from "@/types/dropdown";
 import { useTheme } from "@shopify/restyle";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import DropDownPicker, { DropDownPickerProps } from "react-native-dropdown-picker";
+import DropDownPicker from "react-native-dropdown-picker";
 import { ActivityIndicator } from "react-native";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";

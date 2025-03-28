@@ -17,7 +17,7 @@ export const NudgeSettings: React.FC<NudgeSettingProp> = ({
   options,
   curOption,
   setOption,
-  showTimePicker,
+  showTimePicker = true,
 }) => {
   const [items, setItems] = useState<DropdownItem[]>(options);
 
@@ -59,7 +59,7 @@ export const NudgeMultipleSelectSettings: React.FC<NudgeMultipleSelectSettingsPr
   return (
     <Box>
       {options && items && (
-        <Box>
+        <Box gap="xs">
           <Text variant="caption">SELECT DAYS</Text>
           <SelectMultipleDropdown
             id="nudge"
