@@ -27,7 +27,7 @@ export const SelectMultipleDropdown: React.FC<MultipleSelectDropdownProps> = ({
   setItems,
   isLoading = false,
   onEndReached,
-  direction,
+  direction = "BOTTOM",
 }) => {
   const { openDropdownId, openDropdown, closeDropdown } = useDropdownContext();
   const theme = useTheme<Theme>();
@@ -68,8 +68,11 @@ export const SelectMultipleDropdown: React.FC<MultipleSelectDropdownProps> = ({
         items={items}
         setValue={setValue}
         setItems={setItems}
-        multiple={true as true}
-        placeholder={isLoading ? "Loading groups..." : "Group to post to"}
+        multiple={true}
+        mode="BADGE"
+        showBadgeDot={false}
+        max={6}
+        placeholder={isLoading ? "Loading groups..." : "Days to Nudge"}
         placeholderStyle={{
           color: theme.colors.gray,
           opacity: 0.5,

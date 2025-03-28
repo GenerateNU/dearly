@@ -143,8 +143,8 @@ const SetRecurringNudge = () => {
   const [items, setItems] = useState<DropdownItem[]>(FREQUENCY_DROPDOWN_OPTIONS);
 
   const {
-    nudgeSettings,
-    setRecurringNudge,
+    previousFrequency,
+    setPreviousFrequency,
     frequencySettings,
     setFrequency,
     dayOfWeekSettings,
@@ -184,7 +184,7 @@ const SetRecurringNudge = () => {
           }
           if (data.day) setDayOfMonth(String(data.day));
           setNudgeAt(new Date(data.nudgeAt));
-          setRecurringNudge(data);
+          setPreviousFrequency(data.frequency)
         }
       } catch (error) {
         console.error("Error parsing data:", error);
@@ -194,7 +194,6 @@ const SetRecurringNudge = () => {
 
   useFocusEffect(
     useCallback(() => {
-      setRecurringNudge(null);
       setFrequency(null);
       setDayOfWeek(null);
       setDayOfMonth(null);
@@ -202,12 +201,13 @@ const SetRecurringNudge = () => {
       setNudgeAt(new Date());
       setIsDefault(false);
       refetch();
+      setPreviousFrequency(null);
     }, [refetch]),
   );
 
   useEffect(() => {
     // Reset settings accordingly
-    if (nudgeSettings?.frequency !== frequencySettings) {
+    if (previousFrequency !== frequencySettings) {
       switch (frequencySettings) {
         case "BIWEEKLY":
           setDaysOfWeekArr(null);

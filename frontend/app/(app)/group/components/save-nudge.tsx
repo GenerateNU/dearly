@@ -10,7 +10,7 @@ import { Alert } from "react-native";
 
 const SaveNudgeScheduleButton = () => {
   const {
-    setRecurringNudge,
+    setPreviousFrequency,
     frequencySettings,
     setFrequency,
     dayOfWeekSettings,
@@ -57,7 +57,7 @@ const SaveNudgeScheduleButton = () => {
 
   // reset all values to null
   const resetSettings = () => {
-    setRecurringNudge(null);
+    setPreviousFrequency(null);
     setFrequency(null);
     setDayOfWeek(null);
     setDaysOfWeekArr(null);

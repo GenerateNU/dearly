@@ -2,14 +2,12 @@ import { NudgeScheduleConfig } from "@/types/nudge";
 import { createContext, useState, ReactNode, useContext, SetStateAction, Dispatch } from "react";
 
 interface NudgeSettingsContextType {
-  nudgeSettings: NudgeScheduleConfig | null;
-  setRecurringNudge: Dispatch<SetStateAction<NudgeScheduleConfig | null>>;
+  previousFrequency: string | null;
+  setPreviousFrequency: Dispatch<SetStateAction<string | null>>;
   frequencySettings: string | null;
   setFrequency: Dispatch<SetStateAction<string | null>>;
   dayOfWeekSettings: string | null;
   setDayOfWeek: Dispatch<SetStateAction<string | null>>;
-  dayOfWeek2Settings: string | null;
-  setDayOfWeek2: Dispatch<SetStateAction<string | null>>;
   daysOfWeekArr: string[] | null;
   setDaysOfWeekArr: Dispatch<SetStateAction<string[] | null>>;
   dayOfMonthSettings: string | null;
@@ -21,14 +19,12 @@ interface NudgeSettingsContextType {
 }
 
 export const NudgeSettingsContext = createContext<NudgeSettingsContextType>({
-  nudgeSettings: null,
-  setRecurringNudge: () => {},
+  previousFrequency: null,
+  setPreviousFrequency: () => {},
   frequencySettings: null,
   setFrequency: () => {},
   dayOfWeekSettings: null,
   setDayOfWeek: () => {},
-  dayOfWeek2Settings: null,
-  setDayOfWeek2: () => {},
   daysOfWeekArr: null,
   setDaysOfWeekArr: () => {},
   dayOfMonthSettings: null,
@@ -44,10 +40,9 @@ interface NudgeSettingsProviderProps {
 }
 
 export const NudgeSettingsProvider: React.FC<NudgeSettingsProviderProps> = ({ children }) => {
-  const [nudgeSettings, setRecurringNudge] = useState<NudgeScheduleConfig | null>(null);
+  const [previousFrequency, setPreviousFrequency] = useState<string | null>(null);
   const [frequencySettings, setFrequency] = useState<string | null>(null);
   const [dayOfWeekSettings, setDayOfWeek] = useState<string | null>(null);
-  const [dayOfWeek2Settings, setDayOfWeek2] = useState<string | null>(null);
   const [dayOfMonthSettings, setDayOfMonth] = useState<string | null>(null);
   const [daysOfWeekArr, setDaysOfWeekArr] = useState<string[] | null>(null);
   const [nudgeAtSettings, setNudgeAt] = useState<Date | null>(new Date());
@@ -56,14 +51,12 @@ export const NudgeSettingsProvider: React.FC<NudgeSettingsProviderProps> = ({ ch
   return (
     <NudgeSettingsContext.Provider
       value={{
-        nudgeSettings,
-        setRecurringNudge,
+        previousFrequency,
+        setPreviousFrequency,
         frequencySettings,
         setFrequency,
         dayOfWeekSettings,
         setDayOfWeek,
-        dayOfWeek2Settings,
-        setDayOfWeek2,
         daysOfWeekArr,
         setDaysOfWeekArr,
         dayOfMonthSettings,

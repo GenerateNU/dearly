@@ -2,7 +2,7 @@ import { Box } from "@/design-system/base/box";
 import { Dropdown } from "@/design-system/components/shared/controls/dropdown";
 import { DropdownItem } from "@/types/dropdown";
 import { Text } from "@/design-system/base/text";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import NudgeAtTimePicker from "./nudge-time-settings";
 import { SelectMultipleDropdown } from "@/design-system/components/shared/controls/select-multiple";
 
@@ -20,6 +20,7 @@ export const NudgeSettings: React.FC<NudgeSettingProp> = ({
   showTimePicker = true,
 }) => {
   const [items, setItems] = useState<DropdownItem[]>(options);
+  useEffect(() => { setItems(options)}, [options] )
 
   return (
     <Box>
@@ -40,7 +41,6 @@ export const NudgeSettings: React.FC<NudgeSettingProp> = ({
     </Box>
   );
 };
-
 NudgeSettings.displayName = "NudgeSettings";
 
 interface NudgeMultipleSelectSettingsProp {
