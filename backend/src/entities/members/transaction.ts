@@ -15,8 +15,8 @@ import {
   InternalServerError,
   NotFoundError,
 } from "../../utilities/errors/app-error";
-import { AddMemberPayload, Member, GroupMember } from "../../types/api/internal/members";
-import { Pagination } from "../../types/api/internal/users";
+import { AddMemberPayload, Member } from "../../types/api/internal/members";
+import { Pagination, SearchedUser } from "../../types/api/internal/users";
 import { PostWithMedia } from "../../types/api/internal/posts";
 import { getPostMetadata } from "../../utilities/query";
 import { Transaction } from "../../types/api/internal/transaction";
@@ -28,7 +28,7 @@ export interface MemberTransaction {
   getMember(payload: IDPayload): Promise<Member | null>;
   deleteMember(clientId: string, userId: string, groupId: string): Promise<Member | null>;
   toggleNotification(payload: NotificationConfigPayload): Promise<Member>;
-  getMembers(groupId: string, payload: Pagination): Promise<GroupMember[] | null>;
+  getMembers(groupId: string, payload: Pagination): Promise<SearchedUser[] | null>;
   getMemberPosts(payload: Pagination, viewer: string, groupId: string): Promise<PostWithMedia[]>;
 }
 
@@ -134,7 +134,7 @@ export class MemberTransactionImpl implements MemberTransaction {
   async getMembers(
     groupId: string,
     { id, limit, page }: Pagination,
-  ): Promise<GroupMember[] | null> {
+  ): Promise<SearchedUser[] | null> {
     const requesterIdIsMember = await this.db
       .select()
       .from(membersTable)

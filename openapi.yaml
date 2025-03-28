@@ -1756,13 +1756,18 @@ paths:
                       description: Profile photo url of user.
                     role:
                       type: string
-                      enum: ["MEMBER", "MANAGER", null]
+                      enum: ["MEMBER", "MANAGER"]
                       description: Defines the role and level of permissions this user in the group has.
                     lastNudgedAt:
                       type: string
                       format: date-time
                       example: "2025-01-17T00:00:00Z"
-                      description: The date and time when the member was last nudged.                                       
+                      description: The date and time when the member was last nudged.                 
+                  required:
+                      - id
+                      - name
+                      - username
+                      - role                   
         400:
           description: Malformed request
           content:

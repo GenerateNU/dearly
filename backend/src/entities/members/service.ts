@@ -1,5 +1,5 @@
 import { NotificationConfigPayload } from "../../types/api/internal/notification";
-import { AddMemberPayload, GroupMember, Member } from "../../types/api/internal/members";
+import { AddMemberPayload, Member } from "../../types/api/internal/members";
 import { PostWithMediaURL } from "../../types/api/internal/posts";
 import { Pagination, SearchedUser } from "../../types/api/internal/users";
 import { IDPayload } from "../../types/id";
@@ -55,21 +55,14 @@ export class MemberServiceImpl implements MemberService {
     return handleServiceError(deleteMemberImpl)();
   }
 
-  async getMembers(groupId: string, payload: Pagination): Promise<GroupMember[]> {
+  async getMembers(groupId: string, payload: Pagination): Promise<SearchedUser[]> {
     const getMembersImpl = async () => {
       const members = await this.memberTransaction.getMembers(groupId, payload);
       if (!members) {
         throw new NotFoundError("Group");
       }
       const profileURLs = await this.mediaService.getUsersWithSignedURL(members);
-
-      const membersWithProfileURLs = members.map((member, index) => {
-        return {
-          ...member,
-          profilePhoto: profileURLs[index] ? profileURLs[index].profilePhoto : null,
-        };
-      });
-      return membersWithProfileURLs;
+      return profileURLs;
     };
     return handleServiceError(getMembersImpl)();
   }
