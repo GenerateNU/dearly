@@ -60,7 +60,7 @@ const NudgeSettingsContent = memo(
     dayOfWeekSettings: string | null;
     dayOfWeek2Settings: string | null;
     dayOfMonthSettings: string | null;
-    daysOfWeekArr: string | null;
+    daysOfWeekArr: string[] | null;
     setDayOfWeek: React.Dispatch<React.SetStateAction<string | null>>;
     setDaysOfWeekArr: React.Dispatch<React.SetStateAction<string[] | null>>;
     setDayOfWeek2: React.Dispatch<React.SetStateAction<string | null>>;
