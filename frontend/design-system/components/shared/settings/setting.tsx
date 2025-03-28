@@ -14,7 +14,7 @@ const SettingContent = () => {
         <Box gap="s">
           <TextButton
             textVariant="bodyLargeBold"
-            onPress={() => null}
+            onPress={() => router.push("/(app)/(tabs)/profile/edit-profile")}
             label="Edit Profile"
             variant="text"
           />

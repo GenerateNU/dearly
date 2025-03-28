@@ -3,9 +3,17 @@ import { BaseButton } from "@/design-system/base/button";
 import { Text } from "@/design-system/base/text";
 import { useUserStore } from "@/auth/store";
 import { Icon } from "@/design-system/components/shared/icons/icon";
+import Photo from "../edit-profile/photo";
+import { getUser } from "@/api/user";
+import { useQuery } from "@tanstack/react-query";
 
 const InfoBar = () => {
-  const { group } = useUserStore();
+  const { group, userId } = useUserStore();
+
+  const { isPending, isError, data, error } = useQuery({
+    queryKey: ["api", "v1", "users", userId],
+    queryFn: () => getUser(userId!),
+  });
   const groupName = group ? group.name : "Unknown";
   const onPressGroupName = () => {
     console.log("group names");

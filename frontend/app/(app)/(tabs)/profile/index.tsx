@@ -26,7 +26,6 @@ const ProfilePage = () => {
       flex={1}
       height="100%"
     >
-      <InfoBar />
       <UserInfo
         username={data!.username}
         name={data!.name!}
