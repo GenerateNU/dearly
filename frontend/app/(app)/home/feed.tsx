@@ -22,7 +22,6 @@ const Feed = () => {
   const [commentAttributes, setCommentAttributes] = useState<commentPopUpAttributes>({
     commentId: "",
     likes: 0,
-    comments: 0,
     caption: "",
   });
   const ref = useRef<BottomSheet>(null);
@@ -35,8 +34,8 @@ const Feed = () => {
 
   useEffect(() => {}, [ref.current]);
 
-  const onClickComment = (id: string, caption: string, likes: number, comment: number) => {
-    setCommentAttributes({ commentId: id, caption: caption, comments: comment, likes: likes });
+  const onClickComment = (id: string, caption: string, likes: number) => {
+    setCommentAttributes({ commentId: id, caption: caption, likes: likes });
     ref.current?.snapToIndex(0);
   };
 
@@ -62,11 +61,11 @@ const Feed = () => {
           caption={item.caption}
           media={item.media}
           groupId={item.groupId}
-          onCommentClicked={() => onClickComment(item.id, item.caption, item.likes, item.comments)}
+          onCommentClicked={() => onClickComment(item.id, item.caption, item.likes)}
         />
         <Input
           isButton
-          onPress={() => onClickComment(item.id, item.caption, item.likes, item.comments)}
+          onPress={() => onClickComment(item.id, item.caption, item.likes)}
           placeholder="Write or record a message..."
           rightIcon={<MultitrackAudio />}
         />

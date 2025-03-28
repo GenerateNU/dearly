@@ -97,14 +97,14 @@ const CommentPopUpData: React.FC<CommentPopUpDataProps> = ({ attributes, index }
 
       <Box position="relative" paddingHorizontal="m" height={"100%"} width={"100%"}>
         <Box flexDirection="column" gap="s">
-          <Box flexDirection="row" gap="s">
+          <Box flexDirection="row" gap="s" alignItems="center">
             <Text>💬</Text>
             <Text>{attributes.caption}</Text>
           </Box>
           <Box flexDirection="row" gap="xs" alignItems="center">
             <Text variant="bodyBold">{attributes.likes + " likes"}</Text>
             <Box height={4} width={4} backgroundColor="ink" borderRadius="xl" />
-            <Text variant="bodyBold"> {attributes.comments + " comments"} </Text>
+            <Text variant="bodyBold"> {comments.length  + " comments"} </Text>
           </Box>
           <Box borderRadius="xl" backgroundColor="slate" height={1} ></Box>
         </Box>
@@ -116,7 +116,7 @@ const CommentPopUpData: React.FC<CommentPopUpDataProps> = ({ attributes, index }
           ListFooterComponent={renderFooter}
           contentContainerStyle={{
             paddingTop: 5,
-            paddingBottom: 200,
+            paddingBottom: 210,
           }}
           showsVerticalScrollIndicator={false}
           style={{ flex: 1 }}

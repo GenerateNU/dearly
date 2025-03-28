@@ -21,6 +21,5 @@ export type recordingAttributes = {
 export type commentPopUpAttributes = {
   commentId: string;
   likes: number;
-  comments: number;
   caption: string;
 };

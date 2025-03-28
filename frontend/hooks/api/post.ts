@@ -5,6 +5,7 @@ import { useUserStore } from "@/auth/store";
 import { getGroupFeed } from "@/api/group";
 import { getComments } from "@/api/comment";
 import { postComment } from "@/api/comment";
+import { useQueryClient } from "@tanstack/react-query";
 /**
  * Hook to create a new post
  *
@@ -20,7 +21,7 @@ export const useCreatePost = (groupId: string) => {
 export const useGroupFeed = (options: any = {}) => {
   const { group } = useUserStore();
   return useQueryPagination<Post[]>(
-    ["users", "feed"],
+    ["users", "feed"],  //fix key name to match route
     (page, limit) => {
       return getGroupFeed(group.id, page, limit) as Promise<Post[]>;
     },
@@ -46,8 +47,12 @@ export const useComments = (id: string, options: any = {}) => {
  * @returns Mutation object for creating a post
  */
 export const useCreateComment = (postId: string, groupId:string) => {
+  const queryClient = useQueryClient();
+
   return useMutationBase<CreateCommentPayload, Comment>(
     (payload) => postComment(postId, payload),
     [postId, "comments"],
+    () => queryClient.invalidateQueries({ queryKey: ["users", "feed"]})
   );
 };
+

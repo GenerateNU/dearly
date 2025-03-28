@@ -62,7 +62,6 @@ export const CommentInput: React.FC<Props> = ({ onPress, isButton = false, postI
     await createPost({
       content: text,
     })
-    console.log(createPostError)
     setText("")
   };
 

@@ -72,12 +72,8 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
         comments={comments}
       />
       <Box gap="s" flexDirection="row" justifyContent="flex-start" alignItems="center">
-        <Box>
-          <Text>💬</Text>
-        </Box>
-        <Box width="90%">
-          <Text>{caption}</Text>
-        </Box>
+        <Text>💬</Text>
+        <Text>{caption}</Text>
       </Box>
     </Box>
   );
