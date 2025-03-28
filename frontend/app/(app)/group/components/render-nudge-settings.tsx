@@ -4,8 +4,6 @@ import NudgeAtTimePicker from "./nudge-time-settings";
 
 interface NudgeSettingProp {
   frequency: string | null;
-  dayOfWeek: string | null;
-  setDayOfWeek: React.Dispatch<React.SetStateAction<string | null>>;
   daysOfWeekArr: string[] | null;
   setDaysOfWeekArr: React.Dispatch<React.SetStateAction<string[] | null>>;
   dayOfMonth: string | null;
@@ -14,8 +12,6 @@ interface NudgeSettingProp {
 
 const RenderNudgeSettings: React.FC<NudgeSettingProp> = ({
   frequency,
-  dayOfWeek,
-  setDayOfWeek,
   daysOfWeekArr,
   setDaysOfWeekArr,
   dayOfMonth,
@@ -34,10 +30,10 @@ const RenderNudgeSettings: React.FC<NudgeSettingProp> = ({
       );
     case "BIWEEKLY":
       return (
-        <NudgeSettings
+        <NudgeMultipleSelectSettings
           options={WEEKLY_DROPDOWN_OPTIONS}
-          curOption={dayOfWeek}
-          setOption={setDayOfWeek}
+          curOption={daysOfWeekArr}
+          setOption={setDaysOfWeekArr}
         />
       );
     case "MONTHLY":

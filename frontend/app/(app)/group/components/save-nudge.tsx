@@ -13,7 +13,6 @@ const SaveNudgeScheduleButton = () => {
     setPreviousFrequency,
     frequencySettings,
     setFrequency,
-    dayOfWeekSettings,
     setDayOfWeek,
     daysOfWeekArr,
     setDaysOfWeekArr,
@@ -33,10 +32,8 @@ const SaveNudgeScheduleButton = () => {
         return false;
       case "WEEKLY":
         return daysOfWeekArr ? daysOfWeekArr.length == 0 : true;
-      case "Twice a week":
-        return daysOfWeekArr ? daysOfWeekArr.length > 1 : false;
       case "BIWEEKLY":
-        return !dayOfWeekSettings;
+        return daysOfWeekArr ? daysOfWeekArr.length == 0 : true;
       case "MONTHLY":
         return !dayOfMonthSettings;
       default:

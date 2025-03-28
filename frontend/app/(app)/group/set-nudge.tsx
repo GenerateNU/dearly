@@ -69,8 +69,6 @@ const NudgeSettingsContent = memo(
       <Box width="100%" alignItems="center">
         <RenderNudgeSettings
           frequency={frequencySettings}
-          dayOfWeek={dayOfWeekSettings}
-          setDayOfWeek={setDayOfWeek}
           daysOfWeekArr={daysOfWeekArr}
           setDaysOfWeekArr={setDaysOfWeekArr}
           dayOfMonth={dayOfMonthSettings}
@@ -91,7 +89,6 @@ const SuccessContent = memo(
     items,
     setFrequency,
     setItems,
-    handleToggle,
     dayOfWeekSettings,
     dayOfMonthSettings,
     setDayOfWeek,
@@ -183,10 +180,7 @@ const SetRecurringNudge = () => {
             setEnable(false);
           }
           setFrequency(data.frequency);
-          if (data.frequency === "BIWEEKLY" && data.daysOfWeek) {
-            setDayOfWeek(data.daysOfWeek[0] ?? null);
-          }
-          if (data.frequency === "WEEKLY" && data.daysOfWeek) {
+          if ((data.frequency === "BIWEEKLY" || data.frequency === "WEEKLY") && data.daysOfWeek) {
             setDaysOfWeekArr(data.daysOfWeek);
           }
           if (data.day) setDayOfMonth(String(data.day));
