@@ -1,4 +1,3 @@
-import { error } from "./../../../../install/cache/ajv/8.17.1@@registry.npmjs.org@@@1/lib/vocabularies/applicator/dependencies";
 import { NudgeTransaction } from "./transaction";
 import { handleServiceError } from "../../utilities/errors/service-error";
 import { ExpoPushService } from "../../services/notification/expo";
