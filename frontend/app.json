@@ -12,11 +12,11 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.generate.dearly",
+      "associatedDomains": ["applinks:dearly-35496165508.us-east1.run.app"],
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Dearly needs access to your location to provide better service.",
         "NSLocationAlwaysUsageDescription": "Dearly needs access to your location even when the app is in the background to provide accurate tracking.",
-        "ITSAppUsesNonExemptEncryption": false,
-        "associatedDomains": ["applinks:dearly-35496165508.us-east1.run.app"]
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
