@@ -5,12 +5,12 @@ import { SchedulerClient } from "@aws-sdk/client-scheduler";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { MediaService } from "../../../entities/media/service";
 import { NotificationService } from "../../../services/notification/service";
-import { ExpoPushService } from "../../../services/notification/expo";
+import { PushNotificationService } from "../../../services/notification/expo";
 
 export interface AppService {
   nudgeSchedulerService: NudgeSchedulerService;
   mediaService: MediaService;
-  expoService: ExpoPushService;
+  expoService: PushNotificationService;
 }
 
 export interface ServerService extends AppService {

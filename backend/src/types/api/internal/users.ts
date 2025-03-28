@@ -5,9 +5,9 @@ export interface SearchedUser {
   id: string;
   name: string;
   username: string;
-  profilePhoto?: string | undefined;
-  lastNudgedAt?: Date | undefined;
-  role: "MEMBER" | "MANAGER";
+  profilePhoto?: string | null;
+  lastNudgedAt?: Date | null;
+  role?: "MEMBER" | "MANAGER" | null;
 }
 
 export interface SearchedInfo {

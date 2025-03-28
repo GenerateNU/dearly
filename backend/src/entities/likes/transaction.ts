@@ -52,7 +52,6 @@ export class LikeTransactionImpl implements LikeTransaction {
         id: usersTable.id,
         name: usersTable.name,
         username: usersTable.username,
-        isMember: sql<boolean>`TRUE`,
         profilePhoto: usersTable.profilePhoto,
       })
       .from(usersTable)

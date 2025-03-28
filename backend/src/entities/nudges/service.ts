@@ -1,6 +1,6 @@
 import { NudgeTransaction } from "./transaction";
 import { handleServiceError } from "../../utilities/errors/service-error";
-import { ExpoPushService } from "../../services/notification/expo";
+import { PushNotificationService } from "../../services/notification/expo";
 import { getNotificationBody } from "../../utilities/nudge";
 import { InternalServerError } from "../../utilities/errors/app-error";
 import { NudgeSchedulePayload, NudgeSchedule } from "../../types/api/internal/nudges";
@@ -16,12 +16,12 @@ export interface NudgeService {
 
 export class NudgeServiceImpl implements NudgeService {
   private nudgeTransaction: NudgeTransaction;
-  private expoService: ExpoPushService;
+  private expoService: PushNotificationService;
   private scheduler: NudgeSchedulerService;
 
   constructor(
     nudgeTransaction: NudgeTransaction,
-    expoService: ExpoPushService,
+    expoService: PushNotificationService,
     scheduler: NudgeSchedulerService,
   ) {
     this.nudgeTransaction = nudgeTransaction;
