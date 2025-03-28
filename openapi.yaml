@@ -622,6 +622,19 @@ components:
         - frequency
         - nudgeAt
 
+    WaveForm:
+     type: object
+     properties:
+        length:
+          type: integer
+          description: length of the audio message
+        data:
+          type: array
+          items:
+            type: integer
+            description: the db level at time (index * 500 ms)
+          description: The db levels of the given media 
+
 paths:
   /healthcheck:
     get:
@@ -3172,3 +3185,59 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+
+  /api/v1/group/{groupID}/media/{mediaURL}:
+    get:
+        tags:
+          - Media Endpoint
+        summary: Returns an array of db levels to use in pre-processing
+        description: Allow users to get the db levels from an audio message
+        security:
+          - BearerAuth: []
+        parameters:
+          - name: groupID
+            in: path
+            description: ID group the comment is under
+            required: true
+            schema:
+              type: string
+              format: uuid
+              example: 5e91507e-5630-4efd-9fd4-799178870b10
+          - name: mediaURL
+            in: path
+            description: url of media being pre-processed
+            required: true
+            schema:
+              type: string
+              format: url
+              example: "https://example.com/thumbnail.jpg"
+        responses:
+          201:
+            description: Successfully retrieve object key and type
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/WaveForm"
+          400:
+            description: Malformed request
+            content:
+              application/json:
+                schema:
+                  oneOf:
+                    - $ref: "#/components/schemas/Error"
+                    - $ref: "#/components/schemas/ValidationError"
+          401:
+            description: Unauthorized due to invalid JWT
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/Error"
+          500:
+            description: Internal server error
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/Error"
+
+
+

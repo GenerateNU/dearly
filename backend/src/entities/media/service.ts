@@ -8,11 +8,12 @@ import { S3Service } from "../../services/s3Service";
 import { PostWithMedia, PostWithMediaURL } from "../../types/api/internal/posts";
 import { SearchedUser, User } from "../../types/api/internal/users";
 import { MediaType, Tag } from "../../constants/database";
-import { Media, MediaResponse, MediaWithURL } from "../../types/api/internal/media";
-import { BadRequestError, ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
+import { Media, MediaResponse, MediaWithURL, WaveForm } from "../../types/api/internal/media";
+import { BadRequestError, ForbiddenError, InternalServerError, NotFoundError } from "../../utilities/errors/app-error";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { groupsTable, membersTable } from "../schema";
 import { eq, and } from "drizzle-orm";
+const ffmpeg = require('fluent-ffmpeg');
 
 /**
  * Interface for the Media Service, which provides methods for interacting with media-related operations.
@@ -77,6 +78,13 @@ export interface MediaService {
    * @param key unique object key associated with media
    */
   getSignedUrl(key: string): Promise<string>;
+
+  /**
+   * Gets the db data of the given url
+   * @param groupID 
+   * @param media 
+   */
+  getDBData(media: string): Promise<WaveForm>;
 }
 
 export class MediaServiceImpl {
@@ -269,5 +277,48 @@ export class MediaServiceImpl {
         };
       }),
     );
+  }
+
+  getDBData(media: string, interval = 500): Promise<WaveForm> {
+    return new Promise((resolve, reject) => {
+      const dbData:number[] = []
+      let length = 0
+      ffmpeg.ffprobe(media, (err:Error, metadata:any) => {
+        if (err) {
+          throw new InternalServerError("Failed to Process Audio");
+        }
+        length = metadata.format.duration;
+        const segments = Math.floor(length * 1000 / interval);
+
+        for (let i = 0; i < segments; i++) {
+          const timestamp = i * length / 1000;
+          
+          ffmpeg(media)
+            .setStartTime(timestamp)
+            .setDuration(length / 1000)
+            .audioFilters('volumedetect')
+            .format('null')
+            .on('error', (err:any) => {
+              reject(new InternalServerError("processing audio has failed"));
+            })
+            .on('stderr', (stderrLine: any) => {
+              if (stderrLine.includes('mean_volume:')) {
+                const match = stderrLine.match(/mean_volume: ([-\d.]+) dB/);
+                if (match && match[1]) {
+                  dbData.push(parseFloat(match[1]));
+                }
+              }
+            })
+        }
+      })
+
+      const response: WaveForm = {
+        length: length,
+        data: dbData
+      }
+      resolve(response)
+    })
+      
+
   }
 }

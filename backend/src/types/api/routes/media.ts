@@ -11,3 +11,8 @@ export type USER_MEDIA = TypedResponse<
   | paths["/api/v1/users/media"]["post"]["responses"]["201"]["content"]["application/json"]
   | API_ERROR
 >;
+
+export type WAVEFORM = TypedResponse<
+  | paths["/groups/{groupID}/media/{mediaURL}"]["get"]["responses"]["201"]["content"]["application/json"]
+  | API_ERROR
+>;
