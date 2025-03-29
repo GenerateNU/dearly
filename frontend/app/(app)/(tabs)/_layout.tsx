@@ -129,7 +129,7 @@ const Layout = () => {
         />
       </Tabs>
       <SwitchGroupBottomSheet ref={switchGroupRef} />
-      <SettingPopup ref={settingRef} />
+      <SettingPopup close={() => settingRef.current?.close()} ref={settingRef} />
     </>
   );
 };

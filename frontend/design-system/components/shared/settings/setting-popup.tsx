@@ -4,11 +4,18 @@ import BottomSheetModal from "../bottom-sheet";
 import { Box } from "@/design-system/base/box";
 import SettingContent from "./setting";
 
-const SettingPopup = forwardRef<BottomSheetMethods, object>((_, ref) => {
+// First, define a proper props interface
+interface SettingPopupProps {
+  close: () => void;
+}
+
+// Update the forwardRef type to include your props
+const SettingPopup = forwardRef<BottomSheetMethods, SettingPopupProps>((props, ref) => {
+  const { close } = props;
   return (
     <BottomSheetModal snapPoints={["40%"]} ref={ref}>
       <Box margin="l">
-        <SettingContent />
+        <SettingContent close={close} />
       </Box>
     </BottomSheetModal>
   );

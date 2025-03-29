@@ -15,16 +15,16 @@ export default function Layout() {
         }}
       />
       <Stack.Screen name="edit-sections/name" options={{ headerTransparent: true, title: "", gestureEnabled: false,
-        headerLeft: () => <BackIcon onPress={() => router.navigate("/(app)/(tabs)/profile/edit-profile")} />,
+        headerLeft: () => <BackIcon onPress={() => router.navigate("/(app)/(tabs)/edit-profile")} />,
       }} />
             <Stack.Screen name="edit-sections/bio" options={{ headerTransparent: true, title: "", gestureEnabled: false,
-        headerLeft: () => <BackIcon onPress={() => router.navigate("/(app)/(tabs)/profile/edit-profile")} />,
+        headerLeft: () => <BackIcon onPress={() => router.navigate("/(app)/(tabs)/edit-profile")} />,
       }} />
                   <Stack.Screen name="edit-sections/birthday" options={{ headerTransparent: true, title: "", gestureEnabled: false,
-        headerLeft: () => <BackIcon onPress={() => router.navigate("/(app)/(tabs)/profile/edit-profile")} />,
+        headerLeft: () => <BackIcon onPress={() => router.navigate("/(app)/(tabs)/edit-profile")} />,
       }} />
                   <Stack.Screen name="edit-sections/username" options={{ headerTransparent: true, title: "", gestureEnabled: false,
-        headerLeft: () => <BackIcon onPress={() => router.navigate("/(app)/(tabs)/profile/edit-profile")} />,
+        headerLeft: () => <BackIcon onPress={() => router.navigate("/(app)/(tabs)/edit-profile")} />,
       }} />
     </Stack>
   );
