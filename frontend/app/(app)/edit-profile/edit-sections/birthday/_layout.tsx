@@ -37,7 +37,7 @@ export default function Layout() {
             onChange={(_, date) => setValue("birthday", date!)}
             textColor="black"
             display="spinner"
-            value={new Date()}
+            value={getValues("birthday")}
             mode="date"
           />
         )}
