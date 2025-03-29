@@ -1,6 +1,7 @@
 import { getAllLikeUsers, toggleLike } from "@/api/like";
 import { useMutationBase, useQueryPagination } from "./base";
 import { LikePostUsers } from "@/types/post";
+import { useQueryClient } from "@tanstack/react-query";
 
 /**
  * Hook to toggle the like of a given postId.
@@ -8,7 +9,12 @@ import { LikePostUsers } from "@/types/post";
  * @returns a mutation object for toggling the like.
  */
 export const useToggleLike = (postId: string, groupId: string) => {
-  return useMutationBase<void, void>(() => toggleLike(postId), ["groups", groupId, "feed"]);
+  const queryClient = useQueryClient();
+  return useMutationBase<void, void>(
+    () => toggleLike(postId),
+    ["groups", groupId, "feed"],
+    () => queryClient.invalidateQueries({ queryKey: ["posts", postId, "likes"] }),
+  );
 };
 
 export const useGetAllLikeUsers = (postId: string, limit?: number, page?: number) => {

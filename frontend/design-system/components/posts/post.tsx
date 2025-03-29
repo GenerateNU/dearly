@@ -5,8 +5,8 @@ import { PostHeader } from "./header";
 import { Media } from "@/types/media";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
-import { useCallback, useState } from "react";
-import { useGetAllLikeUsers, useToggleLike } from "@/hooks/api/like";
+import { useToggleLike } from "@/hooks/api/like";
+import { useUserStore } from "@/auth/store";
 
 interface Props {
   onCommentClicked: () => void;
@@ -24,12 +24,13 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
   isLiked,
   comments,
   caption,
+  likes,
   media,
   onLikeClicked,
   onCommentClicked,
   groupId,
 }) => {
-  const [like, setLike] = useState(isLiked);
+  const { group } = useUserStore();
   const data = media
     .filter(
       (item: any): item is Required<Pick<Media, "url">> =>
@@ -37,16 +38,7 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
     )
     .map((item: any) => item.url);
 
-  const { mutate: mutateLike } = useToggleLike(id, groupId);
-  const { data: like_data, refetch } = useGetAllLikeUsers(id);
-
-  const likePost = useCallback(() => {
-    setLike(!like);
-    mutateLike();
-    refetch();
-  }, [mutateLike, refetch]);
-
-  const likes = like_data?.pages?.reduce((total, page) => total + page.length, 0) || 0;
+  const { mutate } = useToggleLike(id, group?.id as string);
 
   return (
     <Box flexDirection="column" gap="s">
@@ -58,11 +50,11 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
         createdAt={createdAt}
         onPress={() => null}
       />
-      <ImageCarousel setLike={likePost} like={like} data={data} />
+      <ImageCarousel setLike={() => mutate()} like={isLiked} data={data} />
       <CommentLike
         onCommentClicked={onCommentClicked}
         onLikeClicked={onLikeClicked}
-        liked={like}
+        liked={isLiked}
         postId={id}
         likes={likes}
         comments={comments}

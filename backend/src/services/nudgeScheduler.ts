@@ -1,4 +1,5 @@
 import {
+  FlexibleTimeWindow,
   CreateScheduleCommandInput,
   CreateScheduleCommand,
   DeleteScheduleCommand,
@@ -76,11 +77,11 @@ export class AWSEventBridgeScheduler implements NudgeSchedulerService {
   private getCronExpression(payload: NudgeSchedulePayload): string {
     const hour = payload.nudgeAt.getHours();
     const min = payload.nudgeAt.getMinutes();
-    const dayOfMonth = payload.day ?? "*";
+    const dayOfMonth = payload.day ?? "?";
     const month = payload.month ?? "*";
-    const dayOfWeek = payload.daysOfWeek?.join() ?? "*";
+    const dayOfWeek = payload.daysOfWeek?.join() ?? (payload.frequency == "MONTHLY" ? "?" : "*");
 
-    const cronExpression = `0 ${min} ${hour} ${dayOfMonth} ${month} ${dayOfWeek} *`;
+    const cronExpression = `cron(${min} ${hour} ${dayOfMonth} ${month} ${dayOfWeek})`;
 
     return cronExpression;
   }
@@ -105,6 +106,11 @@ export class AWSEventBridgeScheduler implements NudgeSchedulerService {
     }
     const lambda_config = getConfigurations().lambdaConfig;
 
+    const FLEXIBLE_TIME_WINDOW: FlexibleTimeWindow = {
+      Mode: "FLEXIBLE",
+      MaximumWindowInMinutes: 5,
+    };
+
     const input = {
       Name: id,
       ScheduleExpression: schedule,
@@ -114,7 +120,7 @@ export class AWSEventBridgeScheduler implements NudgeSchedulerService {
         RoleArn: lambda_config.lambdaRoleARN,
         Input: lambdaInput,
       },
-      FlexibleTimeWindow: undefined,
+      FlexibleTimeWindow: FLEXIBLE_TIME_WINDOW,
     };
     return input;
   }

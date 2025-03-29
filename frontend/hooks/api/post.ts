@@ -1,11 +1,11 @@
 import { Comment, CreatePostPayload, CreateCommentPayload, Post } from "@/types/post";
 import { useMutationBase, useQueryPagination } from "./base";
 import { createPost } from "@/api/post";
-import { useUserStore } from "@/auth/store";
 import { getGroupFeed } from "@/api/group";
 import { getComments } from "@/api/comment";
 import { postComment } from "@/api/comment";
 import { useQueryClient } from "@tanstack/react-query";
+
 /**
  * Hook to create a new post
  *
@@ -18,12 +18,11 @@ export const useCreatePost = (groupId: string) => {
   );
 };
 
-export const useGroupFeed = (options: any = {}) => {
-  const { group } = useUserStore();
+export const useGroupFeed = (id: string, options: any = {}) => {
   return useQueryPagination<Post[]>(
-    ["users", "feed"],  //fix key name to match route
+    ["groups", id, "feed"],
     (page, limit) => {
-      return getGroupFeed(group.id, page, limit) as Promise<Post[]>;
+      return getGroupFeed(id, page, limit) as Promise<Post[]>;
     },
     options,
     10,
@@ -32,7 +31,7 @@ export const useGroupFeed = (options: any = {}) => {
 
 export const useComments = (id: string, options: any = {}) => {
   return useQueryPagination<Comment[]>(
-    [id, "comments"],
+    ["posts", id, "comments"],
     (page, limit) => {
       return getComments(id, page, limit) as Promise<Comment[]>;
     },
@@ -46,13 +45,12 @@ export const useComments = (id: string, options: any = {}) => {
  *
  * @returns Mutation object for creating a post
  */
-export const useCreateComment = (postId: string, groupId:string) => {
+export const useCreateComment = (postId: string, groupId: string) => {
   const queryClient = useQueryClient();
 
-  return useMutationBase<CreateCommentPayload, Comment>(
+  return useMutationBase<CreateCommentPayload, void>(
     (payload) => postComment(postId, payload),
-    [postId, "comments"],
-    () => queryClient.invalidateQueries({ queryKey: ["users", "feed"]})
+    ["posts", postId, "comments"],
+    () => queryClient.invalidateQueries({ queryKey: ["groups", groupId, "feed"] }),
   );
 };
-

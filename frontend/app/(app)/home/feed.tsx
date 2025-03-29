@@ -4,7 +4,7 @@ import { Box } from "@/design-system/base/box";
 import { Post } from "@/types/post";
 import { useGroupFeed } from "@/hooks/api/post";
 import PostSkeleton from "./skeleton";
-import React, { useRef, useState, useEffect, useCallback } from "react";
+import React, { useRef, useState, useCallback, useEffect } from "react";
 import BottomSheet from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheet/BottomSheet";
 import { CommentPopUp } from "@/design-system/components/comments/comment-popup";
 import Input from "@/design-system/components/shared/controls/input";
@@ -13,12 +13,20 @@ import { commentPopUpAttributes } from "@/types/comment";
 import Spinner from "@/design-system/components/shared/spinner";
 import { Animated } from "react-native";
 import { LikePopup } from "@/design-system/components/posts/like-popup";
+import { AnimatedBox } from "@/design-system/base/animated-box";
+import { useUserStore } from "@/auth/store";
+import EmptyDataDisplay from "@/design-system/components/shared/states/empty";
 
 const Feed = () => {
-  const { data, isFetchingNextPage, fetchNextPage, hasNextPage, isLoading } = useGroupFeed();
+  const { group } = useUserStore();
+  const { data, isFetchingNextPage, fetchNextPage, hasNextPage, isLoading, refetch } = useGroupFeed(
+    group?.id as string,
+  );
+
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [scrollY] = useState(new Animated.Value(0));
   const posts = data?.pages.flatMap((page) => page) || [];
+
   const [commentAttributes, setCommentAttributes] = useState<commentPopUpAttributes>({
     commentId: "",
     likes: 0,
@@ -28,13 +36,15 @@ const Feed = () => {
   const likeRef = useRef<BottomSheet>(null);
   const [likePostId, setLikePostId] = useState<string>("");
 
+  useEffect(() => {
+    refetch();
+  }, [group]);
+
   const onEndReached = () => {
     if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
   };
-
-  useEffect(() => {}, [ref.current]);
 
   const onClickComment = (id: string, caption: string, likes: number) => {
     setCommentAttributes({ commentId: id, caption: caption, likes: likes });
@@ -66,6 +76,7 @@ const Feed = () => {
           comments={item.comments}
           caption={item.caption}
           media={item.media}
+          likes={item.likes}
           groupId={item.groupId}
           onLikeClicked={() => onClickLikes(item.id)}
           onCommentClicked={() => onClickComment(item.id, item.caption, item.likes)}
@@ -82,15 +93,23 @@ const Feed = () => {
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => {
+    refetch().finally(() => {
       setRefreshing(false);
-    }, 2000);
-  }, []);
+    });
+  }, [refetch]);
+
+  if (posts.length === 0) {
+    return (
+      <Box flex={1} padding="m">
+        <EmptyDataDisplay />
+      </Box>
+    );
+  }
 
   return (
     <Box>
       {refreshing && (
-        <Animated.View
+        <AnimatedBox
           style={{
             width: "100%",
             position: "absolute",
@@ -104,7 +123,7 @@ const Feed = () => {
           }}
         >
           <Spinner size={25} topOffset={30} />
-        </Animated.View>
+        </AnimatedBox>
       )}
       <Box>
         <FlatList
@@ -115,7 +134,7 @@ const Feed = () => {
           ListFooterComponent={renderFooter}
           onEndReachedThreshold={0.5}
           contentContainerStyle={{
-            paddingBottom: 150,
+            paddingBottom: 200,
             paddingHorizontal: 20,
           }}
           onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {

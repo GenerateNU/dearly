@@ -34,6 +34,9 @@ export interface SupabaseInfo {
 }
 
 export interface LambdaConfig {
+  secretKey: string;
+  publicKey: string;
+  region: string;
   lambdaARN: string;
   lambdaRoleARN: string;
 }

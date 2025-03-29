@@ -1,4 +1,4 @@
-import React, { forwardRef, useRef, useState } from "react";
+import React, { forwardRef, useState } from "react";
 import { Box } from "@/design-system/base/box";
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
@@ -28,11 +28,18 @@ const LikePopUpBlank = () => {
 };
 
 const LikePopUpData: React.FC<LikePopUpDataProps> = ({ postId }) => {
-  const { data: like_data, refetch, isFetchingNextPage } = useGetAllLikeUsers(postId);
-  const likes = like_data?.pages.flatMap((page) => page) || [];
+  const {
+    data: likeData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useGetAllLikeUsers(postId);
+  const likes = likeData?.pages.flatMap((page) => page) || [];
 
   const onEndReached = () => {
-    refetch();
+    if (hasNextPage) {
+      fetchNextPage();
+    }
   };
 
   const renderFooter = () => {
@@ -50,7 +57,6 @@ const LikePopUpData: React.FC<LikePopUpDataProps> = ({ postId }) => {
       profilePhoto={item.profilePhoto ?? null}
       username={item.username ?? ""}
       id={item.id ?? ""}
-      isMember={item.isMember}
     />
   );
 

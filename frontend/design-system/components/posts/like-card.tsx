@@ -4,7 +4,7 @@ import { Text } from "@/design-system/base/text";
 import { Avatar } from "../shared/avatar";
 import { SearchedUser } from "@/types/user";
 
-export const LikeCard: React.FC<Required<SearchedUser>> = ({ name, profilePhoto }) => {
+export const LikeCard: React.FC<SearchedUser> = ({ name, profilePhoto }) => {
   const profile = profilePhoto ? profilePhoto : DEFAULT_PROFILE_PHOTO;
 
   return (

@@ -207,12 +207,14 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
             render={() => (
               <Box>
                 <Dropdown
+                  id="post"
                   value={selectedGroup}
                   setValue={handleGroupUpdate}
                   items={groups}
                   setItems={() => {}}
                   isLoading={isLoading}
                   onEndReached={onEndReached}
+                  placeholder="Group to post to"
                 />
                 {errors.group && (
                   <Text color="error" variant="caption" textAlign="left">

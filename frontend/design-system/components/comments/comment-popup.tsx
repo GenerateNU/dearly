@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef, useState } from "react";
+import React, { forwardRef, useRef, useState } from "react";
 import { CommentCard } from "./comment";
 import { Box } from "@/design-system/base/box";
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
@@ -6,7 +6,7 @@ import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import BottomSheetModal from "../shared/bottom-sheet";
 import { Comment } from "@/types/post";
 import { useComments } from "@/hooks/api/post";
-import { Keyboard, KeyboardAvoidingView, Platform, TextInput } from "react-native";
+import { KeyboardAvoidingView, Platform, TextInput } from "react-native";
 import { CommentInput } from "@/app/(app)/home/comment-input";
 import { CommentSkeleton } from "./comment-skeleton";
 import { Text } from "@/design-system/base/text";
@@ -30,7 +30,7 @@ export const CommentPopUp = forwardRef<BottomSheetMethods, CommentPopUpProps>((p
         snapPoints={["90%"]}
         onChange={(index: number) => setIndex(index)}
       >
-        {props.attributes.commentId == "" ? (
+        {props.attributes.commentId === "" ? (
           <CommentPopUpBlank />
         ) : (
           <CommentPopUpData attributes={props.attributes} index={index} />
@@ -82,7 +82,7 @@ const CommentPopUpData: React.FC<CommentPopUpDataProps> = ({ attributes, index }
   };
 
   const renderItem = ({ item }: { item: Comment }) => (
-    <Box paddingBottom="s">
+    <Box paddingVertical="s">
       <CommentCard
         id={item.id}
         userId={item.userId}

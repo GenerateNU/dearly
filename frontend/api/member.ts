@@ -1,4 +1,4 @@
-import { GroupMembers, Member, MemberPosts, NotificationConfigPayload } from "@/types/group";
+import { GroupMember, Member, MemberPosts, NotificationConfigPayload } from "@/types/group";
 import fetchClient from "./client";
 import { authWrapper, getHeaders } from "@/utilities/auth-token";
 
@@ -36,8 +36,8 @@ export const getAllMembers = async (
   id: string,
   limit?: number,
   page?: number,
-): Promise<GroupMembers> => {
-  const req = async (token: string): Promise<GroupMembers> => {
+): Promise<GroupMember[]> => {
+  const req = async (token: string): Promise<GroupMember[]> => {
     const { data } = await fetchClient.GET("/api/v1/groups/{id}/members", {
       headers: getHeaders(token),
       params: {
@@ -52,7 +52,7 @@ export const getAllMembers = async (
     });
     return data!;
   };
-  return authWrapper<GroupMembers>()(req);
+  return authWrapper<GroupMember[]>()(req);
 };
 
 export const configNotification = async (

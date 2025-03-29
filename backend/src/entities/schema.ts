@@ -202,6 +202,7 @@ export const scheduledNudgesTable = pgTable(
     id: uuid().primaryKey().defaultRandom(),
     groupId: uuid()
       .notNull()
+      .unique()
       .references(() => groupsTable.id, { onDelete: "cascade" }),
     frequency: nudgeFrequencyEnum().notNull().default("WEEKLY"),
     daysOfWeek: dayOfWeekEnum().array(), // MON-SUN

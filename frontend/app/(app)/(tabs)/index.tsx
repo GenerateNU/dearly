@@ -4,8 +4,6 @@ import { useUserGroups } from "@/hooks/api/user";
 import ResourceView from "@/design-system/components/utilities/resource-view";
 import ErrorDisplay from "@/design-system/components/shared/states/error";
 import Spinner from "@/design-system/components/shared/spinner";
-import { useInvitations } from "@/hooks/api/invite";
-import { TextButton } from "@/design-system/components/shared/buttons/text-button";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState } from "react";
 import HomeMenu from "@/design-system/components/home/home-menu";
@@ -24,15 +22,15 @@ const Home = () => {
   };
 
   const SuccessComponent = () => (
-    <Box flexDirection="column" gap="s" >
-      <Box paddingTop = "m" paddingHorizontal="m">
+    <Box flexDirection="column" gap="s">
+      <Box paddingTop="m" paddingHorizontal="m">
         <HomeMenu
           categories={["Feed", "Calendar"]}
           selected={selectedView}
           setSelected={setSelectedView}
         />
       </Box>
-      {selectedView == "Feed" ? <Feed /> : <Calendar />}
+      {selectedView === "Feed" ? <Feed /> : <Calendar />}
     </Box>
   );
 
