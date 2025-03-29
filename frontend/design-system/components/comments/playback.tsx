@@ -42,7 +42,7 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
     isPending: mediaPending,
   } = useProcessAudio();
 
-  const uniqueFilename = `temp-audio-${new Date().getTime()}-${Math.random().toString(36).substring(7)}.mp3`;
+  const uniqueFilename = `temp-audio-${new Date().getTime()}-${Math.random().toString(36).substring(7)}`;
 
   useEffect(() => {
     async function initializeValues() {
@@ -50,6 +50,7 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
         setMemoLines(condenseAudioBarHeights(numLines, dbLevels));
         setLength(audioLength);
         setTotalLength(audioLength);
+        setUri(location)
       } else {
         const downloadResult = await FileSystem.downloadAsync(
           location,
@@ -69,6 +70,8 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
   useEffect(() => {
     return sound
       ? () => {
+          FileSystem.deleteAsync(uri, { idempotent: true })
+          .catch();
           sound.unloadAsync();
         }
       : undefined;
@@ -103,6 +106,7 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
         setLength(statusPlayback.durationMillis! / 1000);
         setStatus({ ...status, playing: false });
       }
+    } else{
     }
   };
   return (
