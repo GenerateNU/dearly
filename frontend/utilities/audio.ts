@@ -28,7 +28,11 @@ export const audioBarHeights = (numLines: number, audioLevels: number[]): number
  * @param audioLevels the audio levels to be represented
  * @returns an array representing the height of the audio levels in the visual representation
  */
-export const condenseAudioBarHeights = (numLines: number, audioLevels: number[], max:number=160): number[] => {
+export const condenseAudioBarHeights = (
+  numLines: number,
+  audioLevels: number[],
+  max: number = 160,
+): number[] => {
   if (audioLevels.length <= numLines) {
     return normalizeLines(audioLevels, 0, audioLevels.length);
   }
@@ -51,7 +55,12 @@ export const condenseAudioBarHeights = (numLines: number, audioLevels: number[],
  * @param end the end number
  * @returns a normalized array of audio levels where each element is between the start and end
  */
-const normalizeLines = (audioLevels: number[], start: number, end: number, max:number = 160): number[] => {
+const normalizeLines = (
+  audioLevels: number[],
+  start: number,
+  end: number,
+  max: number = 160,
+): number[] => {
   const newLines: number[] = [];
   for (let i = start; i < end; i++) {
     const reverseNum = max - Math.abs(audioLevels[i] || 3);
@@ -62,4 +71,3 @@ const normalizeLines = (audioLevels: number[], start: number, end: number, max:n
   }
   return newLines;
 };
-

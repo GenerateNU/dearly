@@ -13,10 +13,9 @@ export const useUploadGroupMedia = (id: string) => {
   );
 };
 
-
 export const useProcessAudio = () => {
   return useMutationBase<processMediaPayload, Waveform>(
     (payload) => processMedia(payload),
     ["media", "processing"],
   );
-}
+};

@@ -19,8 +19,8 @@ import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { groupsTable, membersTable } from "../schema";
 import { eq, and } from "drizzle-orm";
 import ffmpeg, { FfprobeData } from "fluent-ffmpeg";
-import ffmpegPath from 'ffmpeg-static';
-import ffprobePath from 'ffprobe-static';
+import ffmpegPath from "ffmpeg-static";
+import ffprobePath from "ffprobe-static";
 
 ffmpeg.setFfmpegPath(ffmpegPath!);
 ffmpeg.setFfprobePath(ffprobePath.path);
@@ -295,14 +295,14 @@ export class MediaServiceImpl {
 
       ffmpeg.ffprobe(media, (err: Error, metadata: FfprobeData) => {
         if (err) {
-          return reject(new InternalServerError("Failed to Process Audio"))
+          return reject(new InternalServerError("Failed to Process Audio"));
         }
 
         if (!metadata || !metadata.format || !metadata.format.duration) {
           return reject(new InternalServerError("Invalid audio metadata"));
         }
 
-        length = metadata.format.duration
+        length = metadata.format.duration;
         const segments = Math.floor((length * 1000) / interval);
         const dbData: number[] = new Array(segments).fill(0); // Preallocate array
         let completedSegments = 0;
@@ -314,7 +314,7 @@ export class MediaServiceImpl {
             .setDuration(length / 1000)
             .audioFilters("volumedetect")
             .format("null")
-            .output('/dev/null')
+            .output("/dev/null")
             .on("error", () => {
               reject(new InternalServerError("processing audio has failed"));
             })
@@ -331,15 +331,13 @@ export class MediaServiceImpl {
               if (completedSegments === segments) {
                 resolve({
                   length: Math.round(length),
-                  data: dbData
+                  data: dbData,
                 });
               }
             })
             .run();
         }
       });
-
-     
     });
   }
 }

@@ -19,9 +19,10 @@ export default function Layout() {
 
   const onSubmit = async (form: UPDATE_USER_FORM_TYPE) => {
     await uploadUserData(form);
+    router.push("/(app)/edit-profile");
   };
 
-  const { group, userId } = useUserStore();
+  const { userId } = useUserStore();
 
   const { isError, data } = useQuery({
     queryKey: ["api", "v1", "users", userId],
@@ -30,7 +31,7 @@ export default function Layout() {
 
   const { control, handleSubmit, setValue, trigger, getValues } = useForm<UPDATE_USER_FORM_TYPE>({
     resolver: zodResolver(UPDATE_BIO_FORM),
-    defaultValues: { bio: data ? data.bio : "Bio..." },
+    defaultValues: { bio: data ? data.bio! : "Bio..." },
   });
 
   return (
@@ -45,7 +46,7 @@ export default function Layout() {
           <Box width={"100%"}>
             <Input
               paragraph
-              placeholder={data ? data.bio : "Bio..."}
+              placeholder={data ? data.bio! : "Bio..."}
               onChangeText={(str) => {
                 setValue("bio", str);
                 console.log(getValues());
@@ -54,14 +55,7 @@ export default function Layout() {
           </Box>
         )}
       />
-      <TextButton
-        onPress={() => {
-          handleSubmit(onSubmit);
-          router.push("/(app)/edit-profile");
-        }}
-        label="Save"
-        variant="primary"
-      />
+      <TextButton onPress={handleSubmit(onSubmit)} label="Save" variant="primary" />
     </Box>
   );
 }

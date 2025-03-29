@@ -11,7 +11,7 @@ interface Props {
   width?: number;
 }
 
-const Spinner: React.FC<Props> = ({ size = 30, width=100,  topOffset = 50 }) => {
+const Spinner: React.FC<Props> = ({ size = 30, width = 100, topOffset = 50 }) => {
   const animatedValues = useRef(
     Array.from({ length: 12 }).map(() => new Animated.Value(1)),
   ).current;

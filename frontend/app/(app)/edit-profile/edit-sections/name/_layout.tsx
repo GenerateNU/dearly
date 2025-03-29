@@ -18,13 +18,13 @@ export default function Layout() {
 
   const onSubmit = async (form: UPDATE_USER_FORM_TYPE) => {
     const res = await uploadUserData(form);
+    router.push("/(app)/edit-profile");
   };
   const { control, handleSubmit, setValue, trigger, getValues } = useForm<UPDATE_USER_FORM_TYPE>({
     resolver: zodResolver(UPDATE_USER_FORM),
     defaultValues: { name: "" },
   });
 
-  const [text, setText] = useState("");
   return (
     <Box width="100%" paddingTop="xxl" padding="m" flex={1} gap="l" alignItems="center">
       <Box paddingTop="xxl" width="100%" gap="s">
@@ -44,15 +44,7 @@ export default function Layout() {
           />
         )}
       />
-      <TextButton
-        onPress={() => {
-          handleSubmit(onSubmit);
-
-          router.push("/(app)/edit-profile");
-        }}
-        label="Save"
-        variant="primary"
-      />
+      <TextButton onPress={handleSubmit(onSubmit)} label="Save" variant="primary" />
     </Box>
   );
 }

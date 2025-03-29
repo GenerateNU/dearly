@@ -147,11 +147,20 @@ export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
         </Box>
       )}
 
-      {sending ?  <Box width={30} height={30} backgroundColor="honey" borderRadius="xl"><Icon name="send" size={30} />  </Box>:
-      status.done ? (
-        <IconButton variant="icon" onPress={() => 
-          {setSending(true)
-          onSend(attributes.uri)}} icon="send" size={30} />
+      {sending ? (
+        <Box width={30} height={30} backgroundColor="honey" borderRadius="xl">
+          <Icon name="send" size={30} />{" "}
+        </Box>
+      ) : status.done ? (
+        <IconButton
+          variant="icon"
+          onPress={() => {
+            setSending(true);
+            onSend(attributes.uri);
+          }}
+          icon="send"
+          size={30}
+        />
       ) : (
         <IconButton variant="icon" onPress={stopRecording} icon="square-rounded" size={30} />
       )}
