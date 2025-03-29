@@ -8,9 +8,10 @@ import { Animated, ViewStyle, ColorValue } from "react-native";
 interface Props {
   size?: number;
   topOffset?: number;
+  width?: number;
 }
 
-const Spinner: React.FC<Props> = ({ size = 30, topOffset = 50 }) => {
+const Spinner: React.FC<Props> = ({ size = 30, width=100,  topOffset = 50 }) => {
   const animatedValues = useRef(
     Array.from({ length: 12 }).map(() => new Animated.Value(1)),
   ).current;
@@ -49,7 +50,7 @@ const Spinner: React.FC<Props> = ({ size = 30, topOffset = 50 }) => {
   }, []);
 
   return (
-    <Box position="relative" width={100} height={100} alignItems="center" justifyContent="center">
+    <Box position="relative" width={width} height={100} alignItems="center" justifyContent="center">
       {Array.from({ length: 12 }).map((_, i) => {
         // Calculate position for each dot based on its index
         const angle = (i / 12) * 2 * Math.PI;

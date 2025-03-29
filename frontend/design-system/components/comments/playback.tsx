@@ -9,6 +9,7 @@ import { playbackStates } from "@/types/comment";
 import * as FileSystem from "expo-file-system";
 import { useProcessAudio } from "@/hooks/api/media";
 import { Icon } from "../shared/icons/icon";
+import Spinner from "../shared/spinner";
 
 
 interface PlaybackPropsWhenLocal {
@@ -35,11 +36,11 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
   const [memoLines, setMemoLines] = useState<number[]>([]);
   const numLines = 23;
   const [totalLength, setTotalLength] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(false);
   const baseAudio = [3, 3, 3, 20, 30, 40, 50, 50, 50, 50, 90, 80, 70, 10, 10, 10]
   const {
     mutateAsync: processAudio,
     error: mediaError,
+    isPending,
   } = useProcessAudio();
 
   const uniqueFilename = `temp-audio-${new Date().getTime()}-${Math.random().toString(36).substring(7)}`;
@@ -59,7 +60,7 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
         const localUri = downloadResult.uri;
         setUri(localUri);
         const response = await processAudio({url: location});
-        if(mediaError){
+        if(mediaError || isPending){
           setMemoLines(condenseAudioBarHeights(25, baseAudio, 160))
         }
         setLength(response.length)
@@ -110,7 +111,6 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
         setStatus({ ...status, playing: false });
       }
     } else{
-      setLoading(true)
     }
   };
   return (
@@ -151,7 +151,6 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
           ></Box>
         ))}
       </Box>
-      {loading && <Icon  name="loading" size={20} /> }
     </Box>
   );
 };

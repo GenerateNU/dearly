@@ -11,6 +11,11 @@ import { CommentInput } from "@/app/(app)/home/comment-input";
 import { CommentSkeleton } from "./comment-skeleton";
 import { Text } from "@/design-system/base/text";
 import { commentPopUpAttributes } from "@/types/comment";
+import { SafeAreaView } from "react-native-safe-area-context";
+import ResourceView from "../utilities/resource-view";
+import Spinner from "../shared/spinner";
+import ErrorDisplay from "../shared/states/error";
+import { EmptyCommentDisplay } from "./empty-comments";
 
 interface CommentPopUpProps {
   attributes: commentPopUpAttributes;
@@ -64,7 +69,7 @@ const CommentPopUpBlank = () => {
 const CommentPopUpData: React.FC<CommentPopUpDataProps> = ({ attributes, index }) => {
   const ref = useRef<TextInput>(null);
   ref.current?.focus();
-  const { data, isFetchingNextPage, fetchNextPage, hasNextPage } = useComments(
+  const { data, isFetchingNextPage, fetchNextPage, hasNextPage, isLoading, error, refetch} = useComments(
     attributes.commentId,
   );
   const comments = data?.pages.flatMap((page) => page) || [];
@@ -75,7 +80,6 @@ const CommentPopUpData: React.FC<CommentPopUpDataProps> = ({ attributes, index }
     }
   };
 
-  // TODO: add notification when all posts are seen
   const renderFooter = () => {
     if (!isFetchingNextPage) return null;
     return <CommentSkeleton />;
@@ -96,8 +100,16 @@ const CommentPopUpData: React.FC<CommentPopUpDataProps> = ({ attributes, index }
     </Box>
   );
 
-  return (
-    <Box position="relative" paddingHorizontal="m" height={"100%"} width={"100%"}>
+
+  const commentResources = {
+    data: comments,
+    loading: isLoading,
+    error: error ? error.message : null,
+  }
+
+  const SuccessComponent = () => {
+    return (
+      <Box position="relative" paddingHorizontal="m" height={"100%"} width={"100%"}>
       <Box flexDirection="column" gap="s">
         <Box flexDirection="row" gap="s" alignItems="center">
           <Text>💬</Text>
@@ -124,6 +136,21 @@ const CommentPopUpData: React.FC<CommentPopUpDataProps> = ({ attributes, index }
         style={{ flex: 1 }}
       />
     </Box>
+    )
+  }
+
+  return (
+    <SafeAreaView edges={["top"]} className="flex-1">
+      <Box>
+        <ResourceView
+          resourceState={commentResources}
+          loadingComponent={<Spinner />}
+          errorComponent={<ErrorDisplay refresh={refetch} />}
+          emptyComponent={<EmptyCommentDisplay caption={attributes.caption}/>}
+          successComponent={<SuccessComponent />}
+        />
+      </Box>
+    </SafeAreaView>
   );
 };
 
