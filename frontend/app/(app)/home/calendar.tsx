@@ -46,7 +46,9 @@ const Calendar: React.FC = () => {
       onSelectYear: (year: number) => void;
     }) => (
       <TouchableOpacity onPress={() => onSelectYear(item)} style={styles.yearItemContainer}>
-        <Text variant="bodyBold">{item}</Text>
+        <Text variant="bodyBold" color={selectedYear === item ? "honey" : "ink"}>
+          {item}
+        </Text>
       </TouchableOpacity>
     ),
   );
@@ -296,20 +298,19 @@ const Calendar: React.FC = () => {
     );
   }
 
+  const LoadingComponent = () => (
+    <Box padding="s" alignItems="center">
+      <Spinner />
+    </Box>
+  );
+
   return (
     <Box paddingBottom="xl" marginBottom="xl">
       {isLoading && calendarData?.length === 0 ? (
-        <Box flex={1} justifyContent="center" alignItems="center">
-          <Spinner />
-        </Box>
+        <LoadingComponent />
       ) : (
         <>
-          {isFetchingFuture && (
-            <Box padding="s" alignItems="center">
-              <Spinner />
-            </Box>
-          )}
-
+          {isFetchingFuture && <LoadingComponent />}
           <CalendarList
             pastScrollRange={50}
             futureScrollRange={getFutureScrollRange()}
@@ -329,12 +330,7 @@ const Calendar: React.FC = () => {
             hideExtraDays={true}
             onDayPress={handleDayPress}
           />
-
-          {isFetchingPrevious && (
-            <Box padding="s" alignItems="center">
-              <Spinner />
-            </Box>
-          )}
+          {isFetchingPrevious && <LoadingComponent />}
         </>
       )}
     </Box>
