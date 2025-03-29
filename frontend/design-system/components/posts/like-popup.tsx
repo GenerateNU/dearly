@@ -8,6 +8,7 @@ import { LikeCard } from "./like-card";
 import { CommentSkeleton } from "../comments/comment-skeleton";
 import { SearchedUser } from "@/types/user";
 import { useGetAllLikeUsers } from "@/hooks/api/like";
+import { LikeSkeleton } from "./like-skeleton";
 
 interface LikePopUpDataProps {
   postId: string;
@@ -45,7 +46,7 @@ const LikePopUpData: React.FC<LikePopUpDataProps> = ({ postId }) => {
     if (!isFetchingNextPage) return null;
     return (
       <Box padding="m" alignItems="center">
-        <CommentSkeleton />
+        <LikeSkeleton />
       </Box>
     );
   };
