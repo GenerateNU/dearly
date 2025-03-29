@@ -24,6 +24,7 @@
       "adaptiveIcon": {
         "backgroundColor": "#ffffff"
       },
+      "softwareKeyboardLayoutMode": "pan",
       "package": "com.generate.dearly",
       "permissions": [
         "android.permission.CAMERA",

@@ -1,6 +1,6 @@
 import { authWrapper, getHeaders } from "@/utilities/auth-token";
 import fetchClient from "./client";
-import { CreateCommentPayload } from "@/types/post";
+import { Comment, CreateCommentPayload } from "@/types/post";
 
 export const toggleLikeComment = async (id: string): Promise<void> => {
   const req = async (token: string): Promise<void> => {
@@ -16,9 +16,13 @@ export const toggleLikeComment = async (id: string): Promise<void> => {
   return authWrapper<void>()(req);
 };
 
-export const getComments = async (id: string, limit?: number, page?: number): Promise<void> => {
-  const req = async (token: string): Promise<void> => {
-    await fetchClient.GET("/api/v1/posts/{id}/comments", {
+export const getComments = async (
+  id: string,
+  limit?: number,
+  page?: number,
+): Promise<Comment[]> => {
+  const req = async (token: string): Promise<Comment[]> => {
+    const { data } = await fetchClient.GET("/api/v1/posts/{id}/comments", {
       headers: getHeaders(token),
       params: {
         path: {
@@ -30,8 +34,9 @@ export const getComments = async (id: string, limit?: number, page?: number): Pr
         },
       },
     });
+    return data!;
   };
-  return authWrapper<void>()(req);
+  return authWrapper<Comment[]>()(req);
 };
 
 export const postComment = async (id: string, payload: CreateCommentPayload): Promise<void> => {

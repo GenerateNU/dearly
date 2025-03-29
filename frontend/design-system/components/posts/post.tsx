@@ -5,7 +5,8 @@ import { PostHeader } from "./header";
 import { Media } from "@/types/media";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
-import { useState } from "react";
+import { useToggleLike } from "@/hooks/api/like";
+import { useUserStore } from "@/auth/store";
 
 interface Props {
   onCommentClicked: () => void;
@@ -22,19 +23,22 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
   location,
   isLiked,
   comments,
-  likes,
   caption,
+  likes,
   media,
-  onCommentClicked,
   onLikeClicked,
+  onCommentClicked,
+  groupId,
 }) => {
-  const [like, setLike] = useState(isLiked);
+  const { group } = useUserStore();
   const data = media
     .filter(
-      (item): item is Required<Pick<Media, "url">> =>
+      (item: any): item is Required<Pick<Media, "url">> =>
         typeof item.url === "string" && item.url !== "",
     )
-    .map((item) => item.url);
+    .map((item: any) => item.url);
+
+  const { mutate } = useToggleLike(id, group?.id as string);
 
   return (
     <Box flexDirection="column" gap="s">
@@ -46,22 +50,18 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
         createdAt={createdAt}
         onPress={() => null}
       />
-      <ImageCarousel setLike={() => setLike(!like)} like={like} data={data} />
+      <ImageCarousel setLike={() => mutate()} like={isLiked} data={data} />
       <CommentLike
         onCommentClicked={onCommentClicked}
         onLikeClicked={onLikeClicked}
-        liked={like}
+        liked={isLiked}
         postId={id}
         likes={likes}
         comments={comments}
       />
-      <Box gap="s" flexDirection="row" justifyContent="flex-start" alignItems="flex-start">
-        <Box>
-          <Text>💬</Text>
-        </Box>
-        <Box width="90%">
-          <Text>{caption}</Text>
-        </Box>
+      <Box gap="s" flexDirection="row" justifyContent="flex-start" alignItems="center">
+        <Text>💬</Text>
+        <Text>{caption}</Text>
       </Box>
     </Box>
   );

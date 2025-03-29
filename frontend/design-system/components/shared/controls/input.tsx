@@ -25,6 +25,8 @@ type TextboxProps = {
   rightIcon?: ReactNode;
   onPress?: () => void;
   isButton?: boolean;
+  onPressIn?: () => void;
+  onPressOut?: () => void;
 } & BoxProps<Theme>;
 
 const BaseTextInput = createBox<Theme, TextboxProps & TextInputProps>(TextInput);
@@ -46,6 +48,8 @@ const Input: React.FC<TextboxProps> = ({
   onBlur,
   onPress,
   isButton = false,
+  onPressIn,
+  onPressOut,
 }) => {
   const theme = useTheme<Theme>();
 
@@ -84,12 +88,14 @@ const Input: React.FC<TextboxProps> = ({
                 </Text>
               ) : (
                 <BaseTextInput
+                  onPressOut={onPressOut}
+                  onPressIn={onPressIn}
                   placeholder={placeholder}
                   autoFocus={autoFocus}
                   onBlur={onBlur}
                   readOnly={readOnly}
                   inputMode={inputMode}
-                  placeholderTextColor="#D3D3D3"
+                  placeholderTextColor="#5B4E4C"
                   onChangeText={onChangeText}
                   value={value}
                   maxLength={maxLength}

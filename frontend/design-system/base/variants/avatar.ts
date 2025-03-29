@@ -11,4 +11,7 @@ export const avatarVariants = {
   small: {
     size: 70,
   },
+  xsmall: {
+    size: 30,
+  },
 };

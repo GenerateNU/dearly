@@ -9,12 +9,13 @@ interface BottomSheetModalProps {
   initialIndex?: number;
   onClose?: () => void;
   scrollEnabled?: boolean;
+  onChange?: (index: number) => void;
 }
 
 type Ref = BottomSheetMethods;
 
 const BottomSheetModal = forwardRef<Ref, BottomSheetModalProps>(
-  ({ children, snapPoints = ["50%", "95%"], initialIndex = -1, onClose }, ref) => {
+  ({ onChange, children, snapPoints = ["50%", "95%"], initialIndex = -1, onClose }, ref) => {
     const renderBackdrop = useCallback(
       (props: any) => <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} />,
       [],
@@ -29,6 +30,7 @@ const BottomSheetModal = forwardRef<Ref, BottomSheetModalProps>(
 
     return (
       <BottomSheet
+        onChange={onChange}
         ref={ref}
         index={initialIndex}
         snapPoints={snapPoints}

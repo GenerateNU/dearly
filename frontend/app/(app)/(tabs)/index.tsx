@@ -5,11 +5,15 @@ import ResourceView from "@/design-system/components/utilities/resource-view";
 import ErrorDisplay from "@/design-system/components/shared/states/error";
 import Spinner from "@/design-system/components/shared/spinner";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Text } from "@/design-system/base/text";
+import { useState } from "react";
+import HomeMenu from "@/design-system/components/home/home-menu";
+import Feed from "../home/feed";
+import Calendar from "../home/calendar";
 
 const Home = () => {
   const { data, isLoading, error, refetch } = useUserGroups();
   const groups = data?.pages.flatMap((page) => page) || [];
+  const [selectedView, setSelectedView] = useState<string>("Feed");
 
   const groupsResource = {
     data: groups,
@@ -17,10 +21,22 @@ const Home = () => {
     error: error ? error.message : null,
   };
 
+  const SuccessComponent = () => (
+    <Box flexDirection="column" gap="s">
+      <Box paddingTop="m" paddingHorizontal="m">
+        <HomeMenu
+          categories={["Feed", "Calendar"]}
+          selected={selectedView}
+          setSelected={setSelectedView}
+        />
+      </Box>
+      {selectedView === "Feed" ? <Feed /> : <Calendar />}
+    </Box>
+  );
+
   return (
-    <SafeAreaView className="flex-1 pt-[35%]">
+    <SafeAreaView edges={["top"]} className="flex-1 pt-[35%]">
       <Box
-        padding="m"
         gap="xl"
         alignItems="center"
         justifyContent="flex-start"
@@ -32,7 +48,7 @@ const Home = () => {
           loadingComponent={<Spinner />}
           errorComponent={<ErrorDisplay refresh={refetch} />}
           emptyComponent={<EmptyHomePage />}
-          successComponent={<Text>Home Feed</Text>}
+          successComponent={<SuccessComponent />}
         />
       </Box>
     </SafeAreaView>

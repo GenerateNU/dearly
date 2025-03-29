@@ -14,3 +14,8 @@ export type MediaResponse = {
   objectKey: string;
   type: MediaType;
 };
+
+export type WaveForm = {
+  length: number;
+  data: number[];
+};
