@@ -1,10 +1,11 @@
 import { Comment, CreatePostPayload, CreateCommentPayload, Post } from "@/types/post";
 import { useMutationBase, useQueryPagination } from "./base";
 import { createPost } from "@/api/post";
-import { getGroupFeed } from "@/api/group";
 import { getComments } from "@/api/comment";
 import { postComment } from "@/api/comment";
 import { useQueryClient } from "@tanstack/react-query";
+import { getGroupFeed } from "@/api/group";
+import { getMemberPosts } from "@/api/member";
 
 /**
  * Hook to create a new post
@@ -30,10 +31,16 @@ export const useGroupFeed = (id: string, date?: string, options: any = {}) => {
 };
 
 export const useComments = (id: string, options: any = {}) => {
-  return useQueryPagination<Comment[]>(
-    ["posts", id, "comments"],
+  return useQueryPagination<Comment[]>(["posts", id, "comments"], (page, limit) => {
+    return getComments(id, page, limit) as Promise<Comment[]>;
+  });
+};
+
+export const useMemberPost = (id: string, userId: string, options: any = {}) => {
+  return useQueryPagination<Post[]>(
+    ["groups", id, "members", userId, "posts"],
     (page, limit) => {
-      return getComments(id, page, limit) as Promise<Comment[]>;
+      return getMemberPosts(id, userId, limit, page);
     },
     options,
     10,

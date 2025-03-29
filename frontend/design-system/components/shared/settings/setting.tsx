@@ -5,7 +5,11 @@ import { useUserStore } from "@/auth/store";
 import RedTextButton from "../buttons/red-text-button";
 import { useIsBasicMode } from "@/hooks/component/mode";
 
-const SettingContent = () => {
+interface SettingContentProps {
+  close: () => void;
+}
+
+const SettingContent = ({ close }: SettingContentProps) => {
   const { group } = useUserStore();
   const isBasic = useIsBasicMode();
 
@@ -15,13 +19,19 @@ const SettingContent = () => {
         <Box gap="s">
           <TextButton
             textVariant="bodyLargeBold"
-            onPress={() => null} // TODO: add route here
+            onPress={() => {
+              close();
+              router.push("/(app)/edit-profile");
+            }}
             label="Edit Profile"
             variant="text"
           />
           <TextButton
             textVariant="bodyLargeBold"
-            onPress={() => router.push("/(app)/notification/config")}
+            onPress={() => {
+              close();
+              router.push("/(app)/notification/config");
+            }}
             label="Notifications"
             variant="text"
           />
@@ -33,7 +43,10 @@ const SettingContent = () => {
           />
           <TextButton
             textVariant="bodyLargeBold"
-            onPress={() => router.push("/(app)/group/member")}
+            onPress={() => {
+              close();
+              router.push("/(app)/group/member");
+            }}
             label="View Group"
             variant="text"
           />

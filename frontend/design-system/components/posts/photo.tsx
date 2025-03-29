@@ -1,12 +1,14 @@
 import { Box } from "@/design-system/base/box";
 import { Image, TouchableOpacity } from "react-native";
 import { useState, useEffect } from "react";
+import { GestureResponderEvent } from "react-native/Libraries/Types/CoreEventTypes";
 
 interface PhotoProps {
   image: string;
+  onPress?: ((event: GestureResponderEvent) => void) | undefined;
 }
 
-export const Photo: React.FC<PhotoProps> = ({ image }) => {
+export const Photo: React.FC<PhotoProps> = ({ image, onPress }) => {
   const [aspectRatio, setAspectRatio] = useState<number | null>(null);
 
   useEffect(() => {
@@ -26,7 +28,7 @@ export const Photo: React.FC<PhotoProps> = ({ image }) => {
   }, [image]);
 
   return (
-    <TouchableOpacity activeOpacity={0.7}>
+    <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
       <Box
         width="100%"
         style={{

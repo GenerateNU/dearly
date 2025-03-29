@@ -102,7 +102,7 @@ const Layout = () => {
           options={{
             title: "",
             headerShown: true,
-            headerTransparent: true,
+            headerTransparent: false,
             tabBarIcon: ({ focused }) => {
               return (
                 <Box width={80}>
@@ -118,6 +118,7 @@ const Layout = () => {
             },
             headerStyle: {
               height: 100,
+              backgroundColor: "pearl",
             },
             headerLeft: () => (
               <Box paddingLeft="m">
@@ -125,7 +126,7 @@ const Layout = () => {
               </Box>
             ),
             headerRight: () => (
-              <Box paddingRight="m">
+              <Box paddingRight="m" backgroundColor="pearl" borderRadius="m" padding="xs">
                 <Setting onPress={onSettingPressed} />
               </Box>
             ),
@@ -133,7 +134,7 @@ const Layout = () => {
         />
       </Tabs>
       <SwitchGroupBottomSheet ref={switchGroupRef} />
-      <SettingPopup ref={settingRef} />
+      <SettingPopup close={() => settingRef.current?.close()} ref={settingRef} />
     </>
   );
 };
