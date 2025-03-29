@@ -22,7 +22,7 @@ export default function Layout() {
 
       />
       <TextButton
-        onPress={() => router.push("/(app)/(tabs)/profile/edit-profile")}
+        onPress={() => router.push("/(app)/edit-profile")}
         label="Save"
         variant="primary"
       />

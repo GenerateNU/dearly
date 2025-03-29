@@ -21,7 +21,7 @@ export default function Layout() {
         onChangeText={setText}
       />
       <TextButton
-        onPress={() => router.push("/(app)/(tabs)/profile/edit-profile")}
+        onPress={() => router.push("/(app)/edit-profile")}
         label="Save"
         variant="primary"
       />

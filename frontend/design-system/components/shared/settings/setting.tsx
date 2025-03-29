@@ -20,7 +20,7 @@ const SettingContent = ({ close }: SettingContentProps) => {
             textVariant="bodyLargeBold"
             onPress={() => {
               close();
-              router.push("/(app)/(tabs)/profile/edit-profile");
+              router.push("/(app)/edit-profile");
             }}
             label="Edit Profile"
             variant="text"

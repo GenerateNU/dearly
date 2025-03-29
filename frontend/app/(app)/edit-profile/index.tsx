@@ -202,7 +202,7 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
             <BaseButton
               variant="text"
               onPress={() => {
-                router.push("/(app)/(tabs)/profile/edit-profile/edit-sections/name");
+                router.push("/(app)/edit-profile/edit-sections/name");
               }}
             >
               <Controller
@@ -211,7 +211,7 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
                 render={({ field: { onChange, value } }) => (
                   <Input
                     onPress={() => {
-                      router.push("/(app)/(tabs)/profile/edit-profile/edit-sections/name");
+                      router.push("/(app)/edit-profile/edit-sections/name");
                     }}
                     isButton={true}
                     onChangeText={(text: string) => {
@@ -231,7 +231,7 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
             <BaseButton
               variant="text"
               onPress={() => {
-                router.push("/(app)/(tabs)/profile/edit-profile/edit-sections/username");
+                router.push("/(app)/edit-profile/edit-sections/username");
               }}
             >
               <Controller
@@ -240,7 +240,7 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
                 render={({ field: { onChange, value } }) => (
                   <Input
                     onPress={() => {
-                      router.push("/(app)/(tabs)/profile/edit-profile/edit-sections/username");
+                      router.push("/(app)/edit-profile/edit-sections/username");
                     }}
                     isButton={true}
                     onChangeText={(text: string) => {
@@ -260,7 +260,7 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
             <BaseButton
               variant="text"
               onPress={() => {
-                router.push("/(app)/(tabs)/profile/edit-profile/edit-sections/bio");
+                router.push("/(app)/edit-profile/edit-sections/bio");
               }}
             >
               <Controller
@@ -270,7 +270,7 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
                   <Input
                     paragraph={true}
                     onPress={() => {
-                      router.push("/(app)/(tabs)/profile/edit-profile/edit-sections/bio");
+                      router.push("/(app)/edit-profile/edit-sections/bio");
                     }}
                     isButton={true}
                     value={value}
@@ -286,7 +286,7 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
             <BaseButton
               variant="text"
               onPress={() => {
-                router.push("/(app)/(tabs)/profile/edit-profile/edit-sections/birthday");
+                router.push("/(app)/edit-profile/edit-sections/birthday");
               }}
             >
               <Controller
@@ -295,7 +295,7 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
                 render={({ field: { onChange, value } }) => (
                   <Input
                     onPress={() => {
-                      router.push("/(app)/(tabs)/profile/edit-profile/edit-sections/birthday");
+                      router.push("/(app)/edit-profile/edit-sections/birthday");
                     }}
                     isButton={true}
                     value={value}
