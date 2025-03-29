@@ -9,6 +9,11 @@ import { CommentSkeleton } from "../comments/comment-skeleton";
 import { SearchedUser } from "@/types/user";
 import { useGetAllLikeUsers } from "@/hooks/api/like";
 import { LikeSkeleton } from "./like-skeleton";
+import { SafeAreaView } from "react-native-safe-area-context";
+import ResourceView from "../utilities/resource-view";
+import Spinner from "../shared/spinner";
+import ErrorDisplay from "../shared/states/error";
+import { EmptyLikesDisplay } from "./empty-likes";
 
 interface LikePopUpDataProps {
   postId: string;
@@ -33,6 +38,9 @@ const LikePopUpData: React.FC<LikePopUpDataProps> = ({ postId }) => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    isLoading,
+    error,
+    refetch
   } = useGetAllLikeUsers(postId);
   const likes = likeData?.pages.flatMap((page) => page) || [];
 
@@ -41,6 +49,12 @@ const LikePopUpData: React.FC<LikePopUpDataProps> = ({ postId }) => {
       fetchNextPage();
     }
   };
+
+  const likeResources = {
+    data: likes,
+    loading: isLoading,
+    error:  error ? error.message : null
+  }
 
   const renderFooter = () => {
     if (!isFetchingNextPage) return null;
@@ -60,8 +74,9 @@ const LikePopUpData: React.FC<LikePopUpDataProps> = ({ postId }) => {
     />
   );
 
-  return (
-    <Box position="relative" paddingHorizontal="m" height={"100%"} width={"100%"}>
+  const SuccessComponent = () => {
+    return (
+      <Box position="relative" paddingHorizontal="m" height={"100%"} width={"100%"}>
       <Box flexDirection="column" gap="s">
         <Box flexDirection="row" gap="s" alignItems="center">
           <Text variant="bodyLargeBold">
@@ -84,6 +99,19 @@ const LikePopUpData: React.FC<LikePopUpDataProps> = ({ postId }) => {
         style={{ flex: 1 }}
       />
     </Box>
+    )
+  }
+
+  return (
+    <SafeAreaView edges={["top"]} className="flex-1">
+      <ResourceView
+        resourceState={likeResources}
+        loadingComponent={<Spinner />}
+        errorComponent={<ErrorDisplay refresh={refetch} />}
+        emptyComponent={<EmptyLikesDisplay/>}
+        successComponent={<SuccessComponent />}
+      />
+  </SafeAreaView>
   );
 };
 
