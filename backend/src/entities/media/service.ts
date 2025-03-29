@@ -290,6 +290,7 @@ export class MediaServiceImpl {
   }
 
   getDBData(media: string, interval = 500): Promise<WaveForm> {
+    console.log("got to service layer")
     return new Promise((resolve, reject) => {
       const dbData: number[] = [];
       let length = 0;

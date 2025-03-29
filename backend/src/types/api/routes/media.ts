@@ -13,6 +13,6 @@ export type USER_MEDIA = TypedResponse<
 >;
 
 export type WAVEFORM = TypedResponse<
-  | paths["/media/processing"]["post"]["responses"]["201"]["content"]["application/json"]
+  | paths["/media/processing/{url}"]["get"]["responses"]["201"]["content"]["application/json"]
   | API_ERROR
 >;

@@ -62,7 +62,6 @@ const Feed = () => {
   };
 
   const renderItem = ({ item }: { item: Post }) => {
-    console.log(item.profilePhoto)
     return (
       <Box paddingBottom="m" gap="s">
         <ImagePost

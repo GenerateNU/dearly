@@ -70,14 +70,12 @@ const normalizeLines = (audioLevels: number[], start: number, end: number): numb
  */
 export const getDBLevels = (data: Float32Array): number[] => {
   const dbLevels: number[] = [];
-  dbLevels.forEach((amplitude) => {
-    if ((amplitude = 0)) {
-      dbLevels.push(0);
-    } else if (amplitude < 0.000000001) {
-      dbLevels.push(20 * Math.log10(Math.abs(0.000000001)));
-    } else {
-      dbLevels.push(20 * Math.log10(Math.abs(amplitude)));
-    }
+  dbLevels.forEach((num) => {
+    const reverseNum = 70 - Math.abs(num || 3);
+    const squaredNum = Math.pow(reverseNum, 2);
+    let scaledNum = (squaredNum / 4900) * 25;
+    scaledNum = scaledNum > 3 ? scaledNum : 3;
+    dbLevels.push(scaledNum)
   });
   return condenseAudioBarHeights(25, dbLevels);
 };

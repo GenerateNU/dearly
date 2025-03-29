@@ -4,9 +4,11 @@ import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { IconButton } from "../shared/buttons/icon-button";
 import { formatSeconds } from "@/utilities/time";
-import { condenseAudioBarHeights } from "@/utilities/audio";
+import { condenseAudioBarHeights, getDBLevels } from "@/utilities/audio";
 import { playbackStates } from "@/types/comment";
 import * as FileSystem from "expo-file-system";
+import { useProcessAudio } from "@/hooks/api/media";
+import { Waveform } from "@/types/media";
 
 interface PlaybackPropsWhenLocal {
   local: true; // is the audio message being stored locally or in s3
@@ -32,6 +34,13 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
   const [memoLines, setMemoLines] = useState<number[]>([]);
   const numLines = 23;
   const [totalLength, setTotalLength] = useState<number>(0);
+  
+  const {
+    mutateAsync: processAudio,
+    error: mediaError,
+    isError: isMediaError,
+    isPending: mediaPending,
+  } = useProcessAudio();
 
   useEffect(() => {
     async function initializeValues() {
@@ -40,21 +49,23 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
         setLength(audioLength);
         setTotalLength(audioLength);
       } else {
+        console.log("Hellooooo")
         const downloadResult = await FileSystem.downloadAsync(
           location,
           FileSystem.documentDirectory + "temp-audio.mp3",
         );
 
+        console.log("hi")
         const localUri = downloadResult.uri;
         setUri(localUri);
 
-        /* Code that break (Web Worker)
-        const response = await fetch(location); // initally fetch the mp3 file
-        const arrayBuffer = await response.arrayBuffer(); // convert to array buffer
-        const uint8Array = new Uint8Array(arrayBuffer); // convert to unit8Array
-        const audioBuffer = await decoders.mp3(uint8Array); // get AudioBuffer format
-        const channelData = audioBuffer.getChannelData(0); // get the channel data which is the amplitude
-        */
+        console.log("hey 2")
+        const response = await processAudio({url: location});
+        console.log("hey 4")
+        setLength(response.length)==
+        setTotalLength(response.length)
+        setMemoLines(getDBLevels(response.data))
+        console.log(memoLines)
       }
     }
     initializeValues();
