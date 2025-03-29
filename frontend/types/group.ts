@@ -9,6 +9,11 @@ export enum GroupAction {
   CREATE = "Create Group",
 }
 
+export type CalendarDay = {
+  day: number;
+  url: string;
+};
+
 export type NotificationConfigPayload =
   paths["/api/v1/groups/{id}/members/notifications"]["patch"]["requestBody"]["content"]["application/json"];
 

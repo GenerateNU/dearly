@@ -1,14 +1,3 @@
-const isValidDateData = (date: any): date is DateData => {
-  return (
-    date !== undefined &&
-    date !== null &&
-    typeof date === "object" &&
-    "dateString" in date &&
-    typeof date.dateString === "string" &&
-    "day" in date &&
-    typeof date.day === "number"
-  );
-};
 import React, { useState, useRef, useEffect, useCallback, memo, useMemo } from "react";
 import { useUserStore } from "@/auth/store";
 import { Box } from "@/design-system/base/box";
@@ -20,11 +9,14 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
-  View,
   ListRenderItem,
+  ActivityIndicator,
+  View,
 } from "react-native";
 import { Icon } from "@/design-system/components/shared/icons/icon";
 import { BackIcon } from "@/design-system/components/shared/icons/back-icon";
+import { getMonthScrollRange, isSameDate, isValidDateData } from "@/utilities/time";
+import { CalendarDay } from "@/types/group";
 
 type ViewMode = "month" | "week" | "year";
 
@@ -33,95 +25,123 @@ interface DayComponentProps {
   state?: string;
   onPress?: (date: DateData) => void;
   selected?: boolean;
+  image?: string;
 }
 
-interface WeekData {
-  firstDay: string;
-  lastDay: string;
-}
-
-// Memoize the CustomDayComponent to prevent unnecessary re-renders
-const CustomDayComponent = memo(({ date, state, onPress, selected }: DayComponentProps) => {
-  // Make sure date is a valid DateData object
+const CustomDayComponent = memo(({ date, state, onPress, selected, image }: DayComponentProps) => {
   if (!date || typeof date !== "object" || !date.dateString) {
-    return null; // Return null if date is invalid
+    return null;
   }
+
+  if (image) {
+    return (
+      <TouchableOpacity
+        onPress={() => onPress && onPress(date)}
+        activeOpacity={0.7}
+        style={styles.dayComponentWrapper}
+      >
+        <ImageBackground
+          source={{ uri: image }}
+          style={[
+            styles.dayContainer,
+            state === "today" && styles.todayContainer,
+            selected && styles.selectedContainer,
+          ]}
+          imageStyle={styles.imageBackground}
+        >
+          <Text color="ink" variant="caption" style={selected && styles.selectedDayText}>
+            {date.day}
+          </Text>
+        </ImageBackground>
+      </TouchableOpacity>
+    );
+  }
+
   return (
     <TouchableOpacity
       onPress={() => onPress && onPress(date)}
       activeOpacity={0.7}
       style={styles.dayComponentWrapper}
     >
-      <ImageBackground
-        source={{
-          uri: "https://assets.wwf.org.au/image/upload/c_fill,g_auto,w_1400/f_auto/q_auto/v1/website-media/news-blogs/quokka?q=75",
-        }}
+      <View
         style={[
           styles.dayContainer,
           state === "today" && styles.todayContainer,
           selected && styles.selectedContainer,
         ]}
-        imageStyle={styles.imageBackground}
       >
         <Text color="ink" variant="caption" style={selected && styles.selectedDayText}>
           {date.day}
         </Text>
-      </ImageBackground>
+      </View>
     </TouchableOpacity>
   );
 });
 
-// Separate the YearItem component to improve FlatList performance
-const YearItem = memo(
-  ({
-    item,
-    selectedYear,
-    onSelectYear,
-  }: {
-    item: number;
-    selectedYear: number;
-    onSelectYear: (year: number) => void;
-  }) => (
-    <TouchableOpacity onPress={() => onSelectYear(item)} style={styles.yearItemContainer}>
-      <Text
-        variant="bodyBold"
-        style={[styles.yearText, item === selectedYear && styles.selectedYearText]}
-      >
-        {item}
-      </Text>
-    </TouchableOpacity>
-  ),
-);
-
-interface DayProps {
-  date?: DateData;
-  state?: string;
-  marking?: any;
-  markingType?: string;
-  onPress?: (date: DateData) => void;
-  onLongPress?: (date: DateData) => void;
-}
-
-const isSameDate = (date1: DateData | string | undefined, date2: string | undefined): boolean => {
-  if (!date1 || !date2) return false;
-
-  const d1 = typeof date1 === "string" ? date1 : date1.dateString;
-  const d2 = typeof date2 === "string" ? date2 : date2;
-
-  return d1 === d2;
-};
-
 const Calendar: React.FC = () => {
   const { group } = useUserStore();
-  const { data, isLoading } = useGroupCalendar(group?.id || "", new Date(), 3);
-  const [viewMode, setViewMode] = useState<ViewMode>("month");
-  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
-
   const today = new Date();
   const todayString = today.toISOString().split("T")[0];
   const [selectedDate, setSelectedDate] = useState<string | undefined>(todayString);
   const [formattedDate, setFormattedDate] = useState<string>("");
+  const [viewMode, setViewMode] = useState<ViewMode>("month");
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+  const [currentPivot, setCurrentPivot] = useState<Date>(today);
 
+  const {
+    data: calendarData,
+    isLoading,
+    error,
+    fetchPreviousMonths,
+    fetchFutureMonths,
+    isFetchingPrevious,
+    isFetchingFuture,
+  } = useGroupCalendar(group?.id || "", currentPivot, 3);
+  console.log(JSON.stringify(calendarData));
+
+  const YearItem = memo(
+    ({
+      item,
+      selectedYear,
+      onSelectYear,
+    }: {
+      item: number;
+      selectedYear: number;
+      onSelectYear: (year: number) => void;
+    }) => (
+      <TouchableOpacity onPress={() => onSelectYear(item)} style={styles.yearItemContainer}>
+        <Text
+          variant="bodyBold"
+          style={[styles.yearText, item === selectedYear && styles.selectedYearText]}
+        >
+          {item}
+        </Text>
+      </TouchableOpacity>
+    ),
+  );
+
+  const daysWithContent = useMemo(() => {
+    const contentMap = new Map();
+
+    if (calendarData) {
+      calendarData.forEach((month) => {
+        const year = month.year;
+        const monthNum = month.month;
+
+        month.data.forEach((dayData: CalendarDay) => {
+          const day = dayData.day;
+          const dateKey = `${year}-${String(monthNum).padStart(2, "0")}-${String(Math.floor(day)).padStart(2, "0")}`;
+
+          console.log(dayData);
+          contentMap.set(dateKey, dayData.url);
+        });
+      });
+    }
+
+    return contentMap;
+  }, [calendarData]);
+
+  // Years list for the year selection view
   const years = useMemo(
     () => [
       new Date().getFullYear(),
@@ -151,6 +171,33 @@ const Calendar: React.FC = () => {
     }
   }, [selectedDate]);
 
+  // Handler for calendar scrolling to load more data
+  const handleCalendarScroll = useCallback(
+    (data: any) => {
+      // Check if we're approaching the edges of loaded data
+      const visibleMonthYear = data.visibleMonths?.[0];
+      if (visibleMonthYear) {
+        const year = visibleMonthYear.year;
+        const month = visibleMonthYear.month;
+
+        // Create a new pivot date for fetching
+        const newPivotDate = new Date(year, month - 1, 1);
+
+        // Check if we're scrolling up (newer months) or down (older months)
+        if (data.direction === "up") {
+          // Load future months if scrolling up
+          setCurrentPivot(newPivotDate);
+          fetchFutureMonths();
+        } else if (data.direction === "down") {
+          // Load previous months if scrolling down
+          setCurrentPivot(newPivotDate);
+          fetchPreviousMonths();
+        }
+      }
+    },
+    [fetchFutureMonths, fetchPreviousMonths],
+  );
+
   const loadMoreYears = useCallback((): void => {
     const currentYear = yearsList[0];
 
@@ -163,19 +210,7 @@ const Calendar: React.FC = () => {
     }
   }, [yearsList]);
 
-  const getFutureScrollRange = useCallback((): number => {
-    const currentYear = new Date().getFullYear();
-
-    if (selectedYear === currentYear) {
-      return 0; // No future scrolling beyond current month
-    }
-
-    if (selectedYear < currentYear) {
-      return 11;
-    }
-
-    return 0;
-  }, [selectedYear]);
+  const getFutureScrollRange = useCallback(() => getMonthScrollRange(selectedYear), [selectedYear]);
 
   const getMaxDate = useCallback((): string | undefined => {
     return todayString;
@@ -224,40 +259,50 @@ const Calendar: React.FC = () => {
 
   const keyExtractor = useCallback((item: number) => item.toString(), []);
 
+  // Updated to include hasContent prop from daysWithContent map
   const renderDayComponentForCalendarList = useCallback(
     (props: any) => {
       if (!isValidDateData(props.date)) return null;
 
       const normalizedSelected = isSameDate(props.date, selectedDate);
+      const dateKey = props.date.dateString;
+      const dayContent = daysWithContent.get(dateKey);
+
       return (
         <CustomDayComponent
           date={props.date}
           state={props.state}
           selected={normalizedSelected}
           onPress={handleDayPress}
+          image={dayContent}
         />
       );
     },
-    [selectedDate, handleDayPress],
+    [selectedDate, handleDayPress, daysWithContent],
   );
 
+  // Updated to include hasContent prop
   const renderDayComponentForWeekCalendar = useCallback(
     (props: any) => {
       if (!isValidDateData(props.date)) return null;
 
       const normalizedSelected = isSameDate(props.date, selectedDate);
+      const dateKey = props.date.dateString;
+      const dayContent = daysWithContent.get(dateKey);
+
       return (
         <CustomDayComponent
           date={props.date}
           state={props.state}
           selected={normalizedSelected}
+          image={dayContent}
           onPress={(date) => {
             setSelectedDate(date.dateString);
           }}
         />
       );
     },
-    [selectedDate],
+    [selectedDate, daysWithContent],
   );
 
   const currentDate = useMemo(
@@ -318,7 +363,7 @@ const Calendar: React.FC = () => {
               selectedDayBackgroundColor: "#FFC107",
             }}
             pastScrollRange={50}
-            futureScrollRange={0}
+            futureScrollRange={50}
             maxDate={todayString}
             calendarHeight={120}
             allowShadow={false}
@@ -335,24 +380,45 @@ const Calendar: React.FC = () => {
 
   return (
     <Box paddingBottom="xl" marginBottom="xl">
-      <CalendarList
-        pastScrollRange={50}
-        futureScrollRange={getFutureScrollRange()}
-        maxDate={getMaxDate()}
-        scrollEnabled={true}
-        showScrollIndicator={false}
-        bounces={false}
-        firstDay={1}
-        theme={{
-          backgroundColor: "transparent",
-          calendarBackground: "transparent",
-        }}
-        renderHeader={renderCustomHeader}
-        dayComponent={renderDayComponentForCalendarList}
-        current={currentDate}
-        hideExtraDays={true}
-        onDayPress={handleDayPress}
-      />
+      {isLoading && calendarData?.length === 0 ? (
+        <Box flex={1} justifyContent="center" alignItems="center">
+          <ActivityIndicator size="large" color="#FFC107" />
+        </Box>
+      ) : (
+        <>
+          {isFetchingFuture && (
+            <Box padding="s" alignItems="center">
+              <ActivityIndicator size="small" color="#FFC107" />
+            </Box>
+          )}
+
+          <CalendarList
+            pastScrollRange={50}
+            futureScrollRange={getFutureScrollRange()}
+            maxDate={getMaxDate()}
+            scrollEnabled={true}
+            showScrollIndicator={false}
+            bounces={false}
+            firstDay={1}
+            onVisibleMonthsChange={handleCalendarScroll}
+            theme={{
+              backgroundColor: "transparent",
+              calendarBackground: "transparent",
+            }}
+            renderHeader={renderCustomHeader}
+            dayComponent={renderDayComponentForCalendarList}
+            current={currentDate}
+            hideExtraDays={true}
+            onDayPress={handleDayPress}
+          />
+
+          {isFetchingPrevious && (
+            <Box padding="s" alignItems="center">
+              <ActivityIndicator size="small" color="#FFC107" />
+            </Box>
+          )}
+        </>
+      )}
     </Box>
   );
 };
@@ -381,6 +447,9 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#FFC107",
     backgroundColor: "rgba(255, 193, 7, 0.3)",
+  },
+  emptyDayContainer: {
+    opacity: 0.5,
   },
   selectedDayText: {
     fontWeight: "bold",

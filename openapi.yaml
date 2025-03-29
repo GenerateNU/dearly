@@ -2764,6 +2764,14 @@ paths:
           schema:
             type: integer
             default: 1
+        - name: direction
+          in: query
+          description: The direction to fetch months relative to the pivot
+          required: false
+          schema:
+            type: string
+            enum: [before, after, both]
+            default: before
         - name: id
           in: path
           description: ID of the group a post is made in

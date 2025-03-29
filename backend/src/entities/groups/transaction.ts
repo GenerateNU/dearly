@@ -206,10 +206,40 @@ export class GroupTransactionImpl implements GroupTransaction {
     userId,
     groupId,
     range,
+    direction,
   }: CalendarParamPayload): Promise<ThumbnailResponse[]> {
     await this.checkMembership(groupId, userId);
-    const rangeStartDate = new Date(pivot);
-    rangeStartDate.setMonth(rangeStartDate.getMonth() - range);
+
+    const pivotDate = new Date(pivot);
+
+    let startDate, endDate;
+
+    switch (direction) {
+      case "before":
+        startDate = new Date(pivotDate);
+        startDate.setMonth(startDate.getMonth() - range);
+        endDate = pivotDate;
+        break;
+
+      case "after":
+        startDate = pivotDate;
+        endDate = new Date(pivotDate);
+        endDate.setMonth(endDate.getMonth() + range);
+        break;
+
+      case "both":
+        startDate = new Date(pivotDate);
+        startDate.setMonth(startDate.getMonth() - Math.floor(range / 2));
+        endDate = new Date(pivotDate);
+        endDate.setMonth(endDate.getMonth() + Math.ceil(range / 2));
+        break;
+    }
+
+    // Ensure we're not fetching future dates beyond current date if needed
+    const currentDate = new Date();
+    if (endDate > currentDate) {
+      endDate = currentDate;
+    }
 
     // subquery to get all groups of posts that are grouped into date and sorted by likes
     const rankedPosts = this.db
@@ -228,12 +258,14 @@ export class GroupTransactionImpl implements GroupTransaction {
       .where(
         between(
           postsTable.createdAt,
-          sql`${rangeStartDate.toISOString()}`,
-          sql`${new Date(pivot).toISOString()}`,
+          sql`${startDate.toISOString()}`,
+          sql`${endDate.toISOString()}`,
         ),
       )
       .groupBy(sql`DATE(${postsTable.createdAt})`, postsTable.id, mediaTable.objectKey)
       .as("rankedPosts");
+
+    const orderDirection = direction === "after" ? "ASC" : "DESC";
 
     const result = await this.db
       .select({
@@ -254,10 +286,10 @@ export class GroupTransactionImpl implements GroupTransaction {
         sql`EXTRACT(YEAR FROM ${rankedPosts.createdAt})`,
         sql`EXTRACT(MONTH FROM ${rankedPosts.createdAt})`,
       )
-      // order these groups by most recent month to less recent months
+      // Order based on direction parameter
       .orderBy(
-        sql`EXTRACT(YEAR FROM ${rankedPosts.createdAt}) DESC`,
-        sql`EXTRACT(MONTH FROM ${rankedPosts.createdAt}) DESC`,
+        sql`EXTRACT(YEAR FROM ${rankedPosts.createdAt}) ${sql.raw(orderDirection)}`,
+        sql`EXTRACT(MONTH FROM ${rankedPosts.createdAt}) ${sql.raw(orderDirection)}`,
       );
 
     return result;
