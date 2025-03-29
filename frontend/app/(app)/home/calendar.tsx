@@ -4,7 +4,7 @@ import { Box } from "@/design-system/base/box";
 import { useGroupCalendar } from "@/hooks/api/group";
 import { CalendarList, CalendarProvider, WeekCalendar, DateData } from "react-native-calendars";
 import { Text } from "@/design-system/base/text";
-import { StyleSheet, TouchableOpacity, FlatList, ListRenderItem } from "react-native";
+import { StyleSheet, TouchableOpacity, FlatList, ListRenderItem, View } from "react-native";
 import { Icon } from "@/design-system/components/shared/icons/icon";
 import { BackIcon } from "@/design-system/components/shared/icons/back-icon";
 import { getMonthScrollRange, isSameDate, isValidDateData } from "@/utilities/time";
@@ -268,38 +268,40 @@ const Calendar: React.FC = () => {
 
   if (viewMode === "week") {
     return (
-      <CalendarProvider
-        date={selectedDate as string}
-        onDateChanged={(date) => {
-          setSelectedDate(date);
-        }}
-      >
-        <Box paddingHorizontal="m">
-          <BackIcon text={formattedDate} onPress={() => setViewMode("month")} />
-        </Box>
-        <Box marginVertical="xxs">
-          <WeekCalendar
-            firstDay={1}
-            theme={{
-              backgroundColor: "transparent",
-              calendarBackground: "transparent",
-              selectedDayBackgroundColor: "#FFC107",
-            }}
-            pastScrollRange={50}
-            futureScrollRange={50}
-            maxDate={todayString}
-            calendarHeight={60}
-            allowShadow={false}
-            bounces={false}
-            onDayPress={(day) => {
-              setSelectedDate(day.dateString);
-            }}
-            dayComponent={renderDayComponentForWeekCalendar}
-          />
-        </Box>
-        <Feed date={selectedDate} popup={false} commentRef={commentRef} likeRef={likeRef} />
-        <CommentLikesPopup commentRef={commentRef} likeRef={likeRef} />
-      </CalendarProvider>
+      <Box>
+        <CalendarProvider
+          date={selectedDate as string}
+          onDateChanged={(date) => {
+            setSelectedDate(date);
+          }}
+        >
+          <Box paddingHorizontal="m">
+            <BackIcon text={formattedDate} onPress={() => setViewMode("month")} />
+          </Box>
+          <Box marginVertical="xxs">
+            <WeekCalendar
+              firstDay={1}
+              theme={{
+                backgroundColor: "transparent",
+                calendarBackground: "transparent",
+                selectedDayBackgroundColor: "#FFC107",
+              }}
+              pastScrollRange={50}
+              futureScrollRange={50}
+              maxDate={todayString}
+              calendarHeight={60}
+              allowShadow={false}
+              bounces={false}
+              onDayPress={(day) => {
+                setSelectedDate(day.dateString);
+              }}
+              dayComponent={renderDayComponentForWeekCalendar}
+            />
+          </Box>
+          <Feed date={selectedDate} popup={false} commentRef={commentRef} likeRef={likeRef} />
+          <CommentLikesPopup commentRef={commentRef} likeRef={likeRef} />
+        </CalendarProvider>
+      </Box>
     );
   }
 
@@ -334,6 +336,9 @@ const Calendar: React.FC = () => {
             current={currentDate}
             hideExtraDays={true}
             onDayPress={handleDayPress}
+            style={{
+              marginBottom: 100,
+            }}
           />
           {isFetchingPrevious && <LoadingComponent />}
         </>

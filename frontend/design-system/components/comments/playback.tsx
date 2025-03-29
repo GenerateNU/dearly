@@ -26,7 +26,13 @@ interface PlaybackPropsWhenURL {
 
 type PlaybackProps = PlaybackPropsWhenLocal | PlaybackPropsWhenURL;
 
-export const Playback: React.FC<PlaybackProps> = ({ id, local, dbLevels, audioLength, location }) => {
+export const Playback: React.FC<PlaybackProps> = ({
+  id,
+  local,
+  dbLevels,
+  audioLength,
+  location,
+}) => {
   const [status, setStatus] = useState<playbackStates>({ playing: false, pausing: false });
   const [sound, setSound] = useState<Audio.Sound>();
   const [length, setLength] = useState<number>(0);
@@ -76,7 +82,7 @@ export const Playback: React.FC<PlaybackProps> = ({ id, local, dbLevels, audioLe
       await sound?.playAsync();
     } else {
       setStatus({ ...status, playing: true });
-      await Audio.setAudioModeAsync({ playsInSilentModeIOS : true })
+      await Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
       const { sound } = await Audio.Sound.createAsync({ uri: local ? location : uri });
       sound.setOnPlaybackStatusUpdate(onPlayingUpdate);
       sound.setProgressUpdateIntervalAsync(500);
