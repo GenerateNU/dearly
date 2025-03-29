@@ -340,7 +340,7 @@ const Calendar: React.FC = () => {
         futureScrollRange={getFutureScrollRange()}
         maxDate={getMaxDate()}
         scrollEnabled={true}
-        showScrollIndicator={true}
+        showScrollIndicator={false}
         bounces={false}
         firstDay={1}
         theme={{

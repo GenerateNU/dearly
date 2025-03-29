@@ -1,4 +1,4 @@
-import React, { forwardRef, useState } from "react";
+import React, { forwardRef, useEffect, useState } from "react";
 import { Box } from "@/design-system/base/box";
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
@@ -60,6 +60,12 @@ const LikePopUpData: React.FC<LikePopUpDataProps> = ({ postId }) => {
     />
   );
 
+  useEffect(() => {
+    if (likeData?.pages) {
+      console.log("Pages data:", likeData.pages);
+    }
+  }, [likeData]);
+
   return (
     <Box position="relative" paddingHorizontal="m" height={"100%"} width={"100%"}>
       <Box flexDirection="column" gap="s">
@@ -73,7 +79,7 @@ const LikePopUpData: React.FC<LikePopUpDataProps> = ({ postId }) => {
       <BottomSheetFlatList
         data={likes}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, index) => `${item.id}-${index}`}
         onEndReached={onEndReached}
         ListFooterComponent={renderFooter}
         contentContainerStyle={{
