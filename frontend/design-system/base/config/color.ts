@@ -9,7 +9,7 @@ export const ColorPalette = {
   darkGray: "#5B4E4C",
   gray: "#CFCFCF",
   silver: "#DEDEDE",
-  white: "#FFFFFF"
+  white: "#FFFFFF",
 };
 
 export type ColorName = keyof typeof ColorPalette;

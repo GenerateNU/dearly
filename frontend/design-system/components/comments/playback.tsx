@@ -4,10 +4,9 @@ import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { IconButton } from "../shared/buttons/icon-button";
 import { formatSeconds } from "@/utilities/time";
-import { condenseAudioBarHeights, getDBLevels } from "@/utilities/audio";
-import { decoders } from "audio-decode";
+import { condenseAudioBarHeights } from "@/utilities/audio";
 import { playbackStates } from "@/types/comment";
-import * as FileSystem from "expo-file-system"
+import * as FileSystem from "expo-file-system";
 
 interface PlaybackPropsWhenLocal {
   local: true; // is the audio message being stored locally or in s3
@@ -34,7 +33,6 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
   const numLines = 23;
   const [totalLength, setTotalLength] = useState<number>(0);
 
-
   useEffect(() => {
     async function initializeValues() {
       if (local) {
@@ -44,13 +42,12 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
       } else {
         const downloadResult = await FileSystem.downloadAsync(
           location,
-          FileSystem.documentDirectory + 'temp-audio.mp3'
+          FileSystem.documentDirectory + "temp-audio.mp3",
         );
 
         const localUri = downloadResult.uri;
-        setUri(localUri)
+        setUri(localUri);
 
-        
         /* Code that break (Web Worker)
         const response = await fetch(location); // initally fetch the mp3 file
         const arrayBuffer = await response.arrayBuffer(); // convert to array buffer
@@ -77,7 +74,7 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
       await sound?.playAsync();
     } else {
       setStatus({ ...status, playing: true });
-      const { sound } = await Audio.Sound.createAsync({ uri: local? location : uri });
+      const { sound } = await Audio.Sound.createAsync({ uri: local ? location : uri });
       sound.setOnPlaybackStatusUpdate(onPlayingUpdate);
       sound.setProgressUpdateIntervalAsync(500);
       setSound(sound);
@@ -110,7 +107,7 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
       paddingLeft="s"
       gap="s"
       width="100%"
-      height={local? 50 : 40}
+      height={local ? 50 : 40}
       borderRadius="l"
       flexDirection="row"
       alignContent="center"

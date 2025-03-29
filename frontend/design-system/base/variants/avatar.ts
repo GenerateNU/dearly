@@ -13,6 +13,5 @@ export const avatarVariants = {
   },
   xsmall: {
     size: 30,
-  }
+  },
 };
-

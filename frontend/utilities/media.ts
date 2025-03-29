@@ -15,4 +15,3 @@ export const getPhotoBlobs = async (uris: string[]) => {
 
   return formData;
 };
-

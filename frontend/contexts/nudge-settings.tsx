@@ -1,4 +1,3 @@
-import { NudgeScheduleConfig } from "@/types/nudge";
 import { createContext, useState, ReactNode, useContext, SetStateAction, Dispatch } from "react";
 
 interface NudgeSettingsContextType {

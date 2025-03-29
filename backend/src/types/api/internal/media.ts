@@ -15,9 +15,7 @@ export type MediaResponse = {
   type: MediaType;
 };
 
-
 export type WaveForm = {
-  length: number
-  data: number[]
-
-}
+  length: number;
+  data: number[];
+};
