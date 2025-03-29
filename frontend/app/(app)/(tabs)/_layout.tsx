@@ -98,7 +98,7 @@ const Layout = () => {
           options={{
             title: "",
             headerShown: true,
-            headerTransparent: true,
+            headerTransparent: false,
             tabBarIcon: ({ focused }) => {
               return (
                 <Box width={80}>
@@ -114,6 +114,7 @@ const Layout = () => {
             },
             headerStyle: {
               height: 100,
+              backgroundColor: "pearl",
             },
             headerLeft: () => (
               <Box paddingLeft="m">
