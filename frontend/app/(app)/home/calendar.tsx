@@ -1,15 +1,51 @@
-import React, { useState, useRef, useEffect } from "react";
+const isValidDateData = (date: any): date is DateData => {
+  return (
+    date !== undefined &&
+    date !== null &&
+    typeof date === "object" &&
+    "dateString" in date &&
+    typeof date.dateString === "string" &&
+    "day" in date &&
+    typeof date.day === "number"
+  );
+};
+import React, { useState, useRef, useEffect, useCallback, memo, useMemo } from "react";
 import { useUserStore } from "@/auth/store";
 import { Box } from "@/design-system/base/box";
 import { useGroupCalendar } from "@/hooks/api/group";
-import { CalendarList, CalendarProvider, WeekCalendar } from "react-native-calendars";
+import { CalendarList, CalendarProvider, WeekCalendar, DateData } from "react-native-calendars";
 import { Text } from "@/design-system/base/text";
-import { ImageBackground, StyleSheet, TouchableOpacity, FlatList, View } from "react-native";
+import {
+  ImageBackground,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  View,
+  ListRenderItem,
+} from "react-native";
 import { Icon } from "@/design-system/components/shared/icons/icon";
 import { BackIcon } from "@/design-system/components/shared/icons/back-icon";
 
-// Custom day component to be used in both calendar views
-const CustomDayComponent = ({ date, state, onPress, selected }) => {
+type ViewMode = "month" | "week" | "year";
+
+interface DayComponentProps {
+  date: DateData;
+  state?: string;
+  onPress?: (date: DateData) => void;
+  selected?: boolean;
+}
+
+interface WeekData {
+  firstDay: string;
+  lastDay: string;
+}
+
+// Memoize the CustomDayComponent to prevent unnecessary re-renders
+const CustomDayComponent = memo(({ date, state, onPress, selected }: DayComponentProps) => {
+  // Make sure date is a valid DateData object
+  if (!date || typeof date !== "object" || !date.dateString) {
+    return null; // Return null if date is invalid
+  }
   return (
     <TouchableOpacity
       onPress={() => onPress && onPress(date)}
@@ -33,73 +69,124 @@ const CustomDayComponent = ({ date, state, onPress, selected }) => {
       </ImageBackground>
     </TouchableOpacity>
   );
+});
+
+// Separate the YearItem component to improve FlatList performance
+const YearItem = memo(
+  ({
+    item,
+    selectedYear,
+    onSelectYear,
+  }: {
+    item: number;
+    selectedYear: number;
+    onSelectYear: (year: number) => void;
+  }) => (
+    <TouchableOpacity onPress={() => onSelectYear(item)} style={styles.yearItemContainer}>
+      <Text
+        variant="bodyBold"
+        style={[styles.yearText, item === selectedYear && styles.selectedYearText]}
+      >
+        {item}
+      </Text>
+    </TouchableOpacity>
+  ),
+);
+
+interface DayProps {
+  date?: DateData;
+  state?: string;
+  marking?: any;
+  markingType?: string;
+  onPress?: (date: DateData) => void;
+  onLongPress?: (date: DateData) => void;
+}
+
+const isSameDate = (date1: DateData | string | undefined, date2: string | undefined): boolean => {
+  if (!date1 || !date2) return false;
+
+  const d1 = typeof date1 === "string" ? date1 : date1.dateString;
+  const d2 = typeof date2 === "string" ? date2 : date2;
+
+  return d1 === d2;
 };
 
-// Helper function to ensure consistent date formatting
-const formatDateString = (dateString) => {
-  // Ensure we're working with UTC to prevent timezone issues
-  const date = new Date(dateString + "T00:00:00Z");
-  return date.toISOString().split("T")[0];
-};
-
-const Calendar = () => {
+const Calendar: React.FC = () => {
   const { group } = useUserStore();
   const { data, isLoading } = useGroupCalendar(group?.id || "", new Date(), 3);
-  const [viewMode, setViewMode] = useState("month");
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [viewMode, setViewMode] = useState<ViewMode>("month");
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
 
-  // Initialize with today's date in consistent format
   const today = new Date();
   const todayString = today.toISOString().split("T")[0];
-  const [selectedDate, setSelectedDate] = useState(todayString);
-  const [formattedDate, setFormattedDate] = useState("");
-  const [years, setYears] = useState([
-    new Date().getFullYear(),
-    ...Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - (i + 1)),
-  ]);
-  const yearListRef = useRef(null);
+  const [selectedDate, setSelectedDate] = useState<string | undefined>(todayString);
+  const [formattedDate, setFormattedDate] = useState<string>("");
 
-  // Format date whenever selectedDate changes
+  const years = useMemo(
+    () => [
+      new Date().getFullYear(),
+      ...Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - (i + 1)),
+    ],
+    [],
+  );
+
+  const [yearsList, setYearsList] = useState<number[]>(years);
+  const yearListRef = useRef<FlatList<number>>(null);
+
   useEffect(() => {
     if (selectedDate) {
-      // Use a consistent way to create Date object to avoid timezone issues
-      const date = new Date(selectedDate + "T00:00:00Z");
-      const formatted = date.toLocaleDateString("en-US", {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      });
-      setFormattedDate(formatted);
+      const [year, month, day] = selectedDate.split("-").map(Number);
+
+      if (year && month && day) {
+        const date = new Date(year, month - 1, day);
+
+        const formatted = date.toLocaleDateString("en-US", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        });
+
+        setFormattedDate(formatted);
+      }
     }
   }, [selectedDate]);
 
-  const loadMoreYears = () => {
-    const currentYear = years[0];
+  const loadMoreYears = useCallback((): void => {
+    const currentYear = yearsList[0];
 
-    if (currentYear > 2000) {
-      const newYears = Array.from({ length: 5 }, (_, i) => currentYear - (years.length + i + 1));
-      setYears((prevYears) => [...prevYears, ...newYears]);
+    if (currentYear && currentYear > 2000) {
+      const newYears = Array.from(
+        { length: 5 },
+        (_, i) => currentYear - (yearsList.length + i + 1),
+      );
+      setYearsList((prevYears) => [...prevYears, ...newYears]);
     }
-  };
+  }, [yearsList]);
 
-  const getFutureScrollRange = () => {
-    const currentYear = new Date().getFullYear(); // 2025
+  const getFutureScrollRange = useCallback((): number => {
+    const currentYear = new Date().getFullYear();
 
-    // If viewing the current year, don't allow scrolling beyond current month
     if (selectedYear === currentYear) {
       return 0; // No future scrolling beyond current month
     }
 
-    // If viewing a past year, allow all 12 months
     if (selectedYear < currentYear) {
-      return 11; // Allow scrolling through all months (0-11)
+      return 11;
     }
 
-    // If somehow in a future year
-    return 0; // No future scrolling
-  };
+    return 0;
+  }, [selectedYear]);
 
-  const renderCustomHeader = (date) => {
+  const getMaxDate = useCallback((): string | undefined => {
+    return todayString;
+  }, [todayString]);
+
+  const handleSelectYear = useCallback((year: number) => {
+    setSelectedYear(year);
+    setViewMode("month");
+  }, []);
+
+  const renderCustomHeader = useCallback((date: any): React.ReactNode => {
     const month = date.toString("MMMM");
     const year = date.toString("yyyy");
 
@@ -112,61 +199,97 @@ const Calendar = () => {
         </Box>
       </TouchableOpacity>
     );
-  };
+  }, []);
 
-  const renderYearItem = ({ item }) => (
-    <TouchableOpacity
-      onPress={() => {
-        setSelectedYear(item);
-        setViewMode("month");
-      }}
-      style={styles.yearItemContainer}
-    >
-      <Text
-        variant="bodyBold"
-        style={[styles.yearText, item === selectedYear && styles.selectedYearText]}
-      >
-        {item}
-      </Text>
-    </TouchableOpacity>
+  const renderYearItem: ListRenderItem<number> = useCallback(
+    ({ item }) => (
+      <YearItem item={item} selectedYear={selectedYear} onSelectYear={handleSelectYear} />
+    ),
+    [selectedYear, handleSelectYear],
   );
 
-  const handleDayPress = (day) => {
-    // Ensure consistent date format
-    const formattedDateString = formatDateString(day.dateString);
-    setSelectedDate(formattedDateString);
+  const handleDayPress = useCallback((day: DateData): void => {
+    setSelectedDate(day.dateString);
     setViewMode("week");
-  };
+  }, []);
 
-  const handleWeekChange = (week) => {
-    // Update the selected date when scrolling through weeks
-    if (week && week.firstDay) {
-      const formattedDateString = formatDateString(week.firstDay);
-      setSelectedDate(formattedDateString);
-    }
-  };
+  const getItemLayout = useCallback(
+    (_: any, index: number) => ({
+      length: 44,
+      offset: 44 * index,
+      index,
+    }),
+    [],
+  );
+
+  const keyExtractor = useCallback((item: number) => item.toString(), []);
+
+  const renderDayComponentForCalendarList = useCallback(
+    (props: any) => {
+      if (!isValidDateData(props.date)) return null;
+
+      const normalizedSelected = isSameDate(props.date, selectedDate);
+      return (
+        <CustomDayComponent
+          date={props.date}
+          state={props.state}
+          selected={normalizedSelected}
+          onPress={handleDayPress}
+        />
+      );
+    },
+    [selectedDate, handleDayPress],
+  );
+
+  const renderDayComponentForWeekCalendar = useCallback(
+    (props: any) => {
+      if (!isValidDateData(props.date)) return null;
+
+      const normalizedSelected = isSameDate(props.date, selectedDate);
+      return (
+        <CustomDayComponent
+          date={props.date}
+          state={props.state}
+          selected={normalizedSelected}
+          onPress={(date) => {
+            setSelectedDate(date.dateString);
+          }}
+        />
+      );
+    },
+    [selectedDate],
+  );
+
+  const currentDate = useMemo(
+    () =>
+      selectedYear < new Date().getFullYear()
+        ? `${selectedYear}-01-01`
+        : new Date().toISOString().split("T")[0],
+    [selectedYear],
+  );
+
+  const initialScrollIndex = useMemo(() => {
+    return yearsList.findIndex((year) => year === selectedYear);
+  }, [yearsList, selectedYear]);
 
   if (viewMode === "year") {
     return (
       <Box flex={1} paddingHorizontal="m">
         <FlatList
           ref={yearListRef}
-          data={years}
+          data={yearsList}
           renderItem={renderYearItem}
-          keyExtractor={(item) => item.toString()}
+          keyExtractor={keyExtractor}
           contentContainerStyle={styles.yearList}
-          initialScrollIndex={years.findIndex((year) => year === selectedYear)}
-          maxToRenderPerBatch={15}
-          windowSize={10}
+          initialScrollIndex={initialScrollIndex >= 0 ? initialScrollIndex : 0}
+          maxToRenderPerBatch={10}
+          windowSize={5}
           removeClippedSubviews={true}
-          getItemLayout={(_, index) => ({
-            length: 44,
-            offset: 44 * index,
-            index,
-          })}
+          getItemLayout={getItemLayout}
           onEndReached={loadMoreYears}
           onEndReachedThreshold={0.5}
           showsVerticalScrollIndicator={false}
+          initialNumToRender={20}
         />
       </Box>
     );
@@ -175,97 +298,57 @@ const Calendar = () => {
   if (viewMode === "week") {
     return (
       <CalendarProvider
-        date={selectedDate}
+        date={selectedDate as string}
         onDateChanged={(date) => {
-          const formattedDateString = formatDateString(date);
-          setSelectedDate(formattedDateString);
+          setSelectedDate(date);
         }}
         onMonthChange={(month) => {
           console.log("Month changed", month);
         }}
       >
-        <Box flex={1} paddingHorizontal="m">
+        <Box paddingHorizontal="m">
           <BackIcon text={formattedDate} onPress={() => setViewMode("month")} />
-          <Box marginTop="s">
-            <WeekCalendar
-              firstDay={1}
-              theme={{
-                backgroundColor: "#ffffff",
-                calendarBackground: "#ffffff",
-                textSectionTitleColor: "#b6c1cd",
-                selectedDayBackgroundColor: "#FFC107",
-                selectedDayTextColor: "#ffffff",
-                todayTextColor: "#FFC107",
-                dayTextColor: "#2d4150",
-                textDisabledColor: "#d9e1e8",
-                dotColor: "#FFC107",
-                selectedDotColor: "#ffffff",
-                arrowColor: "#FFC107",
-                monthTextColor: "#2d4150",
-                indicatorColor: "#FFC107",
-                textDayFontWeight: "300",
-                textMonthFontWeight: "bold",
-                textDayHeaderFontWeight: "300",
-                textDayFontSize: 16,
-                textMonthFontSize: 16,
-                textDayHeaderFontSize: 16,
-              }}
-              allowShadow={false}
-              style={styles.weekCalendar}
-              onDayPress={(day) => {
-                const formattedDateString = formatDateString(day.dateString);
-                setSelectedDate(formattedDateString);
-              }}
-              onWeekChange={handleWeekChange}
-              dayComponent={({ date, state }) => {
-                const normalizedSelected = formatDateString(date.dateString) === selectedDate;
-                return (
-                  <CustomDayComponent
-                    date={date}
-                    state={state}
-                    selected={normalizedSelected}
-                    onPress={(date) => {
-                      const formattedDateString = formatDateString(date.dateString);
-                      setSelectedDate(formattedDateString);
-                    }}
-                  />
-                );
-              }}
-            />
-          </Box>
+        </Box>
+        <Box style={styles.weekCalendarContainer}>
+          <WeekCalendar
+            firstDay={1}
+            theme={{
+              backgroundColor: "transparent",
+              calendarBackground: "transparent",
+              selectedDayBackgroundColor: "#FFC107",
+            }}
+            pastScrollRange={50}
+            futureScrollRange={0}
+            maxDate={todayString}
+            calendarHeight={120}
+            allowShadow={false}
+            bounces={false}
+            onDayPress={(day) => {
+              setSelectedDate(day.dateString);
+            }}
+            dayComponent={renderDayComponentForWeekCalendar}
+          />
         </Box>
       </CalendarProvider>
     );
   }
 
-  const currentDate =
-    selectedYear < new Date().getFullYear()
-      ? `${selectedYear}-01-01` // For past years, start at January
-      : new Date().toISOString().split("T")[0]; // For current year, start at current date
-
   return (
-    <Box paddingBottom="xl">
+    <Box paddingBottom="xl" marginBottom="xl">
       <CalendarList
         pastScrollRange={50}
         futureScrollRange={getFutureScrollRange()}
+        maxDate={getMaxDate()}
         scrollEnabled={true}
         showScrollIndicator={true}
+        bounces={false}
         firstDay={1}
+        theme={{
+          backgroundColor: "transparent",
+          calendarBackground: "transparent",
+        }}
         renderHeader={renderCustomHeader}
-        dayComponent={({ date, state }) => {
-          const normalizedSelected = formatDateString(date.dateString) === selectedDate;
-          return (
-            <CustomDayComponent
-              date={date}
-              state={state}
-              selected={normalizedSelected}
-              onPress={(date) => handleDayPress(date)}
-            />
-          );
-        }}
-        style={{
-          marginBottom: 120,
-        }}
+        dayComponent={renderDayComponentForCalendarList}
         current={currentDate}
         hideExtraDays={true}
         onDayPress={handleDayPress}
@@ -277,9 +360,10 @@ const Calendar = () => {
 const styles = StyleSheet.create({
   dayComponentWrapper: {
     width: 40,
-    height: 45,
+    height: 50,
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: 5,
   },
   dayContainer: {
     justifyContent: "center",
@@ -332,12 +416,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#f0f0f0",
     borderRadius: 8,
   },
-  backButtonText: {
-    marginLeft: 8,
-  },
-  weekCalendar: {
-    height: 100,
-    width: "100%",
+  weekCalendarContainer: {
+    height: 120,
+    marginTop: 10,
+    marginBottom: 10,
+    paddingBottom: 10,
   },
 });
 
