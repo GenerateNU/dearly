@@ -7,6 +7,7 @@ import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { useToggleLike } from "@/hooks/api/like";
 import { useUserStore } from "@/auth/store";
+import { useState } from "react";
 
 interface Props {
   onCommentClicked: () => void;
@@ -38,7 +39,16 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
     )
     .map((item: any) => item.url);
 
-  const { mutate } = useToggleLike(id, group?.id as string);
+  const { mutate, isPending, isSuccess, isError} = useToggleLike(id, group?.id as string);
+  const [pending, setPending] = useState<boolean>(false);
+
+  const toggleLike = () => {
+    setPending(true)
+    mutate()
+    if(isSuccess || isError){
+      setPending(false)
+    }
+  }
 
   return (
     <Box flexDirection="column" gap="s">
@@ -50,7 +60,7 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
         createdAt={createdAt}
         onPress={() => null}
       />
-      <ImageCarousel setLike={() => mutate()} like={isLiked} data={data} />
+      <ImageCarousel setLike={toggleLike} like={pending || isLiked } data={data} />
       <CommentLike
         onCommentClicked={onCommentClicked}
         onLikeClicked={onLikeClicked}
