@@ -22,5 +22,4 @@ export type commentPopUpAttributes = {
   commentId: string;
   likes: number;
   caption: string;
-  comments: number;
 };

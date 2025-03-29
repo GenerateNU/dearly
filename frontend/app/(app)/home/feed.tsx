@@ -16,6 +16,7 @@ import { LikePopup } from "@/design-system/components/posts/like-popup";
 import { AnimatedBox } from "@/design-system/base/animated-box";
 import { useUserStore } from "@/auth/store";
 import EmptyDataDisplay from "@/design-system/components/shared/states/empty";
+import { EmptyFeed } from "@/design-system/components/posts/empty-feed";
 
 const Feed = () => {
   const { group } = useUserStore();
@@ -101,7 +102,7 @@ const Feed = () => {
   if (posts.length === 0) {
     return (
       <Box flex={1} padding="m">
-        <EmptyDataDisplay />
+        <EmptyFeed />
       </Box>
     );
   }
