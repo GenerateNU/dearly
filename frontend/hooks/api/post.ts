@@ -40,7 +40,7 @@ export const useMemberPost = (id: string, userId: string, options: any = {}) => 
   return useQueryPagination<Post[]>(
     ["groups", id, "members", userId, "posts"],
     (page, limit) => {
-      return getMemberPosts(id, userId, limit, page);
+      return getMemberPosts(id, userId, 10, 1);
     },
     options,
     10,

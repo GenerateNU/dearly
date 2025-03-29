@@ -15,7 +15,6 @@ import { useUserStore } from "@/auth/store";
 import { useQuery } from "@tanstack/react-query";
 import { getUser } from "@/api/user";
 import { usePatchUser, useUploadUserMedia } from "@/hooks/api/user";
-import { UpdateUserPayload } from "@/types/user";
 import { Avatar } from "@/design-system/components/shared/avatar";
 
 type UpdatePhotoData = z.infer<typeof UPDATE_PHOTO_FORM>;

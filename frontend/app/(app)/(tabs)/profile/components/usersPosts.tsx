@@ -15,8 +15,6 @@ const UserPosts = () => {
 
   const posts = data?.pages.flatMap((page) => page);
 
-  console.log(JSON.stringify(data));
-
   return (
     <Box width={"100%"} height={"auto"}>
       <Text variant="bodyLargeBold">Posts</Text>

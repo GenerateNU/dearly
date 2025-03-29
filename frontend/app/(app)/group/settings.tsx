@@ -1,7 +1,7 @@
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "@/design-system/base/text";
 import { Box } from "@/design-system/base/box";
-import SettingContent from "@/design-system/components/shared/settings/setting";
+import GroupOptionContent from "@/design-system/components/shared/settings/options";
 
 const GroupSettings = () => {
   return (
@@ -16,7 +16,7 @@ const GroupSettings = () => {
       >
         <Text variant="bodyLargeBold">Settings</Text>
         <Box paddingTop="s" width="100%">
-          <SettingContent close={() => {}} />
+          <GroupOptionContent close={() => null} />
         </Box>
       </Box>
     </SafeAreaView>
