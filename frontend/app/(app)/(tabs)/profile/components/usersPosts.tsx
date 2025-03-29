@@ -3,45 +3,24 @@ import { useUserStore } from "@/auth/store";
 import { Text } from "@/design-system/base/text";
 import { Post } from "@/types/post";
 import { MasonryList } from "@/design-system/components/posts/masonry";
-import { useGroupFeed } from "@/hooks/api/post";
+import { useMemberPost } from "@/hooks/api/post";
 
 const UserPosts = () => {
   const { userId, group } = useUserStore();
 
   const groupId = group && group.id ? group!.id : "";
-  let userPosts: Post[] = [];
-  const {
-    data,
-    isFetchingNextPage,
-    fetchNextPage,
-    hasNextPage,
-    isLoading,
-    refetch,
-    isError,
-    error,
-  } = useGroupFeed(group?.id as string);
 
-  if (!isLoading && !isError) {
-    userPosts = data?.pages.flatMap((page) => page) || [];
-    userPosts = [
-      ...userPosts,
-      ...userPosts,
-      ...userPosts,
-      ...userPosts,
-      ...userPosts,
-      ...userPosts,
-      ...userPosts,
-    ];
-  }
+  const { data, isFetchingNextPage, fetchNextPage, hasNextPage, isLoading, refetch, error } =
+    useMemberPost(group?.id as string, userId!);
 
-  if (isError) {
-    return <Text>{error.message}</Text>;
-  }
+  const posts = data?.pages.flatMap((page) => page);
+
+  console.log(JSON.stringify(data));
 
   return (
     <Box width={"100%"} height={"auto"}>
       <Text variant="bodyLargeBold">Posts</Text>
-      <MasonryList posts={userPosts} />
+      <MasonryList posts={posts} />
     </Box>
   );
 };

@@ -12,7 +12,7 @@ import ErrorDisplay from "@/design-system/components/shared/states/error";
 const ProfilePage = () => {
   const { userId } = useUserStore();
 
-  const { isLoading, data, error } = useQuery({
+  const { isLoading, data, error, refetch, isRefetching } = useQuery({
     queryKey: ["api", "v1", "users", userId],
     queryFn: () => getUser(userId!),
   });
@@ -23,7 +23,7 @@ const ProfilePage = () => {
         <Box
           gap="xl"
           alignItems="flex-start"
-          padding="l"
+          padding="m"
           paddingBottom="none"
           justifyContent="center"
           flex={1}
@@ -45,7 +45,7 @@ const ProfilePage = () => {
   };
 
   const state = {
-    loading: isLoading,
+    loading: isLoading || isRefetching,
     data,
     error: error ? error.message : null,
   };
@@ -61,7 +61,7 @@ const ProfilePage = () => {
       }
       errorComponent={
         <Box padding="m" flex={1} justifyContent="center" alignItems="center">
-          <ErrorDisplay />
+          <ErrorDisplay refresh={refetch} />
         </Box>
       }
     />

@@ -9,7 +9,7 @@ export default function Layout() {
         options={{
           headerTitle: "",
           headerTransparent: true,
-          headerShown: false,
+          headerShown: true,
           gestureEnabled: false,
           headerLeft: () => <BackIcon onPress={() => router.navigate("/(app)/(tabs)/profile")} />,
         }}
