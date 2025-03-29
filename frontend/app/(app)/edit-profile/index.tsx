@@ -1,15 +1,12 @@
 import { Box } from "@/design-system/base/box";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z, ZodError } from "zod";
 import { Text } from "@/design-system/base/text";
-import { Pressable, Alert } from "react-native";
+import { Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { ScrollView } from "react-native-gesture-handler";
 import { BaseButton } from "@/design-system/base/button";
-import { CREATE_POST_SCHEMA, UPDATE_PHOTO_FORM } from "@/utilities/form-schema";
-import ImagePlaceholder from "./photo-placeholder";
+import { UPDATE_PHOTO_FORM } from "@/utilities/form-schema";
 import { router } from "expo-router";
 import { getPhotoBlobs } from "@/utilities/media";
 import { TextButton } from "@/design-system/components/shared/buttons/text-button";
@@ -19,23 +16,18 @@ import { useQuery } from "@tanstack/react-query";
 import { getUser } from "@/api/user";
 import { usePatchUser, useUploadUserMedia } from "@/hooks/api/user";
 import { UpdateUserPayload } from "@/types/user";
-import SelectedPhoto from "./photo";
 import { Avatar } from "@/design-system/components/shared/avatar";
 
-const PHOTO_DIMENSION = 200;
 type UpdatePhotoData = z.infer<typeof UPDATE_PHOTO_FORM>;
 
 const PostCreationForm = () => {
   const {
-    control,
     handleSubmit,
     trigger,
     setValue: setFormValue,
     getValues,
     watch,
-    formState: { errors, isValid },
   } = useForm<UpdatePhotoData>({
-    resolver: zodResolver(CREATE_POST_SCHEMA),
     mode: "onChange",
     defaultValues: {
       profilePhoto: "",
@@ -43,7 +35,6 @@ const PostCreationForm = () => {
   });
 
   const watchPhotos = watch("profilePhoto");
-  const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
 
   const {
     mutateAsync: uploadMedia,
@@ -138,109 +129,69 @@ const PostCreationForm = () => {
             </Box>
           </Box>
           <Box gap="s" width="100%">
-            <Text color="ink" variant="caption" textAlign="left">
-              Name
-            </Text>
             <BaseButton
               variant="text"
               onPress={() => {
                 router.push("/(app)/edit-profile/edit-sections/name");
               }}
             >
-              <Controller
-                name="profilePhoto"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <Input
-                    onPress={() => {
-                      router.push("/(app)/edit-profile/edit-sections/name");
-                    }}
-                    isButton={true}
-                    onChangeText={(text: string) => {
-                      onChange(text);
-                      trigger("profilePhoto");
-                    }}
-                    value={value}
-                    placeholder={data ? data.name : "Name..."}
-                  />
-                )}
+              <Input
+                title="Name"
+                onPress={() => {
+                  router.push("/(app)/edit-profile/edit-sections/name");
+                }}
+                isButton={true}
+                value={data?.name}
+                placeholder={data ? data.name : "Name..."}
               />
             </BaseButton>
-            <Text color="ink" variant="caption" textAlign="left">
-              Username
-            </Text>
             <BaseButton
               variant="text"
               onPress={() => {
                 router.push("/(app)/edit-profile/edit-sections/username");
               }}
             >
-              <Controller
-                name="profilePhoto"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <Input
-                    onPress={() => {
-                      router.push("/(app)/edit-profile/edit-sections/username");
-                    }}
-                    isButton={true}
-                    onChangeText={(text: string) => {
-                      onChange(text);
-                      trigger("profilePhoto");
-                    }}
-                    value={value}
-                    placeholder={data ? data.username : "Username..."}
-                  />
-                )}
+              <Input
+                title="Username"
+                onPress={() => {
+                  router.push("/(app)/edit-profile/edit-sections/username");
+                }}
+                isButton={true}
+                value={data?.username}
+                placeholder={data ? data.username : "Username..."}
               />
             </BaseButton>
-            <Text color="ink" variant="caption" textAlign="left">
-              Bio
-            </Text>
             <BaseButton
               variant="text"
               onPress={() => {
                 router.push("/(app)/edit-profile/edit-sections/bio");
               }}
             >
-              <Controller
-                name="profilePhoto"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <Input
-                    paragraph={true}
-                    onPress={() => {
-                      router.push("/(app)/edit-profile/edit-sections/bio");
-                    }}
-                    isButton={true}
-                    value={value}
-                    placeholder={data ? data.bio! : "Bio..."}
-                  />
-                )}
+              <Input
+                title="Bio"
+                paragraph={true}
+                onPress={() => {
+                  router.push("/(app)/edit-profile/edit-sections/bio");
+                }}
+                isButton={true}
+                value={data?.bio ? data?.bio : undefined}
+                placeholder={data ? data.bio! : "Bio..."}
               />
             </BaseButton>
-            <Text color="ink" variant="caption" textAlign="left">
-              Birthday
-            </Text>
             <BaseButton
               variant="text"
               onPress={() => {
                 router.push("/(app)/edit-profile/edit-sections/birthday");
               }}
             >
-              <Controller
-                name="profilePhoto"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <Input
-                    onPress={() => {
-                      router.push("/(app)/edit-profile/edit-sections/birthday");
-                    }}
-                    isButton={true}
-                    value={value}
-                    placeholder={data ? data.birthday! : "MM/DD/YYYY"}
-                  />
-                )}
+              <Input
+                title="Birthday"
+                onPress={() => {
+                  router.push("/(app)/edit-profile/edit-sections/birthday");
+                }}
+                isButton={true}
+                value={data?.birthday ? data?.birthday : undefined}
+                placeholder={data ? data.birthday! : "MM/DD/YYYY"}
               />
             </BaseButton>
           </Box>
@@ -259,7 +210,7 @@ const PostCreationForm = () => {
         </Box>
         <Box alignItems="center" width="100%">
           <TextButton
-            disabled={!isValid || watchPhotos.length === 0 || isPendingMedia || isPendingCreatePost}
+            disabled={watchPhotos.length === 0 || isPendingMedia || isPendingCreatePost}
             variant="primary"
             onPress={handleSubmit(onSubmit)}
             label="Save"
