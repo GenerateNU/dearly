@@ -8,10 +8,9 @@ interface SelectedPhotoProps {
   uri: string;
   index: number;
   dimension: number;
-  onRemove: () => void;
 }
 
-const SelectedPhoto: React.FC<SelectedPhotoProps> = ({ uri, index, dimension, onRemove }) => {
+const SelectedPhoto: React.FC<SelectedPhotoProps> = ({ uri, index, dimension }) => {
   const theme = useTheme<Theme>();
 
   return (
@@ -24,20 +23,18 @@ const SelectedPhoto: React.FC<SelectedPhotoProps> = ({ uri, index, dimension, on
           width: dimension,
         }}
       />
-      <Pressable onPress={onRemove} className="top-2 right-2 z-10 absolute">
-        <Box
-          backgroundColor="pearl"
-          borderRadius="full"
-          padding="xs"
-          shadowColor="ink"
-          shadowOffset={{ width: 0, height: 2 }}
-          shadowOpacity={0.3}
-          shadowRadius={3}
-          elevation={3}
-        >
-          <Icon size={20} name="close" />
-        </Box>
-      </Pressable>
+      <Box
+        backgroundColor="pearl"
+        borderRadius="full"
+        padding="xs"
+        shadowColor="ink"
+        shadowOffset={{ width: 0, height: 2 }}
+        shadowOpacity={0.3}
+        shadowRadius={3}
+        elevation={3}
+      >
+        <Icon size={20} name="close" />
+      </Box>
     </Box>
   );
 };

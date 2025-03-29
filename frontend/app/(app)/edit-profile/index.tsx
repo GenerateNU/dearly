@@ -1,22 +1,17 @@
 import { Box } from "@/design-system/base/box";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, SetStateAction } from "react";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z, ZodError } from "zod";
 import { Text } from "@/design-system/base/text";
 import { Pressable, Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { FlatList, ScrollView } from "react-native-gesture-handler";
+import { ScrollView } from "react-native-gesture-handler";
 import { BaseButton } from "@/design-system/base/button";
-import { DropdownItem } from "@/types/dropdown";
 import { CREATE_POST_SCHEMA, UPDATE_PHOTO_FORM } from "@/utilities/form-schema";
-import SelectedPhoto from "./photo";
 import ImagePlaceholder from "./photo-placeholder";
-import { useUploadGroupMedia } from "@/hooks/api/media";
-import { useCreatePost } from "@/hooks/api/post";
 import { router } from "expo-router";
 import { getPhotoBlobs } from "@/utilities/media";
-import { CreatePostPayload } from "@/types/post";
 import { TextButton } from "@/design-system/components/shared/buttons/text-button";
 import Input from "@/design-system/components/shared/controls/input";
 import { useUserStore } from "@/auth/store";
@@ -24,6 +19,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getUser } from "@/api/user";
 import { usePatchUser, useUploadUserMedia } from "@/hooks/api/user";
 import { UpdateUserPayload } from "@/types/user";
+import SelectedPhoto from "./photo";
 
 const PHOTO_DIMENSION = 200;
 type UpdatePhotoData = z.infer<typeof UPDATE_PHOTO_FORM>;
@@ -41,7 +37,7 @@ const PostCreationForm = () => {
     resolver: zodResolver(CREATE_POST_SCHEMA),
     mode: "onChange",
     defaultValues: {
-      profilePhoto: ""
+      profilePhoto: "",
     },
   });
 
@@ -63,21 +59,20 @@ const PostCreationForm = () => {
   const onSubmit = async (form: UpdatePhotoData) => {
     try {
       const data = UPDATE_PHOTO_FORM.parse(form);
-      console.log("data",data)
+      console.log("data", data);
       const formData = await getPhotoBlobs([data.profilePhoto]);
-      console.log("formdata",formData)
+      console.log("formdata", formData);
       const keys = await uploadMedia(formData);
-      console.log("data",data)
-      console.log("keys",keys)
+      console.log("data", data);
+      console.log("keys", keys);
 
       await patchUser({
         media: keys as UpdateUserPayload["profilePhoto"],
       });
-      
+
       if (!mediaError || !createPostError) {
         router.push("/(app)/(tabs)/profile");
       }
-
     } catch (err: unknown) {
       if (err instanceof ZodError) {
         const errorMessages = err.errors.map((error) => error.message).join("\n");
@@ -100,23 +95,14 @@ const PostCreationForm = () => {
       return;
     }
 
-    console.log("result",result)
-    console.log("result",result!.assets[0]!.uri)
+    console.log("result", result);
+    console.log("result", result!.assets[0]!.uri);
 
-      setFormValue("profilePhoto", result!.assets[0]!.uri);
-      trigger("profilePhoto");
+    setFormValue("profilePhoto", result!.assets[0]!.uri);
+    trigger("profilePhoto");
   };
 
-  const renderPhotoItem = ({ item, index }: { item: string; index: number }) => (
-    <SelectedPhoto
-      uri={item}
-      dimension={PHOTO_DIMENSION}
-      index={index}
-      onRemove={() => {}}
-    />
-  );
-
-  const { group, userId } = useUserStore();
+  const { userId } = useUserStore();
 
   const { isPending, isError, data, error } = useQuery({
     queryKey: ["api", "v1", "users", userId],
@@ -142,25 +128,10 @@ const PostCreationForm = () => {
             </Pressable>
           ) : (
             <Box width="100%">
-              <FlatList
-                data={watchPhotos}
-                renderItem={renderPhotoItem}
-                keyExtractor={(_, index) => index.toString()}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{ paddingLeft: "20%" }}
-              />
+              <SelectedPhoto uri={watchPhotos} dimension={PHOTO_DIMENSION} index={0} />
             </Box>
           )}
           <Box gap="s" width="100%">
-            <TextButton
-              onPress={pickImage}
-              variant="secondary"
-              label={
-                watchPhotos?.length > 0 ? `Add more photos (${watchPhotos.length}/3)` : "Add photos"
-              }
-            />
-
             <Text color="ink" variant="caption" textAlign="left">
               Name
             </Text>
@@ -237,7 +208,7 @@ const PostCreationForm = () => {
                     }}
                     isButton={true}
                     value={value}
-                    placeholder={data ? data.bio : "Bio..."}
+                    placeholder={data ? data.bio! : "Bio..."}
                   />
                 )}
               />
@@ -261,7 +232,7 @@ const PostCreationForm = () => {
                     }}
                     isButton={true}
                     value={value}
-                    placeholder={data ? data.birthday : "MM/DD/YYYY"}
+                    placeholder={data ? data.birthday! : "MM/DD/YYYY"}
                   />
                 )}
               />
@@ -281,17 +252,12 @@ const PostCreationForm = () => {
           )}
         </Box>
         <Box alignItems="center" width="100%">
-        <TextButton
-          disabled={
-            !isValid ||
-            watchPhotos.length === 0 ||
-            isPendingMedia ||
-            isPendingCreatePost
-          }
-          variant="primary"
-          onPress={handleSubmit(onSubmit)}
-          label="Save"
-        />
+          <TextButton
+            disabled={!isValid || watchPhotos.length === 0 || isPendingMedia || isPendingCreatePost}
+            variant="primary"
+            onPress={handleSubmit(onSubmit)}
+            label="Save"
+          />
         </Box>
       </Box>
     </ScrollView>
