@@ -1,18 +1,18 @@
 import { ImagePost } from "@/design-system/components/posts/post";
-import { FlatList, RefreshControl, ScrollView } from "react-native-gesture-handler";
+import { FlatList, RefreshControl } from "react-native-gesture-handler";
 import { Box } from "@/design-system/base/box";
 import { Post } from "@/types/post";
 import { useGroupFeed } from "@/hooks/api/post";
 import PostSkeleton from "./skeleton";
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import BottomSheet from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheet/BottomSheet";
 import { CommentPopUp } from "@/design-system/components/comments/comment-popup";
 import Input from "@/design-system/components/shared/controls/input";
 import MultitrackAudio from "@/assets/audio.svg";
 import { commentPopUpAttributes } from "@/types/comment";
 import Spinner from "@/design-system/components/shared/spinner";
-import { Dimensions } from "react-native";
 import { Animated } from "react-native";
+import { LikePopup } from "@/design-system/components/posts/like-popup";
 
 const Feed = () => {
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage, isLoading } = useGroupFeed();
@@ -25,6 +25,8 @@ const Feed = () => {
     caption: "",
   });
   const ref = useRef<BottomSheet>(null);
+  const likeRef = useRef<BottomSheet>(null);
+  const [likePostId, setLikePostId] = useState<string>("");
 
   const onEndReached = () => {
     if (hasNextPage && !isFetchingNextPage) {
@@ -38,6 +40,11 @@ const Feed = () => {
     setCommentAttributes({ commentId: id, caption: caption, likes: likes });
     ref.current?.snapToIndex(0);
   };
+
+  const onClickLikes = useCallback((postId: string) => {
+    setLikePostId(postId);
+    likeRef.current?.expand();
+  }, []);
 
   const renderFooter = () => {
     if (!isFetchingNextPage || isLoading) return null;
@@ -57,10 +64,10 @@ const Feed = () => {
           location={item.location}
           isLiked={item.isLiked}
           comments={item.comments}
-          likes={item.likes}
           caption={item.caption}
           media={item.media}
           groupId={item.groupId}
+          onLikeClicked={() => onClickLikes(item.id)}
           onCommentClicked={() => onClickComment(item.id, item.caption, item.likes)}
         />
         <Input
@@ -109,7 +116,7 @@ const Feed = () => {
           onEndReachedThreshold={0.5}
           contentContainerStyle={{
             paddingBottom: 150,
-            paddingHorizontal: 20
+            paddingHorizontal: 20,
           }}
           onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
             useNativeDriver: false,
@@ -121,11 +128,12 @@ const Feed = () => {
               style={{ backgroundColor: "transparent" }}
               refreshing={refreshing}
               onRefresh={onRefresh}
-            ></RefreshControl>
+            />
           }
-        ></FlatList>
+        />
       </Box>
       <CommentPopUp ref={ref} attributes={commentAttributes} />
+      <LikePopup ref={likeRef} postId={likePostId} />
     </Box>
   );
 };

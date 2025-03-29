@@ -23,9 +23,9 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
   location,
   isLiked,
   comments,
-  // likes,
   caption,
   media,
+  onLikeClicked,
   onCommentClicked,
   groupId,
 }) => {
@@ -37,20 +37,16 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
     )
     .map((item: any) => item.url);
 
-  const { mutate } = useToggleLike(id, groupId);
+  const { mutate: mutateLike } = useToggleLike(id, groupId);
   const { data: like_data, refetch } = useGetAllLikeUsers(id);
 
   const likePost = useCallback(() => {
-    mutate();
     setLike(!like);
+    mutateLike();
     refetch();
-  }, [mutate, refetch]);
+  }, [mutateLike, refetch]);
 
   const likes = like_data?.pages?.reduce((total, page) => total + page.length, 0) || 0;
-
-  const onLikeClick = () => {
-    null;
-  };
 
   return (
     <Box flexDirection="column" gap="s">
@@ -65,7 +61,7 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
       <ImageCarousel setLike={likePost} like={like} data={data} />
       <CommentLike
         onCommentClicked={onCommentClicked}
-        onLikeClicked={onLikeClick}
+        onLikeClicked={onLikeClicked}
         liked={like}
         postId={id}
         likes={likes}
