@@ -17,10 +17,11 @@ import { AnimatedBox } from "@/design-system/base/animated-box";
 import { useUserStore } from "@/auth/store";
 import EmptyDataDisplay from "@/design-system/components/shared/states/empty";
 import { EmptyFeed } from "@/design-system/components/posts/empty-feed";
+import ErrorDisplay from "@/design-system/components/shared/states/error";
 
 const Feed = () => {
   const { group } = useUserStore();
-  const { data, isFetchingNextPage, fetchNextPage, hasNextPage, isLoading, refetch } = useGroupFeed(
+  const { data, isFetchingNextPage, isError, fetchNextPage, hasNextPage, isLoading, refetch } = useGroupFeed(
     group?.id as string,
   );
 
@@ -108,6 +109,7 @@ const Feed = () => {
   }
 
   return (
+    isError ? <ErrorDisplay refresh={onRefresh}/> : 
     <Box>
       {refreshing && (
         <AnimatedBox
@@ -155,6 +157,7 @@ const Feed = () => {
       <CommentPopUp ref={ref} attributes={commentAttributes} />
       <LikePopup ref={likeRef} postId={likePostId} />
     </Box>
+    
   );
 };
 
