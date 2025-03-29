@@ -9,6 +9,7 @@ import { playbackStates } from "@/types/comment";
 import * as FileSystem from "expo-file-system";
 
 interface PlaybackPropsWhenLocal {
+  id: string;
   local: true; // is the audio message being stored locally or in s3
   dbLevels: number[];
   audioLength: number;
@@ -16,6 +17,7 @@ interface PlaybackPropsWhenLocal {
 }
 
 interface PlaybackPropsWhenURL {
+  id: string;
   local: false;
   location: string;
   dbLevels?: number[];
@@ -24,7 +26,7 @@ interface PlaybackPropsWhenURL {
 
 type PlaybackProps = PlaybackPropsWhenLocal | PlaybackPropsWhenURL;
 
-export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength, location }) => {
+export const Playback: React.FC<PlaybackProps> = ({ id, local, dbLevels, audioLength, location }) => {
   const [status, setStatus] = useState<playbackStates>({ playing: false, pausing: false });
   const [sound, setSound] = useState<Audio.Sound>();
   const [length, setLength] = useState<number>(0);
@@ -42,7 +44,7 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
       } else {
         const downloadResult = await FileSystem.downloadAsync(
           location,
-          FileSystem.documentDirectory + "temp-audio.mp3",
+          FileSystem.documentDirectory + `temp-audio-${id}.mp3`,
         );
 
         const localUri = downloadResult.uri;
@@ -74,6 +76,7 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
       await sound?.playAsync();
     } else {
       setStatus({ ...status, playing: true });
+      await Audio.setAudioModeAsync({ playsInSilentModeIOS : true })
       const { sound } = await Audio.Sound.createAsync({ uri: local ? location : uri });
       sound.setOnPlaybackStatusUpdate(onPlayingUpdate);
       sound.setProgressUpdateIntervalAsync(500);
