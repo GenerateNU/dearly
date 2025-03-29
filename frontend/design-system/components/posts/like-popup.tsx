@@ -1,4 +1,4 @@
-import React, { forwardRef} from "react";
+import React, { forwardRef } from "react";
 import { Box } from "@/design-system/base/box";
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
@@ -19,7 +19,6 @@ interface LikePopUpDataProps {
 }
 
 export const LikePopup = forwardRef<BottomSheetMethods, { postId: string }>((props, ref) => {
-
   return (
     <BottomSheetModal ref={ref} snapPoints={["60%"]}>
       {props.postId ? <LikePopUpData postId={props.postId} /> : <LikePopUpBlank />}
@@ -28,7 +27,11 @@ export const LikePopup = forwardRef<BottomSheetMethods, { postId: string }>((pro
 });
 
 const LikePopUpBlank = () => {
-  return <></>;
+  return (
+    <Box flex={1} justifyContent="center" alignItems="center">
+      <Text variant="bodyLargeBold">No likes yet</Text>
+    </Box>
+  );
 };
 
 const LikePopUpData: React.FC<LikePopUpDataProps> = ({ postId }) => {
@@ -39,12 +42,13 @@ const LikePopUpData: React.FC<LikePopUpDataProps> = ({ postId }) => {
     isFetchingNextPage,
     isLoading,
     error,
-    refetch
+    refetch,
   } = useGetAllLikeUsers(postId);
   const likes = likeData?.pages.flatMap((page) => page) || [];
 
   const onEndReached = () => {
-    if (hasNextPage) {
+    if (!isFetchingNextPage) return null;
+    if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
   };
@@ -52,8 +56,8 @@ const LikePopUpData: React.FC<LikePopUpDataProps> = ({ postId }) => {
   const likeResources = {
     data: likes,
     loading: isLoading,
-    error:  error ? error.message : null
-  }
+    error: error ? error.message : null,
+  };
 
   const renderFooter = () => {
     if (!isFetchingNextPage) return null;
@@ -76,30 +80,31 @@ const LikePopUpData: React.FC<LikePopUpDataProps> = ({ postId }) => {
   const SuccessComponent = () => {
     return (
       <Box position="relative" paddingHorizontal="m" height={"100%"} width={"100%"}>
-      <Box flexDirection="column" gap="s">
-        <Box flexDirection="row" gap="s" alignItems="center">
-          <Text variant="bodyLargeBold">
-            {likes.length === 1 ? "1 like" : `${likes.length} likes`}
-          </Text>
+        <Box flexDirection="column" gap="s">
+          <Box flexDirection="row" gap="s" alignItems="center">
+            <Text variant="bodyLargeBold">
+              {likes.length === 1 ? "1 like" : `${likes.length} likes`}
+            </Text>
+          </Box>
+          <Box borderRadius="xl" backgroundColor="slate" height={1}></Box>
         </Box>
-        <Box borderRadius="xl" backgroundColor="slate" height={1}></Box>
+        <BottomSheetFlatList
+          data={likes}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id ?? ""}
+          onEndReached={onEndReached}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={renderFooter}
+          contentContainerStyle={{
+            paddingTop: 5,
+            paddingBottom: 20,
+          }}
+          showsVerticalScrollIndicator={false}
+          style={{ flex: 1 }}
+        />
       </Box>
-      <BottomSheetFlatList
-        data={likes}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        onEndReached={onEndReached}
-        ListFooterComponent={renderFooter}
-        contentContainerStyle={{
-          paddingTop: 5,
-          paddingBottom: 20,
-        }}
-        showsVerticalScrollIndicator={false}
-        style={{ flex: 1 }}
-      />
-    </Box>
-    )
-  }
+    );
+  };
 
   return (
     <SafeAreaView edges={["top"]} className="flex-1">
@@ -107,10 +112,10 @@ const LikePopUpData: React.FC<LikePopUpDataProps> = ({ postId }) => {
         resourceState={likeResources}
         loadingComponent={<Spinner />}
         errorComponent={<ErrorDisplay refresh={refetch} />}
-        emptyComponent={<EmptyLikesDisplay/>}
+        emptyComponent={<EmptyLikesDisplay />}
         successComponent={<SuccessComponent />}
       />
-  </SafeAreaView>
+    </SafeAreaView>
   );
 };
 
