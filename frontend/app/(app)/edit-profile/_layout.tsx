@@ -20,9 +20,7 @@ export default function Layout() {
           headerTransparent: true,
           title: "",
           gestureEnabled: false,
-          headerLeft: () => (
-            <BackIcon onPress={() => router.navigate("/(app)/edit-profile")} />
-          ),
+          headerLeft: () => <BackIcon onPress={() => router.navigate("/(app)/edit-profile")} />,
         }}
       />
       <Stack.Screen
@@ -31,9 +29,7 @@ export default function Layout() {
           headerTransparent: true,
           title: "",
           gestureEnabled: false,
-          headerLeft: () => (
-            <BackIcon onPress={() => router.navigate("/(app)/edit-profile")} />
-          ),
+          headerLeft: () => <BackIcon onPress={() => router.navigate("/(app)/edit-profile")} />,
         }}
       />
       <Stack.Screen
@@ -42,9 +38,7 @@ export default function Layout() {
           headerTransparent: true,
           title: "",
           gestureEnabled: false,
-          headerLeft: () => (
-            <BackIcon onPress={() => router.navigate("/(app)/edit-profile")} />
-          ),
+          headerLeft: () => <BackIcon onPress={() => router.navigate("/(app)/edit-profile")} />,
         }}
       />
       <Stack.Screen
@@ -53,9 +47,7 @@ export default function Layout() {
           headerTransparent: true,
           title: "",
           gestureEnabled: false,
-          headerLeft: () => (
-            <BackIcon onPress={() => router.navigate("/(app)/edit-profile")} />
-          ),
+          headerLeft: () => <BackIcon onPress={() => router.navigate("/(app)/edit-profile")} />,
         }}
       />
     </Stack>

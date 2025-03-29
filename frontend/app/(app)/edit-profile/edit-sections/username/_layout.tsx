@@ -42,10 +42,14 @@ export default function Layout() {
           />
         )}
       />
-      <TextButton         onPress={() => {
+      <TextButton
+        onPress={() => {
           handleSubmit(onSubmit);
           router.push("/(app)/edit-profile");
-        }} label="Save" variant="primary" />
+        }}
+        label="Save"
+        variant="primary"
+      />
     </Box>
   );
 }

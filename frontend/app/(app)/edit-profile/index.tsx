@@ -20,6 +20,7 @@ import { getUser } from "@/api/user";
 import { usePatchUser, useUploadUserMedia } from "@/hooks/api/user";
 import { UpdateUserPayload } from "@/types/user";
 import SelectedPhoto from "./photo";
+import { Avatar } from "@/design-system/components/shared/avatar";
 
 const PHOTO_DIMENSION = 200;
 type UpdatePhotoData = z.infer<typeof UPDATE_PHOTO_FORM>;
@@ -122,15 +123,20 @@ const PostCreationForm = () => {
         y-space-20
       >
         <Box paddingTop="xxl" gap="xl" width="100%" alignItems="center" justifyContent="center">
-          {!watchPhotos || watchPhotos.length === 0 ? (
-            <Pressable onPress={pickImage}>
-              <ImagePlaceholder dimension={PHOTO_DIMENSION} />
-            </Pressable>
-          ) : (
-            <Box width="100%">
-              <SelectedPhoto uri={watchPhotos} dimension={PHOTO_DIMENSION} index={0} />
+          <Box
+            width="100%"
+            alignItems="center"
+            justifyContent="center"
+            flexDirection="column"
+            gap="m"
+          >
+            <Box alignItems="center" justifyContent="center">
+              <Avatar profilePhoto={watchPhotos} variant="huge" />
             </Box>
-          )}
+            <Box width="25%">
+              <TextButton onPress={pickImage} label="Edit" variant="primary" />
+            </Box>
+          </Box>
           <Box gap="s" width="100%">
             <Text color="ink" variant="caption" textAlign="left">
               Name

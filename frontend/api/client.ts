@@ -3,7 +3,7 @@ import createFetchClient, { Middleware } from "openapi-fetch";
 import { handleHTTPStatusError } from "@/utilities/errors";
 
 const fetchClient = createFetchClient<paths>({
-  baseUrl: process.env.EXPO_PUBLIC_API_BASE_URL,
+  baseUrl: process.env.EXPO_BASE_URL,
 });
 
 const middleware: Middleware = {
