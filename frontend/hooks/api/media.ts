@@ -1,8 +1,6 @@
 import { UploadGroupMediaResponse, Waveform, processMediaPayload } from "@/types/media";
 import { useMutationBase } from "./base";
 import { processMedia, uploadPostMedia } from "@/api/media";
-import { useQueryClient } from "@tanstack/react-query";
-
 /**
  * Hook to upload group media
  *

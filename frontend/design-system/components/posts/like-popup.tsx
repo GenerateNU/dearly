@@ -14,10 +14,9 @@ interface LikePopUpDataProps {
 }
 
 export const LikePopup = forwardRef<BottomSheetMethods, { postId: string }>((props, ref) => {
-  const [index, setIndex] = useState<number>(-1);
 
   return (
-    <BottomSheetModal ref={ref} snapPoints={["60%"]} onChange={(index: number) => setIndex(index)}>
+    <BottomSheetModal ref={ref} snapPoints={["60%"]}>
       {props.postId ? <LikePopUpData postId={props.postId} /> : <LikePopUpBlank />}
     </BottomSheetModal>
   );
