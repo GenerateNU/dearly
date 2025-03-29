@@ -12,7 +12,6 @@ import { CalendarDay } from "@/types/group";
 import Feed, { CommentLikesPopup } from "./feed";
 import { CustomDayComponent } from "./calendar-day";
 import Spinner from "@/design-system/components/shared/spinner";
-import { useFeedContext } from "@/contexts/feed-post-context";
 import BottomSheet from "@gorhom/bottom-sheet";
 
 type ViewMode = "month" | "week" | "year";
