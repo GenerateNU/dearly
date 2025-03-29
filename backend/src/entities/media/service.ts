@@ -291,7 +291,6 @@ export class MediaServiceImpl {
 
   getDBData(media: string, interval = 500): Promise<WaveForm> {
     return new Promise((resolve, reject) => {
-      const dbData: number[] = [];
       let length = 0;
 
       ffmpeg.ffprobe(media, (err: Error, metadata: FfprobeData) => {
@@ -305,6 +304,7 @@ export class MediaServiceImpl {
 
         length = metadata.format.duration
         const segments = Math.floor((length * 1000) / interval);
+        const dbData: number[] = new Array(segments).fill(0); // Preallocate array
         let completedSegments = 0;
         for (let i = 0; i < segments; i++) {
           const timestamp = (i * length) / 1000;
@@ -322,7 +322,7 @@ export class MediaServiceImpl {
               if (stderrLine.includes("mean_volume:")) {
                 const match = stderrLine.match(/mean_volume: ([-\d.]+) dB/);
                 if (match && match[1]) {
-                  dbData.push(parseFloat(match[1]));
+                  dbData[i] = parseFloat(match[1]);
                 }
               }
             })

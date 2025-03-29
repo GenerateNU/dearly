@@ -61,7 +61,7 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
         const response = await processAudio({url: location});
         setLength(response.length)
         setTotalLength(response.length)
-        setMemoLines(condenseAudioBarHeights(25, response.data, 70))
+        setMemoLines(condenseAudioBarHeights(25, response.data, 91))
       }
     }
     initializeValues();
