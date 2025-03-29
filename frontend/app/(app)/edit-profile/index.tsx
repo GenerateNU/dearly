@@ -51,15 +51,11 @@ const PostCreationForm = () => {
   const onSubmit = async (form: UpdatePhotoData) => {
     try {
       const data = UPDATE_PHOTO_FORM.parse(form);
-      console.log("data", data);
       const formData = await getPhotoBlobs([data.profilePhoto]);
-      console.log("formdata", formData);
-      const keys = await uploadMedia(formData);
-      console.log("data", data);
-      console.log("keys", keys);
+      const media = await uploadMedia(formData);
 
       await patchUser({
-        media: keys as UpdateUserPayload["profilePhoto"],
+        profilePhoto: media.objectKey,
       });
 
       if (!mediaError || !createPostError) {
