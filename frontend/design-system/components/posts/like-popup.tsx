@@ -1,4 +1,4 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef, useState, useEffect } from "react";
 import { Box } from "@/design-system/base/box";
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
@@ -14,27 +14,27 @@ import Spinner from "../shared/spinner";
 import ErrorDisplay from "../shared/states/error";
 import { EmptyLikesDisplay } from "./empty-likes";
 
-interface LikePopUpDataProps {
-  postId: string;
-}
-
 export const LikePopup = forwardRef<BottomSheetMethods, { postId: string }>((props, ref) => {
+  const [isEmpty, setIsEmpty] = useState(false);
+  const snapPoints = isEmpty ? ["40%"] : ["60%"];
+
   return (
-    <BottomSheetModal ref={ref} snapPoints={["60%"]}>
-      {props.postId ? <LikePopUpData postId={props.postId} /> : <LikePopUpBlank />}
+    <BottomSheetModal ref={ref} snapPoints={snapPoints}>
+      {props.postId ? (
+        <LikePopUpData postId={props.postId} onEmptyChange={(empty) => setIsEmpty(empty)} />
+      ) : (
+        <></>
+      )}
     </BottomSheetModal>
   );
 });
 
-const LikePopUpBlank = () => {
-  return (
-    <Box flex={1} justifyContent="center" alignItems="center">
-      <Text variant="bodyLargeBold">No likes yet</Text>
-    </Box>
-  );
-};
+interface LikePopUpDataProps {
+  postId: string;
+  onEmptyChange: (isEmpty: boolean) => void;
+}
 
-const LikePopUpData: React.FC<LikePopUpDataProps> = ({ postId }) => {
+const LikePopUpData: React.FC<LikePopUpDataProps> = ({ postId, onEmptyChange }) => {
   const {
     data: likeData,
     fetchNextPage,
@@ -44,19 +44,25 @@ const LikePopUpData: React.FC<LikePopUpDataProps> = ({ postId }) => {
     error,
     refetch,
   } = useGetAllLikeUsers(postId);
+
   const likes = likeData?.pages.flatMap((page) => page) || [];
 
-  const onEndReached = () => {
-    if (!isFetchingNextPage) return null;
-    if (hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
+  useEffect(() => {
+    if (!isLoading && likeData) {
+      onEmptyChange(likes.length === 0);
     }
-  };
+  }, [isLoading, likeData, onEmptyChange]);
 
   const likeResources = {
     data: likes,
     loading: isLoading,
     error: error ? error.message : null,
+  };
+
+  const onEndReached = () => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
   };
 
   const renderFooter = () => {
@@ -88,20 +94,24 @@ const LikePopUpData: React.FC<LikePopUpDataProps> = ({ postId }) => {
           </Box>
           <Box borderRadius="xl" backgroundColor="slate" height={1}></Box>
         </Box>
-        <BottomSheetFlatList
-          data={likes}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id ?? ""}
-          onEndReached={onEndReached}
-          onEndReachedThreshold={0.5}
-          ListFooterComponent={renderFooter}
-          contentContainerStyle={{
-            paddingTop: 5,
-            paddingBottom: 20,
-          }}
-          showsVerticalScrollIndicator={false}
-          style={{ flex: 1 }}
-        />
+        {likes.length !== 0 ? (
+          <BottomSheetFlatList
+            data={likes}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id ?? ""}
+            onEndReached={onEndReached}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={renderFooter}
+            contentContainerStyle={{
+              paddingTop: 5,
+              paddingBottom: 20,
+            }}
+            showsVerticalScrollIndicator={false}
+            style={{ flex: 1 }}
+          />
+        ) : (
+          <EmptyLikesDisplay />
+        )}
       </Box>
     );
   };

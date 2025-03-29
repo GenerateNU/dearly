@@ -39,16 +39,16 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
     )
     .map((item: any) => item.url);
 
-  const { mutate, isSuccess, isError} = useToggleLike(id, group?.id as string);
+  const { mutate, isSuccess, isError } = useToggleLike(id, group?.id as string);
   const [pending, setPending] = useState<boolean>(false);
 
   const toggleLike = () => {
-    setPending(true)
-    mutate()
-    if(isSuccess || isError){
-      setPending(false)
+    setPending(true);
+    mutate();
+    if (isSuccess || isError) {
+      setPending(false);
     }
-  }
+  };
 
   return (
     <Box flexDirection="column" gap="s">
@@ -60,7 +60,7 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
         createdAt={createdAt}
         onPress={() => null}
       />
-      <ImageCarousel setLike={toggleLike} like={pending || isLiked } data={data} />
+      <ImageCarousel setLike={toggleLike} like={pending || isLiked} data={data} />
       <CommentLike
         onCommentClicked={onCommentClicked}
         onLikeClicked={onLikeClicked}

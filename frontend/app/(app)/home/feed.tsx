@@ -20,9 +20,8 @@ import ErrorDisplay from "@/design-system/components/shared/states/error";
 
 const Feed = () => {
   const { group } = useUserStore();
-  const { data, isFetchingNextPage, isError, fetchNextPage, hasNextPage, isLoading, refetch } = useGroupFeed(
-    group?.id as string,
-  );
+  const { data, isFetchingNextPage, isError, fetchNextPage, hasNextPage, isLoading, refetch } =
+    useGroupFeed(group?.id as string);
 
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [scrollY] = useState(new Animated.Value(0));
@@ -107,8 +106,9 @@ const Feed = () => {
     );
   }
 
-  return (
-    isError ? <ErrorDisplay refresh={onRefresh}/> : 
+  return isError ? (
+    <ErrorDisplay refresh={onRefresh} />
+  ) : (
     <Box>
       {refreshing && (
         <AnimatedBox
@@ -156,7 +156,6 @@ const Feed = () => {
       <CommentPopUp ref={ref} attributes={commentAttributes} />
       <LikePopup ref={likeRef} postId={likePostId} />
     </Box>
-    
   );
 };
 
