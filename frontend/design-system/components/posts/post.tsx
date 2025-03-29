@@ -59,10 +59,12 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
         likes={likes}
         comments={comments}
       />
-      <Box gap="s" flexDirection="row" justifyContent="flex-start" alignItems="center">
-        <Text>💬</Text>
-        <Text>{caption}</Text>
-      </Box>
+      {caption && (
+        <Box gap="s" flexDirection="row" justifyContent="flex-start" alignItems="center">
+          <Text>💬</Text>
+          <Text>{caption}</Text>
+        </Box>
+      )}
     </Box>
   );
 };

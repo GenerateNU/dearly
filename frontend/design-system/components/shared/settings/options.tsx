@@ -1,9 +1,11 @@
 import { Box } from "@/design-system/base/box";
-import { TextButton } from "@/design-system/components/shared/buttons/text-button";
 import { useUserStore } from "@/auth/store";
 import { Text } from "@/design-system/base/text";
 import RedTextButton from "../buttons/red-text-button";
 import { router } from "expo-router";
+import { TouchableOpacity } from "react-native";
+import { useIsBasicMode } from "@/hooks/component/mode";
+import Arrow from "@/assets/arrow.svg";
 
 interface CloseModalProps {
   close: () => void;
@@ -18,6 +20,7 @@ type AppRoute =
 
 const GroupOptionContent: React.FC<CloseModalProps> = ({ close }) => {
   const { group, userId } = useUserStore();
+  const isBasic = useIsBasicMode();
 
   if (!group) return null;
 
@@ -28,6 +31,18 @@ const GroupOptionContent: React.FC<CloseModalProps> = ({ close }) => {
     router.push(path);
   };
 
+  const Button = ({ route, label }: { route: AppRoute; label: string }) => {
+    return (
+      <TouchableOpacity
+        style={{ justifyContent: "space-between", alignItems: "center", flexDirection: "row" }}
+        onPress={() => handleNavigation(route)}
+      >
+        <Text variant="bodyLargeBold">{label}</Text>
+        {isBasic && <Arrow />}
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <Box gap="s" flexDirection="column">
       <Text color="darkGray" variant="caption">
@@ -35,24 +50,9 @@ const GroupOptionContent: React.FC<CloseModalProps> = ({ close }) => {
       </Text>
       {isManager ? (
         <Box gap="s">
-          <TextButton
-            textVariant="bodyLargeBold"
-            onPress={() => handleNavigation("/(app)/group/change-name")}
-            label="Change Group Name"
-            variant="text"
-          />
-          <TextButton
-            textVariant="bodyLargeBold"
-            onPress={() => handleNavigation("/(app)/group/add-member")}
-            label="Add New Member"
-            variant="text"
-          />
-          <TextButton
-            textVariant="bodyLargeBold"
-            onPress={() => handleNavigation("/(app)/group/set-nudge")}
-            label="Set Recurring Nudge"
-            variant="text"
-          />
+          <Button route="/(app)/group/change-name" label="Change Group Name" />
+          <Button route="/(app)/group/add-member" label="Add New Member" />
+          <Button route="/(app)/group/set-nudge" label="Set Recurring Nudge" />
           <RedTextButton
             onPress={() => handleNavigation("/(app)/group/delete")}
             label="Delete Group"
