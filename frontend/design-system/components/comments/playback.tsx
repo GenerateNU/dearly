@@ -8,9 +8,6 @@ import { condenseAudioBarHeights} from "@/utilities/audio";
 import { playbackStates } from "@/types/comment";
 import * as FileSystem from "expo-file-system";
 import { useProcessAudio } from "@/hooks/api/media";
-import { Icon } from "../shared/icons/icon";
-import Spinner from "../shared/spinner";
-
 
 interface PlaybackPropsWhenLocal {
   local: true; // is the audio message being stored locally or in s3
@@ -38,8 +35,6 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
   const [totalLength, setTotalLength] = useState<number>(0);
   const {
     mutateAsync: processAudio,
-    error: mediaError,
-    isPending,
   } = useProcessAudio();
 
   const uniqueFilename = `temp-audio-${new Date().getTime()}-${Math.random().toString(36).substring(7)}`;

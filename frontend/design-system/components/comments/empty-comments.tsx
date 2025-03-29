@@ -1,8 +1,5 @@
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
-import { router } from "expo-router";
-import { TextButton } from "../shared/buttons/text-button";
-import EmptyDataDisplay from "../shared/states/empty";
 
 type EmptyCommentsProps = {
     caption:string

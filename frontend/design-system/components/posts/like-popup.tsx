@@ -1,11 +1,10 @@
-import React, { forwardRef, useState } from "react";
+import React, { forwardRef} from "react";
 import { Box } from "@/design-system/base/box";
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import BottomSheetModal from "../shared/bottom-sheet";
 import { Text } from "@/design-system/base/text";
 import { LikeCard } from "./like-card";
-import { CommentSkeleton } from "../comments/comment-skeleton";
 import { SearchedUser } from "@/types/user";
 import { useGetAllLikeUsers } from "@/hooks/api/like";
 import { LikeSkeleton } from "./like-skeleton";

@@ -39,7 +39,7 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
     )
     .map((item: any) => item.url);
 
-  const { mutate, isPending, isSuccess, isError} = useToggleLike(id, group?.id as string);
+  const { mutate, isSuccess, isError} = useToggleLike(id, group?.id as string);
   const [pending, setPending] = useState<boolean>(false);
 
   const toggleLike = () => {

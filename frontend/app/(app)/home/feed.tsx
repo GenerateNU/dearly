@@ -15,7 +15,6 @@ import { Animated } from "react-native";
 import { LikePopup } from "@/design-system/components/posts/like-popup";
 import { AnimatedBox } from "@/design-system/base/animated-box";
 import { useUserStore } from "@/auth/store";
-import EmptyDataDisplay from "@/design-system/components/shared/states/empty";
 import { EmptyFeed } from "@/design-system/components/posts/empty-feed";
 import ErrorDisplay from "@/design-system/components/shared/states/error";
 
