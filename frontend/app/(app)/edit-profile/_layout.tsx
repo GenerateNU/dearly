@@ -8,7 +8,7 @@ export default function Layout() {
         name="index"
         options={{
           headerTitle: "",
-          headerTransparent: false,
+          headerTransparent: true,
           headerShown: false,
           gestureEnabled: false,
           headerLeft: () => <BackIcon onPress={() => router.navigate("/(app)/(tabs)/profile")} />,

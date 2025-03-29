@@ -7,6 +7,7 @@ import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { usePatchUser } from "@/hooks/api/user";
+import { router } from "expo-router";
 
 type UPDATE_USER_FORM_TYPE = z.infer<typeof UPDATE_USERNAME_FORM>;
 
@@ -41,7 +42,10 @@ export default function Layout() {
           />
         )}
       />
-      <TextButton onPress={handleSubmit(onSubmit)} label="Save" variant="primary" />
+      <TextButton         onPress={() => {
+          handleSubmit(onSubmit);
+          router.push("/(app)/edit-profile");
+        }} label="Save" variant="primary" />
     </Box>
   );
 }

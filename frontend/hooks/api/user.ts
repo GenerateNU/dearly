@@ -2,6 +2,8 @@ import { getNotifications, getUserGroups, updateUser } from "@/api/user";
 import { Notifications } from "@/types/user";
 import { useMutationBase, useQueryPagination } from "./base";
 import { Group } from "@/types/group";
+import { UploadUserMediaResponse } from "@/types/media";
+import { uploadUserMedia } from "@/api/media";
 
 /**
  * Hook to get all user notifications
@@ -30,4 +32,16 @@ export const usePatchUser = (options: any = {}) => {
  */
 export const useUserGroups = (options: any = {}) => {
   return useQueryPagination<Group[]>(["users", "groups"], getUserGroups, options, 5);
+};
+
+/**
+ * Hook to upload group media
+ *
+ * @returns Mutation object for creating a group
+ */
+export const useUploadUserMedia = (id: string) => {
+  return useMutationBase<FormData, UploadUserMediaResponse>(
+    (form) => uploadUserMedia(form),
+    ["user", id, "media"],
+  );
 };

@@ -9,7 +9,7 @@ import * as ImagePicker from "expo-image-picker";
 import { FlatList, ScrollView } from "react-native-gesture-handler";
 import { BaseButton } from "@/design-system/base/button";
 import { DropdownItem } from "@/types/dropdown";
-import { CREATE_POST_SCHEMA } from "@/utilities/form-schema";
+import { CREATE_POST_SCHEMA, UPDATE_PHOTO_FORM } from "@/utilities/form-schema";
 import SelectedPhoto from "./photo";
 import ImagePlaceholder from "./photo-placeholder";
 import { useUploadGroupMedia } from "@/hooks/api/media";
@@ -19,21 +19,16 @@ import { getPhotoBlobs } from "@/utilities/media";
 import { CreatePostPayload } from "@/types/post";
 import { TextButton } from "@/design-system/components/shared/buttons/text-button";
 import Input from "@/design-system/components/shared/controls/input";
-import { Icon } from "@/design-system/components/shared/icons/icon";
 import { useUserStore } from "@/auth/store";
 import { useQuery } from "@tanstack/react-query";
 import { getUser } from "@/api/user";
+import { usePatchUser, useUploadUserMedia } from "@/hooks/api/user";
+import { UpdateUserPayload } from "@/types/user";
 
 const PHOTO_DIMENSION = 200;
-type CreatePostData = z.infer<typeof CREATE_POST_SCHEMA>;
+type UpdatePhotoData = z.infer<typeof UPDATE_PHOTO_FORM>;
 
-interface PostCreationFormProps {
-  groups: DropdownItem[];
-  isLoading: boolean;
-  onEndReached: () => void;
-}
-
-const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormProps) => {
+const PostCreationForm = () => {
   const {
     control,
     handleSubmit,
@@ -42,62 +37,47 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
     getValues,
     watch,
     formState: { errors, isValid },
-  } = useForm<CreatePostData>({
+  } = useForm<UpdatePhotoData>({
     resolver: zodResolver(CREATE_POST_SCHEMA),
     mode: "onChange",
     defaultValues: {
-      photos: [],
-      group: "",
+      profilePhoto: ""
     },
   });
 
-  const watchPhotos = watch("photos");
-  const watchGroup = watch("group");
+  const watchPhotos = watch("profilePhoto");
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
-
-  const handleGroupUpdate = (value: SetStateAction<string | null>) => {
-    setSelectedGroup(value);
-    if (typeof value === "string") {
-      setFormValue("group", value);
-      trigger("group");
-    } else if (typeof value === "function") {
-      const newValue = value(selectedGroup);
-      if (newValue) {
-        setFormValue("group", newValue);
-        trigger("group");
-      } else {
-        setFormValue("group", "");
-        trigger("group");
-      }
-    }
-  };
 
   const {
     mutateAsync: uploadMedia,
     isPending: isPendingMedia,
     error: mediaError,
-  } = useUploadGroupMedia(getValues("group"));
+  } = useUploadUserMedia(getValues("profilePhoto"));
 
   const {
-    mutateAsync: createPost,
+    mutateAsync: patchUser,
     isPending: isPendingCreatePost,
     error: createPostError,
-  } = useCreatePost(getValues("group"));
+  } = usePatchUser();
 
-  const onSubmit = async (form: CreatePostData) => {
+  const onSubmit = async (form: UpdatePhotoData) => {
     try {
-      const data = CREATE_POST_SCHEMA.parse(form);
-      const formData = await getPhotoBlobs(data.photos);
+      const data = UPDATE_PHOTO_FORM.parse(form);
+      console.log("data",data)
+      const formData = await getPhotoBlobs([data.profilePhoto]);
+      console.log("formdata",formData)
       const keys = await uploadMedia(formData);
+      console.log("data",data)
+      console.log("keys",keys)
 
-      await createPost({
-        media: keys as CreatePostPayload["media"],
-        caption: data.caption,
-        location: data.location,
+      await patchUser({
+        media: keys as UpdateUserPayload["profilePhoto"],
       });
+      
       if (!mediaError || !createPostError) {
-        router.push("/(app)/(tabs)");
+        router.push("/(app)/(tabs)/profile");
       }
+
     } catch (err: unknown) {
       if (err instanceof ZodError) {
         const errorMessages = err.errors.map((error) => error.message).join("\n");
@@ -107,24 +87,12 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
   };
 
   const pickImage = async () => {
-    const currentPhotos = getValues("photos") || [];
-    if (currentPhotos.length >= 3) {
-      Alert.alert(
-        "Maximum Photos Reached",
-        "You've already selected 3 photos. Please remove at least one photo before adding more.",
-        [{ text: "OK" }],
-      );
-      return;
-    }
-
-    const remainingSlots = 3 - currentPhotos.length;
-
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       aspect: [4, 4],
       quality: 1,
-      allowsMultipleSelection: true,
-      selectionLimit: remainingSlots,
+      allowsMultipleSelection: false,
+      selectionLimit: 1,
       orderedSelection: true,
     });
 
@@ -132,19 +100,11 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
       return;
     }
 
-    if (result.assets) {
-      const newPhotos = result.assets.map((asset) => asset.uri);
-      const combinedPhotos = [...currentPhotos, ...newPhotos].slice(0, 3);
-      setFormValue("photos", combinedPhotos);
-      trigger("photos");
-    }
-  };
+    console.log("result",result)
+    console.log("result",result!.assets[0]!.uri)
 
-  const removePhoto = (indexToRemove: number) => {
-    const currentPhotos = getValues("photos") || [];
-    const updatedPhotos = currentPhotos.filter((_, index) => index !== indexToRemove);
-    setFormValue("photos", updatedPhotos);
-    trigger("photos");
+      setFormValue("profilePhoto", result!.assets[0]!.uri);
+      trigger("profilePhoto");
   };
 
   const renderPhotoItem = ({ item, index }: { item: string; index: number }) => (
@@ -152,7 +112,7 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
       uri={item}
       dimension={PHOTO_DIMENSION}
       index={index}
-      onRemove={() => removePhoto(index)}
+      onRemove={() => {}}
     />
   );
 
@@ -200,11 +160,6 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
                 watchPhotos?.length > 0 ? `Add more photos (${watchPhotos.length}/3)` : "Add photos"
               }
             />
-            {errors.photos && (
-              <Text color="error" variant="caption" textAlign="left">
-                {errors.photos.message}
-              </Text>
-            )}
 
             <Text color="ink" variant="caption" textAlign="left">
               Name
@@ -216,7 +171,7 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
               }}
             >
               <Controller
-                name="location"
+                name="profilePhoto"
                 control={control}
                 render={({ field: { onChange, value } }) => (
                   <Input
@@ -226,11 +181,10 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
                     isButton={true}
                     onChangeText={(text: string) => {
                       onChange(text);
-                      trigger("location");
+                      trigger("profilePhoto");
                     }}
                     value={value}
                     placeholder={data ? data.name : "Name..."}
-                    error={errors.location && errors.location.message}
                   />
                 )}
               />
@@ -245,7 +199,7 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
               }}
             >
               <Controller
-                name="location"
+                name="profilePhoto"
                 control={control}
                 render={({ field: { onChange, value } }) => (
                   <Input
@@ -255,11 +209,10 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
                     isButton={true}
                     onChangeText={(text: string) => {
                       onChange(text);
-                      trigger("location");
+                      trigger("profilePhoto");
                     }}
                     value={value}
                     placeholder={data ? data.username : "Username..."}
-                    error={errors.location && errors.location.message}
                   />
                 )}
               />
@@ -274,7 +227,7 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
               }}
             >
               <Controller
-                name="location"
+                name="profilePhoto"
                 control={control}
                 render={({ field: { onChange, value } }) => (
                   <Input
@@ -285,7 +238,6 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
                     isButton={true}
                     value={value}
                     placeholder={data ? data.bio : "Bio..."}
-                    error={errors.location && errors.location.message}
                   />
                 )}
               />
@@ -300,7 +252,7 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
               }}
             >
               <Controller
-                name="location"
+                name="profilePhoto"
                 control={control}
                 render={({ field: { onChange, value } }) => (
                   <Input
@@ -310,7 +262,6 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
                     isButton={true}
                     value={value}
                     placeholder={data ? data.birthday : "MM/DD/YYYY"}
-                    error={errors.location && errors.location.message}
                   />
                 )}
               />
@@ -330,18 +281,17 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
           )}
         </Box>
         <Box alignItems="center" width="100%">
-          <TextButton
-            disabled={
-              !isValid ||
-              !watchGroup ||
-              watchPhotos.length === 0 ||
-              isPendingMedia ||
-              isPendingCreatePost
-            }
-            variant="primary"
-            onPress={handleSubmit(onSubmit)}
-            label="Post"
-          />
+        <TextButton
+          disabled={
+            !isValid ||
+            watchPhotos.length === 0 ||
+            isPendingMedia ||
+            isPendingCreatePost
+          }
+          variant="primary"
+          onPress={handleSubmit(onSubmit)}
+          label="Save"
+        />
         </Box>
       </Box>
     </ScrollView>

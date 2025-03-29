@@ -49,3 +49,7 @@ export const UPDATE_BIO_FORM = z.object({
 export const UPDATE_BIRTHDAY_FORM = z.object({
   birthday: z.date(),
 });
+
+export const UPDATE_PHOTO_FORM = z.object({
+  profilePhoto: z.string(),
+});
