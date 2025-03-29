@@ -130,7 +130,7 @@ const CommentPopUpData: React.FC<CommentPopUpDataProps> = ({ attributes, index }
         ListFooterComponent={renderFooter}
         contentContainerStyle={{
           paddingTop: 5,
-          paddingBottom: 210,
+          paddingBottom: 220,
         }}
         showsVerticalScrollIndicator={false}
         style={{ flex: 1 }}

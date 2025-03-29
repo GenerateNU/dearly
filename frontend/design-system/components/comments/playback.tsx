@@ -36,7 +36,6 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
   const [memoLines, setMemoLines] = useState<number[]>([]);
   const numLines = 23;
   const [totalLength, setTotalLength] = useState<number>(0);
-  const baseAudio = [3, 3, 3, 20, 30, 40, 50, 50, 50, 50, 90, 80, 70, 10, 10, 10]
   const {
     mutateAsync: processAudio,
     error: mediaError,
@@ -60,9 +59,6 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
         const localUri = downloadResult.uri;
         setUri(localUri);
         const response = await processAudio({url: location});
-        if(mediaError || isPending){
-          setMemoLines(condenseAudioBarHeights(25, baseAudio, 160))
-        }
         setLength(response.length)
         setTotalLength(response.length)
         setMemoLines(condenseAudioBarHeights(25, response.data, 70))
