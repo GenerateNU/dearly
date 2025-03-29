@@ -1,3 +1,4 @@
+import Birthday from "@/app/(auth)/register/birthday";
 import { z } from "zod";
 
 export const CREATE_POST_SCHEMA = z.object({
@@ -25,4 +26,26 @@ export const CREATE_POST_SCHEMA = z.object({
   group: z.string({
     required_error: "Group is required",
   }),
+});
+
+export const UPDATE_USER_FORM = z.object({
+  name: z.string().max(100, {
+    message: "Username must be less than 100 characters",
+  }),
+});
+
+export const UPDATE_USERNAME_FORM = z.object({
+  username: z.string().max(100, {
+    message: "Caption must be at most 100 characters",
+  }),
+});
+
+export const UPDATE_BIO_FORM = z.object({
+  bio: z.string().max(500, {
+    message: "Caption must be at most 500 characters",
+  }),
+});
+
+export const UPDATE_BIRTHDAY_FORM = z.object({
+  birthday: z.date(),
 });

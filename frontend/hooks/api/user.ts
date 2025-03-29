@@ -1,6 +1,6 @@
-import { getNotifications, getUserGroups } from "@/api/user";
+import { getNotifications, getUserGroups, updateUser } from "@/api/user";
 import { Notifications } from "@/types/user";
-import { useQueryPagination } from "./base";
+import { useMutationBase, useQueryPagination } from "./base";
 import { Group } from "@/types/group";
 
 /**
@@ -16,6 +16,10 @@ export const useUserNotification = (options: any = {}) => {
     options,
     10,
   );
+};
+
+export const usePatchUser = (options: any = {}) => {
+  return useMutationBase((payload) => updateUser(payload), ["users", "userid"]);
 };
 
 /**

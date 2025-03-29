@@ -16,7 +16,6 @@ export const useCreatePost = (groupId: string) => {
   );
 };
 
-
 export const useGroupFeed = (id: string, options: any = {}) => {
   return useQueryPagination<Post[]>(
     ["groups", id, "feed"],

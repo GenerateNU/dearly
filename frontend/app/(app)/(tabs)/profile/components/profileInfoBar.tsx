@@ -3,7 +3,6 @@ import { BaseButton } from "@/design-system/base/button";
 import { Text } from "@/design-system/base/text";
 import { useUserStore } from "@/auth/store";
 import { Icon } from "@/design-system/components/shared/icons/icon";
-import Photo from "../edit-profile/photo";
 import { getUser } from "@/api/user";
 import { useQuery } from "@tanstack/react-query";
 

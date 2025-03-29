@@ -14,9 +14,14 @@ export default function Layout() {
           headerLeft: () => <BackIcon onPress={() => router.navigate("/(app)/(tabs)/profile")} />,
         }}
       />
-      <Stack.Screen name="edit-profile" options={{ headerShown: false, gestureEnabled: false,
-        headerLeft: () => <BackIcon onPress={() => router.navigate("/(app)/(tabs)/profile")} />,
-       }} />
+      <Stack.Screen
+        name="edit-profile"
+        options={{
+          headerShown: false,
+          gestureEnabled: false,
+          headerLeft: () => <BackIcon onPress={() => router.navigate("/(app)/(tabs)/profile")} />,
+        }}
+      />
     </Stack>
   );
 }

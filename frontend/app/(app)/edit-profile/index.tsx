@@ -20,6 +20,9 @@ import { CreatePostPayload } from "@/types/post";
 import { TextButton } from "@/design-system/components/shared/buttons/text-button";
 import Input from "@/design-system/components/shared/controls/input";
 import { Icon } from "@/design-system/components/shared/icons/icon";
+import { useUserStore } from "@/auth/store";
+import { useQuery } from "@tanstack/react-query";
+import { getUser } from "@/api/user";
 
 const PHOTO_DIMENSION = 200;
 type CreatePostData = z.infer<typeof CREATE_POST_SCHEMA>;
@@ -153,6 +156,13 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
     />
   );
 
+  const { group, userId } = useUserStore();
+
+  const { isPending, isError, data, error } = useQuery({
+    queryKey: ["api", "v1", "users", userId],
+    queryFn: () => getUser(userId!),
+  });
+
   return (
     <ScrollView>
       <Box
@@ -219,7 +229,7 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
                       trigger("location");
                     }}
                     value={value}
-                    placeholder="Change Name..."
+                    placeholder={data ? data.name : "Name..."}
                     error={errors.location && errors.location.message}
                   />
                 )}
@@ -248,7 +258,7 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
                       trigger("location");
                     }}
                     value={value}
-                    placeholder="Change username..."
+                    placeholder={data ? data.username : "Username..."}
                     error={errors.location && errors.location.message}
                   />
                 )}
@@ -274,7 +284,7 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
                     }}
                     isButton={true}
                     value={value}
-                    placeholder="Add a bio..."
+                    placeholder={data ? data.bio : "Bio..."}
                     error={errors.location && errors.location.message}
                   />
                 )}
@@ -299,7 +309,7 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
                     }}
                     isButton={true}
                     value={value}
-                    placeholder="MM/DD/YYYY"
+                    placeholder={data ? data.birthday : "MM/DD/YYYY"}
                     error={errors.location && errors.location.message}
                   />
                 )}

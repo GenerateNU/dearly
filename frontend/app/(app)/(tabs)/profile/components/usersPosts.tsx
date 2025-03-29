@@ -23,7 +23,15 @@ const UserPosts = () => {
 
   if (!isLoading && !isError) {
     userPosts = data?.pages.flatMap((page) => page) || [];
-    userPosts= [... userPosts, ... userPosts, ... userPosts, ... userPosts, ... userPosts, ... userPosts, ... userPosts ]
+    userPosts = [
+      ...userPosts,
+      ...userPosts,
+      ...userPosts,
+      ...userPosts,
+      ...userPosts,
+      ...userPosts,
+      ...userPosts,
+    ];
   }
 
   if (isError) {

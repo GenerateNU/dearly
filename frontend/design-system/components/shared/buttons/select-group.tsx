@@ -41,7 +41,7 @@ const SwitchGroupButton: React.FC<SwitchGroupProps> = ({ onPress }) => {
   const displayName = group.name.length > 10 ? `${group.name.substring(0, 8)}...` : group.name;
 
   return (
-    <BaseButton variant="text" onPress={onPress} >
+    <BaseButton variant="text" onPress={onPress}>
       <Box
         justifyContent="center"
         alignContent="center"
@@ -51,7 +51,7 @@ const SwitchGroupButton: React.FC<SwitchGroupProps> = ({ onPress }) => {
         backgroundColor="pearl"
         padding="xs"
         borderRadius="m"
->
+      >
         <Text color="ink" variant="bodyLargeBold">
           {displayName}
         </Text>
