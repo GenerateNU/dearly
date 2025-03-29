@@ -4,76 +4,16 @@ import { Box } from "@/design-system/base/box";
 import { useGroupCalendar } from "@/hooks/api/group";
 import { CalendarList, CalendarProvider, WeekCalendar, DateData } from "react-native-calendars";
 import { Text } from "@/design-system/base/text";
-import {
-  ImageBackground,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
-  ListRenderItem,
-  ActivityIndicator,
-  View,
-} from "react-native";
+import { StyleSheet, TouchableOpacity, FlatList, ListRenderItem } from "react-native";
 import { Icon } from "@/design-system/components/shared/icons/icon";
 import { BackIcon } from "@/design-system/components/shared/icons/back-icon";
 import { getMonthScrollRange, isSameDate, isValidDateData } from "@/utilities/time";
 import { CalendarDay } from "@/types/group";
 import Feed from "./feed";
+import { CustomDayComponent } from "./calendar-day";
+import Spinner from "@/design-system/components/shared/spinner";
 
 type ViewMode = "month" | "week" | "year";
-
-interface DayComponentProps {
-  date: DateData;
-  state?: string;
-  onPress?: (date: DateData) => void;
-  selected?: boolean;
-  image?: string;
-}
-
-const CustomDayComponent = memo(({ date, state, onPress, selected, image }: DayComponentProps) => {
-  if (!date || typeof date !== "object" || !date.dateString) {
-    return null;
-  }
-
-  if (image) {
-    return (
-      <TouchableOpacity
-        onPress={() => onPress && onPress(date)}
-        activeOpacity={0.7}
-        style={styles.dayComponentWrapper}
-      >
-        <ImageBackground
-          source={{ uri: image }}
-          style={[
-            styles.dayContainer,
-            state === "today" && styles.todayContainer,
-            selected && styles.selectedContainer,
-          ]}
-          imageStyle={styles.imageBackground}
-        >
-          <Text color="ink" variant="caption" style={selected && styles.selectedDayText}>
-            {date.day}
-          </Text>
-        </ImageBackground>
-      </TouchableOpacity>
-    );
-  }
-
-  return (
-    <TouchableOpacity activeOpacity={0.7} style={styles.dayComponentWrapper}>
-      <View
-        style={[
-          styles.dayContainer,
-          state === "today" && styles.todayContainer,
-          selected && styles.selectedContainer,
-        ]}
-      >
-        <Text color="ink" variant="caption" style={selected && styles.selectedDayText}>
-          {date.day}
-        </Text>
-      </View>
-    </TouchableOpacity>
-  );
-});
 
 const Calendar: React.FC = () => {
   const { group } = useUserStore();
@@ -106,12 +46,7 @@ const Calendar: React.FC = () => {
       onSelectYear: (year: number) => void;
     }) => (
       <TouchableOpacity onPress={() => onSelectYear(item)} style={styles.yearItemContainer}>
-        <Text
-          variant="bodyBold"
-          style={[styles.yearText, item === selectedYear && styles.selectedYearText]}
-        >
-          {item}
-        </Text>
+        <Text variant="bodyBold">{item}</Text>
       </TouchableOpacity>
     ),
   );
@@ -135,7 +70,6 @@ const Calendar: React.FC = () => {
     return contentMap;
   }, [calendarData]);
 
-  // Years list for the year selection view
   const years = useMemo(
     () => [
       new Date().getFullYear(),
@@ -165,25 +99,19 @@ const Calendar: React.FC = () => {
     }
   }, [selectedDate]);
 
-  // Handler for calendar scrolling to load more data
   const handleCalendarScroll = useCallback(
     (data: any) => {
-      // Check if we're approaching the edges of loaded data
       const visibleMonthYear = data.visibleMonths?.[0];
       if (visibleMonthYear) {
         const year = visibleMonthYear.year;
         const month = visibleMonthYear.month;
 
-        // Create a new pivot date for fetching
         const newPivotDate = new Date(year, month - 1, 1);
 
-        // Check if we're scrolling up (newer months) or down (older months)
         if (data.direction === "up") {
-          // Load future months if scrolling up
           setCurrentPivot(newPivotDate);
           fetchFutureMonths();
         } else if (data.direction === "down") {
-          // Load previous months if scrolling down
           setCurrentPivot(newPivotDate);
           fetchPreviousMonths();
         }
@@ -253,7 +181,6 @@ const Calendar: React.FC = () => {
 
   const keyExtractor = useCallback((item: number) => item.toString(), []);
 
-  // Updated to include hasContent prop from daysWithContent map
   const renderDayComponentForCalendarList = useCallback(
     (props: any) => {
       if (!isValidDateData(props.date)) return null;
@@ -275,7 +202,6 @@ const Calendar: React.FC = () => {
     [selectedDate, handleDayPress, daysWithContent],
   );
 
-  // Updated to include hasContent prop
   const renderDayComponentForWeekCalendar = useCallback(
     (props: any) => {
       if (!isValidDateData(props.date)) return null;
@@ -345,7 +271,7 @@ const Calendar: React.FC = () => {
         <Box paddingHorizontal="m">
           <BackIcon text={formattedDate} onPress={() => setViewMode("month")} />
         </Box>
-        <Box style={styles.weekCalendarContainer}>
+        <Box marginVertical="xxs">
           <WeekCalendar
             firstDay={1}
             theme={{
@@ -374,13 +300,13 @@ const Calendar: React.FC = () => {
     <Box paddingBottom="xl" marginBottom="xl">
       {isLoading && calendarData?.length === 0 ? (
         <Box flex={1} justifyContent="center" alignItems="center">
-          <ActivityIndicator size="large" color="#FFC107" />
+          <Spinner />
         </Box>
       ) : (
         <>
           {isFetchingFuture && (
             <Box padding="s" alignItems="center">
-              <ActivityIndicator size="small" color="#FFC107" />
+              <Spinner />
             </Box>
           )}
 
@@ -406,7 +332,7 @@ const Calendar: React.FC = () => {
 
           {isFetchingPrevious && (
             <Box padding="s" alignItems="center">
-              <ActivityIndicator size="small" color="#FFC107" />
+              <Spinner />
             </Box>
           )}
         </>
@@ -416,42 +342,6 @@ const Calendar: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  dayComponentWrapper: {
-    width: 40,
-    height: 50,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 5,
-  },
-  dayContainer: {
-    justifyContent: "center",
-    alignItems: "center",
-    width: 40,
-    height: 45,
-    borderRadius: 8,
-    overflow: "hidden",
-  },
-  todayContainer: {
-    borderWidth: 2,
-    borderColor: "#FFC107",
-  },
-  selectedContainer: {
-    borderWidth: 2,
-    borderColor: "#FFC107",
-    backgroundColor: "rgba(255, 193, 7, 0.3)",
-  },
-  emptyDayContainer: {
-    opacity: 0.5,
-  },
-  selectedDayText: {
-    fontWeight: "bold",
-  },
-  imageBackground: {
-    flex: 1,
-    resizeMode: "cover",
-    justifyContent: "center",
-    alignItems: "center",
-  },
   yearList: {
     paddingVertical: 20,
     paddingHorizontal: 16,
@@ -466,9 +356,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
   },
-  selectedYearText: {
-    color: "#FFC107",
-  },
   backButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -476,9 +363,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     backgroundColor: "#f0f0f0",
     borderRadius: 8,
-  },
-  weekCalendarContainer: {
-    marginVertical: 2,
   },
 });
 
