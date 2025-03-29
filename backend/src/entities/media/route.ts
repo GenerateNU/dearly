@@ -9,7 +9,7 @@ export const mediaRoutes = (mediaService: MediaService): Hono => {
 
   media.post("/groups/:id/media", (ctx) => mediaController.uploadPostMedia(ctx));
   media.post("/users/media", (ctx) => mediaController.uploadUserMedia(ctx));
-  media.get("/groups/:id/media/:id", (ctx) => mediaController.getDBData(ctx));
+  media.post("/media/processing", (ctx) => mediaController.getDBData(ctx));
 
   return media;
 };
