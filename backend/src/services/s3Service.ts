@@ -61,7 +61,7 @@ export class S3ServiceImpl implements S3Service {
    */
   async compressImage(file: Blob): Promise<Buffer> {
     const imageBuffer = await file.arrayBuffer();
-    return await sharp(Buffer.from(imageBuffer)).jpeg({ quality: 80 }).toBuffer();
+    return await sharp(Buffer.from(imageBuffer)).withMetadata().jpeg({ quality: 80 }).toBuffer();
   }
 
   /**

@@ -9,32 +9,61 @@ import BottomSheet from "@gorhom/bottom-sheet/lib/typescript/components/bottomSh
 import { CommentPopUp } from "@/design-system/components/comments/comment-popup";
 import Input from "@/design-system/components/shared/controls/input";
 import MultitrackAudio from "@/assets/audio.svg";
-import { commentPopUpAttributes } from "@/types/comment";
 import Spinner from "@/design-system/components/shared/spinner";
 import { Animated } from "react-native";
 import { LikePopup } from "@/design-system/components/posts/like-popup";
 import { AnimatedBox } from "@/design-system/base/animated-box";
 import { useUserStore } from "@/auth/store";
-import EmptyDataDisplay from "@/design-system/components/shared/states/empty";
+import { useFeedContext } from "@/contexts/feed-post-context";
+import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
+import { EmptyFeed } from "@/design-system/components/posts/empty-feed";
 
-const Feed = () => {
+interface FeedProps {
+  date?: string;
+  popup: boolean;
+  commentRef: React.RefObject<BottomSheetMethods>;
+  likeRef: React.RefObject<BottomSheetMethods>;
+}
+
+interface CommentLikesPopupProps {
+  commentRef: React.RefObject<BottomSheetMethods>;
+  likeRef: React.RefObject<BottomSheetMethods>;
+}
+
+export const CommentLikesPopup: React.FC<CommentLikesPopupProps> = ({ commentRef, likeRef }) => {
+  const { commentAttributes, likePostId } = useFeedContext();
+
+  return (
+    <>
+      <CommentPopUp ref={commentRef} attributes={commentAttributes} />
+      <LikePopup ref={likeRef} postId={likePostId} />
+    </>
+  );
+};
+
+const Feed: React.FC<FeedProps> = ({
+  date,
+  popup = true,
+  commentRef = useRef<BottomSheet>(null),
+  likeRef = useRef<BottomSheet>(null),
+}) => {
   const { group } = useUserStore();
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage, isLoading, refetch } = useGroupFeed(
     group?.id as string,
+    date,
   );
+
+  useEffect(() => {
+    if (date) {
+      refetch();
+    }
+  }, [date, refetch]);
 
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [scrollY] = useState(new Animated.Value(0));
   const posts = data?.pages.flatMap((page) => page) || [];
 
-  const [commentAttributes, setCommentAttributes] = useState<commentPopUpAttributes>({
-    commentId: "",
-    likes: 0,
-    caption: "",
-  });
-  const ref = useRef<BottomSheet>(null);
-  const likeRef = useRef<BottomSheet>(null);
-  const [likePostId, setLikePostId] = useState<string>("");
+  const { setCommentAttributes, setLikePostId } = useFeedContext();
 
   useEffect(() => {
     refetch();
@@ -48,7 +77,7 @@ const Feed = () => {
 
   const onClickComment = (id: string, caption: string, likes: number) => {
     setCommentAttributes({ commentId: id, caption: caption, likes: likes });
-    ref.current?.snapToIndex(0);
+    commentRef.current?.snapToIndex(0);
   };
 
   const onClickLikes = useCallback((postId: string) => {
@@ -101,7 +130,7 @@ const Feed = () => {
   if (posts.length === 0) {
     return (
       <Box flex={1} padding="m">
-        <EmptyDataDisplay />
+        <EmptyFeed />
       </Box>
     );
   }
@@ -151,8 +180,7 @@ const Feed = () => {
           }
         />
       </Box>
-      <CommentPopUp ref={ref} attributes={commentAttributes} />
-      <LikePopup ref={likeRef} postId={likePostId} />
+      {popup && <CommentLikesPopup commentRef={commentRef} likeRef={likeRef} />}
     </Box>
   );
 };

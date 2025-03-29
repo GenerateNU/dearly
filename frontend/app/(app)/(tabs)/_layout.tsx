@@ -10,12 +10,16 @@ import { router, Tabs } from "expo-router";
 import { useRef } from "react";
 
 const Layout = () => {
-  const hasLabel = useIsBasicMode();
+  const isBasic = useIsBasicMode();
   const switchGroupRef = useRef<BottomSheet>(null);
   const settingRef = useRef<BottomSheet>(null);
 
   const onSwitchGroup = () => {
-    switchGroupRef.current?.snapToIndex(0);
+    if (isBasic) {
+      router.push("/(app)/group/switch");
+    } else {
+      switchGroupRef.current?.snapToIndex(0);
+    }
   };
 
   const onSettingPressed = () => {
@@ -49,7 +53,7 @@ const Layout = () => {
                   <Icon
                     navbar
                     labelPosition="bottom"
-                    label={hasLabel ? "HOME" : undefined}
+                    label={isBasic ? "HOME" : undefined}
                     name="home"
                     color={focused ? "ink" : "slate"}
                   />
@@ -83,7 +87,7 @@ const Layout = () => {
                   <Icon
                     navbar
                     labelPosition="bottom"
-                    label={hasLabel ? "POST" : undefined}
+                    label={isBasic ? "POST" : undefined}
                     name="plus-circle"
                     color={focused ? "ink" : "slate"}
                   />
@@ -98,14 +102,14 @@ const Layout = () => {
           options={{
             title: "",
             headerShown: true,
-            headerTransparent: true,
+            headerTransparent: false,
             tabBarIcon: ({ focused }) => {
               return (
                 <Box width={80}>
                   <Icon
                     navbar
                     labelPosition="bottom"
-                    label={hasLabel ? "PROFILE" : undefined}
+                    label={isBasic ? "PROFILE" : undefined}
                     name="account-circle"
                     color={focused ? "ink" : "slate"}
                   />
@@ -114,6 +118,7 @@ const Layout = () => {
             },
             headerStyle: {
               height: 100,
+              backgroundColor: "pearl",
             },
             headerLeft: () => (
               <Box paddingLeft="m">
@@ -121,7 +126,7 @@ const Layout = () => {
               </Box>
             ),
             headerRight: () => (
-              <Box paddingRight="m">
+              <Box paddingRight="m" backgroundColor="pearl" borderRadius="m" padding="xs">
                 <Setting onPress={onSettingPressed} />
               </Box>
             ),
@@ -129,7 +134,7 @@ const Layout = () => {
         />
       </Tabs>
       <SwitchGroupBottomSheet ref={switchGroupRef} />
-      <SettingPopup ref={settingRef} />
+      <SettingPopup close={() => settingRef.current?.close()} ref={settingRef} />
     </>
   );
 };

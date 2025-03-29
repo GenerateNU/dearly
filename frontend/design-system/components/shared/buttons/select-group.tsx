@@ -54,6 +54,9 @@ const SwitchGroupButton: React.FC<SwitchGroupProps> = ({ onPress }) => {
         alignItems="center"
         flexDirection="row"
         gap="xs"
+        backgroundColor="pearl"
+        padding="xs"
+        borderRadius="m"
       >
         <Text color="ink" variant="bodyLargeBold">
           {displayName}

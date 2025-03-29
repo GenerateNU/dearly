@@ -12,13 +12,14 @@ import { useFonts } from "expo-font";
 import { useAccessibility } from "@/hooks/component/accessibility";
 import { UserProvider } from "@/auth/provider";
 import { useUserStore } from "@/auth/store";
-import SplashScreenAnimation from "./(auth)/components/splash-screen";
 import { OnboardingProvider } from "@/contexts/onboarding";
 import { queryClient } from "@/auth/client";
 import { useVerifyInviteToken } from "@/hooks/api/group";
 import * as Linking from "expo-linking";
 import { DropdownProvider } from "@/contexts/nudge-dropdown";
 import LoadingOverlay from "@/design-system/components/shared/states/loading-overlay";
+import AddMemberLoading from "@/design-system/components/shared/add-member";
+import SplashScreenAnimation from "@/app/(auth)/components/splash-screen";
 
 const InitialLayout = () => {
   const { isAuthenticated, clearError, completeOnboarding, setInviteToken, inviteToken } =

@@ -3,15 +3,21 @@ import { RemoveMemberProvider } from "@/contexts/remove-meber";
 import Setting from "@/design-system/components/shared/buttons/setting";
 import { BackIcon } from "@/design-system/components/shared/icons/back-icon";
 import OptionsPopup from "@/design-system/components/shared/settings/options-popup";
+import { useIsBasicMode } from "@/hooks/component/mode";
 import BottomSheet from "@gorhom/bottom-sheet";
-import { Stack } from "expo-router";
+import { router, Stack } from "expo-router";
 import { useRef } from "react";
 
 const Layout = () => {
   const settingRef = useRef<BottomSheet>(null);
+  const isBasic = useIsBasicMode();
 
   const onSettingPressed = () => {
-    settingRef.current?.snapToIndex(0);
+    if (isBasic) {
+      router.push("/(app)/group/settings");
+    } else {
+      settingRef.current?.snapToIndex(0);
+    }
   };
 
   return (
@@ -98,6 +104,26 @@ const Layout = () => {
             />
             <Stack.Screen
               name="leave"
+              options={{
+                headerShown: true,
+                headerTitle: "",
+                headerTransparent: true,
+                gestureEnabled: false,
+                headerLeft: () => <BackIcon />,
+              }}
+            />
+            <Stack.Screen
+              name="switch"
+              options={{
+                headerShown: true,
+                headerTitle: "",
+                headerTransparent: true,
+                gestureEnabled: false,
+                headerLeft: () => <BackIcon />,
+              }}
+            />
+            <Stack.Screen
+              name="settings"
               options={{
                 headerShown: true,
                 headerTitle: "",

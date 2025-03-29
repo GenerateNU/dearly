@@ -35,7 +35,7 @@ export const CommentCard: React.FC<Required<Comment>> = ({
         </Text>
       </Box>
       <Box>{content && <Text>{content}</Text>}</Box>
-      {voiceMemo && <Playback local={false} location={voiceMemo} />}
+      {voiceMemo && <Playback id={id} local={false} location={voiceMemo} />}
     </Box>
   );
 };

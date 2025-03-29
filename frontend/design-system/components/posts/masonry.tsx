@@ -1,18 +1,27 @@
 import React from "react";
 import { MasonryFlashList } from "@shopify/flash-list";
-import { Box } from "@/design-system/base/box";
 import { Photo } from "./photo";
+import { Box } from "@/design-system/base/box";
+import { Post } from "@/types/post";
+import { router } from "expo-router";
 
 interface MasonryFeedProps {
-  data: string[];
+  posts: Post[];
 }
 
-export const MasonryList: React.FC<MasonryFeedProps> = ({ data }) => {
+export const MasonryList: React.FC<MasonryFeedProps> = ({ posts }) => {
   return (
-    <Box flex={1} width="100%">
+    <Box
+      flex={1}
+      width="100%"
+      height="100%" // Ensure full height
+      style={{ minHeight: "100%" }} // Minimum height to fit content
+    >
       <MasonryFlashList
-        data={data}
+        data={posts}
         numColumns={2}
+        scrollEnabled={false}
+        estimatedItemSize={200} // Add an estimated item size
         renderItem={({ item, index }) => (
           <Box
             width="100%"
@@ -21,10 +30,15 @@ export const MasonryList: React.FC<MasonryFeedProps> = ({ data }) => {
             paddingRight={index % 2 === 0 ? "s" : "none"}
             paddingLeft={index % 2 !== 0 ? "s" : "none"}
           >
-            <Photo image={item} />
+            <Photo
+              image={item.media?.[0]?.url ?? ""}
+              onPress={() => {
+                router.push(`/ViewPost/${item.id}`);
+              }}
+            />
           </Box>
         )}
-        estimatedItemSize={200}
+        contentContainerStyle={{ paddingBottom: 20 }} // Add padding at the bottom
       />
     </Box>
   );

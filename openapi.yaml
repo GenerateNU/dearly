@@ -2764,6 +2764,14 @@ paths:
           schema:
             type: integer
             default: 1
+        - name: direction
+          in: query
+          description: The direction to fetch months relative to the pivot
+          required: false
+          schema:
+            type: string
+            enum: [before, after, both]
+            default: before
         - name: id
           in: path
           description: ID of the group a post is made in
@@ -3137,31 +3145,23 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /api/v1/group/{groupID}/media/{mediaURL}:
-    get:
+  /api/v1/media/processing:
+    post:
         tags:
           - Media Endpoint
         summary: Returns an array of db levels to use in pre-processing
         description: Allow users to get the db levels from an audio message
         security:
           - BearerAuth: []
-        parameters:
-          - name: groupID
-            in: path
-            description: ID group the comment is under
-            required: true
-            schema:
-              type: string
-              format: uuid
-              example: 5e91507e-5630-4efd-9fd4-799178870b10
-          - name: mediaURL
-            in: path
-            description: url of media being pre-processed
-            required: true
-            schema:
-              type: string
-              format: url
-              example: "https://example.com/thumbnail.jpg"
+        requestBody:
+          application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: url
+                    example: "https://example.com/thumbnail.jpg"
         responses:
           201:
             description: Successfully retrieve object key and type

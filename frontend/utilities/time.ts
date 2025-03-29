@@ -1,5 +1,44 @@
 import { ZodiacDatesAndIcons } from "@/constants/zodiac";
 import { MaterialIcon } from "@/types/icon";
+import { DateData } from "react-native-calendars";
+
+export const isValidDateData = (date: any): date is DateData => {
+  return (
+    date !== undefined &&
+    date !== null &&
+    typeof date === "object" &&
+    "dateString" in date &&
+    typeof date.dateString === "string" &&
+    "day" in date &&
+    typeof date.day === "number"
+  );
+};
+
+export const isSameDate = (
+  date1: DateData | string | undefined,
+  date2: string | undefined,
+): boolean => {
+  if (!date1 || !date2) return false;
+
+  const d1 = typeof date1 === "string" ? date1 : date1.dateString;
+  const d2 = typeof date2 === "string" ? date2 : date2;
+
+  return d1 === d2;
+};
+
+export const getMonthScrollRange = (selectedYear: number) => {
+  const currentYear = new Date().getFullYear();
+
+  if (selectedYear === currentYear) {
+    return 0;
+  }
+
+  if (selectedYear < currentYear) {
+    return 11;
+  }
+
+  return 0;
+};
 
 export const timeAgo = (date: Date = new Date()): string => {
   const seconds = Math.floor((new Date().getTime() - new Date(date).getTime()) / 1000);
