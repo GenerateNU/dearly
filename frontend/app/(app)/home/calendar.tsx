@@ -17,6 +17,7 @@ import { Icon } from "@/design-system/components/shared/icons/icon";
 import { BackIcon } from "@/design-system/components/shared/icons/back-icon";
 import { getMonthScrollRange, isSameDate, isValidDateData } from "@/utilities/time";
 import { CalendarDay } from "@/types/group";
+import Feed from "./feed";
 
 type ViewMode = "month" | "week" | "year";
 
@@ -97,7 +98,6 @@ const Calendar: React.FC = () => {
     isFetchingPrevious,
     isFetchingFuture,
   } = useGroupCalendar(group?.id || "", currentPivot, 3);
-  console.log(JSON.stringify(calendarData));
 
   const YearItem = memo(
     ({
@@ -131,8 +131,6 @@ const Calendar: React.FC = () => {
         month.data.forEach((dayData: CalendarDay) => {
           const day = dayData.day;
           const dateKey = `${year}-${String(monthNum).padStart(2, "0")}-${String(Math.floor(day)).padStart(2, "0")}`;
-
-          console.log(dayData);
           contentMap.set(dateKey, dayData.url);
         });
       });
@@ -347,9 +345,6 @@ const Calendar: React.FC = () => {
         onDateChanged={(date) => {
           setSelectedDate(date);
         }}
-        onMonthChange={(month) => {
-          console.log("Month changed", month);
-        }}
       >
         <Box paddingHorizontal="m">
           <BackIcon text={formattedDate} onPress={() => setViewMode("month")} />
@@ -365,7 +360,7 @@ const Calendar: React.FC = () => {
             pastScrollRange={50}
             futureScrollRange={50}
             maxDate={todayString}
-            calendarHeight={120}
+            calendarHeight={60}
             allowShadow={false}
             bounces={false}
             onDayPress={(day) => {
@@ -374,6 +369,7 @@ const Calendar: React.FC = () => {
             dayComponent={renderDayComponentForWeekCalendar}
           />
         </Box>
+        <Feed date={selectedDate} />
       </CalendarProvider>
     );
   }

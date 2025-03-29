@@ -256,10 +256,13 @@ export class GroupTransactionImpl implements GroupTransaction {
       .leftJoin(likesTable, eq(likesTable.postId, postsTable.id))
       .innerJoin(mediaTable, eq(mediaTable.postId, postsTable.id))
       .where(
-        between(
-          postsTable.createdAt,
-          sql`${startDate.toISOString()}`,
-          sql`${endDate.toISOString()}`,
+        and(
+          between(
+            postsTable.createdAt,
+            sql`${startDate.toISOString()}`,
+            sql`${endDate.toISOString()}`,
+          ),
+          eq(postsTable.groupId, groupId),
         ),
       )
       .groupBy(sql`DATE(${postsTable.createdAt})`, postsTable.id, mediaTable.objectKey)

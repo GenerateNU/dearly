@@ -18,11 +18,11 @@ export const useCreatePost = (groupId: string) => {
   );
 };
 
-export const useGroupFeed = (id: string, options: any = {}) => {
+export const useGroupFeed = (id: string, date?: string, options: any = {}) => {
   return useQueryPagination<Post[]>(
     ["groups", id, "feed"],
     (page, limit) => {
-      return getGroupFeed(id, page, limit) as Promise<Post[]>;
+      return getGroupFeed(id, page, limit, date) as Promise<Post[]>;
     },
     options,
     10,

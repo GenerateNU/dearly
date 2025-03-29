@@ -17,11 +17,24 @@ import { AnimatedBox } from "@/design-system/base/animated-box";
 import { useUserStore } from "@/auth/store";
 import EmptyDataDisplay from "@/design-system/components/shared/states/empty";
 
-const Feed = () => {
+interface FeedProps {
+  date?: string;
+}
+
+const Feed: React.FC<FeedProps> = ({ date }) => {
   const { group } = useUserStore();
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage, isLoading, refetch } = useGroupFeed(
     group?.id as string,
+    date,
   );
+
+  useEffect(() => {
+    if (date) {
+      console.log(date);
+      console.log(JSON.stringify(data));
+      refetch();
+    }
+  }, [date, refetch]);
 
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [scrollY] = useState(new Animated.Value(0));
