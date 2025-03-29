@@ -30,8 +30,6 @@ const Feed: React.FC<FeedProps> = ({ date }) => {
 
   useEffect(() => {
     if (date) {
-      console.log(date);
-      console.log(JSON.stringify(data));
       refetch();
     }
   }, [date, refetch]);

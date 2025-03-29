@@ -172,8 +172,7 @@ export const useGroupCalendar = (
     queryKey: ["groups", id, "calendar", "pivot"],
     queryFn: async () => {
       const formattedDate = formatDateToMonthYear(initialPivot);
-      // Pass 'both' direction with small range to get just the pivot month
-      return getGroupCalendar(id, formattedDate, 0, "both");
+      return getGroupCalendar(id, formattedDate, 1, "both");
     },
     ...options,
   });
@@ -226,6 +225,12 @@ export const useGroupCalendar = (
   // Combine error states
   const error = pivotMonthQuery.error || previousMonthsQuery.error || futureMonthsQuery.error;
 
+  // Combine refetching states
+  const isRefetching =
+    pivotMonthQuery.isRefetching ||
+    previousMonthsQuery.isRefetching ||
+    futureMonthsQuery.isRefetching;
+
   // Functions to fetch more data in either direction
   const fetchPreviousMonths = () => {
     if (!previousMonthsQuery.isFetchingNextPage) {
@@ -243,6 +248,7 @@ export const useGroupCalendar = (
     data: allMonths,
     isLoading,
     error,
+    isRefetching,
     isFetchingPrevious: previousMonthsQuery.isFetchingNextPage,
     isFetchingFuture: futureMonthsQuery.isFetchingNextPage,
     fetchPreviousMonths,

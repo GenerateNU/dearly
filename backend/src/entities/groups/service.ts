@@ -48,7 +48,6 @@ export class GroupServiceImpl implements GroupService {
       const postsWithUrls = await Promise.all(
         posts.map(this.mediaService.getPostWithMediaUrls.bind(this.mediaService)),
       );
-      console.log(postsWithUrls);
       return postsWithUrls;
     };
     return handleServiceError(getAllPostsImpl)();

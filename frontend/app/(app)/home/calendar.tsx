@@ -59,11 +59,7 @@ const CustomDayComponent = memo(({ date, state, onPress, selected, image }: DayC
   }
 
   return (
-    <TouchableOpacity
-      onPress={() => onPress && onPress(date)}
-      activeOpacity={0.7}
-      style={styles.dayComponentWrapper}
-    >
+    <TouchableOpacity activeOpacity={0.7} style={styles.dayComponentWrapper}>
       <View
         style={[
           styles.dayContainer,
@@ -482,10 +478,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   weekCalendarContainer: {
-    height: 120,
-    marginTop: 10,
-    marginBottom: 10,
-    paddingBottom: 10,
+    marginVertical: 2,
   },
 });
 

@@ -60,12 +60,6 @@ const LikePopUpData: React.FC<LikePopUpDataProps> = ({ postId }) => {
     />
   );
 
-  useEffect(() => {
-    if (likeData?.pages) {
-      console.log("Pages data:", likeData.pages);
-    }
-  }, [likeData]);
-
   return (
     <Box position="relative" paddingHorizontal="m" height={"100%"} width={"100%"}>
       <Box flexDirection="column" gap="s">
