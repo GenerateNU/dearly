@@ -1,12 +1,11 @@
 import {
-    DEARLY_GROUP_ID,
     USER_ALICE_ID,
   } from "./../helpers/test-constants";
   import { Hono } from "hono";
   import { startTestApp } from "../helpers/test-app";
   import { TestBuilder } from "../helpers/test-builder";
-  import { generateJWTFromID, generateUUID } from "../helpers/test-token";
-  import { HTTPRequest, Status } from "../../constants/http";
+  import { generateJWTFromID} from "../helpers/test-token";
+  import { HTTPRequest} from "../../constants/http";
   import { resolve } from "node:path";
   const PROJECT_ROOT = resolve(__dirname, "../..");
 
@@ -19,9 +18,11 @@ import {
         url: PROJECT_ROOT + "/tests/test-assets/test_audio_2.m4a"
     }
 
+    /*
     const badRequestBody = {
         url: "random_website.com"
     }
+    */
 
     beforeAll(async () => {
       app = await startTestApp();

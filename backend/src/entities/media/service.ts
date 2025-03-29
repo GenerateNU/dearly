@@ -315,7 +315,7 @@ export class MediaServiceImpl {
             .audioFilters("volumedetect")
             .format("null")
             .output('/dev/null')
-            .on("error", (err: unknown) => {
+            .on("error", () => {
               reject(new InternalServerError("processing audio has failed"));
             })
             .on("stderr", (stderrLine: string) => {
