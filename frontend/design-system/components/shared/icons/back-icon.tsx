@@ -6,14 +6,15 @@ import { router } from "expo-router";
 
 interface BackIconProps {
   onPress?: () => void;
+  text?: string;
 }
 
-export const BackIcon: React.FC<BackIconProps> = ({ onPress }) => {
+export const BackIcon: React.FC<BackIconProps> = ({ onPress, text }) => {
   return (
     <Pressable onPress={onPress ? onPress : () => router.back()}>
       <Box alignItems="center" flexDirection="row" gap="xs">
         <Icon name="arrow-left-circle-outline" />
-        <Text variant="captionBold">Back</Text>
+        <Text variant="captionBold">{text ? text : "Back"}</Text>
       </Box>
     </Pressable>
   );
