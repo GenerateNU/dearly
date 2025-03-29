@@ -14,9 +14,9 @@ import { Animated } from "react-native";
 import { LikePopup } from "@/design-system/components/posts/like-popup";
 import { AnimatedBox } from "@/design-system/base/animated-box";
 import { useUserStore } from "@/auth/store";
-import EmptyDataDisplay from "@/design-system/components/shared/states/empty";
 import { useFeedContext } from "@/contexts/feed-post-context";
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
+import { EmptyFeed } from "@/design-system/components/posts/empty-feed";
 
 interface FeedProps {
   date?: string;
@@ -130,7 +130,7 @@ const Feed: React.FC<FeedProps> = ({
   if (posts.length === 0) {
     return (
       <Box flex={1} padding="m">
-        <EmptyDataDisplay />
+        <EmptyFeed />
       </Box>
     );
   }

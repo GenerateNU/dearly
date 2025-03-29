@@ -18,10 +18,12 @@ import {
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { groupsTable, membersTable } from "../schema";
 import { eq, and } from "drizzle-orm";
-import ffmpeg from "fluent-ffmpeg";
-import ffmpegInstaller from "@ffmpeg-installer/ffmpeg";
-import logger from "../../utilities/logger";
-ffmpeg.setFfmpegPath(ffmpegInstaller.path);
+import ffmpeg, { FfprobeData } from "fluent-ffmpeg";
+import ffmpegPath from 'ffmpeg-static';
+import ffprobePath from 'ffprobe-static';
+
+ffmpeg.setFfmpegPath(ffmpegPath!);
+ffmpeg.setFfprobePath(ffprobePath.path);
 
 /**
  * Interface for the Media Service, which provides methods for interacting with media-related operations.
@@ -289,17 +291,21 @@ export class MediaServiceImpl {
 
   getDBData(media: string, interval = 500): Promise<WaveForm> {
     return new Promise((resolve, reject) => {
-      const dbData: number[] = [];
       let length = 0;
-      // TODO: define the type of this, no type any
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ffmpeg.ffprobe(media, (err: Error, metadata: any) => {
-        if (err) {
-          throw new InternalServerError("Failed to Process Audio");
-        }
-        length = metadata.format.duration;
-        const segments = Math.floor((length * 1000) / interval);
 
+      ffmpeg.ffprobe(media, (err: Error, metadata: FfprobeData) => {
+        if (err) {
+          return reject(new InternalServerError("Failed to Process Audio"))
+        }
+
+        if (!metadata || !metadata.format || !metadata.format.duration) {
+          return reject(new InternalServerError("Invalid audio metadata"));
+        }
+
+        length = metadata.format.duration
+        const segments = Math.floor((length * 1000) / interval);
+        const dbData: number[] = new Array(segments).fill(0); // Preallocate array
+        let completedSegments = 0;
         for (let i = 0; i < segments; i++) {
           const timestamp = (i * length) / 1000;
 
@@ -308,26 +314,32 @@ export class MediaServiceImpl {
             .setDuration(length / 1000)
             .audioFilters("volumedetect")
             .format("null")
-            .on("error", (err: unknown) => {
-              logger.error(err);
+            .output('/dev/null')
+            .on("error", () => {
               reject(new InternalServerError("processing audio has failed"));
             })
             .on("stderr", (stderrLine: string) => {
               if (stderrLine.includes("mean_volume:")) {
                 const match = stderrLine.match(/mean_volume: ([-\d.]+) dB/);
                 if (match && match[1]) {
-                  dbData.push(parseFloat(match[1]));
+                  dbData[i] = parseFloat(match[1]);
                 }
               }
-            });
+            })
+            .on("end", () => {
+              completedSegments++;
+              if (completedSegments === segments) {
+                resolve({
+                  length: Math.round(length),
+                  data: dbData
+                });
+              }
+            })
+            .run();
         }
       });
 
-      const response: WaveForm = {
-        length: length,
-        data: dbData,
-      };
-      resolve(response);
+     
     });
   }
 }

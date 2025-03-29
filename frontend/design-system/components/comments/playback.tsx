@@ -4,9 +4,10 @@ import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { IconButton } from "../shared/buttons/icon-button";
 import { formatSeconds } from "@/utilities/time";
-import { condenseAudioBarHeights } from "@/utilities/audio";
+import { condenseAudioBarHeights} from "@/utilities/audio";
 import { playbackStates } from "@/types/comment";
 import * as FileSystem from "expo-file-system";
+import { useProcessAudio } from "@/hooks/api/media";
 
 interface PlaybackPropsWhenLocal {
   id: string;
@@ -40,6 +41,11 @@ export const Playback: React.FC<PlaybackProps> = ({
   const [memoLines, setMemoLines] = useState<number[]>([]);
   const numLines = 23;
   const [totalLength, setTotalLength] = useState<number>(0);
+  const {
+    mutateAsync: processAudio,
+  } = useProcessAudio();
+
+  const uniqueFilename = `temp-audio-${new Date().getTime()}-${Math.random().toString(36).substring(7)}`;
 
   useEffect(() => {
     async function initializeValues() {
@@ -47,22 +53,18 @@ export const Playback: React.FC<PlaybackProps> = ({
         setMemoLines(condenseAudioBarHeights(numLines, dbLevels));
         setLength(audioLength);
         setTotalLength(audioLength);
+        setUri(location)
       } else {
         const downloadResult = await FileSystem.downloadAsync(
           location,
           FileSystem.documentDirectory + `temp-audio-${id}.mp3`,
         );
-
         const localUri = downloadResult.uri;
         setUri(localUri);
-
-        /* Code that break (Web Worker)
-        const response = await fetch(location); // initally fetch the mp3 file
-        const arrayBuffer = await response.arrayBuffer(); // convert to array buffer
-        const uint8Array = new Uint8Array(arrayBuffer); // convert to unit8Array
-        const audioBuffer = await decoders.mp3(uint8Array); // get AudioBuffer format
-        const channelData = audioBuffer.getChannelData(0); // get the channel data which is the amplitude
-        */
+        const response = await processAudio({url: location});
+        setLength(response.length)
+        setTotalLength(response.length)
+        setMemoLines(condenseAudioBarHeights(25, response.data, 91))
       }
     }
     initializeValues();
@@ -71,6 +73,8 @@ export const Playback: React.FC<PlaybackProps> = ({
   useEffect(() => {
     return sound
       ? () => {
+          FileSystem.deleteAsync(uri, { idempotent: true })
+          .catch();
           sound.unloadAsync();
         }
       : undefined;
@@ -106,6 +110,7 @@ export const Playback: React.FC<PlaybackProps> = ({
         setLength(statusPlayback.durationMillis! / 1000);
         setStatus({ ...status, playing: false });
       }
+    } else{
     }
   };
   return (

@@ -1,11 +1,9 @@
 import { paths } from "@/gen/openapi";
 import createFetchClient, { Middleware } from "openapi-fetch";
 import { handleHTTPStatusError } from "@/utilities/errors";
-import { API_BASE_URL } from "@/constants/api";
 
 const fetchClient = createFetchClient<paths>({
-  baseUrl: API_BASE_URL,
-  // process.env.EXPO_PUBLIC_API_BASE_URL,
+  baseUrl: "https://ebae-155-33-134-3.ngrok-free.app/",
 });
 
 const middleware: Middleware = {
