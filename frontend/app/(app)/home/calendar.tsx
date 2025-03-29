@@ -9,9 +9,11 @@ import { Icon } from "@/design-system/components/shared/icons/icon";
 import { BackIcon } from "@/design-system/components/shared/icons/back-icon";
 import { getMonthScrollRange, isSameDate, isValidDateData } from "@/utilities/time";
 import { CalendarDay } from "@/types/group";
-import Feed from "./feed";
+import Feed, { CommentLikesPopup } from "./feed";
 import { CustomDayComponent } from "./calendar-day";
 import Spinner from "@/design-system/components/shared/spinner";
+import { useFeedContext } from "@/contexts/feed-post-context";
+import BottomSheet from "@gorhom/bottom-sheet";
 
 type ViewMode = "month" | "week" | "year";
 
@@ -52,6 +54,9 @@ const Calendar: React.FC = () => {
       </TouchableOpacity>
     ),
   );
+
+  const commentRef = useRef<BottomSheet>(null);
+  const likeRef = useRef<BottomSheet>(null);
 
   const daysWithContent = useMemo(() => {
     const contentMap = new Map();
@@ -293,7 +298,8 @@ const Calendar: React.FC = () => {
             dayComponent={renderDayComponentForWeekCalendar}
           />
         </Box>
-        <Feed date={selectedDate} />
+        <Feed date={selectedDate} popup={false} commentRef={commentRef} likeRef={likeRef} />
+        <CommentLikesPopup commentRef={commentRef} likeRef={likeRef} />
       </CalendarProvider>
     );
   }
