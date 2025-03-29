@@ -4,11 +4,11 @@ import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { IconButton } from "../shared/buttons/icon-button";
 import { formatSeconds } from "@/utilities/time";
-import { condenseAudioBarHeights, getDBLevels } from "@/utilities/audio";
+import { condenseAudioBarHeights} from "@/utilities/audio";
 import { playbackStates } from "@/types/comment";
 import * as FileSystem from "expo-file-system";
 import { useProcessAudio } from "@/hooks/api/media";
-import { Waveform } from "@/types/media";
+
 
 interface PlaybackPropsWhenLocal {
   local: true; // is the audio message being stored locally or in s3
@@ -42,6 +42,8 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
     isPending: mediaPending,
   } = useProcessAudio();
 
+  const uniqueFilename = `temp-audio-${new Date().getTime()}-${Math.random().toString(36).substring(7)}.mp3`;
+
   useEffect(() => {
     async function initializeValues() {
       if (local) {
@@ -49,23 +51,16 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
         setLength(audioLength);
         setTotalLength(audioLength);
       } else {
-        console.log("Hellooooo")
         const downloadResult = await FileSystem.downloadAsync(
           location,
-          FileSystem.documentDirectory + "temp-audio.mp3",
+          FileSystem.documentDirectory + uniqueFilename + "temp-audio.mp3",
         );
-
-        console.log("hi")
         const localUri = downloadResult.uri;
         setUri(localUri);
-
-        console.log("hey 2")
         const response = await processAudio({url: location});
-        console.log("hey 4")
-        setLength(response.length)==
+        setLength(response.length)
         setTotalLength(response.length)
-        setMemoLines(getDBLevels(response.data))
-        console.log(memoLines)
+        setMemoLines(condenseAudioBarHeights(25, response.data, 70))
       }
     }
     initializeValues();

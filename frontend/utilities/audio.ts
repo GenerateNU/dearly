@@ -28,7 +28,7 @@ export const audioBarHeights = (numLines: number, audioLevels: number[]): number
  * @param audioLevels the audio levels to be represented
  * @returns an array representing the height of the audio levels in the visual representation
  */
-export const condenseAudioBarHeights = (numLines: number, audioLevels: number[]): number[] => {
+export const condenseAudioBarHeights = (numLines: number, audioLevels: number[], max:number=160): number[] => {
   if (audioLevels.length <= numLines) {
     return normalizeLines(audioLevels, 0, audioLevels.length);
   }
@@ -41,7 +41,7 @@ export const condenseAudioBarHeights = (numLines: number, audioLevels: number[])
     const avg = chunk.reduce((acc, val) => acc + val, 0) / chunk.length;
     compressedLines.push(avg);
   }
-  return normalizeLines(compressedLines, 0, compressedLines.length);
+  return normalizeLines(compressedLines, 0, compressedLines.length, max);
 };
 
 /**
@@ -51,31 +51,15 @@ export const condenseAudioBarHeights = (numLines: number, audioLevels: number[])
  * @param end the end number
  * @returns a normalized array of audio levels where each element is between the start and end
  */
-const normalizeLines = (audioLevels: number[], start: number, end: number): number[] => {
+const normalizeLines = (audioLevels: number[], start: number, end: number, max:number = 160): number[] => {
   const newLines: number[] = [];
   for (let i = start; i < end; i++) {
-    const reverseNum = 160 - Math.abs(audioLevels[i] || 3);
+    const reverseNum = max - Math.abs(audioLevels[i] || 3);
     const squaredNum = Math.pow(reverseNum, 2);
-    let scaledNum = (squaredNum / 25600) * 25;
+    let scaledNum = (squaredNum / Math.pow(max, 2)) * 25;
     scaledNum = scaledNum > 3 ? scaledNum : 3;
     newLines.push(scaledNum);
   }
   return newLines;
 };
 
-/**
- * Converts an array of amplitude data to an array of db levels
- * @param data the array of amplitude data to be converted
- * @returns an array of db levels
- */
-export const getDBLevels = (data: Float32Array): number[] => {
-  const dbLevels: number[] = [];
-  dbLevels.forEach((num) => {
-    const reverseNum = 70 - Math.abs(num || 3);
-    const squaredNum = Math.pow(reverseNum, 2);
-    let scaledNum = (squaredNum / 4900) * 25;
-    scaledNum = scaledNum > 3 ? scaledNum : 3;
-    dbLevels.push(scaledNum)
-  });
-  return condenseAudioBarHeights(25, dbLevels);
-};

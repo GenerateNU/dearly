@@ -33,15 +33,12 @@ export const uploadUserMedia = async (payload: FormData): Promise<UploadUserMedi
 };
 
 export const processMedia = async (payload: processMediaPayload): Promise<Waveform> => {
-  console.log("got to processMedia method")
-  console.log(payload)
+
   const req = async (token: string): Promise<Waveform> => {
-    console.log("inside")
     const { data } = await fetchClient.POST("/api/v1/media/processing", {
       headers: getHeaders(token),
       body: payload
     });
-    console.log("data", data)
     return data!;
   };
   return authWrapper<Waveform>()(req);
