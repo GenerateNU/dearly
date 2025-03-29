@@ -121,7 +121,7 @@ const Layout = () => {
               </Box>
             ),
             headerRight: () => (
-              <Box paddingRight="m">
+              <Box paddingRight="m" backgroundColor="pearl" borderRadius="m" padding="xs">
                 <Setting onPress={onSettingPressed} />
               </Box>
             ),
