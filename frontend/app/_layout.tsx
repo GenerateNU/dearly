@@ -18,7 +18,6 @@ import { useVerifyInviteToken } from "@/hooks/api/group";
 import * as Linking from "expo-linking";
 import { DropdownProvider } from "@/contexts/nudge-dropdown";
 import LoadingOverlay from "@/design-system/components/shared/states/loading-overlay";
-import AddMemberLoading from "@/design-system/components/shared/add-member";
 import SplashScreenAnimation from "@/app/(auth)/components/splash-screen";
 
 const InitialLayout = () => {

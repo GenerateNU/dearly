@@ -4,7 +4,7 @@ import { Box } from "@/design-system/base/box";
 import { useGroupCalendar } from "@/hooks/api/group";
 import { CalendarList, CalendarProvider, WeekCalendar, DateData } from "react-native-calendars";
 import { Text } from "@/design-system/base/text";
-import { StyleSheet, TouchableOpacity, FlatList, ListRenderItem, View } from "react-native";
+import { StyleSheet, TouchableOpacity, FlatList, ListRenderItem } from "react-native";
 import { Icon } from "@/design-system/components/shared/icons/icon";
 import { BackIcon } from "@/design-system/components/shared/icons/back-icon";
 import { getMonthScrollRange, isSameDate, isValidDateData } from "@/utilities/time";
@@ -53,6 +53,8 @@ const Calendar: React.FC = () => {
       </TouchableOpacity>
     ),
   );
+
+  YearItem.displayName = "YearItem";
 
   const commentRef = useRef<BottomSheet>(null);
   const likeRef = useRef<BottomSheet>(null);

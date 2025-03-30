@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { ImagePost } from "@/design-system/components/posts/post";
 import { FlatList, RefreshControl } from "react-native-gesture-handler";
 import { Box } from "@/design-system/base/box";

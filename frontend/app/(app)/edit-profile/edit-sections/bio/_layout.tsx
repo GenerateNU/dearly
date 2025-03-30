@@ -29,7 +29,7 @@ export default function Layout() {
     queryFn: () => getUser(userId!),
   });
 
-  const { control, handleSubmit, setValue, trigger, getValues } = useForm<UPDATE_USER_FORM_TYPE>({
+  const { control, handleSubmit, setValue, getValues } = useForm<UPDATE_USER_FORM_TYPE>({
     resolver: zodResolver(UPDATE_BIO_FORM),
     defaultValues: { bio: data ? data.bio! : "Bio..." },
   });

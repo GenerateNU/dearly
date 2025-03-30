@@ -18,7 +18,7 @@ export default function Layout() {
     await uploadUserData(form);
     router.push("/(app)/edit-profile");
   };
-  const { control, handleSubmit, setValue, trigger, getValues } = useForm<UPDATE_USER_FORM_TYPE>({
+  const { control, handleSubmit, setValue, getValues } = useForm<UPDATE_USER_FORM_TYPE>({
     resolver: zodResolver(UPDATE_USERNAME_FORM),
     defaultValues: { username: "" },
   });

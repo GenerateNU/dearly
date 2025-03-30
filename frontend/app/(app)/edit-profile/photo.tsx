@@ -2,7 +2,7 @@ import { Box } from "@/design-system/base/box";
 import { Theme } from "@/design-system/base/theme";
 import { Icon } from "@/design-system/components/shared/icons/icon";
 import { useTheme } from "@shopify/restyle";
-import { Image, Pressable } from "react-native";
+import { Image } from "react-native";
 
 interface SelectedPhotoProps {
   uri: string;

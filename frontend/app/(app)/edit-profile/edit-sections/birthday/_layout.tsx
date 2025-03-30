@@ -1,8 +1,7 @@
 import { Box } from "@/design-system/base/box";
 import { TextButton } from "@/design-system/components/shared/buttons/text-button";
-import { TextInput } from "react-native";
 import { Text } from "@/design-system/base/text";
-import { UPDATE_BIRTHDAY_FORM, UPDATE_USERNAME_FORM } from "@/utilities/form-schema";
+import { UPDATE_BIRTHDAY_FORM } from "@/utilities/form-schema";
 import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,7 +19,7 @@ export default function Layout() {
     router.push("/(app)/edit-profile");
   };
 
-  const { control, handleSubmit, setValue, trigger, getValues } = useForm<UPDATE_USER_FORM_TYPE>({
+  const { control, handleSubmit, setValue, getValues } = useForm<UPDATE_USER_FORM_TYPE>({
     resolver: zodResolver(UPDATE_BIRTHDAY_FORM),
     defaultValues: { birthday: new Date() },
   });
