@@ -40,6 +40,7 @@ const Notification = () => {
           referenceType={item.referenceType}
           mediaURL={item.mediaURL}
           actorId={item.actorId}
+          profilePhoto={item.profilePhoto}
           description={item.description}
           receiverId={item.receiverId}
           title={item.title}

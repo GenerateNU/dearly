@@ -83,6 +83,7 @@ export class ExpoNotificationService implements NotificationService {
       commentId: null,
       likeId: null,
       description: message,
+      createdAt: new Date(),
     }));
 
     const insertedNotification = await this.transaction.insertNotifications(notifications);
@@ -112,6 +113,7 @@ export class ExpoNotificationService implements NotificationService {
         groupId,
         likeId: null,
         description: message,
+        createdAt: new Date(),
       },
     ];
 
@@ -145,6 +147,7 @@ export class ExpoNotificationService implements NotificationService {
         postId: like.postId,
         title: "New Like",
         description: message,
+        createdAt: new Date(),
       },
     ];
 
