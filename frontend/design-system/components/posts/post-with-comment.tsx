@@ -15,21 +15,21 @@ export const PostWithComment = ({
   onClickLike,
 }: { item: Post } & PostWithCommentProps) => {
   return (
-    <Box paddingBottom="m" gap="s">
+    <Box gap="s">
       <ImagePost
-        profilePhoto={item.profilePhoto}
-        username={item.username}
-        name={item.name}
-        id={item.id}
-        userId={item.userId}
-        createdAt={item.createdAt}
-        location={item.location}
-        isLiked={item.isLiked}
-        comments={item.comments}
-        caption={item.caption}
-        media={item.media}
-        likes={item.likes}
-        groupId={item.groupId}
+        profilePhoto={item.profilePhoto ? item.profilePhoto : null}
+        username={item.username!}
+        name={item.name ? item.name : ""}
+        id={item.id!}
+        userId={item.userId!}
+        createdAt={item.createdAt!}
+        location={item.location ? item.location : ""}
+        isLiked={item.isLiked!}
+        comments={item.comments!}
+        caption={item.caption ? item.caption : ""}
+        media={item.media!}
+        likes={item.likes!}
+        groupId={item.groupId!}
         onLikeClicked={onClickLike}
         onCommentClicked={onClickComment}
       />

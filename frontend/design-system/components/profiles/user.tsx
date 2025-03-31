@@ -1,5 +1,4 @@
 import { Box } from "@/design-system/base/box";
-import { useUserStore } from "@/auth/store";
 import { ScrollView } from "react-native-gesture-handler";
 import ResourceView from "@/design-system/components/utilities/resource-view";
 import Spinner from "@/design-system/components/shared/spinner";
@@ -24,11 +23,11 @@ export const User = ({ id }: { id: string }) => {
           width="100%"
         >
           <UserInfo
-            username={data!.username}
-            name={data!.name!}
-            profilePhoto={data!.profilePhoto ? data!.profilePhoto! : undefined}
-            bio={data!.bio ? data!.bio! : undefined}
-            birthday={data!.birthday ? data!.birthday! : undefined}
+            username={data?.username!}
+            name={data?.name ? data.name : ""}
+            profilePhoto={data?.profilePhoto ? data.profilePhoto : ""}
+            bio={data?.bio ? data.bio : ""}
+            birthday={data?.birthday ? data.birthday : undefined}
           />
           <Box flex={1} width="100%">
             <UserPosts id={id} />

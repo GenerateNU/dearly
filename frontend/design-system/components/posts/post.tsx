@@ -30,7 +30,6 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
   media,
   onLikeClicked,
   onCommentClicked,
-  groupId,
 }) => {
   const { group } = useUserStore();
   const data = media

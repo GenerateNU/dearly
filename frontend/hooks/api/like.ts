@@ -13,7 +13,10 @@ export const useToggleLike = (postId: string, groupId: string) => {
   return useMutationBase<void, void>(
     () => toggleLike(postId),
     ["groups", groupId, "feed"],
-    () => queryClient.invalidateQueries({ queryKey: ["posts", postId, "likes"] }),
+    () => {
+      queryClient.invalidateQueries({ queryKey: ["posts", postId, "likes"] });
+      queryClient.invalidateQueries({ queryKey: ["posts", postId] });
+    },
   );
 };
 

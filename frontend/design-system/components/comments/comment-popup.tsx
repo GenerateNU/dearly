@@ -19,6 +19,7 @@ import { EmptyCommentDisplay } from "./empty-comments";
 
 interface CommentPopUpProps {
   attributes: commentPopUpAttributes;
+  offset?: number;
 }
 
 interface CommentPopUpDataProps {
@@ -26,41 +27,43 @@ interface CommentPopUpDataProps {
   index: number;
 }
 
-export const CommentPopUp = forwardRef<BottomSheetMethods, CommentPopUpProps>((props, ref) => {
-  const [index, setIndex] = useState<number>(-1);
-  return (
-    <>
-      <BottomSheetModal
-        ref={ref}
-        snapPoints={["90%"]}
-        onChange={(index: number) => setIndex(index)}
-      >
-        {props.attributes.commentId === "" ? (
-          <CommentPopUpBlank />
-        ) : (
-          <CommentPopUpData attributes={props.attributes} index={index} />
-        )}
-      </BottomSheetModal>
-      {index !== -1 && (
-        <KeyboardAvoidingView
-          behavior="padding"
-          keyboardVerticalOffset={Platform.OS === "ios" ? 169 : 0}
-          style={{
-            position: "absolute",
-            bottom: 160,
-            left: 0,
-            right: 0,
-            zIndex: 10,
-          }}
+export const CommentPopUp = forwardRef<BottomSheetMethods, CommentPopUpProps>(
+  ({ attributes, offset = 169 }, ref) => {
+    const [index, setIndex] = useState<number>(-1);
+    return (
+      <>
+        <BottomSheetModal
+          ref={ref}
+          snapPoints={["85%"]}
+          onChange={(index: number) => setIndex(index)}
         >
-          <Box backgroundColor="white" padding="s">
-            <CommentInput postID={props.attributes.commentId} />
-          </Box>
-        </KeyboardAvoidingView>
-      )}
-    </>
-  );
-});
+          {attributes.commentId === "" ? (
+            <CommentPopUpBlank />
+          ) : (
+            <CommentPopUpData attributes={attributes} index={index} />
+          )}
+        </BottomSheetModal>
+        {index !== -1 && (
+          <KeyboardAvoidingView
+            behavior="padding"
+            keyboardVerticalOffset={Platform.OS === "ios" ? offset : 0}
+            style={{
+              position: "absolute",
+              bottom: offset,
+              left: 0,
+              right: 0,
+              zIndex: 10,
+            }}
+          >
+            <Box backgroundColor="white" padding="s">
+              <CommentInput postID={attributes.commentId} />
+            </Box>
+          </KeyboardAvoidingView>
+        )}
+      </>
+    );
+  },
+);
 
 const CommentPopUpBlank = () => {
   return <></>;

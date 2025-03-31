@@ -4,7 +4,6 @@ import { Photo } from "./photo";
 import { Box } from "@/design-system/base/box";
 import { Post } from "@/types/post";
 import { router } from "expo-router";
-import { faLessThan } from "@fortawesome/free-solid-svg-icons";
 
 interface MasonryFeedProps {
   posts: Post[];
@@ -23,8 +22,8 @@ export const MasonryList: React.FC<MasonryFeedProps> = ({ posts, onEndReached })
         data={posts}
         numColumns={2}
         scrollEnabled={false}
-        onEndReachedThreshold={0.8}
-        onEndReached={onEndReached}
+        // onEndReachedThreshold={0.8}
+        // onEndReached={onEndReached}
         showsVerticalScrollIndicator={false}
         estimatedItemSize={100} // Add an estimated item size
         renderItem={({ item, index }) => (

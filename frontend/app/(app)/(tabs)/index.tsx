@@ -8,7 +8,6 @@ import { useState } from "react";
 import HomeMenu from "@/design-system/components/home/home-menu";
 import Feed from "../home/feed";
 import Calendar from "../home/calendar";
-import { FeedContextProvider } from "@/contexts/feed-post-context";
 import Spinner from "@/design-system/components/shared/spinner";
 
 const Home = () => {
@@ -24,16 +23,14 @@ const Home = () => {
 
   const SuccessComponent = () => (
     <Box flexDirection="column" gap="s">
-      <FeedContextProvider>
-        <Box paddingTop="m" paddingHorizontal="m">
-          <HomeMenu
-            categories={["Feed", "Calendar"]}
-            selected={selectedView}
-            setSelected={setSelectedView}
-          />
-        </Box>
-        {selectedView === "Feed" ? <Feed /> : <Calendar />}
-      </FeedContextProvider>
+      <Box paddingTop="m" paddingHorizontal="m">
+        <HomeMenu
+          categories={["Feed", "Calendar"]}
+          selected={selectedView}
+          setSelected={setSelectedView}
+        />
+      </Box>
+      {selectedView === "Feed" ? <Feed /> : <Calendar />}
     </Box>
   );
 
