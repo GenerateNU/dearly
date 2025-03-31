@@ -64,7 +64,7 @@ export class CommentControllerImpl implements CommentController {
       const id = parseUUID(ctx.req.param("id"));
       const isLiked = await this.commentService.toggleLikeComment({ id, userId });
       const message = isLiked ? "like" : "unlike";
-      return ctx.json({ message: `Successfully ${message} comment` }, 200);
+      return ctx.json({ message: `Successfully ${message} comment` }, Status.OK);
     };
     return await handleAppError(toggleLikeCommentImpl)(ctx);
   }
@@ -90,7 +90,7 @@ export class CommentControllerImpl implements CommentController {
       const userId = ctx.get("userId");
       const id = parseUUID(ctx.req.param("id"));
       await this.commentService.deleteComment({ userId, id });
-      return ctx.json({ message: `Successfully deleted comment` }, 200);
+      return ctx.json({ message: `Successfully deleted comment` }, Status.OK);
     };
     return await handleAppError(deleteCommentImpl)(ctx);
   }

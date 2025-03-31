@@ -9,6 +9,7 @@ import {
 import * as crypto from "crypto";
 import { getSlackMessage } from "../utilities/monitoring/slack";
 import logger from "../utilities/monitoring/logger";
+import { Status } from "../constants/http";
 
 interface ExpoBuildWebhookPayload {
   status: "errored" | "finished" | "canceled";
@@ -79,20 +80,20 @@ export class SlackControllerImpl implements SlackController {
 
       // Only process non-production builds
       if (payload.metadata.buildProfile === "production") {
-        return ctx.text("New production build, message not sent to Slack", 200);
+        return ctx.text("New production build, message not sent to Slack", Status.OK);
       }
 
       // Check build status and take appropriate actions
       if (payload.status === "finished") {
         await this.sendSlackMessage(payload);
-        return ctx.text("Successfully sent Slack notification", 200);
+        return ctx.text("Successfully sent Slack notification", Status.OK);
       } else if (payload.status === "errored") {
         logger.warn("Failed to build:", payload.error!.message);
-        return ctx.text("Failed to build", 200);
+        return ctx.text("Failed to build", Status.OK);
       } else if (payload.status === "canceled") {
-        return ctx.text("Build canceled", 200);
+        return ctx.text("Build canceled", Status.OK);
       }
-      return ctx.text("Build not finished, no notification sent", 200);
+      return ctx.text("Build not finished, no notification sent", Status.OK);
     };
     return await handleAppError(slackMessageImpl)(ctx);
   }

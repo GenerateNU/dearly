@@ -16,6 +16,7 @@ import { AppService } from "../types/api/internal/services";
 import { NudgeSchedulerService } from "../services/nudgeScheduler";
 import { redirectPage } from "../utilities/server/redirect";
 import { serveStatic } from "@hono/node-server/serve-static";
+import { Status } from "../constants/http";
 
 export const setUpRoutes = (
   app: Hono,
@@ -54,7 +55,7 @@ const setUpApiDocsRoute = (app: Hono) => {
 // Set up the healthcheck route
 const setUpHealthcheckRoute = (app: Hono) => {
   app.get("/healthcheck", (ctx: Context): HealthcheckResponse => {
-    return ctx.json({ message: "OK" }, 200);
+    return ctx.json({ message: "OK" }, Status.OK);
   });
 };
 
@@ -78,7 +79,7 @@ const setUpAppleAppSiteAssociationRoute = (app: Hono) => {
     async (c, next) => {
       await next();
       c.res.headers.set("Content-Type", "application/json");
-      c.status(200);
+      c.status(Status.OK);
     },
     serveStatic({
       root: "src/static",
