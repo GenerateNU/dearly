@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { MasonryFlashList } from "@shopify/flash-list";

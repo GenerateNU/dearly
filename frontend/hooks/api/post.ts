@@ -37,7 +37,7 @@ export const useGroupFeed = (id: string, date?: string, options: any = {}) => {
   );
 };
 
-export const useComments = (id: string, options: any = {}) => {
+export const useComments = (id: string) => {
   return useQueryPagination<Comment[]>(["posts", id, "comments"], (page, limit) => {
     return getComments(id, page, limit) as Promise<Comment[]>;
   });
@@ -47,7 +47,7 @@ export const useMemberPost = (id: string, userId: string, options: any = {}) => 
   return useQueryPagination<Post[]>(
     ["groups", id, "members", userId, "posts"],
     (page, limit) => {
-      return getMemberPosts(id, userId, 10, 1);
+      return getMemberPosts(id, userId, page, limit);
     },
     options,
     10,
