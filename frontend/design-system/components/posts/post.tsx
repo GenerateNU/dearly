@@ -70,7 +70,13 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
         comments={comments}
       />
       {caption && (
-        <Box gap="s" flexDirection="row" justifyContent="flex-start" alignItems="center">
+        <Box
+          width="90%"
+          gap="s"
+          flexDirection="row"
+          justifyContent="flex-start"
+          alignItems="center"
+        >
           <Text>💬</Text>
           <Text>{caption}</Text>
         </Box>

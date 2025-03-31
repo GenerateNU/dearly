@@ -18,7 +18,6 @@ import { useVerifyInviteToken } from "@/hooks/api/group";
 import * as Linking from "expo-linking";
 import { DropdownProvider } from "@/contexts/nudge-dropdown";
 import LoadingOverlay from "@/design-system/components/shared/states/loading-overlay";
-import AddMemberLoading from "@/design-system/components/shared/add-member";
 import SplashScreenAnimation from "@/app/(auth)/components/splash-screen";
 
 const InitialLayout = () => {
@@ -41,7 +40,7 @@ const InitialLayout = () => {
 
   useEffect(() => {
     if (error) {
-      Alert.alert("Error", "Invalid or expired link. Please ask for a new link.", [{ text: "OK" }]);
+      Alert.alert("Error", "You are already in the group, or link has expired.", [{ text: "OK" }]);
     }
   }, [error]);
 

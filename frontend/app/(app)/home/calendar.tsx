@@ -4,7 +4,7 @@ import { Box } from "@/design-system/base/box";
 import { useGroupCalendar } from "@/hooks/api/group";
 import { CalendarList, CalendarProvider, WeekCalendar, DateData } from "react-native-calendars";
 import { Text } from "@/design-system/base/text";
-import { StyleSheet, TouchableOpacity, FlatList, ListRenderItem, View } from "react-native";
+import { StyleSheet, TouchableOpacity, FlatList, ListRenderItem } from "react-native";
 import { Icon } from "@/design-system/components/shared/icons/icon";
 import { BackIcon } from "@/design-system/components/shared/icons/back-icon";
 import { getMonthScrollRange, isSameDate, isValidDateData } from "@/utilities/time";
@@ -13,6 +13,7 @@ import Feed, { CommentLikesPopup } from "./feed";
 import { CustomDayComponent } from "./calendar-day";
 import Spinner from "@/design-system/components/shared/spinner";
 import BottomSheet from "@gorhom/bottom-sheet";
+import ErrorDisplay from "@/design-system/components/shared/states/error";
 
 type ViewMode = "month" | "week" | "year";
 
@@ -53,6 +54,8 @@ const Calendar: React.FC = () => {
       </TouchableOpacity>
     ),
   );
+
+  YearItem.displayName = "YearItem";
 
   const commentRef = useRef<BottomSheet>(null);
   const likeRef = useRef<BottomSheet>(null);
@@ -298,7 +301,9 @@ const Calendar: React.FC = () => {
               dayComponent={renderDayComponentForWeekCalendar}
             />
           </Box>
-          <Feed date={selectedDate} popup={false} commentRef={commentRef} likeRef={likeRef} />
+          <Box style={{ paddingBottom: 100 }}>
+            <Feed date={selectedDate} popup={false} commentRef={commentRef} likeRef={likeRef} />
+          </Box>
           <CommentLikesPopup commentRef={commentRef} likeRef={likeRef} />
         </CalendarProvider>
       </Box>
@@ -310,6 +315,14 @@ const Calendar: React.FC = () => {
       <Spinner />
     </Box>
   );
+
+  if (error) {
+    return (
+      <Box padding="m" flex={1}>
+        <ErrorDisplay />
+      </Box>
+    );
+  }
 
   return (
     <Box paddingBottom="xl" marginBottom="xl">

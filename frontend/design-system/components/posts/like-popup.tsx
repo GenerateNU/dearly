@@ -7,16 +7,16 @@ import { Text } from "@/design-system/base/text";
 import { LikeCard } from "./like-card";
 import { SearchedUser } from "@/types/user";
 import { useGetAllLikeUsers } from "@/hooks/api/like";
-import { LikeSkeleton } from "./like-skeleton";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ResourceView from "../utilities/resource-view";
 import Spinner from "../shared/spinner";
 import ErrorDisplay from "../shared/states/error";
 import { EmptyLikesDisplay } from "./empty-likes";
+import { LikeSkeleton } from "./like-skeleton";
 
 export const LikePopup = forwardRef<BottomSheetMethods, { postId: string }>((props, ref) => {
   const [isEmpty, setIsEmpty] = useState(false);
-  const snapPoints = isEmpty ? ["40%"] : ["60%"];
+  const snapPoints = isEmpty ? ["40%"] : ["70%", "90%"];
 
   return (
     <BottomSheetModal ref={ref} snapPoints={snapPoints}>
@@ -119,7 +119,11 @@ const LikePopUpData: React.FC<LikePopUpDataProps> = ({ postId, onEmptyChange }) 
     <SafeAreaView edges={["top"]} className="flex-1">
       <ResourceView
         resourceState={likeResources}
-        loadingComponent={<Spinner />}
+        loadingComponent={
+          <Box flex={1} width="100%" paddingTop="m" alignItems="center">
+            <Spinner />
+          </Box>
+        }
         errorComponent={<ErrorDisplay refresh={refetch} />}
         emptyComponent={<EmptyLikesDisplay />}
         successComponent={<SuccessComponent />}

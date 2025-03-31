@@ -64,6 +64,8 @@ export const CustomDayComponent = memo(
   },
 );
 
+CustomDayComponent.displayName = "CustomDayComponent";
+
 const styles = StyleSheet.create({
   dayComponentWrapper: {
     width: 40,

@@ -75,7 +75,6 @@ export class MediaControllerImpl implements MediaController {
     return blobs;
   }
   async getDBData(ctx: Context): Promise<WAVEFORM> {
-    console.log("in controller");
     const getDBImpl = async () => {
       const dataProcessing = processURLValidate.parse(await ctx.req.json());
       const url = dataProcessing["url"];

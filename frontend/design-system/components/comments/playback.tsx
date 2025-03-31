@@ -43,8 +43,6 @@ export const Playback: React.FC<PlaybackProps> = ({
   const [totalLength, setTotalLength] = useState<number>(0);
   const { mutateAsync: processAudio } = useProcessAudio();
 
-  const uniqueFilename = `temp-audio-${new Date().getTime()}-${Math.random().toString(36).substring(7)}`;
-
   useEffect(() => {
     async function initializeValues() {
       if (local) {
@@ -60,6 +58,9 @@ export const Playback: React.FC<PlaybackProps> = ({
         const localUri = downloadResult.uri;
         setUri(localUri);
         const response = await processAudio({ url: location });
+
+        if (!response.length || !response.data) return;
+
         setLength(response.length);
         setTotalLength(response.length);
         setMemoLines(condenseAudioBarHeights(25, response.data, 91));

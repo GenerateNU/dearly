@@ -16,12 +16,6 @@ describe("POST /media/processing", () => {
     url: PROJECT_ROOT + "/tests/test-assets/test_audio_2.m4a",
   };
 
-  /*
-    const badRequestBody = {
-        url: "random_website.com"
-    }
-    */
-
   beforeAll(async () => {
     app = await startTestApp();
   });

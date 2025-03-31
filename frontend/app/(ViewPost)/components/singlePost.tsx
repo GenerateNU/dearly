@@ -25,7 +25,6 @@ const SinglePost = ({ data, postId }: SinglePostProps) => {
             variant="text"
             onPress={() => {
               router.back();
-              console.log("PRESSED");
             }}
             icon="chevron-left"
           />
@@ -56,8 +55,6 @@ const SinglePost = ({ data, postId }: SinglePostProps) => {
           onCommentClicked={() => {}}
         />
       </Box>
-      <CommentPopUp id={postId} ref={commentRef} />
-      <CommentPopUp id={postId} ref={likeRef} />
     </Box>
   );
 };

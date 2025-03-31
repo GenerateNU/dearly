@@ -35,7 +35,7 @@ export const MONTHLY_DROPDOWN_OPTIONS = Array.from({ length: 28 }, (_, i) => ({
   label: String(i + 1),
 }));
 
-export const convertData = (mapping: {}, key: string) => {
+export const convertData = (mapping: Record<string, string>, key: string) => {
   const data = mapping[key as keyof typeof mapping];
   return data;
 };
