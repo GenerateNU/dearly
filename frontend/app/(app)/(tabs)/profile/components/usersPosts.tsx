@@ -8,8 +8,8 @@ import { EmptyFeed } from "@/design-system/components/posts/empty-feed";
 import Spinner from "@/design-system/components/shared/spinner";
 import ErrorDisplay from "@/design-system/components/shared/states/error";
 
-const UserPosts = () => {
-  const { userId, group } = useUserStore();
+const UserPosts = ({ id }: { id: string }) => {
+  const { group } = useUserStore();
 
   const {
     data,
@@ -20,7 +20,7 @@ const UserPosts = () => {
     isLoading,
     refetch,
     error,
-  } = useMemberPost(group?.id as string, userId!);
+  } = useMemberPost(group?.id as string, id);
 
   const posts = data?.pages.flatMap((page) => page);
 

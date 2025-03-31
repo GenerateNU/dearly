@@ -8,6 +8,7 @@ import { Text } from "@/design-system/base/text";
 import { useToggleLike } from "@/hooks/api/like";
 import { useUserStore } from "@/auth/store";
 import { useState } from "react";
+import { router } from "expo-router";
 
 interface Props {
   onCommentClicked: () => void;
@@ -58,7 +59,7 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
         profilePhoto={profilePhoto}
         location={location}
         createdAt={createdAt}
-        onPress={() => null}
+        onPress={() => router.push(`/(app)/user/${userId}`)}
       />
       <ImageCarousel setLike={toggleLike} like={pending || isLiked} data={data} />
       <CommentLike

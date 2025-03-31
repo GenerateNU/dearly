@@ -31,7 +31,7 @@ export const User = ({ id }: { id: string }) => {
             birthday={data!.birthday ? data!.birthday! : undefined}
           />
           <Box flex={1} width="100%">
-            <UserPosts />
+            <UserPosts id={id} />
           </Box>
         </Box>
       </ScrollView>
