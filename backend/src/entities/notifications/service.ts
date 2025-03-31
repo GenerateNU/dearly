@@ -5,6 +5,10 @@ import { MediaService } from "../media/service";
 import { NotificationTransactions } from "./transaction";
 import { NotificationWithMedia as Notification } from "../../types/api/internal/notification";
 
+/**
+ * Interface for handling notification-related service operations.
+ * Provides methods for retrieving notifications for a user.
+ */
 export interface NotificationService {
   /**
    * Get notifications for a user, along with pre-signed urls.

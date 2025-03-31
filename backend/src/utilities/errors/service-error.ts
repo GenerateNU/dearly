@@ -1,7 +1,13 @@
-import logger from "../logger";
+import logger from "../monitoring/logger";
 import { InternalServerError, isAppError } from "./app-error";
 import { isDatabaseError, mapDBErrorToAppError } from "./db-error";
 
+/**
+ * Handles service errors by mapping them to a response.
+ *
+ * @param fn - The function to execute
+ * @returns A response object with the appropriate status code and message
+ */
 export const handleServiceError = <T>(fn: () => T) => {
   return async () => {
     try {

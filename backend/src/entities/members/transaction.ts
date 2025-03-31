@@ -18,17 +18,62 @@ import {
 import { AddMemberPayload, Member } from "../../types/api/internal/members";
 import { Pagination, SearchedUser } from "../../types/api/internal/users";
 import { PostWithMedia } from "../../types/api/internal/posts";
-import { getPostMetadata } from "../../utilities/query";
+import { getPostMetadata } from "../../utilities/api/query";
 import { Transaction } from "../../types/api/internal/transaction";
 import { NotificationConfigPayload } from "../../types/api/internal/notification";
-import { IDPayload } from "../../types/id";
+import { IDPayload } from "../../types/api/internal/id";
 
+/**
+ * Interface defining the operations available for managing members in the application.
+ * It includes methods for inserting a new member, retrieving a member by ID, deleting a member,
+ * retrieving members of a group, toggling notification settings, and retrieving posts of a member.
+ */
 export interface MemberTransaction {
+  /**
+   * Inserts a new member into a group.
+   * @param payload - Object containing userId, groupId, and role for the new member
+   * @returns Promise resolving to the created Member object or null if insertion fails
+   */
   insertMember(payload: AddMemberPayload): Promise<Member | null>;
+
+  /**
+   * Retrieves a specific member from a group.
+   * @param payload - Object containing group ID and user ID to look up
+   * @returns Promise resolving to the Member object or null if not found
+   */
   getMember(payload: IDPayload): Promise<Member | null>;
+
+  /**
+   * Removes a member from a group. Can be performed by the member themselves or a group manager.
+   * @param clientId - ID of the user making the deletion request
+   * @param userId - ID of the member to be deleted
+   * @param groupId - ID of the group the member is being removed from
+   * @returns Promise resolving to the deleted Member object or null if not found
+   */
   deleteMember(clientId: string, userId: string, groupId: string): Promise<Member | null>;
-  toggleNotification(payload: NotificationConfigPayload): Promise<Member>;
+
+  /**
+   * Retrieves a list of members belonging to a group.
+   * @param groupId - ID of the group to get members from
+   * @param payload - Pagination parameters for the query
+   * @returns Promise resolving to an array of SearchedUser objects or null if none found
+   */
   getMembers(groupId: string, payload: Pagination): Promise<SearchedUser[] | null>;
+
+  /**
+   * Updates a member's notification preferences for a group.
+   * @param payload - Object containing notification configuration settings
+   * @returns Promise resolving to the updated Member object
+   */
+  toggleNotification(payload: NotificationConfigPayload): Promise<Member>;
+
+  /**
+   * Retrieves posts made by members of a group.
+   * @param payload - Pagination parameters for the query
+   * @param viewer - ID of the user viewing the posts
+   * @param groupId - ID of the group to get posts from
+   * @returns Promise resolving to an array of PostWithMedia objects
+   */
   getMemberPosts(payload: Pagination, viewer: string, groupId: string): Promise<PostWithMedia[]>;
 }
 

@@ -1,15 +1,75 @@
 import { z } from "zod";
-import {
-  calendarParamsValidate,
-  feedParamValidate,
-  updateGroupValidate,
-} from "../../../entities/groups/validator";
 import { groupsTable } from "../../../entities/schema";
+import { MIN_LIMIT, NAME_MAX_LIMIT, TEXT_MAX_LIMIT } from "../../../constants/database";
+import {
+  convertToDate,
+  validateCalendarParam,
+  validateYearMonth,
+} from "../../../utilities/time/date";
+import { paginationSchema } from "../../../utilities/api/pagination";
+
+export const createGroupValidate = z
+  .object({
+    name: z
+      .string()
+      .min(MIN_LIMIT, `Name must be at least ${MIN_LIMIT} character long`)
+      .max(NAME_MAX_LIMIT, `Name must be at most ${NAME_MAX_LIMIT} characters long`),
+    description: z
+      .string()
+      .min(MIN_LIMIT, `Description must be at least ${MIN_LIMIT} character long`)
+      .max(TEXT_MAX_LIMIT, `Description must be at most ${TEXT_MAX_LIMIT} characters long`)
+      .optional(),
+  })
+  .passthrough();
+
+export const feedParamValidate = z
+  .object({
+    date: z
+      .string()
+      .refine(validateYearMonth, {
+        message: "Invalid date. Please follow the format YYYY-MM-DD.",
+      })
+      .transform((val) => new Date(val))
+      .optional(),
+  })
+  .merge(paginationSchema);
+
+export const calendarParamsValidate = z.object({
+  range: z
+    .string()
+    .transform((val) => {
+      const parsed = Number(val);
+      return parsed;
+    })
+    .refine((val) => !isNaN(val) && val > 0, {
+      message: "Range must be a positive number",
+    })
+    .optional()
+    .default("1"),
+
+  pivot: z
+    .string()
+    .refine((input) => validateCalendarParam(input), {
+      message: "Date must be in YYYY-MM format",
+    })
+    .transform(convertToDate)
+    .optional()
+    .default(() => {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    }),
+
+  direction: z.enum(["before", "after", "both"]).optional().default("before"),
+});
+
+export const updateGroupValidate = createGroupValidate.partial();
 
 export type CreateGroupPayload = typeof groupsTable.$inferInsert;
+
 export type UpdateGroupPayload = z.infer<typeof updateGroupValidate> & GroupIdPayload;
 
 export type Group = typeof groupsTable.$inferSelect;
+
 export type FeedParamPayload = z.infer<typeof feedParamValidate> & GroupUserIDPayload;
 
 export type GroupUserIDPayload = {
@@ -36,6 +96,7 @@ export type ResponseWithDate<T> = {
 };
 
 export type ThumbnailResponse = ResponseWithDate<DayWithObjectKey>;
+
 export type ThumbnailResponseWithURL = ResponseWithDate<DayWithURL>;
 
 export type GroupIdPayload = {

@@ -1,17 +1,53 @@
 import { Context } from "hono";
 import { PostService } from "./service";
 import { handleAppError } from "../../utilities/errors/app-error";
-import { parseUUID } from "../../utilities/uuid";
-import { createPostValidate, updatePostValidate } from "./validator";
+import { parseUUID } from "../../utilities/api/uuid";
 import { Status } from "../../constants/http";
-import { DEL_POST, GET_POST, POST_API } from "../../types/api/routes/posts";
-import { CreatePostPayload, UpdatePostPayload } from "../../types/api/internal/posts";
+import {
+  DeletePostResponse,
+  GetPostResponse,
+  CreatePostResponse,
+  UpdatePostResponse,
+} from "../../types/api/routes/posts";
+import {
+  CreatePostPayload,
+  createPostValidate,
+  UpdatePostPayload,
+  updatePostValidate,
+} from "../../types/api/internal/posts";
 
+/**
+ * Interface for handling post-related controller operations.
+ * Provides methods for creating, retrieving, updating, and deleting posts.
+ */
 export interface PostController {
-  createPost(ctx: Context): Promise<POST_API>;
-  getPost(ctx: Context): Promise<GET_POST>;
-  updatePost(ctx: Context): Promise<POST_API>;
-  deletePost(ctx: Context): Promise<DEL_POST>;
+  /**
+   * Creates a new post.
+   * @param ctx - The context of the HTTP request
+   * @returns Promise resolving to the created post
+   */
+  createPost(ctx: Context): Promise<CreatePostResponse>;
+
+  /**
+   * Retrieves a post by its ID.
+   * @param ctx - The context of the HTTP request
+   * @returns Promise resolving to the retrieved post
+   */
+  getPost(ctx: Context): Promise<GetPostResponse>;
+
+  /**
+   * Updates an existing post.
+   * @param ctx - The context of the HTTP request
+   * @returns Promise resolving to the updated post
+   */
+  updatePost(ctx: Context): Promise<UpdatePostResponse>;
+
+  /**
+   * Deletes a post by its ID.
+   * @param ctx - The context of the HTTP request
+   * @returns Promise resolving to the deleted post
+   */
+  deletePost(ctx: Context): Promise<DeletePostResponse>;
 }
 
 export class PostControllerImpl implements PostController {
@@ -21,7 +57,7 @@ export class PostControllerImpl implements PostController {
     this.postService = postService;
   }
 
-  async createPost(ctx: Context): Promise<POST_API> {
+  async createPost(ctx: Context): Promise<CreatePostResponse> {
     const createPostImpl = async () => {
       // pull out essential IDs
       const groupId = parseUUID(ctx.req.param("id"));
@@ -42,7 +78,7 @@ export class PostControllerImpl implements PostController {
     return await handleAppError(createPostImpl)(ctx);
   }
 
-  async getPost(ctx: Context): Promise<POST_API> {
+  async getPost(ctx: Context): Promise<GetPostResponse> {
     const getPostImpl = async () => {
       // pull out essential IDs
       const id = parseUUID(ctx.req.param("id"));
@@ -54,7 +90,7 @@ export class PostControllerImpl implements PostController {
     return await handleAppError(getPostImpl)(ctx);
   }
 
-  async updatePost(ctx: Context): Promise<POST_API> {
+  async updatePost(ctx: Context): Promise<UpdatePostResponse> {
     const updatePostImpl = async () => {
       // pull out essential IDs
       const userId = parseUUID(ctx.get("userId"));
@@ -75,7 +111,7 @@ export class PostControllerImpl implements PostController {
     return await handleAppError(updatePostImpl)(ctx);
   }
 
-  async deletePost(ctx: Context): Promise<DEL_POST> {
+  async deletePost(ctx: Context): Promise<DeletePostResponse> {
     const deletePostImpl = async () => {
       // pull out essential IDs
       const id = parseUUID(ctx.req.param("id"));

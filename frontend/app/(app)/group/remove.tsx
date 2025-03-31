@@ -1,7 +1,7 @@
 import { useUserStore } from "@/auth/store";
 import { SafeAreaView } from "react-native";
 import SimplePage from "@/design-system/components/shared/simple-page";
-import { useRemoveMemberContext } from "@/contexts/remove-meber";
+import { useRemoveMemberContext } from "@/contexts/remove-member";
 import { useRemoveMember } from "@/hooks/api/member";
 import { router } from "expo-router";
 import { useEffect } from "react";

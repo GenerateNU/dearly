@@ -1,11 +1,11 @@
 import { Hono } from "hono";
-import { getConfigurations } from "./config/config";
+import { getConfigurations } from "./config/init";
 import { connectDB } from "./database/connect";
 import { configureMiddlewares } from "./middlewares/init";
 import { setUpRoutes } from "./routes/init";
 import { automigrateDB } from "./database/migrate";
 import { initIntegration, initService } from "./services/init";
-import { handleServerShuttingDown } from "./utilities/server";
+import { handleServerShuttingDown } from "./utilities/server/server";
 
 const app = new Hono();
 const config = getConfigurations();

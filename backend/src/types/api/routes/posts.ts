@@ -1,27 +1,31 @@
 import { TypedResponse } from "hono";
 import { paths } from "../../../gen/openapi";
-import { API_ERROR } from "../schemas/error";
+import { APIError } from "../schemas/error";
 
-export type POST_API = TypedResponse<
+export type CreatePostResponse = TypedResponse<
   | paths["/api/v1/groups/{id}/posts"]["post"]["responses"]["201"]["content"]["application/json"]
-  | API_ERROR
+  | APIError
 >;
 
-export type GET_POST = TypedResponse<
-  paths["/api/v1/posts/{id}"]["get"]["responses"]["200"]["content"]["application/json"] | API_ERROR
+export type GetPostResponse = TypedResponse<
+  paths["/api/v1/posts/{id}"]["get"]["responses"]["200"]["content"]["application/json"] | APIError
 >;
 
-export type DEL_POST = TypedResponse<
+export type UpdatePostResponse = TypedResponse<
+  paths["/api/v1/posts/{id}"]["patch"]["responses"]["200"]["content"]["application/json"] | APIError
+>;
+
+export type DeletePostResponse = TypedResponse<
   | paths["/api/v1/posts/{id}"]["delete"]["responses"]["200"]["content"]["application/json"]
-  | API_ERROR
+  | APIError
 >;
 
-export type LIKE_USERS = TypedResponse<
+export type LikeUsersResponse = TypedResponse<
   | paths["/api/v1/posts/{id}/likes"]["get"]["responses"]["200"]["content"]["application/json"]
-  | API_ERROR
+  | APIError
 >;
 
-export type TOGGLE_LIKE = TypedResponse<
+export type ToggleLikeResponse = TypedResponse<
   | paths["/api/v1/posts/{id}/likes"]["patch"]["responses"]["200"]["content"]["application/json"]
-  | API_ERROR
+  | APIError
 >;

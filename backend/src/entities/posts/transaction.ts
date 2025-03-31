@@ -10,18 +10,49 @@ import {
 } from "../schema";
 import { eq, and, sql, count } from "drizzle-orm";
 import { ForbiddenError, NotFoundError } from "../../utilities/errors/app-error";
-import { IDPayload } from "../../types/id";
+import { IDPayload } from "../../types/api/internal/id";
 import {
   CreatePostPayload,
   PostWithMedia,
   UpdatePostPayload,
 } from "../../types/api/internal/posts";
-import { getPostMetadata } from "../../utilities/query";
+import { getPostMetadata } from "../../utilities/api/query";
 
+/**
+ * Interface for handling post-related database transactions.
+ * Provides methods for creating, retrieving, updating, and deleting posts.
+ */
 export interface PostTransaction {
+  /**
+   * Creates a new post.
+   * @param post - The post to create
+   * @returns Promise resolving to the created post or null if creation fails
+   */
   createPost(post: CreatePostPayload): Promise<PostWithMedia | null>;
+
+  /**
+   * Retrieves a post by its ID.
+   * @param payload - The ID payload containing the post ID and user ID
+   * @returns Promise resolving to the retrieved post or null if not found
+   */
   getPost(payload: IDPayload): Promise<PostWithMedia | null>;
+
+  /**
+   * Updates an existing post.
+   * @param payload - The payload containing updated post data and IDs
+   * @returns Promise resolving to the updated post or null if update fails
+   * @throws ForbiddenError if user does not own the post
+   * @throws NotFoundError if post does not exist
+   */
   updatePost(payload: UpdatePostPayload): Promise<PostWithMedia | null>;
+
+  /**
+   * Deletes a post.
+   * @param payload - The ID payload containing the post ID and user ID
+   * @returns Promise resolving to void
+   * @throws ForbiddenError if user does not own the post
+   * @throws NotFoundError if post does not exist
+   */
   deletePost(payload: IDPayload): Promise<void>;
 }
 

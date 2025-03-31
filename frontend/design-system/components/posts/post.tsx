@@ -9,7 +9,7 @@ import { useToggleLike } from "@/hooks/api/like";
 import { useUserStore } from "@/auth/store";
 import { useState } from "react";
 import { router } from "expo-router";
-import { useRemoveMemberContext } from "@/contexts/remove-meber";
+import { useRemoveMemberContext } from "@/contexts/remove-member";
 
 interface Props {
   onCommentClicked: () => void;

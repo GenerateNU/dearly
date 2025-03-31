@@ -1,10 +1,23 @@
 type ErrorMessages = Record<string, string>;
 
+/**
+ * Represents an error with a foreign key constraint.
+ *
+ * @property column - The column name that violates the foreign key constraint
+ * @property table - The table name that violates the foreign key constraint
+ */
 interface ForeignKeyError {
   column: string;
   table: string;
 }
 
+/**
+ * Map of friendly error messages for different error types.
+ *
+ * @property conflict - Messages for unique constraint violations, organized by table and column
+ * @property foreignKey - Messages for foreign key constraint violations, organized by table
+ * @property default - Default message when a more specific message is not available
+ */
 const FRIENDLY_ERROR_MESSAGES = {
   conflict: {
     users: {
@@ -29,7 +42,10 @@ const DB_ERROR_DETAILS_REGEX = {
   foreignKey: /Key \((\w+)\)=\((.+?)\) is not present in table "(\w+)"/,
 } as const;
 
-// parse the database error details from regex pattern
+/**
+ * Utility class for parsing database error details.
+ * Extracts relevant information from error messages using regex patterns.
+ */
 class ErrorParser {
   static parseConflictError(detail: string): string | undefined {
     const match = detail.match(DB_ERROR_DETAILS_REGEX.conflict);
@@ -45,7 +61,10 @@ class ErrorParser {
   }
 }
 
-// retrieve friendly error mesages from table name and column
+/**
+ * Utility class for formatting error messages.
+ * Formats error messages based on the table name and detail.
+ */
 class ErrorFormatter {
   static getConflictMessage(tableName: string, column: string): string | undefined {
     return FRIENDLY_ERROR_MESSAGES.conflict[tableName]?.[column];
@@ -72,7 +91,13 @@ class ErrorFormatter {
   }
 }
 
-// get friendly error message from database error
+/**
+ * Retrieves a friendly error message based on the table name and detail.
+ *
+ * @param tableName - The name of the table that the error occurred in
+ * @param detail - The detail of the error
+ * @returns A friendly error message
+ */
 export const getFriendlyErrorMessage = (tableName: string, detail: string): string => {
   return ErrorFormatter.formatError(tableName, detail);
 };

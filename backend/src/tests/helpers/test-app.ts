@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { getConfigurations } from "../../config/config";
+import { getConfigurations } from "../../config/init";
 import { connectDB } from "../../database/connect";
 import { configureMiddlewares } from "../../middlewares/init";
 import { setUpRoutes } from "../../routes/init";

@@ -3,7 +3,7 @@ import { Hono } from "hono";
 import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID } from "../helpers/test-token";
-import { HTTPRequest } from "../../constants/http";
+import { HTTPRequest, Status } from "../../constants/http";
 import { resolve } from "node:path";
 const PROJECT_ROOT = resolve(__dirname, "../..");
 
@@ -35,7 +35,7 @@ describe("POST /media/processing", () => {
         },
       })
     )
-      .assertStatusCode(201)
+      .assertStatusCode(Status.OK)
       .assertField("length", 5)
       .assertArrayFieldExists("data");
   });

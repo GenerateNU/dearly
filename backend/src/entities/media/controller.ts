@@ -1,14 +1,42 @@
 import { Context } from "hono";
 import { MediaService } from "./service";
 import { BadRequestError, handleAppError } from "../../utilities/errors/app-error";
-import { parseUUID } from "../../utilities/uuid";
-import { GROUP_MEDIA, USER_MEDIA, WAVEFORM } from "../../types/api/routes/media";
-import { processURLValidate } from "./validator";
+import { parseUUID } from "../../utilities/api/uuid";
+import { GroupMediaResponse, UserMediaResponse, Waveform } from "../../types/api/routes/media";
+import { Status } from "../../constants/http";
+import { processURLValidate } from "../../types/api/internal/media";
 
+/**
+ * Interface for handling media upload operations.
+ * Provides methods for uploading media files for posts and user profiles.
+ */
 export interface MediaController {
-  uploadPostMedia(ctx: Context): Promise<GROUP_MEDIA>;
-  uploadUserMedia(ctx: Context): Promise<USER_MEDIA>;
-  getDBData(ctx: Context): Promise<WAVEFORM>;
+  /**
+   * Uploads media files for a post.
+   * @param ctx - The context object containing the request and response information
+   * @returns Promise resolving to the GroupMediaResponse object
+   */
+  uploadPostMedia(ctx: Context): Promise<GroupMediaResponse>;
+
+  /**
+   * Uploads media files for a user profile.
+   * @param ctx - The context object containing the request and response information
+   * @returns Promise resolving to the UserMediaResponse object
+   */
+  uploadUserMedia(ctx: Context): Promise<UserMediaResponse>;
+
+  /**
+   * Retrieves data related to a specific URL from the database.
+   *
+   * This method extracts a URL from the request body, validates it, and then
+   * uses the `MediaService` to fetch corresponding data from the database.
+   * The result is returned as a JSON response.
+   *
+   * @param ctx - The context object containing the request and response information.
+   * @returns Promise resolving to the database response wrapped in a JSON format.
+   * @throws BadRequestError - If the URL is not provided or is invalid.
+   */
+  getDBData(ctx: Context): Promise<Waveform>;
 }
 
 export class MediaControllerImpl implements MediaController {
@@ -18,7 +46,7 @@ export class MediaControllerImpl implements MediaController {
     this.mediaService = mediaService;
   }
 
-  async uploadPostMedia(ctx: Context): Promise<GROUP_MEDIA> {
+  async uploadPostMedia(ctx: Context): Promise<GroupMediaResponse> {
     const uploadMediaImpl = async () => {
       const groupId = parseUUID(ctx.req.param("id"));
       const userId = ctx.get("userId");
@@ -32,12 +60,12 @@ export class MediaControllerImpl implements MediaController {
       const blobs = this.checkMediaType(media);
 
       const objectKeys = await this.mediaService.uploadPostMedia(blobs, groupId, userId);
-      return ctx.json(objectKeys, 201);
+      return ctx.json(objectKeys, Status.Created);
     };
     return await handleAppError(uploadMediaImpl)(ctx);
   }
 
-  async uploadUserMedia(ctx: Context): Promise<USER_MEDIA> {
+  async uploadUserMedia(ctx: Context): Promise<UserMediaResponse> {
     const uploadMediaImpl = async () => {
       const userId = ctx.get("userId");
       const body = await ctx.req.parseBody();
@@ -49,7 +77,7 @@ export class MediaControllerImpl implements MediaController {
 
       if (media instanceof File) {
         const objectKeys = await this.mediaService.uploadUserMedia(media, userId);
-        return ctx.json(objectKeys, 201);
+        return ctx.json(objectKeys, Status.Created);
       }
 
       throw new BadRequestError("Invalid file type");
@@ -74,7 +102,8 @@ export class MediaControllerImpl implements MediaController {
     }
     return blobs;
   }
-  async getDBData(ctx: Context): Promise<WAVEFORM> {
+
+  async getDBData(ctx: Context): Promise<Waveform> {
     const getDBImpl = async () => {
       const dataProcessing = processURLValidate.parse(await ctx.req.json());
       const url = dataProcessing["url"];
@@ -82,7 +111,7 @@ export class MediaControllerImpl implements MediaController {
         throw new BadRequestError("Invalid Url");
       }
       const response = await this.mediaService.getDBData(url);
-      return ctx.json(response, 201);
+      return ctx.json(response, Status.OK);
     };
     return await handleAppError(getDBImpl)(ctx);
   }

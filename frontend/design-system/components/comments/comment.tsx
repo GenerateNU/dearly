@@ -7,7 +7,7 @@ import { Avatar } from "../shared/avatar";
 import { Playback } from "./playback";
 import { Pressable } from "react-native";
 import { router } from "expo-router";
-import { useRemoveMemberContext } from "@/contexts/remove-meber";
+import { useRemoveMemberContext } from "@/contexts/remove-member";
 
 export const CommentCard: React.FC<Required<Comment>> = ({
   id,

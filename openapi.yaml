@@ -3163,7 +3163,7 @@ paths:
                     format: url
                     example: "https://example.com/thumbnail.jpg"
         responses:
-          201:
+          200:
             description: Successfully retrieve object key and type
             content:
               application/json:

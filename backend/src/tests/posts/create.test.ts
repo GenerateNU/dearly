@@ -10,7 +10,7 @@ import { startTestApp } from "../helpers/test-app";
 import { TestBuilder } from "../helpers/test-builder";
 import { generateJWTFromID, generateUUID } from "../helpers/test-token";
 import { HTTPRequest, Status } from "../../constants/http";
-import { MAX_MEDIA_COUNT, TEXT_MAX_LIMIT } from "../../constants/database";
+import { MediaLimit, TEXT_MAX_LIMIT } from "../../constants/database";
 
 describe("POST /groups/:id/posts", () => {
   let app: Hono;
@@ -296,7 +296,7 @@ describe("POST /groups/:id/posts", () => {
       .assertError([
         {
           path: "media",
-          message: `At most ${MAX_MEDIA_COUNT} media items are allowed.`,
+          message: `At most ${MediaLimit.MAX_COUNT} media items are allowed.`,
         },
       ]);
   });

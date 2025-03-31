@@ -2,7 +2,7 @@ import { Stack } from "expo-router";
 import { BackIcon } from "@/design-system/components/shared/icons/back-icon";
 import { useUserStore } from "@/auth/store";
 import RemoveMemberPopUp from "@/design-system/components/shared/settings/remove-member-popup";
-import { useRemoveMemberContext } from "@/contexts/remove-meber";
+import { useRemoveMemberContext } from "@/contexts/remove-member";
 import { Box } from "@/design-system/base/box";
 import { Icon } from "@/design-system/components/shared/icons/icon";
 import { Text } from "@/design-system/base/text";

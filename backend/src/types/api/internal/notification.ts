@@ -1,11 +1,18 @@
-import { createSelectSchema } from "drizzle-zod";
 import { notificationsTable } from "../../../entities/schema";
 import { Post } from "./posts";
 import { Like } from "./like";
 import { Comment } from "./comments";
-import { IDPayload } from "../../id";
+import { IDPayload } from "./id";
+import { z } from "zod";
 
-export const notificationValidate = createSelectSchema(notificationsTable);
+export const notificationValidate = z
+  .object({
+    likeNotificationEnabled: z.boolean().optional(),
+    commnentNotificationEnabled: z.boolean().optional(),
+    nudgeNotificationEnabled: z.boolean().optional(),
+    postNotificationEnabled: z.boolean().optional(),
+  })
+  .passthrough();
 
 export type Notification = typeof notificationsTable.$inferInsert;
 

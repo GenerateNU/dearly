@@ -9,7 +9,7 @@ import * as yaml from "yaml";
  */
 export const getOpenAPISpecification = (): string => {
   try {
-    const yamlLocation = path.resolve(__dirname, "../../../openapi.yaml");
+    const yamlLocation = path.resolve(__dirname, "../../../../openapi.yaml");
     const yamlSpec = fs.readFileSync(yamlLocation, "utf-8");
     const openapiSpec = yaml.parse(yamlSpec);
     return openapiSpec;

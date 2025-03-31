@@ -1,4 +1,4 @@
-import { getConfigurations } from "./../../config/config";
+import { getConfigurations } from "../../config/init";
 import { DeleteObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { mockClient } from "aws-sdk-client-mock";
 import fs from "fs";

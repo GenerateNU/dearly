@@ -1,28 +1,21 @@
 import * as dotenv from "dotenv";
 import { resolve } from "path";
 import { Configuration } from "../types/config";
+import { parseEnv, parseSSL } from "./helpers";
 
+// Get the current environment (default is "test")
 const nodeEnv = process.env.NODE_ENV || "test";
+// Choose the appropriate environment file based on the environment
 const envFile = nodeEnv === "test" || nodeEnv === "development" ? ".env.test" : ".env";
 
+// Load environment variables from the appropriate .env file
 dotenv.config({ path: resolve(__dirname, "../../../", envFile) });
 
-const parseEnv = (envVarName: string): string => {
-  const value = process.env[envVarName] || "";
-  if (!value) {
-    throw new Error(`Missing required environment variable: ${envVarName}`);
-  }
-  return value;
-};
-
-const parseSSL = (value: string): boolean | "require" => {
-  const lowerValue = value.toLowerCase();
-  if (lowerValue === "true") return true;
-  if (lowerValue === "false") return false;
-  if (lowerValue === "require") return lowerValue;
-  throw new Error(`Invalid value for SSL environment variable`);
-};
-
+/**
+ * Retrieves the application configuration by parsing environment variables.
+ * Returns a configuration object that can be used throughout the application.
+ * @returns The application configuration object with various settings.
+ */
 export const getConfigurations = (): Configuration => {
   const config: Configuration = {
     server: {
