@@ -4,6 +4,7 @@ import { Photo } from "./photo";
 import { Box } from "@/design-system/base/box";
 import { Post } from "@/types/post";
 import { router } from "expo-router";
+import { faLessThan } from "@fortawesome/free-solid-svg-icons";
 
 interface MasonryFeedProps {
   posts: Post[];
@@ -24,6 +25,7 @@ export const MasonryList: React.FC<MasonryFeedProps> = ({ posts, onEndReached })
         scrollEnabled={false}
         onEndReachedThreshold={0.8}
         onEndReached={onEndReached}
+        showsVerticalScrollIndicator={false}
         estimatedItemSize={100} // Add an estimated item size
         renderItem={({ item, index }) => (
           <Box
@@ -36,12 +38,12 @@ export const MasonryList: React.FC<MasonryFeedProps> = ({ posts, onEndReached })
             <Photo
               image={item.media?.[0]?.url ?? ""}
               onPress={() => {
-                router.push(`/ViewPost/${item.id}`);
+                router.push(`/(app)/view-post/${item.id}`);
               }}
             />
           </Box>
         )}
-        contentContainerStyle={{ paddingBottom: 20 }} // Add padding at the bottom
+        contentContainerStyle={{ paddingBottom: 200 }}
       />
     </Box>
   );

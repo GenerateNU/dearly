@@ -7,9 +7,10 @@ import ResourceView from "@/design-system/components/utilities/resource-view";
 import { EmptyFeed } from "@/design-system/components/posts/empty-feed";
 import Spinner from "@/design-system/components/shared/spinner";
 import ErrorDisplay from "@/design-system/components/shared/states/error";
+import EmptyDataDisplay from "@/design-system/components/shared/states/empty";
 
 const UserPosts = ({ id }: { id: string }) => {
-  const { group } = useUserStore();
+  const { group, userId } = useUserStore();
 
   const {
     data,
@@ -32,7 +33,6 @@ const UserPosts = ({ id }: { id: string }) => {
 
   const SuccessComponent = () => (
     <Box width={"100%"} height={"auto"}>
-      <Text variant="bodyLargeBold">Posts</Text>
       <MasonryList onEndReached={loadMore} posts={posts} />
     </Box>
   );
@@ -44,21 +44,26 @@ const UserPosts = ({ id }: { id: string }) => {
   };
 
   return (
-    <ResourceView
-      resourceState={state}
-      successComponent={<SuccessComponent />}
-      loadingComponent={
-        <Box flex={1} justifyContent="center" alignItems="center">
-          <Spinner />
-        </Box>
-      }
-      emptyComponent={<EmptyFeed />}
-      errorComponent={
-        <Box paddingTop="xl">
-          <ErrorDisplay refresh={refetch} />
-        </Box>
-      }
-    />
+    <>
+      <Text paddingBottom="s" variant="bodyLargeBold">
+        Posts
+      </Text>
+      <ResourceView
+        resourceState={state}
+        successComponent={<SuccessComponent />}
+        loadingComponent={
+          <Box flex={1} justifyContent="center" alignItems="center">
+            <Spinner />
+          </Box>
+        }
+        emptyComponent={userId === id ? <EmptyFeed /> : <EmptyDataDisplay />}
+        errorComponent={
+          <Box paddingTop="xl">
+            <ErrorDisplay refresh={refetch} />
+          </Box>
+        }
+      />
+    </>
   );
 };
 

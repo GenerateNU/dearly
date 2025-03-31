@@ -109,7 +109,7 @@ const CommentPopUpData: React.FC<CommentPopUpDataProps> = ({ attributes, index }
     return (
       <Box position="relative" paddingHorizontal="m" height={"100%"} width={"100%"}>
         <Box flexDirection="column" gap="s">
-          <Box flexDirection="row" gap="s" alignItems="center">
+          <Box width="90%" flexDirection="row" gap="s" alignItems="center">
             <Text>💬</Text>
             <Text>{attributes.caption}</Text>
           </Box>

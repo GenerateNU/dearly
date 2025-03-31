@@ -4,9 +4,11 @@ import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { Avatar } from "../shared/avatar";
 import { TextButton } from "../shared/buttons/text-button";
+import { router } from "expo-router";
 
 interface PostHeaderProps {
   username: string;
+  id: string;
   profilePhoto: string | null;
   location: string | null;
   createdAt: string;
@@ -17,8 +19,8 @@ interface PostHeaderProps {
 export const PostHeader: React.FC<PostHeaderProps> = ({
   username,
   profilePhoto,
+  id,
   createdAt,
-  name,
   location,
   onPress,
 }) => {
@@ -31,8 +33,8 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
         <Box flexDirection="column" justifyContent="center" alignItems="flex-start">
           <TextButton
             variant="text"
-            label={name ? name : username}
-            onPress={() => null}
+            label={username}
+            onPress={() => router.push(`/(app)/user/${id}`)}
           ></TextButton>
           {location && (
             <Box flexDirection="row" justifyContent="flex-start" alignItems="center">

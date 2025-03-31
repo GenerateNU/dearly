@@ -54,6 +54,7 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
   return (
     <Box flexDirection="column" gap="s">
       <PostHeader
+        id={userId}
         name={name}
         username={username}
         profilePhoto={profilePhoto}
