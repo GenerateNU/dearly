@@ -1,3 +1,4 @@
+import { BackIcon } from "@/design-system/components/shared/icons/back-icon";
 import { Stack } from "expo-router";
 
 export default function Layout() {
@@ -10,6 +11,7 @@ export default function Layout() {
           headerTransparent: true,
           headerShown: true,
           gestureEnabled: false,
+          headerLeft: () => <BackIcon />,
         }}
       />
     </Stack>

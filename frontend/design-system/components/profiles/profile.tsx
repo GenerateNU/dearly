@@ -22,7 +22,6 @@ export const Profile: React.FC<ProfileProps> = ({
 }) => {
   const profile = profilePhoto ? profilePhoto : DEFAULT_PROFILE_PHOTO;
   const formattedBirthday = new Date(birthday ? birthday : "");
-  //Birthdays are always off by 1 :(
   formattedBirthday.setDate(formattedBirthday.getDate() + 1);
   return (
     <Box width={"100%"} gap="m" flexDirection="row" alignItems="center" justifyContent="flex-start">

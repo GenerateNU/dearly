@@ -1,3 +1,4 @@
+import { DEFAULT_PROFILE_PHOTO } from "@/constants/photo";
 import { Box } from "@/design-system/base/box";
 import { Profile } from "@/design-system/components/profiles/profile";
 
@@ -14,7 +15,7 @@ const UserInfo = ({ username, name, profilePhoto, bio, birthday }: UserInfoProps
     <Box width="100%" maxWidth="100%">
       <Profile
         username={username}
-        profilePhoto={profilePhoto ? profilePhoto : ""}
+        profilePhoto={profilePhoto ? profilePhoto : DEFAULT_PROFILE_PHOTO}
         bio={bio ? bio : ""}
         birthday={birthday ? birthday : ""}
         name={name}

@@ -9,11 +9,12 @@ import { Icon } from "@/design-system/components/shared/icons/icon";
 import { BackIcon } from "@/design-system/components/shared/icons/back-icon";
 import { getMonthScrollRange, isSameDate, isValidDateData } from "@/utilities/time";
 import { CalendarDay } from "@/types/group";
-import Feed, { CommentLikesPopup } from "./feed";
+import Feed from "./feed";
 import { CustomDayComponent } from "./calendar-day";
 import Spinner from "@/design-system/components/shared/spinner";
 import BottomSheet from "@gorhom/bottom-sheet";
 import ErrorDisplay from "@/design-system/components/shared/states/error";
+import { CommentLikesPopup } from "@/design-system/components/posts/comment-like-popup";
 
 type ViewMode = "month" | "week" | "year";
 

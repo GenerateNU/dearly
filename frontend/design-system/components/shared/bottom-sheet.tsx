@@ -44,6 +44,7 @@ const BottomSheetModal = forwardRef<Ref, BottomSheetModalProps>(
         onClose={handleClose}
         style={{
           flex: 1,
+          zIndex: 9999,
         }}
       >
         {children}

@@ -109,10 +109,8 @@ export class PostTransactionImpl implements PostTransaction {
       .select(getPostMetadata(userId))
       .from(postsTable)
       .innerJoin(usersTable, eq(postsTable.userId, usersTable.id))
-      .leftJoin(mediaTable, eq(postsTable.id, mediaTable.postId))
+      .innerJoin(mediaTable, eq(postsTable.id, mediaTable.postId))
       .innerJoin(groupsTable, eq(postsTable.groupId, groupsTable.id))
-      .leftJoin(commentsTable, eq(commentsTable.postId, postsTable.id))
-      .leftJoin(likesTable, eq(likesTable.postId, postsTable.id))
       .innerJoin(
         membersTable,
         and(eq(groupsTable.id, membersTable.groupId), eq(membersTable.userId, userId)),

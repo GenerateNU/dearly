@@ -9,7 +9,7 @@ import { Icon } from "@/design-system/components/shared/icons/icon";
 import { useRemoveMemberContext } from "@/contexts/remove-meber";
 import { useManualNudge } from "@/hooks/api/member";
 import { useUserStore } from "@/auth/store";
-import { Alert } from "react-native";
+import { Alert, Pressable } from "react-native";
 
 interface MemberProps extends GroupMember {
   managerView: boolean;
@@ -62,18 +62,20 @@ const ViewGroupProfile: React.FC<MemberProps> = ({
 
   return (
     <Box flexDirection="row" justifyContent="space-between">
-      <Box gap="m" flexDirection="row" alignItems="center" justifyContent="flex-start">
-        <Box>
-          <Avatar variant="small" profilePhoto={profile} />
-        </Box>
-        <Box>
-          {name && <Text variant="bodyBold">{name}</Text>}
-          <Box alignContent="center" alignItems="center" flexDirection="row" gap="xxs">
-            <Text variant="caption">@{username}</Text>
-            {role === "MANAGER" && <Icon size={20} name="account-outline" />}
+      <Pressable onPress={removeMemberPressed}>
+        <Box gap="m" flexDirection="row" alignItems="center" justifyContent="flex-start">
+          <Box>
+            <Avatar variant="small" profilePhoto={profile} />
+          </Box>
+          <Box>
+            {name && <Text variant="bodyBold">{name}</Text>}
+            <Box alignContent="center" alignItems="center" flexDirection="row" gap="xxs">
+              <Text variant="caption">@{username}</Text>
+              {role === "MANAGER" && <Icon size={20} name="account-outline" />}
+            </Box>
           </Box>
         </Box>
-      </Box>
+      </Pressable>
       {managerView && role === "MEMBER" && (
         <>
           <Box

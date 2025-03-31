@@ -1,23 +1,20 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { ImagePost } from "@/design-system/components/posts/post";
 import { FlatList, RefreshControl } from "react-native-gesture-handler";
 import { Box } from "@/design-system/base/box";
 import { Post } from "@/types/post";
 import { useGroupFeed } from "@/hooks/api/post";
 import React, { useRef, useState, useCallback, useEffect } from "react";
 import BottomSheet from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheet/BottomSheet";
-import { CommentPopUp } from "@/design-system/components/comments/comment-popup";
-import Input from "@/design-system/components/shared/controls/input";
-import MultitrackAudio from "@/assets/audio.svg";
 import Spinner from "@/design-system/components/shared/spinner";
 import { Animated } from "react-native";
-import { LikePopup } from "@/design-system/components/posts/like-popup";
 import { AnimatedBox } from "@/design-system/base/animated-box";
 import { useUserStore } from "@/auth/store";
 import { useFeedContext } from "@/contexts/feed-post-context";
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 import { EmptyFeed } from "@/design-system/components/posts/empty-feed";
 import { PostSkeleton } from "@/design-system/components/posts/post-skeleton";
+import { CommentLikesPopup } from "@/design-system/components/posts/comment-like-popup";
+import { PostWithComment } from "@/design-system/components/posts/post-with-comment";
 
 interface FeedProps {
   date?: string;
@@ -25,22 +22,6 @@ interface FeedProps {
   commentRef?: React.RefObject<BottomSheetMethods>;
   likeRef?: React.RefObject<BottomSheetMethods>;
 }
-
-interface CommentLikesPopupProps {
-  commentRef: React.RefObject<BottomSheetMethods>;
-  likeRef: React.RefObject<BottomSheetMethods>;
-}
-
-export const CommentLikesPopup: React.FC<CommentLikesPopupProps> = ({ commentRef, likeRef }) => {
-  const { commentAttributes, likePostId } = useFeedContext();
-
-  return (
-    <>
-      <CommentPopUp ref={commentRef} attributes={commentAttributes} />
-      <LikePopup ref={likeRef} postId={likePostId} />
-    </>
-  );
-};
 
 const Feed: React.FC<FeedProps> = ({
   date,
@@ -93,29 +74,13 @@ const Feed: React.FC<FeedProps> = ({
 
   const renderItem = ({ item }: { item: Post }) => {
     return (
-      <Box paddingBottom="m" gap="s">
-        <ImagePost
-          profilePhoto={item.profilePhoto}
-          username={item.username}
-          name={item.name}
-          id={item.id}
-          userId={item.userId}
-          createdAt={item.createdAt}
-          location={item.location}
-          isLiked={item.isLiked}
-          comments={item.comments}
-          caption={item.caption}
-          media={item.media}
-          likes={item.likes}
-          groupId={item.groupId}
-          onLikeClicked={() => onClickLikes(item.id)}
-          onCommentClicked={() => onClickComment(item.id, item.caption, item.likes)}
-        />
-        <Input
-          isButton
-          onPress={() => onClickComment(item.id, item.caption, item.likes)}
-          placeholder="Write or record a message..."
-          rightIcon={<MultitrackAudio />}
+      <Box paddingBottom="m">
+        <PostWithComment
+          item={item}
+          onClickComment={() =>
+            onClickComment(item.id!, item.caption ? item.caption : "", item.likes!)
+          }
+          onClickLike={() => onClickLikes(item.id!)}
         />
       </Box>
     );
