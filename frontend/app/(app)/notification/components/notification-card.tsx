@@ -38,16 +38,18 @@ const NotificationCard: React.FC<Notification> = ({
           </Text>
         </Pressable>
       </Box>
-      <Image
-        style={{
-          aspectRatio: 1,
-          width: theme.avatarVariants.small.size,
-          borderRadius: theme.borderRadii.m,
-        }}
-        source={{
-          uri: mediaURL,
-        }}
-      />
+      <Pressable onPress={() => router.push(`/(app)/view-post/${postId}`)}>
+        <Image
+          style={{
+            aspectRatio: 1,
+            width: theme.avatarVariants.small.size,
+            borderRadius: theme.borderRadii.m,
+          }}
+          source={{
+            uri: mediaURL,
+          }}
+        />
+      </Pressable>
     </Box>
   );
 };
