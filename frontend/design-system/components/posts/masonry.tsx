@@ -12,20 +12,18 @@ interface MasonryFeedProps {
 
 export const MasonryList: React.FC<MasonryFeedProps> = ({ posts, onEndReached }) => {
   return (
-    <Box
-      flex={1}
-      width="100%"
-      height="100%" // Ensure full height
-      style={{ minHeight: "100%" }} // Minimum height to fit content
-    >
+    <Box flex={1} width="100%" height={50} style={{ minHeight: "100%" }}>
       <MasonryFlashList
         data={posts}
         numColumns={2}
-        scrollEnabled={false}
-        // onEndReachedThreshold={0.8}
-        // onEndReached={onEndReached}
+        scrollEnabled={true}
+        onEndReachedThreshold={1}
+        onEndReached={() => {
+          // onEndReached();
+          console.log("end reach");
+        }}
         showsVerticalScrollIndicator={false}
-        estimatedItemSize={100} // Add an estimated item size
+        estimatedItemSize={100}
         renderItem={({ item, index }) => (
           <Box
             width="100%"

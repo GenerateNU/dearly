@@ -24,32 +24,6 @@ const ViewPost = () => {
   const [isCommentOpen, setIsCommentOpen] = useState(false);
   const [isLikeOpen, setIsLikeOpen] = useState(false);
 
-  // Handle back button to close sheets instead of navigating back
-  useEffect(() => {
-    const backHandler = BackHandler.addEventListener("hardwareBackPress", () => {
-      if (isCommentOpen) {
-        commentRef.current?.close();
-        return true;
-      }
-      if (isLikeOpen) {
-        likeRef.current?.close();
-        return true;
-      }
-      return false;
-    });
-
-    return () => backHandler.remove();
-  }, [isCommentOpen, isLikeOpen]);
-
-  // Handle sheet changes
-  const handleCommentSheetChange = useCallback((index: number) => {
-    setIsCommentOpen(index !== -1);
-  }, []);
-
-  const handleLikeSheetChange = useCallback((index: number) => {
-    setIsLikeOpen(index !== -1);
-  }, []);
-
   const onClickLikes = useCallback(
     (postId: string) => {
       if (!postId) return;
@@ -57,10 +31,8 @@ const ViewPost = () => {
       setLikePostId(postId);
       setIsLikeOpen(true);
 
-      // Make sure keyboard is dismissed before opening sheet
       Keyboard.dismiss();
 
-      // Slight delay to ensure keyboard is fully dismissed
       setTimeout(() => {
         likeRef.current?.snapToIndex(0);
       }, 100);

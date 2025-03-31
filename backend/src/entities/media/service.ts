@@ -292,7 +292,6 @@ export class MediaServiceImpl {
   getDBData(media: string, interval = 500): Promise<WaveForm> {
     return new Promise((resolve, reject) => {
       let length = 0;
-
       ffmpeg.ffprobe(media, (err: Error, metadata: FfprobeData) => {
         if (err) {
           return reject(new InternalServerError("Failed to Process Audio"));
