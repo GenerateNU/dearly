@@ -83,9 +83,6 @@ const PostCreationForm = () => {
       return;
     }
 
-    console.log("result", result);
-    console.log("result", result!.assets[0]!.uri);
-
     setFormValue("profilePhoto", result!.assets[0]!.uri);
     trigger("profilePhoto");
   };

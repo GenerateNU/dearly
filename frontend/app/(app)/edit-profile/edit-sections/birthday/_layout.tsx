@@ -33,8 +33,6 @@ export default function Layout() {
     return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
   };
 
-  console.log(data?.birthday);
-
   const { control, handleSubmit, setValue, getValues } = useForm<UPDATE_USER_FORM_TYPE>({
     resolver: zodResolver(UPDATE_BIRTHDAY_FORM),
     defaultValues: { birthday: parseBirthday(data?.birthday ? data?.birthday : undefined) },

@@ -53,8 +53,16 @@ const Home = () => {
               <Spinner />
             </Box>
           }
-          errorComponent={<ErrorDisplay refresh={refetch} />}
-          emptyComponent={<EmptyHomePage />}
+          errorComponent={
+            <Box flex={1} padding="m">
+              <ErrorDisplay refresh={refetch} />
+            </Box>
+          }
+          emptyComponent={
+            <Box width="100%" flex={1} padding="m">
+              <EmptyHomePage />
+            </Box>
+          }
           successComponent={<SuccessComponent />}
         />
       </Box>
