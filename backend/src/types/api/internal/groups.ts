@@ -50,7 +50,7 @@ export const calendarParamsValidate = z.object({
   pivot: z
     .string()
     .refine((input) => validateCalendarParam(input), {
-      message: "Date must be in YYYY-MM format and cannot be in future",
+      message: "Date must be in YYYY-MM format",
     })
     .transform(convertToDate)
     .optional()
@@ -58,6 +58,8 @@ export const calendarParamsValidate = z.object({
       const now = new Date();
       return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
     }),
+
+  direction: z.enum(["before", "after", "both"]).optional().default("before"),
 });
 
 export const updateGroupValidate = createGroupValidate.partial();

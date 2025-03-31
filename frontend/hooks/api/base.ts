@@ -51,7 +51,7 @@ export const useQueryPagination = <T>(
     initialPageParam: 1,
     keepPreviousData: true,
     getNextPageParam: (lastPage, allPages) => {
-      return Array.isArray(lastPage) && lastPage.length > 0 ? allPages.length + 1 : undefined;
+      return Array.isArray(lastPage) && lastPage.length === limit ? allPages.length + 1 : undefined;
     },
     ...options,
   });

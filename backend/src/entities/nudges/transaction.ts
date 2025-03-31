@@ -78,6 +78,8 @@ export interface NudgeTransaction {
    * @returns The deactivated nudge schedule configuration
    */
   deactivateNudge(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null>;
+
+  deleteNudge(groupId: string, managerId: string): Promise<NudgeSchedule | null>;
 }
 
 export class NudgeTransactionImpl implements NudgeTransaction {
@@ -93,14 +95,17 @@ export class NudgeTransactionImpl implements NudgeTransaction {
   ): Promise<NudgeSchedule | null> {
     return await this.db.transaction(async (tx) => {
       // validate group existence and manager permissions
-      await this.validateGroup(tx, payload.groupId, managerId);
-
+      try {
+        await this.validateGroup(tx, payload.groupId, managerId);
+      } catch {
+        return null;
+      }
       // insert the value into the database
       const [nudgeSchedule] = await tx
         .insert(scheduledNudgesTable)
         .values(payload)
         .onConflictDoUpdate({
-          target: [scheduledNudgesTable.id, groupsTable.id],
+          target: scheduledNudgesTable.groupId,
           set: { ...payload, updatedAt: new Date() },
         })
         .returning();
@@ -110,7 +115,7 @@ export class NudgeTransactionImpl implements NudgeTransaction {
   }
 
   async getNudgeSchedule(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null> {
-    return await this.db.transaction(async (tx) => {
+    const transactionPromise = await this.db.transaction(async (tx) => {
       // validate group existence and manager permissions
       await this.validateGroup(tx, groupId, managerId);
 
@@ -121,6 +126,8 @@ export class NudgeTransactionImpl implements NudgeTransaction {
 
       return nudgeSchedule ?? null;
     });
+
+    return transactionPromise;
   }
 
   async deactivateNudge(groupId: string, managerId: string): Promise<NudgeSchedulePayload | null> {
@@ -135,6 +142,29 @@ export class NudgeTransactionImpl implements NudgeTransaction {
         .returning();
 
       return nudgeSchedule ?? null;
+    });
+  }
+
+  async deleteNudge(groupId: string, managerId: string): Promise<NudgeSchedule | null> {
+    return await this.db.transaction(async (tx) => {
+      await this.validateGroup(tx, groupId, managerId);
+
+      // check schedule exists
+      const [schedule] = await this.db
+        .select()
+        .from(scheduledNudgesTable)
+        .where(eq(scheduledNudgesTable.groupId, groupId))
+        .limit(1);
+
+      if (schedule) {
+        const [removedSchedule] = await this.db
+          .delete(scheduledNudgesTable)
+          .where(eq(scheduledNudgesTable.groupId, groupId))
+          .returning();
+        return removedSchedule ?? null;
+      }
+
+      return null;
     });
   }
 

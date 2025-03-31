@@ -63,8 +63,11 @@ export class ExpoNotificationService implements NotificationService {
   }
 
   async notifyPost(post: Post): Promise<Notification[]> {
-    const { username, groupName, deviceTokens, memberIDs } =
-      await this.transaction.getPostMetadata(post);
+    const data = await this.transaction.getPostMetadata(post);
+
+    if (!data) return [];
+
+    const { username, groupName, deviceTokens, memberIDs } = data;
 
     const message = this.formatMessage(username, groupName, NotificationType.POST);
 
@@ -78,6 +81,7 @@ export class ExpoNotificationService implements NotificationService {
       commentId: null,
       likeId: null,
       description: message,
+      createdAt: new Date(),
     }));
 
     const insertedNotification = await this.transaction.insertNotifications(notifications);
@@ -88,8 +92,11 @@ export class ExpoNotificationService implements NotificationService {
   }
 
   async notifyComment(comment: Comment): Promise<Notification[]> {
-    const { userId, username, groupName, deviceTokens, isEnabled, groupId } =
-      await this.transaction.getCommentMetadata(comment);
+    const data = await this.transaction.getCommentMetadata(comment);
+
+    if (!data) return [];
+
+    const { userId, username, groupName, deviceTokens, isEnabled, groupId } = data;
 
     const message = this.formatMessage(username, groupName, NotificationType.COMMENT);
 
@@ -104,6 +111,7 @@ export class ExpoNotificationService implements NotificationService {
         groupId,
         likeId: null,
         description: message,
+        createdAt: new Date(),
       },
     ];
 
@@ -119,8 +127,11 @@ export class ExpoNotificationService implements NotificationService {
   }
 
   async notifyLike(like: Like): Promise<Notification[]> {
-    const { userId, username, groupName, deviceTokens, isEnabled, groupId } =
-      await this.transaction.getLikeMetadata(like);
+    const data = await this.transaction.getLikeMetadata(like);
+
+    if (!data) return [];
+
+    const { userId, username, groupName, deviceTokens, isEnabled, groupId } = data;
 
     const message = this.formatMessage(username, groupName, NotificationType.LIKE);
 
@@ -134,6 +145,7 @@ export class ExpoNotificationService implements NotificationService {
         postId: like.postId,
         title: "New Like",
         description: message,
+        createdAt: new Date(),
       },
     ];
 

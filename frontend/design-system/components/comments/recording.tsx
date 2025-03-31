@@ -7,6 +7,7 @@ import { formatSeconds } from "@/utilities/time";
 import { audioBarHeights, condenseAudioBarHeights } from "@/utilities/audio";
 import { Playback } from "./playback";
 import { recordingAttributes, recordingStatus } from "@/types/comment";
+import { Icon } from "../shared/icons/icon";
 
 interface RecordingProps {
   onClose: () => void;
@@ -14,15 +15,16 @@ interface RecordingProps {
 }
 
 export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
-  const [status, setStatus] = useState<recordingStatus>({ recording: false, done: false });
+  const numLines = 36;
+  const [status, setStatus] = useState<recordingStatus>({ recording: true, done: false });
   const [attributes, setAttributes] = useState<recordingAttributes>({
     recording: null,
     audioLevels: [],
     length: 0,
-    memoLines: new Array(50).fill(5),
+    memoLines: new Array(numLines).fill(5),
     uri: "",
   });
-  const numLines = 36;
+  const [sending, setSending] = useState<boolean>(false);
 
   useEffect(() => {
     if (status.recording) {
@@ -85,20 +87,33 @@ export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
     }));
   }
 
+  useEffect(() => {
+    startRecording();
+  }, []);
+
   return (
-    <Box gap="s" flexDirection="row" justifyContent="center" height={50} borderRadius="l">
+    <Box
+      gap="s"
+      flexDirection="row"
+      justifyContent="center"
+      alignItems="center"
+      height={50}
+      borderRadius="l"
+    >
       {status.done && (
         <Box>
-          <IconButton variant="iconGray" onPress={onClose} icon="close" />
+          <IconButton variant="iconGray" onPress={onClose} icon="close" size={30} />
         </Box>
       )}
       {status.done ? (
-        <Playback
-          local
-          dbLevels={attributes.audioLevels}
-          location={attributes.uri}
-          audioLength={attributes.length}
-        />
+        <Box width="65%">
+          <Playback
+            local
+            dbLevels={attributes.audioLevels}
+            location={attributes.uri}
+            audioLength={attributes.length}
+          />
+        </Box>
       ) : (
         <Box
           borderWidth={1}
@@ -132,12 +147,22 @@ export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
         </Box>
       )}
 
-      {status.recording ? (
-        <IconButton variant="icon" onPress={stopRecording} icon="square-rounded" />
+      {sending ? (
+        <Box width={30} height={30} backgroundColor="honey" borderRadius="xl">
+          <Icon name="send" size={30} />{" "}
+        </Box>
       ) : status.done ? (
-        <IconButton variant="icon" onPress={() => onSend(attributes.uri)} icon="send" />
+        <IconButton
+          variant="icon"
+          onPress={() => {
+            setSending(true);
+            onSend(attributes.uri);
+          }}
+          icon="send"
+          size={30}
+        />
       ) : (
-        <IconButton variant="icon" onPress={startRecording} icon="circle" />
+        <IconButton variant="icon" onPress={stopRecording} icon="square-rounded" size={30} />
       )}
     </Box>
   );

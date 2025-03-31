@@ -2,7 +2,8 @@ import { Context } from "hono";
 import { MediaService } from "./service";
 import { BadRequestError, handleAppError } from "../../utilities/errors/app-error";
 import { parseUUID } from "../../utilities/api/uuid";
-import { GroupMediaResponse, UserMediaResponse } from "../../types/api/routes/media";
+import { processURLValidate } from "./validator";
+import { GroupMediaResponse, UserMediaResponse, Waveform } from "../../types/api/routes/media";
 
 /**
  * Interface for handling media upload operations.
@@ -22,6 +23,7 @@ export interface MediaController {
    * @returns Promise resolving to the UserMediaResponse object
    */
   uploadUserMedia(ctx: Context): Promise<UserMediaResponse>;
+  getDBData(ctx: Context): Promise<Waveform>;
 }
 
 export class MediaControllerImpl implements MediaController {
@@ -86,5 +88,18 @@ export class MediaControllerImpl implements MediaController {
       throw new BadRequestError("Invalid media type");
     }
     return blobs;
+  }
+
+  async getDBData(ctx: Context): Promise<Waveform> {
+    const getDBImpl = async () => {
+      const dataProcessing = processURLValidate.parse(await ctx.req.json());
+      const url = dataProcessing["url"];
+      if (!url) {
+        throw new BadRequestError("Invalid Url");
+      }
+      const response = await this.mediaService.getDBData(url);
+      return ctx.json(response, 201);
+    };
+    return await handleAppError(getDBImpl)(ctx);
   }
 }

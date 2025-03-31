@@ -4,11 +4,13 @@ import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { IconButton } from "../shared/buttons/icon-button";
 import { formatSeconds } from "@/utilities/time";
-import { condenseAudioBarHeights, getDBLevels } from "@/utilities/audio";
-import { decoders } from "audio-decode";
+import { condenseAudioBarHeights } from "@/utilities/audio";
 import { playbackStates } from "@/types/comment";
+import * as FileSystem from "expo-file-system";
+import { useProcessAudio } from "@/hooks/api/media";
 
 interface PlaybackPropsWhenLocal {
+  id: string;
   local: true; // is the audio message being stored locally or in s3
   dbLevels: number[];
   audioLength: number;
@@ -16,6 +18,7 @@ interface PlaybackPropsWhenLocal {
 }
 
 interface PlaybackPropsWhenURL {
+  id: string;
   local: false;
   location: string;
   dbLevels?: number[];
@@ -24,13 +27,21 @@ interface PlaybackPropsWhenURL {
 
 type PlaybackProps = PlaybackPropsWhenLocal | PlaybackPropsWhenURL;
 
-export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength, location }) => {
+export const Playback: React.FC<PlaybackProps> = ({
+  id,
+  local,
+  dbLevels,
+  audioLength,
+  location,
+}) => {
   const [status, setStatus] = useState<playbackStates>({ playing: false, pausing: false });
   const [sound, setSound] = useState<Audio.Sound>();
   const [length, setLength] = useState<number>(0);
+  const [uri, setUri] = useState<string>("");
   const [memoLines, setMemoLines] = useState<number[]>([]);
-  const numLines = 25;
+  const numLines = 23;
   const [totalLength, setTotalLength] = useState<number>(0);
+  const { mutateAsync: processAudio } = useProcessAudio();
 
   useEffect(() => {
     async function initializeValues() {
@@ -38,16 +49,21 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
         setMemoLines(condenseAudioBarHeights(numLines, dbLevels));
         setLength(audioLength);
         setTotalLength(audioLength);
+        setUri(location);
       } else {
-        const response = await fetch(location); // initally fetch the mp3 file
-        const arrayBuffer = await response.arrayBuffer(); // convert to array buffer
-        const uint8Array = new Uint8Array(arrayBuffer); // convert to unit8Array
-        const audioBuffer = await decoders.mp3(uint8Array); // get AudioBuffer format
-        const channelData = audioBuffer.getChannelData(0); // get the channel data which is the amplitude
+        const downloadResult = await FileSystem.downloadAsync(
+          location,
+          FileSystem.documentDirectory + `temp-audio-${id}.mp3`,
+        );
+        const localUri = downloadResult.uri;
+        setUri(localUri);
+        const response = await processAudio({ url: location });
 
-        setMemoLines(getDBLevels(channelData));
-        setLength(audioBuffer.duration);
-        setTotalLength(audioBuffer.duration);
+        if (!response.length || !response.data) return;
+
+        setLength(response.length);
+        setTotalLength(response.length);
+        setMemoLines(condenseAudioBarHeights(25, response.data, 91));
       }
     }
     initializeValues();
@@ -56,6 +72,7 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
   useEffect(() => {
     return sound
       ? () => {
+          FileSystem.deleteAsync(uri, { idempotent: true }).catch();
           sound.unloadAsync();
         }
       : undefined;
@@ -67,7 +84,8 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
       await sound?.playAsync();
     } else {
       setStatus({ ...status, playing: true });
-      const { sound } = await Audio.Sound.createAsync({ uri: location });
+      await Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
+      const { sound } = await Audio.Sound.createAsync({ uri: local ? location : uri });
       sound.setOnPlaybackStatusUpdate(onPlayingUpdate);
       sound.setProgressUpdateIntervalAsync(500);
       setSound(sound);
@@ -90,17 +108,18 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
         setLength(statusPlayback.durationMillis! / 1000);
         setStatus({ ...status, playing: false });
       }
+    } else {
     }
   };
   return (
     <Box
       borderWidth={1}
       borderColor="ink"
-      backgroundColor={local ? "pearl" : "honey"}
+      backgroundColor={local ? "pearl" : "white"}
       paddingLeft="s"
       gap="s"
-      width="70%"
-      height={50}
+      width="100%"
+      height={local ? 50 : 40}
       borderRadius="l"
       flexDirection="row"
       alignContent="center"
@@ -116,7 +135,7 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
       ) : (
         <IconButton variant="smallIconPearlBorder" onPress={playRecording} icon="play" size={20} />
       )}
-      {local && <Text variant="bodyLarge">{formatSeconds(length)}</Text>}
+      <Text variant="bodyLarge">{formatSeconds(length)}</Text>
       <Box flexDirection="row" gap="xs" alignItems="center">
         {memoLines.map((item, index) => (
           <Box
@@ -130,7 +149,6 @@ export const Playback: React.FC<PlaybackProps> = ({ local, dbLevels, audioLength
           ></Box>
         ))}
       </Box>
-      {!local && <Text variant="bodyLarge">{formatSeconds(length)}</Text>}
     </Box>
   );
 };

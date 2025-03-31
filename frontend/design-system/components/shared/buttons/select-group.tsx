@@ -4,7 +4,8 @@ import { Text } from "@/design-system/base/text";
 import { BaseButton } from "@/design-system/base/button";
 import { useUserStore } from "@/auth/store";
 import { useUserGroups } from "@/hooks/api/user";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useFocusEffect } from "expo-router";
 
 interface SwitchGroupProps {
   onPress: () => void;
@@ -12,12 +13,18 @@ interface SwitchGroupProps {
 
 const SwitchGroupButton: React.FC<SwitchGroupProps> = ({ onPress }) => {
   const { group, setSelectedGroup } = useUserStore();
-  const { data, isLoading, error } = useUserGroups();
+  const { data, isLoading, error, refetch, isRefetching } = useUserGroups();
   const groups = data?.pages.flatMap((page) => page) || [];
   const [isInitialized, setIsInitialized] = useState(false);
 
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch]),
+  );
+
   useEffect(() => {
-    if (isInitialized || isLoading || error) {
+    if (isInitialized || isLoading || error || isRefetching) {
       return;
     }
 
@@ -26,7 +33,6 @@ const SwitchGroupButton: React.FC<SwitchGroupProps> = ({ onPress }) => {
     }
 
     const shouldUpdateGroup = !group || !groups.some((g) => g.id === group.id);
-
     if (shouldUpdateGroup && groups[0]) {
       setSelectedGroup(groups[0]);
     }
@@ -48,6 +54,9 @@ const SwitchGroupButton: React.FC<SwitchGroupProps> = ({ onPress }) => {
         alignItems="center"
         flexDirection="row"
         gap="xs"
+        backgroundColor="pearl"
+        padding="xs"
+        borderRadius="m"
       >
         <Text color="ink" variant="bodyLargeBold">
           {displayName}

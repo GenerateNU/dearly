@@ -1,8 +1,8 @@
 import { Box } from "@/design-system/base/box";
-import Spinner from "./spinner";
+import Spinner from "../spinner";
 import { Text } from "@/design-system/base/text";
 
-const AddMemberLoading = () => {
+const LoadingOverlay = ({ message }: { message: string }) => {
   return (
     <Box position="absolute" top={0} bottom={0} left={0} right={0} zIndex={9999}>
       <Box
@@ -18,7 +18,7 @@ const AddMemberLoading = () => {
       <Box flex={1} alignItems="center" justifyContent="center">
         <Spinner />
         <Text color="pearl" marginTop="m">
-          Joining group...
+          {message}
         </Text>
         <Text color="pearl" fontSize={14} marginTop="xs">
           This will only take a moment
@@ -28,4 +28,4 @@ const AddMemberLoading = () => {
   );
 };
 
-export default AddMemberLoading;
+export default LoadingOverlay;

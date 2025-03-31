@@ -22,9 +22,24 @@ export const getPostMetadata = (userId: string) => {
     profilePhoto: usersTable.profilePhoto,
     username: usersTable.username,
     name: usersTable.name,
-    comments: sql<number>`COUNT(DISTINCT ${commentsTable.id})`.mapWith(Number),
-    likes: sql<number>`COUNT(DISTINCT ${likesTable.id})`.mapWith(Number),
-    isLiked: sql<boolean>`BOOL_OR(CASE WHEN ${likesTable.userId} = ${userId} THEN true ELSE false END)`,
+    comments: sql<number>`(
+      SELECT COUNT(*) 
+      FROM ${commentsTable}
+      WHERE ${commentsTable.postId} = ${postsTable.id}
+    )`.mapWith(Number),
+    likes: sql<number>`(
+      SELECT COUNT(*) 
+      FROM ${likesTable}
+      WHERE ${likesTable.postId} = ${postsTable.id}
+    )`.mapWith(Number),
+    isLiked: sql<boolean>`(
+      SELECT COALESCE(
+        BOOL_OR(CASE WHEN ${likesTable.userId} = ${userId} THEN true ELSE false END),
+        false
+      )
+      FROM ${likesTable}
+      WHERE ${likesTable.postId} = ${postsTable.id}
+    )`,
     media: sql<Media[]>`ARRAY_AGG(
         JSON_BUILD_OBJECT(
           'id', ${mediaTable.id},

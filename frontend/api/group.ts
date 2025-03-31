@@ -68,6 +68,7 @@ export const getGroupCalendar = async (
   id: string,
   pivot?: string,
   range?: number,
+  direction: "before" | "after" | "both" = "before",
 ): Promise<GroupCalendar> => {
   const req = async (token: string): Promise<GroupCalendar> => {
     const { data } = await fetchClient.GET("/api/v1/groups/{id}/calendar", {
@@ -79,6 +80,7 @@ export const getGroupCalendar = async (
         query: {
           pivot,
           range,
+          direction,
         },
       },
     });

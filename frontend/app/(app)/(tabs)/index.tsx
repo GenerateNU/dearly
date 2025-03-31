@@ -3,14 +3,17 @@ import { EmptyHomePage } from "@/design-system/components/home/empty";
 import { useUserGroups } from "@/hooks/api/user";
 import ResourceView from "@/design-system/components/utilities/resource-view";
 import ErrorDisplay from "@/design-system/components/shared/states/error";
-import Spinner from "@/design-system/components/shared/spinner";
-import { useInvitations } from "@/hooks/api/invite";
-import { TextButton } from "@/design-system/components/shared/buttons/text-button";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useState } from "react";
+import HomeMenu from "@/design-system/components/home/home-menu";
+import Feed from "../home/feed";
+import Calendar from "../home/calendar";
+import Spinner from "@/design-system/components/shared/spinner";
 
 const Home = () => {
   const { data, isLoading, error, refetch } = useUserGroups();
   const groups = data?.pages.flatMap((page) => page) || [];
+  const [selectedView, setSelectedView] = useState<string>("Feed");
 
   const groupsResource = {
     data: groups,
@@ -19,15 +22,21 @@ const Home = () => {
   };
 
   const SuccessComponent = () => (
-    <>
-      <TextButton variant="text" label="Send Message" onPress={useInvitations} />
-    </>
+    <Box flexDirection="column" gap="s">
+      <Box paddingTop="m" paddingHorizontal="m">
+        <HomeMenu
+          categories={["Feed", "Calendar"]}
+          selected={selectedView}
+          setSelected={setSelectedView}
+        />
+      </Box>
+      {selectedView === "Feed" ? <Feed /> : <Calendar />}
+    </Box>
   );
 
   return (
-    <SafeAreaView className="flex-1 pt-[35%]">
+    <SafeAreaView edges={["top"]} className="flex-1 pt-[35%]">
       <Box
-        padding="m"
         gap="xl"
         alignItems="center"
         justifyContent="flex-start"
@@ -36,9 +45,21 @@ const Home = () => {
       >
         <ResourceView
           resourceState={groupsResource}
-          loadingComponent={<Spinner />}
-          errorComponent={<ErrorDisplay refresh={refetch} />}
-          emptyComponent={<EmptyHomePage />}
+          loadingComponent={
+            <Box flex={1} justifyContent="center" alignItems="center">
+              <Spinner />
+            </Box>
+          }
+          errorComponent={
+            <Box flex={1} padding="m">
+              <ErrorDisplay refresh={refetch} />
+            </Box>
+          }
+          emptyComponent={
+            <Box width="100%" flex={1} padding="m">
+              <EmptyHomePage />
+            </Box>
+          }
           successComponent={<SuccessComponent />}
         />
       </Box>

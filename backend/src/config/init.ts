@@ -47,6 +47,9 @@ export const getConfigurations = (): Configuration => {
       name: parseEnv("AWS_BUCKET_NAME"),
     },
     lambdaConfig: {
+      secretKey: parseEnv("AWS_SECRET_KEY"),
+      publicKey: parseEnv("AWS_PUBLIC_KEY"),
+      region: parseEnv("AWS_REGION_LAMBDA"),
       lambdaARN: parseEnv("NUDGE_LAMBDA_ARN"),
       lambdaRoleARN: parseEnv("NUDGE_LAMBDA_ROLE_ARN"),
     },

@@ -1,5 +1,5 @@
-import { AddMemberPayload, Member } from "../../types/api/internal/members";
 import { NotificationConfigPayload } from "../../types/api/internal/notification";
+import { AddMemberPayload, Member } from "../../types/api/internal/members";
 import { PostWithMediaURL } from "../../types/api/internal/posts";
 import { Pagination, SearchedUser } from "../../types/api/internal/users";
 import { IDPayload } from "../../types/api/internal/id";
@@ -106,8 +106,8 @@ export class MemberServiceImpl implements MemberService {
       if (!members) {
         throw new NotFoundError("Group");
       }
-      const membersWithProfileURLs = await this.mediaService.getUsersWithSignedURL(members);
-      return membersWithProfileURLs;
+      const profileURLs = await this.mediaService.getUsersWithSignedURL(members);
+      return profileURLs;
     };
     return handleServiceError(getMembersImpl)();
   }

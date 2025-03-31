@@ -1,13 +1,5 @@
-import { useState, useCallback } from "react";
-import { LayoutChangeEvent, TouchableWithoutFeedback } from "react-native";
-import {
-  useSharedValue,
-  withSpring,
-  withTiming,
-  withSequence,
-  runOnJS,
-  useAnimatedStyle,
-} from "react-native-reanimated";
+import { useState, useCallback, useRef } from "react";
+import { LayoutChangeEvent, TouchableWithoutFeedback, Animated } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import { Image } from "expo-image";
 import { Box } from "@/design-system/base/box";
@@ -27,14 +19,12 @@ const ImageCarousel: React.FC<CarouselProps> = ({ data, initialPage = 0, like, s
   const [containerWidth, setContainerWidth] = useState<number>(0);
   const [page, setPage] = useState<number>(0);
   const [showFlyingHeart, setShowFlyingHeart] = useState(false);
-  const scrollOffsetValue = useSharedValue<number>(0);
   const [lastTap, setLastTap] = useState<number>(0);
 
-  // Animation values
-  const scale = useSharedValue(0.5);
-  const opacity = useSharedValue(0);
-  const translateX = useSharedValue(0);
-  const translateY = useSharedValue(0);
+  const scale = useRef(new Animated.Value(0.5)).current;
+  const opacity = useRef(new Animated.Value(0)).current;
+  const translateX = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(0)).current;
 
   const handleLayout = (event: LayoutChangeEvent) => {
     const { width } = event.nativeEvent.layout;
@@ -51,36 +41,48 @@ const ImageCarousel: React.FC<CarouselProps> = ({ data, initialPage = 0, like, s
     const centerY = containerWidth / 2 - 20;
 
     // Reset position
-    translateX.value = startX;
-    translateY.value = startY;
-    scale.value = 0.5;
-    opacity.value = 1;
+    translateX.setValue(startX);
+    translateY.setValue(startY);
+    scale.setValue(0.5);
+    opacity.setValue(1);
     setShowFlyingHeart(true);
 
-    // Animate to center
-    translateX.value = withSequence(
-      withSpring(centerX, { damping: 15 }),
-      withTiming(startX, { duration: 0 }),
-    );
-    translateY.value = withSequence(
-      withSpring(centerY, { damping: 15 }),
-      withTiming(startY, { duration: 0 }),
-    );
-    scale.value = withSequence(withSpring(1.2, { damping: 15 }), withTiming(0.5, { duration: 0 }));
-    opacity.value = withSequence(
-      withTiming(1, { duration: 200 }),
-      withTiming(0, { duration: 200 }, () => {
-        runOnJS(setShowFlyingHeart)(false);
+    // Animate everything in parallel, including the fade-out
+    Animated.parallel([
+      Animated.spring(translateX, {
+        toValue: centerX,
+        damping: 15,
+        useNativeDriver: true,
       }),
-    );
-  }, [containerWidth]);
+      Animated.spring(translateY, {
+        toValue: centerY,
+        damping: 15,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scale, {
+        toValue: 1.2,
+        damping: 15,
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setShowFlyingHeart(false);
+      translateX.setValue(startX);
+      translateY.setValue(startY);
+      scale.setValue(0.5);
+    });
+  }, [containerWidth, translateX, translateY, scale, opacity]);
 
   const handleLike = useCallback(() => {
     setLike();
     if (!like) {
       animateHeart();
     }
-  }, [like, animateHeart]);
+  }, [like, animateHeart, setLike]);
 
   const handleDoubleTap = useCallback(() => {
     const now = Date.now();
@@ -95,14 +97,10 @@ const ImageCarousel: React.FC<CarouselProps> = ({ data, initialPage = 0, like, s
     setLastTap(now);
   }, [lastTap, like, setLike, animateHeart]);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: translateX.value },
-      { translateY: translateY.value },
-      { scale: scale.value },
-    ],
-    opacity: opacity.value,
-  }));
+  const animatedStyle = {
+    transform: [{ translateX: translateX }, { translateY: translateY }, { scale: scale }],
+    opacity: opacity,
+  };
 
   const renderItem = ({ item }: { item: string }) => (
     <TouchableWithoutFeedback onPress={handleDoubleTap}>
@@ -149,7 +147,6 @@ const ImageCarousel: React.FC<CarouselProps> = ({ data, initialPage = 0, like, s
               style={{ position: "relative", borderRadius: 12 }}
               data={data}
               onProgressChange={(_, index) => setPage(Math.round(index))}
-              defaultScrollOffsetValue={scrollOffsetValue}
               renderItem={renderItem}
             />
           </>

@@ -1,23 +1,21 @@
 import { useUserStore } from "@/auth/store";
-import { Box } from "@/design-system/base/box";
-import { Text } from "@/design-system/base/text";
-import { TextButton } from "@/design-system/components/shared/buttons/text-button";
+import SimplePage from "@/design-system/components/shared/simple-page";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Logout = () => {
-  const { logout } = useUserStore();
+  const { logout, isPending, error } = useUserStore();
 
   return (
-    <SafeAreaView className="flex-1">
-      <Box width="100%" paddingTop="xxl" padding="m" flex={1} gap="l" alignItems="center">
-        <Box width="100%" gap="s">
-          <Text variant="h2">Log out?</Text>
-          <Text variant="body">Are you sure you want to log out?</Text>
-        </Box>
-        <Box width="40%">
-          <TextButton onPress={logout} label="Log out" variant="primary" />
-        </Box>
-      </Box>
+    <SafeAreaView className="flex-1 mt-[15%]">
+      <SimplePage
+        title="Log out?"
+        isLoading={isPending}
+        isError={true}
+        error={error ? new Error(error) : null}
+        onPress={logout}
+        buttonLabel="Log Out"
+        description="Are you sure you want to log out?"
+      />
     </SafeAreaView>
   );
 };

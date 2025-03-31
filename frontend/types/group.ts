@@ -9,6 +9,11 @@ export enum GroupAction {
   CREATE = "Create Group",
 }
 
+export type CalendarDay = {
+  day: number;
+  url: string;
+};
+
 export type NotificationConfigPayload =
   paths["/api/v1/groups/{id}/members/notifications"]["patch"]["requestBody"]["content"]["application/json"];
 
@@ -24,8 +29,8 @@ export type GroupCalendar =
 export type GroupPostFeed =
   paths["/api/v1/groups/{id}/feed"]["get"]["responses"]["200"]["content"]["application/json"];
 
-export type GroupMembers =
-  paths["/api/v1/groups/{id}/members"]["get"]["responses"]["200"]["content"]["application/json"];
+export type GroupMember =
+  paths["/api/v1/groups/{id}/members"]["get"]["responses"]["200"]["content"]["application/json"][number];
 
 export type InvitationToken =
   paths["/api/v1/groups/{groupId}/invites"]["get"]["responses"]["200"]["content"]["application/json"];

@@ -1,7 +1,6 @@
-import { UploadGroupMediaResponse } from "@/types/media";
+import { UploadGroupMediaResponse, Waveform, processMediaPayload } from "@/types/media";
 import { useMutationBase } from "./base";
-import { uploadPostMedia } from "@/api/media";
-
+import { processMedia, uploadPostMedia } from "@/api/media";
 /**
  * Hook to upload group media
  *
@@ -11,5 +10,12 @@ export const useUploadGroupMedia = (id: string) => {
   return useMutationBase<FormData, UploadGroupMediaResponse>(
     (form) => uploadPostMedia(id, form),
     ["groups", id, "media"],
+  );
+};
+
+export const useProcessAudio = () => {
+  return useMutationBase<processMediaPayload, Waveform>(
+    (payload) => processMedia(payload),
+    ["media", "processing"],
   );
 };

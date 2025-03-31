@@ -1,18 +1,29 @@
 import React from "react";
 import { MasonryFlashList } from "@shopify/flash-list";
-import { Box } from "@/design-system/base/box";
 import { Photo } from "./photo";
+import { Box } from "@/design-system/base/box";
+import { Post } from "@/types/post";
+import { router } from "expo-router";
 
 interface MasonryFeedProps {
-  data: string[];
+  posts: Post[];
+  onEndReached: () => void;
 }
 
-export const MasonryList: React.FC<MasonryFeedProps> = ({ data }) => {
+export const MasonryList: React.FC<MasonryFeedProps> = ({ posts, onEndReached }) => {
   return (
-    <Box flex={1} width="100%">
+    <Box flex={1} width="100%" height={50} style={{ minHeight: "100%" }}>
       <MasonryFlashList
-        data={data}
+        data={posts}
         numColumns={2}
+        scrollEnabled={true}
+        onEndReachedThreshold={1}
+        onEndReached={() => {
+          // onEndReached();
+          console.log("end reach");
+        }}
+        showsVerticalScrollIndicator={false}
+        estimatedItemSize={100}
         renderItem={({ item, index }) => (
           <Box
             width="100%"
@@ -21,10 +32,15 @@ export const MasonryList: React.FC<MasonryFeedProps> = ({ data }) => {
             paddingRight={index % 2 === 0 ? "s" : "none"}
             paddingLeft={index % 2 !== 0 ? "s" : "none"}
           >
-            <Photo image={item} />
+            <Photo
+              image={item.media?.[0]?.url ?? ""}
+              onPress={() => {
+                router.push(`/(app)/view-post/${item.id}`);
+              }}
+            />
           </Box>
         )}
-        estimatedItemSize={200}
+        contentContainerStyle={{ paddingBottom: 200 }}
       />
     </Box>
   );

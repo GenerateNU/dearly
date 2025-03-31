@@ -12,12 +12,15 @@ import { useFonts } from "expo-font";
 import { useAccessibility } from "@/hooks/component/accessibility";
 import { UserProvider } from "@/auth/provider";
 import { useUserStore } from "@/auth/store";
-import SplashScreenAnimation from "./(auth)/components/splash-screen";
 import { OnboardingProvider } from "@/contexts/onboarding";
 import { queryClient } from "@/auth/client";
 import { useVerifyInviteToken } from "@/hooks/api/group";
 import * as Linking from "expo-linking";
-import AddMemberLoading from "@/design-system/components/shared/add-member";
+import { DropdownProvider } from "@/contexts/nudge-dropdown";
+import LoadingOverlay from "@/design-system/components/shared/states/loading-overlay";
+import SplashScreenAnimation from "@/app/(auth)/components/splash-screen";
+import { FeedContextProvider } from "@/contexts/feed-post-context";
+import { RemoveMemberProvider } from "@/contexts/remove-meber";
 
 const InitialLayout = () => {
   const { isAuthenticated, clearError, completeOnboarding, setInviteToken, inviteToken } =
@@ -39,7 +42,7 @@ const InitialLayout = () => {
 
   useEffect(() => {
     if (error) {
-      Alert.alert("Error", "Invalid or expired link. Please ask for a new link.", [{ text: "OK" }]);
+      Alert.alert("Error", "You are already in the group, or link has expired.", [{ text: "OK" }]);
     }
   }, [error]);
 
@@ -145,7 +148,7 @@ const InitialLayout = () => {
       ) : (
         <>
           <Slot />
-          {isPending && <AddMemberLoading />}
+          {isPending && <LoadingOverlay message="Adding you to the group..." />}
         </>
       )}
     </ThemeProvider>
@@ -156,14 +159,20 @@ const RootLayout = () => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <NotificationProvider>
-        <UserProvider>
-          <QueryClientProvider client={queryClient}>
-            <OnboardingProvider>
-              <StatusBar />
-              <InitialLayout />
-            </OnboardingProvider>
-          </QueryClientProvider>
-        </UserProvider>
+        <RemoveMemberProvider>
+          <FeedContextProvider>
+            <UserProvider>
+              <DropdownProvider>
+                <QueryClientProvider client={queryClient}>
+                  <OnboardingProvider>
+                    <StatusBar />
+                    <InitialLayout />
+                  </OnboardingProvider>
+                </QueryClientProvider>
+              </DropdownProvider>
+            </UserProvider>
+          </FeedContextProvider>
+        </RemoveMemberProvider>
       </NotificationProvider>
     </GestureHandlerRootView>
   );

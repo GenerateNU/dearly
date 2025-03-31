@@ -7,7 +7,6 @@ import {
   DeleteUserResponse,
   RemoveDeviceTokenResponse,
   UserGroupsResponse,
-  SearchedUsersResponse,
   CreateUserResponse,
   GetUserResponse,
   UpdateUserResponse,
@@ -17,7 +16,6 @@ import { paginationSchema } from "../../utilities/api/pagination";
 import {
   createUserValidate,
   expoTokenValidate,
-  querySchema,
   updateUserValidate,
 } from "../../types/api/internal/users";
 
@@ -85,14 +83,6 @@ export interface UserController {
    * @throws BadRequestError if validation fails
    */
   getGroups(ctx: Context): Promise<UserGroupsResponse>;
-
-  /**
-   * Searches for users by username.
-   * @param ctx - The Hono context containing search params
-   * @returns Promise resolving to SearchedUsersResponse with matching users
-   * @throws BadRequestError if validation fails
-   */
-  searchByUsername(ctx: Context): Promise<SearchedUsersResponse>;
 }
 
 export class UserControllerImpl implements UserController {
@@ -182,27 +172,5 @@ export class UserControllerImpl implements UserController {
       return ctx.json(groups, Status.OK);
     };
     return await handleAppError(getGroupsImpl)(ctx);
-  }
-
-  async searchByUsername(ctx: Context): Promise<SearchedUsersResponse> {
-    const search = async () => {
-      const { username, groupId, limit, page } = ctx.req.query();
-      const userId = ctx.get("userId");
-
-      // handle validation using zod
-      const parsedQuery = querySchema.parse({
-        username,
-        limit,
-        page,
-        groupId,
-      });
-
-      const result = await this.userService.searchByUsername({
-        ...parsedQuery,
-        userId,
-      });
-      return ctx.json(result, Status.OK);
-    };
-    return await handleAppError(search)(ctx);
   }
 }

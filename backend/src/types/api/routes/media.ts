@@ -10,3 +10,8 @@ export type GroupMediaResponse = TypedResponse<
 export type UserMediaResponse = TypedResponse<
   paths["/api/v1/users/media"]["post"]["responses"]["201"]["content"]["application/json"] | APIError
 >;
+
+export type Waveform = TypedResponse<
+  | paths["/media/processing/{url}"]["get"]["responses"]["201"]["content"]["application/json"]
+  | APIError
+>;

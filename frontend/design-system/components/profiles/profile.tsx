@@ -21,8 +21,10 @@ export const Profile: React.FC<ProfileProps> = ({
   username,
 }) => {
   const profile = profilePhoto ? profilePhoto : DEFAULT_PROFILE_PHOTO;
+  const formattedBirthday = new Date(birthday ? birthday : "");
+  formattedBirthday.setDate(formattedBirthday.getDate() + 1);
   return (
-    <Box gap="m" flexDirection="row" alignItems="center" justifyContent="flex-start">
+    <Box width={"100%"} gap="m" flexDirection="row" alignItems="center" justifyContent="flex-start">
       <Box>
         <Avatar variant="medium" profilePhoto={profile} />
       </Box>
@@ -36,7 +38,7 @@ export const Profile: React.FC<ProfileProps> = ({
         {birthday && (
           <Box gap="xs" flexDirection="row" alignItems="center" justifyContent="center">
             <Icon name={getZodiacIcon(birthday)} color="ink" />
-            <Text>{formatDay(new Date(birthday))}</Text>
+            <Text>{birthday ? formatDay(formattedBirthday) : ""}</Text>
           </Box>
         )}
       </Box>

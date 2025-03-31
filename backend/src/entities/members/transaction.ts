@@ -9,7 +9,7 @@ import {
   mediaTable,
   notificationsTable,
 } from "../schema";
-import { eq, and, sql, desc, or } from "drizzle-orm";
+import { eq, and, desc, or } from "drizzle-orm";
 import {
   ForbiddenError,
   InternalServerError,
@@ -196,10 +196,7 @@ export class MemberTransactionImpl implements MemberTransaction {
         name: usersTable.name,
         username: usersTable.username,
         profilePhoto: usersTable.profilePhoto,
-        isMember:
-          sql<boolean>`CASE WHEN ${membersTable.groupId} = ${groupId} THEN true ELSE false END`.as(
-            "isMember", // assuming that member includes manager
-          ),
+        role: membersTable.role,
         lastNudgedAt: membersTable.lastManualNudge,
       })
       .from(usersTable)
@@ -286,8 +283,6 @@ export class MemberTransactionImpl implements MemberTransaction {
       return await tx
         .select(getPostMetadata(viewee))
         .from(postsTable)
-        .leftJoin(likesTable, eq(likesTable.postId, postsTable.id))
-        .leftJoin(commentsTable, eq(commentsTable.postId, postsTable.id))
         .innerJoin(usersTable, eq(postsTable.userId, usersTable.id))
         .innerJoin(mediaTable, eq(mediaTable.postId, postsTable.id))
         .where(and(eq(postsTable.userId, viewee), eq(postsTable.groupId, groupId)))

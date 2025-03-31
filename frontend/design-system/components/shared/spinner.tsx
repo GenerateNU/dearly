@@ -5,7 +5,13 @@ import { useTheme } from "@shopify/restyle";
 import { useEffect, useRef } from "react";
 import { Animated, ViewStyle, ColorValue } from "react-native";
 
-const Spinner = () => {
+interface Props {
+  size?: number;
+  topOffset?: number;
+  width?: number;
+}
+
+const Spinner: React.FC<Props> = ({ size = 30, width = 100, topOffset = 50 }) => {
   const animatedValues = useRef(
     Array.from({ length: 12 }).map(() => new Animated.Value(1)),
   ).current;
@@ -44,11 +50,11 @@ const Spinner = () => {
   }, []);
 
   return (
-    <Box position="relative" width={100} height={100} alignItems="center" justifyContent="center">
+    <Box position="relative" width={width} height={100} alignItems="center" justifyContent="center">
       {Array.from({ length: 12 }).map((_, i) => {
         // Calculate position for each dot based on its index
         const angle = (i / 12) * 2 * Math.PI;
-        const radius = 30; // Size of the circle
+        const radius = size; // Size of the circle
         const x = Math.cos(angle) * radius;
         const y = Math.sin(angle) * radius;
 
@@ -62,13 +68,13 @@ const Spinner = () => {
 
         const animatedStyle = {
           position: "absolute" as "absolute",
-          width: 5,
-          height: 5,
+          width: size / 6,
+          height: size / 6,
           borderRadius: 5,
           backgroundColor: animatedBackgroundColor, // Animated background color
           opacity: 0.5 + i / 12,
           left: 50 + x,
-          top: 50 + y,
+          top: topOffset + y,
           transform: [{ scale: animatedValues[i] }],
         } as ViewStyle;
 

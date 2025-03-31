@@ -5,7 +5,11 @@ import { PostHeader } from "./header";
 import { Media } from "@/types/media";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
+import { useToggleLike } from "@/hooks/api/like";
+import { useUserStore } from "@/auth/store";
 import { useState } from "react";
+import { router } from "expo-router";
+import { useRemoveMemberContext } from "@/contexts/remove-meber";
 
 interface Props {
   onCommentClicked: () => void;
@@ -22,47 +26,70 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
   location,
   isLiked,
   comments,
-  likes,
   caption,
+  likes,
   media,
-  onCommentClicked,
   onLikeClicked,
+  onCommentClicked,
 }) => {
-  const [like, setLike] = useState(isLiked);
+  const { group } = useUserStore();
+  const { setUser } = useRemoveMemberContext();
   const data = media
     .filter(
-      (item): item is Required<Pick<Media, "url">> =>
+      (item: any): item is Required<Pick<Media, "url">> =>
         typeof item.url === "string" && item.url !== "",
     )
-    .map((item) => item.url);
+    .map((item: any) => item.url);
+
+  const { mutate, isSuccess, isError } = useToggleLike(id, group?.id as string);
+  const [pending, setPending] = useState<boolean>(false);
+
+  const toggleLike = () => {
+    setPending(true);
+    mutate();
+    if (isSuccess || isError) {
+      setPending(false);
+    }
+  };
 
   return (
     <Box flexDirection="column" gap="s">
       <PostHeader
+        id={userId}
         name={name}
         username={username}
         profilePhoto={profilePhoto}
         location={location}
         createdAt={createdAt}
-        onPress={() => null}
+        onPress={() => {
+          setUser({
+            id: userId,
+            username: username,
+          });
+          router.push(`/(app)/user/${userId}`);
+        }}
       />
-      <ImageCarousel setLike={() => setLike(!like)} like={like} data={data} />
+      <ImageCarousel setLike={toggleLike} like={pending || isLiked} data={data} />
       <CommentLike
         onCommentClicked={onCommentClicked}
         onLikeClicked={onLikeClicked}
-        liked={like}
+        liked={isLiked}
         postId={id}
         likes={likes}
         comments={comments}
       />
-      <Box gap="s" flexDirection="row" justifyContent="flex-start" alignItems="flex-start">
-        <Box>
+      {caption && (
+        <Box
+          width="90%"
+          gap="s"
+          flexDirection="row"
+          justifyContent="flex-start"
+          alignItems="center"
+        >
           <Text>💬</Text>
-        </Box>
-        <Box width="90%">
           <Text>{caption}</Text>
         </Box>
-      </Box>
+      )}
     </Box>
   );
 };

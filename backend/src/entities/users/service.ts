@@ -4,8 +4,6 @@ import { UserTransaction } from "./transaction";
 import {
   CreateUserPayload,
   Pagination,
-  SearchedInfo,
-  SearchedUser,
   UpdateUserPayload,
   User,
 } from "../../types/api/internal/users";
@@ -73,13 +71,6 @@ export interface UserService {
    * @returns Promise resolving to array of Groups
    */
   getGroups(payload: Pagination): Promise<Group[]>;
-
-  /**
-   * Searches for users by username.
-   * @param payload - Search parameters including query string
-   * @returns Promise resolving to array of matching SearchedUsers
-   */
-  searchByUsername(payload: SearchedInfo): Promise<SearchedUser[]>;
 }
 
 export class UserServiceImpl implements UserService {
@@ -155,14 +146,5 @@ export class UserServiceImpl implements UserService {
       return await this.userTransaction.getGroups(payload);
     };
     return handleServiceError(getGroupsImpl)();
-  }
-
-  async searchByUsername(payload: SearchedInfo): Promise<SearchedUser[]> {
-    const search = async () => {
-      const users = await this.userTransaction.getUsersByUsername(payload);
-      const usersWithProfileURLs = await this.mediaService.getUsersWithSignedURL(users);
-      return usersWithProfileURLs;
-    };
-    return handleServiceError(search)();
   }
 }

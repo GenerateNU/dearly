@@ -43,7 +43,13 @@ export const initIntegration = (
     },
   }),
   expoClient: Expo = new Expo(),
-  schedulerClient: SchedulerClient = new SchedulerClient(),
+  schedulerClient: SchedulerClient = new SchedulerClient({
+    region: config.lambdaConfig.region,
+    credentials: {
+      accessKeyId: config.lambdaConfig.publicKey,
+      secretAccessKey: config.lambdaConfig.secretKey,
+    },
+  }),
   supabaseClient: ReturnType<typeof createClient> = createClient(
     config.supabase.url,
     config.supabase.key,

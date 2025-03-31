@@ -1,11 +1,9 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { devicesTable, groupsTable, membersTable, postsTable, usersTable } from "../schema";
-import { and, eq, sql, not, exists, inArray } from "drizzle-orm";
+import { and, eq, sql, inArray } from "drizzle-orm";
 import {
   CreateUserPayload,
   Pagination,
-  SearchedInfo,
-  SearchedUser,
   UpdateUserPayload,
   User,
 } from "../../types/api/internal/users";
@@ -69,13 +67,6 @@ export interface UserTransaction {
    * @returns Promise resolving to array of Groups
    */
   getGroups(payload: Pagination): Promise<Group[]>;
-
-  /**
-   * Searches for users by username.
-   * @param payload - Search parameters including query string
-   * @returns Promise resolving to array of matching SearchedUsers
-   */
-  getUsersByUsername(payload: SearchedInfo): Promise<SearchedUser[]>;
 }
 
 export class UserTransactionImpl implements UserTransaction {
@@ -194,63 +185,5 @@ export class UserTransactionImpl implements UserTransaction {
       .orderBy(groupsTable.name)
       .limit(limit)
       .offset((page - 1) * limit);
-  }
-
-  async getUsersByUsername({
-    userId,
-    groupId,
-    limit,
-    page,
-    username,
-  }: SearchedInfo): Promise<SearchedUser[]> {
-    const joinedResult = await this.db.transaction(async (tx) => {
-      const result = await tx
-        .select({
-          id: usersTable.id,
-          name: usersTable.name,
-          username: usersTable.username,
-          profilePhoto: usersTable.profilePhoto,
-          // return true if the user is member of group
-          isMember:
-            sql<boolean>`CASE WHEN ${membersTable.groupId} = ${groupId} THEN true ELSE false END`.as(
-              "isMember",
-            ),
-          lastNudgedAt: membersTable.lastManualNudge,
-        })
-        .from(usersTable)
-        .leftJoin(
-          membersTable,
-          and(eq(membersTable.userId, usersTable.id), eq(membersTable.groupId, groupId)),
-        )
-        .where(
-          and(
-            // exclude the user who is searching
-            not(eq(usersTable.id, userId)),
-            // true if user is manager of the group
-            exists(
-              tx
-                .select()
-                .from(membersTable)
-                .where(
-                  and(
-                    eq(membersTable.role, "MANAGER"),
-                    eq(membersTable.userId, userId),
-                    eq(membersTable.groupId, groupId),
-                  ),
-                ),
-            ),
-          ),
-        )
-        // sort by most relevance
-        .orderBy(
-          sql`ts_rank(to_tsvector('english', ${usersTable.username}), plainto_tsquery('english', ${username})) DESC`,
-        )
-        // handle pagination
-        .limit(limit)
-        .offset((page - 1) * limit);
-
-      return result;
-    });
-    return joinedResult;
   }
 }

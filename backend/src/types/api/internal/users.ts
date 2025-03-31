@@ -31,9 +31,9 @@ export interface SearchedUser {
   id: string;
   name: string;
   username: string;
-  profilePhoto: string | null;
-  isMember?: boolean;
+  profilePhoto?: string | null;
   lastNudgedAt?: Date | null;
+  role?: "MEMBER" | "MANAGER" | null;
 }
 
 export interface SearchedInfo {
