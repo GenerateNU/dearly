@@ -4,7 +4,6 @@ import { FlatList, RefreshControl } from "react-native-gesture-handler";
 import { Box } from "@/design-system/base/box";
 import { Post } from "@/types/post";
 import { useGroupFeed } from "@/hooks/api/post";
-import PostSkeleton from "./skeleton";
 import React, { useRef, useState, useCallback, useEffect } from "react";
 import BottomSheet from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheet/BottomSheet";
 import { CommentPopUp } from "@/design-system/components/comments/comment-popup";

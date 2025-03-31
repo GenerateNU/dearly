@@ -117,7 +117,10 @@ const PostCreationForm = () => {
             gap="m"
           >
             <Box alignItems="center" justifyContent="center">
-              <Avatar profilePhoto={watchPhotos === "" ? data?.profilePhoto! : watchPhotos} variant="huge" />
+              <Avatar
+                profilePhoto={watchPhotos === "" ? data?.profilePhoto! : watchPhotos}
+                variant="huge"
+              />
             </Box>
             <Box width="25%">
               <TextButton onPress={pickImage} label="Edit" variant="primary" />

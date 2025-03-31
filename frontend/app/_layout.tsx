@@ -40,7 +40,7 @@ const InitialLayout = () => {
 
   useEffect(() => {
     if (error) {
-      Alert.alert("Error", "Invalid or expired link. Please ask for a new link.", [{ text: "OK" }]);
+      Alert.alert("Error", "You are already in the group, or link has expired.", [{ text: "OK" }]);
     }
   }, [error]);
 

@@ -6,7 +6,7 @@ import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import BottomSheetModal from "../shared/bottom-sheet";
 import { Comment } from "@/types/post";
 import { useComments } from "@/hooks/api/post";
-import { KeyboardAvoidingView, Platform, TextInput } from "react-native";
+import { Keyboard, KeyboardAvoidingView, Platform, Pressable, TextInput } from "react-native";
 import { CommentInput } from "@/app/(app)/home/comment-input";
 import { CommentSkeleton } from "./comment-skeleton";
 import { Text } from "@/design-system/base/text";
@@ -47,7 +47,7 @@ export const CommentPopUp = forwardRef<BottomSheetMethods, CommentPopUpProps>((p
           keyboardVerticalOffset={Platform.OS === "ios" ? 169 : 0}
           style={{
             position: "absolute",
-            bottom: 150,
+            bottom: 160,
             left: 0,
             right: 0,
             zIndex: 10,
@@ -139,7 +139,7 @@ const CommentPopUpData: React.FC<CommentPopUpDataProps> = ({ attributes, index }
 
   return (
     <SafeAreaView edges={["top"]} className="flex-1">
-      <Box>
+      <Pressable onPress={Keyboard.dismiss}>
         <ResourceView
           resourceState={commentResources}
           loadingComponent={<Spinner />}
@@ -147,7 +147,7 @@ const CommentPopUpData: React.FC<CommentPopUpDataProps> = ({ attributes, index }
           emptyComponent={<EmptyCommentDisplay caption={attributes.caption} />}
           successComponent={<SuccessComponent />}
         />
-      </Box>
+      </Pressable>
     </SafeAreaView>
   );
 };

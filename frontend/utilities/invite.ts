@@ -1,8 +1,8 @@
-import * as Linking from "expo-linking";
 import { Share } from "react-native";
 
 export const showSharePopup = async (token: string | undefined) => {
-  const url = Linking.createURL(`/(app)/(tabs)?token=${token}`);
+  const deeplink = process.env.EXPO_PUBLIC_API_BASE_URL;
+  const url = deeplink + `group?token=${token}`;
 
   try {
     await Share.share({

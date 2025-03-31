@@ -3,13 +3,13 @@ import { EmptyHomePage } from "@/design-system/components/home/empty";
 import { useUserGroups } from "@/hooks/api/user";
 import ResourceView from "@/design-system/components/utilities/resource-view";
 import ErrorDisplay from "@/design-system/components/shared/states/error";
-import Spinner from "@/design-system/components/shared/spinner";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState } from "react";
 import HomeMenu from "@/design-system/components/home/home-menu";
 import Feed from "../home/feed";
 import Calendar from "../home/calendar";
 import { FeedContextProvider } from "@/contexts/feed-post-context";
+import PostSkeleton from "@/design-system/components/posts/post-skeleton";
 
 const Home = () => {
   const { data, isLoading, error, refetch } = useUserGroups();
@@ -48,7 +48,7 @@ const Home = () => {
       >
         <ResourceView
           resourceState={groupsResource}
-          loadingComponent={<Spinner />}
+          loadingComponent={<PostSkeleton />}
           errorComponent={<ErrorDisplay refresh={refetch} />}
           emptyComponent={<EmptyHomePage />}
           successComponent={<SuccessComponent />}
