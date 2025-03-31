@@ -28,7 +28,7 @@ const NotificationCard: React.FC<Notification> = ({
           <Text variant="caption">
             {description?.split(" ").slice(1, description?.split(" ").length).join(" ")}
           </Text>{" "}
-          <Text variant="caption" color="darkGray">
+          <Text variant="caption" color="slate">
             {categorizeTime(new Date(createdAt).toISOString())}
           </Text>
         </Text>

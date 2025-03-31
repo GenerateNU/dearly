@@ -4,7 +4,7 @@ import { Text } from "@/design-system/base/text";
 import { Avatar } from "../shared/avatar";
 import { SearchedUser } from "@/types/user";
 
-export const LikeCard: React.FC<SearchedUser> = ({ name, profilePhoto }) => {
+export const LikeCard: React.FC<SearchedUser> = ({ name, profilePhoto, username }) => {
   const profile = profilePhoto ? profilePhoto : DEFAULT_PROFILE_PHOTO;
 
   return (
@@ -19,7 +19,10 @@ export const LikeCard: React.FC<SearchedUser> = ({ name, profilePhoto }) => {
         <Box>
           <Avatar variant="small" profilePhoto={profile} />
         </Box>
-        <Text variant="bodyLarge">{name}</Text>
+        <Box>
+          <Text variant="bodyBold">@{username}</Text>
+          {name && <Text variant="body">{name}</Text>}
+        </Box>
       </Box>
     </Box>
   );

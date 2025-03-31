@@ -12,10 +12,10 @@ import { getPhotoBlobs } from "@/utilities/media";
 import { TextButton } from "@/design-system/components/shared/buttons/text-button";
 import Input from "@/design-system/components/shared/controls/input";
 import { useUserStore } from "@/auth/store";
-import { useQuery } from "@tanstack/react-query";
-import { getUser } from "@/api/user";
-import { usePatchUser, useUploadUserMedia } from "@/hooks/api/user";
+import { usePatchUser, useUploadUserMedia, useUser } from "@/hooks/api/user";
 import { Avatar } from "@/design-system/components/shared/avatar";
+import Spinner from "@/design-system/components/shared/spinner";
+import ErrorDisplay from "@/design-system/components/shared/states/error";
 
 type UpdatePhotoData = z.infer<typeof UPDATE_PHOTO_FORM>;
 
@@ -33,6 +33,7 @@ const PostCreationForm = () => {
     },
   });
 
+  const { userId } = useUserStore();
   const watchPhotos = watch("profilePhoto");
 
   const {
@@ -43,9 +44,9 @@ const PostCreationForm = () => {
 
   const {
     mutateAsync: patchUser,
-    isPending: isPendingCreatePost,
-    error: createPostError,
-  } = usePatchUser();
+    isPending: isUpdatingUser,
+    error: updateUserError,
+  } = usePatchUser(userId!);
 
   const onSubmit = async (form: UpdatePhotoData) => {
     try {
@@ -57,7 +58,7 @@ const PostCreationForm = () => {
         profilePhoto: media.objectKey,
       });
 
-      if (!mediaError || !createPostError) {
+      if (!mediaError || !updateUserError) {
         router.push("/(app)/(tabs)/profile");
       }
     } catch (err: unknown) {
@@ -89,12 +90,23 @@ const PostCreationForm = () => {
     trigger("profilePhoto");
   };
 
-  const { userId } = useUserStore();
+  const { isLoading, data, error } = useUser(userId!);
 
-  const { isPending, isError, data, error } = useQuery({
-    queryKey: ["api", "v1", "users", userId],
-    queryFn: () => getUser(userId!),
-  });
+  if (isLoading) {
+    return (
+      <Box flex={1} padding="m">
+        <Spinner />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box flex={1} padding="m">
+        <ErrorDisplay />
+      </Box>
+    );
+  }
 
   return (
     <ScrollView>
@@ -200,15 +212,15 @@ const PostCreationForm = () => {
               {mediaError.message}
             </Text>
           )}
-          {createPostError && (
+          {updateUserError && (
             <Text variant="caption" color="error">
-              {createPostError.message}
+              {updateUserError.message}
             </Text>
           )}
         </Box>
         <Box alignItems="center" width="100%">
           <TextButton
-            disabled={watchPhotos.length === 0 || isPendingMedia || isPendingCreatePost}
+            disabled={watchPhotos.length === 0 || isPendingMedia || isUpdatingUser}
             variant="primary"
             onPress={handleSubmit(onSubmit)}
             label="Save"

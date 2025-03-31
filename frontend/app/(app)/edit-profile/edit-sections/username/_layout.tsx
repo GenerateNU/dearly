@@ -1,26 +1,28 @@
 import { Box } from "@/design-system/base/box";
 import { TextButton } from "@/design-system/components/shared/buttons/text-button";
-import { TextInput } from "react-native";
 import { Text } from "@/design-system/base/text";
 import { UPDATE_USERNAME_FORM } from "@/utilities/form-schema";
 import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { usePatchUser } from "@/hooks/api/user";
+import { usePatchUser, useUser } from "@/hooks/api/user";
 import { router } from "expo-router";
+import { useUserStore } from "@/auth/store";
+import Input from "@/design-system/components/shared/controls/input";
 
 type UPDATE_USER_FORM_TYPE = z.infer<typeof UPDATE_USERNAME_FORM>;
 
 export default function Layout() {
-  const { mutateAsync: uploadUserData, error, isPending } = usePatchUser();
+  const { userId } = useUserStore();
+  const { mutateAsync: uploadUserData, error, isPending } = usePatchUser(userId!);
+  const { data, error: userError } = useUser(userId!);
 
   const onSubmit = async (form: UPDATE_USER_FORM_TYPE) => {
     await uploadUserData(form);
     router.push("/(app)/edit-profile");
   };
-  const { control, handleSubmit, setValue, getValues } = useForm<UPDATE_USER_FORM_TYPE>({
+  const { control, handleSubmit, setValue } = useForm<UPDATE_USER_FORM_TYPE>({
     resolver: zodResolver(UPDATE_USERNAME_FORM),
-    defaultValues: { username: "" },
   });
 
   return (
@@ -32,18 +34,31 @@ export default function Layout() {
         name="username"
         control={control}
         render={() => (
-          <TextInput
-            className="border border-black-300 p-2 h-12 w-full rounded-lg"
-            placeholder="Username..."
-            placeholderTextColor="#999"
-            onChangeText={(str) => {
-              setValue("username", str);
-              console.log(getValues());
-            }}
-          />
+          <Box width="100%">
+            <Input
+              paragraph
+              placeholder="Enter your username"
+              value={data?.username ?? undefined}
+              onChangeText={(str) => {
+                setValue("username", str);
+              }}
+              error={
+                error
+                  ? "Failed to update username. Please try again later."
+                  : userError
+                    ? "Failed to fetch your username. "
+                    : undefined
+              }
+            />
+          </Box>
         )}
       />
-      <TextButton onPress={handleSubmit(onSubmit)} label="Save" variant="primary" />
+      <TextButton
+        disabled={isPending}
+        onPress={handleSubmit(onSubmit)}
+        label="Save"
+        variant="primary"
+      />
     </Box>
   );
 }

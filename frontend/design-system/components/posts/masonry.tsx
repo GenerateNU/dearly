@@ -7,9 +7,10 @@ import { router } from "expo-router";
 
 interface MasonryFeedProps {
   posts: Post[];
+  onEndReached: () => void;
 }
 
-export const MasonryList: React.FC<MasonryFeedProps> = ({ posts }) => {
+export const MasonryList: React.FC<MasonryFeedProps> = ({ posts, onEndReached }) => {
   return (
     <Box
       flex={1}
@@ -21,7 +22,9 @@ export const MasonryList: React.FC<MasonryFeedProps> = ({ posts }) => {
         data={posts}
         numColumns={2}
         scrollEnabled={false}
-        estimatedItemSize={200} // Add an estimated item size
+        onEndReachedThreshold={0.8}
+        onEndReached={onEndReached}
+        estimatedItemSize={100} // Add an estimated item size
         renderItem={({ item, index }) => (
           <Box
             width="100%"

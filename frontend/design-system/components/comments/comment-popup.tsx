@@ -123,12 +123,12 @@ const CommentPopUpData: React.FC<CommentPopUpDataProps> = ({ attributes, index }
         <BottomSheetFlatList
           data={comments}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item, index) => item.id?.toString() ?? index.toString()}
           onEndReached={onEndReached}
           ListFooterComponent={renderFooter}
           contentContainerStyle={{
             paddingTop: 5,
-            paddingBottom: 220,
+            paddingBottom: 250,
           }}
           showsVerticalScrollIndicator={false}
           style={{ flex: 1 }}
@@ -142,7 +142,11 @@ const CommentPopUpData: React.FC<CommentPopUpDataProps> = ({ attributes, index }
       <Pressable onPress={Keyboard.dismiss}>
         <ResourceView
           resourceState={commentResources}
-          loadingComponent={<Spinner />}
+          loadingComponent={
+            <Box flex={1} paddingTop="m" alignItems="center">
+              <Spinner />
+            </Box>
+          }
           errorComponent={<ErrorDisplay refresh={refetch} />}
           emptyComponent={<EmptyCommentDisplay caption={attributes.caption} />}
           successComponent={<SuccessComponent />}

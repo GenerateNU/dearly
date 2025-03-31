@@ -9,7 +9,7 @@ import HomeMenu from "@/design-system/components/home/home-menu";
 import Feed from "../home/feed";
 import Calendar from "../home/calendar";
 import { FeedContextProvider } from "@/contexts/feed-post-context";
-import PostSkeleton from "@/design-system/components/posts/post-skeleton";
+import Spinner from "@/design-system/components/shared/spinner";
 
 const Home = () => {
   const { data, isLoading, error, refetch } = useUserGroups();
@@ -48,7 +48,11 @@ const Home = () => {
       >
         <ResourceView
           resourceState={groupsResource}
-          loadingComponent={<PostSkeleton />}
+          loadingComponent={
+            <Box flex={1} justifyContent="center" alignItems="center">
+              <Spinner />
+            </Box>
+          }
           errorComponent={<ErrorDisplay refresh={refetch} />}
           emptyComponent={<EmptyHomePage />}
           successComponent={<SuccessComponent />}

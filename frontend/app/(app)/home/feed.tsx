@@ -17,12 +17,13 @@ import { useUserStore } from "@/auth/store";
 import { useFeedContext } from "@/contexts/feed-post-context";
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 import { EmptyFeed } from "@/design-system/components/posts/empty-feed";
+import { PostSkeleton } from "@/design-system/components/posts/post-skeleton";
 
 interface FeedProps {
   date?: string;
-  popup: boolean;
-  commentRef: React.RefObject<BottomSheetMethods>;
-  likeRef: React.RefObject<BottomSheetMethods>;
+  popup?: boolean;
+  commentRef?: React.RefObject<BottomSheetMethods>;
+  likeRef?: React.RefObject<BottomSheetMethods>;
 }
 
 interface CommentLikesPopupProps {
@@ -82,7 +83,7 @@ const Feed: React.FC<FeedProps> = ({
 
   const onClickLikes = useCallback((postId: string) => {
     setLikePostId(postId);
-    likeRef.current?.expand();
+    likeRef.current?.snapToIndex(0);
   }, []);
 
   const renderFooter = () => {
@@ -131,6 +132,14 @@ const Feed: React.FC<FeedProps> = ({
     return (
       <Box flex={1} padding="m">
         <EmptyFeed />
+      </Box>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <Box flex={1} paddingHorizontal="m">
+        <PostSkeleton />
       </Box>
     );
   }

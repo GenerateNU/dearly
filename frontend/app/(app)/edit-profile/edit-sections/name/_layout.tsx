@@ -1,28 +1,30 @@
-import logout from "@/app/(app)/logout";
 import { Box } from "@/design-system/base/box";
 import { TextButton } from "@/design-system/components/shared/buttons/text-button";
-import { SafeAreaView, TextInput } from "react-native";
 import { Text } from "@/design-system/base/text";
 import { router } from "expo-router";
-import { useState } from "react";
 import { UPDATE_USER_FORM } from "@/utilities/form-schema";
 import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { usePatchUser } from "@/hooks/api/user";
+import { usePatchUser, useUser } from "@/hooks/api/user";
+import { useUserStore } from "@/auth/store";
+import Input from "@/design-system/components/shared/controls/input";
 
 type UPDATE_USER_FORM_TYPE = z.infer<typeof UPDATE_USER_FORM>;
 
 export default function Layout() {
-  const { mutateAsync: uploadUserData, error, isPending } = usePatchUser();
+  const { userId } = useUserStore();
+  const { mutateAsync: uploadUserData, error, isPending } = usePatchUser(userId!);
 
   const onSubmit = async (form: UPDATE_USER_FORM_TYPE) => {
-    const res = await uploadUserData(form);
+    await uploadUserData(form);
     router.push("/(app)/edit-profile");
   };
-  const { control, handleSubmit, setValue, trigger, getValues } = useForm<UPDATE_USER_FORM_TYPE>({
+
+  const { data, error: userError } = useUser(userId!);
+
+  const { control, handleSubmit, setValue } = useForm<UPDATE_USER_FORM_TYPE>({
     resolver: zodResolver(UPDATE_USER_FORM),
-    defaultValues: { name: "" },
   });
 
   return (
@@ -34,17 +36,31 @@ export default function Layout() {
         name="name"
         control={control}
         render={() => (
-          <TextInput
-            className="border border-black-300 p-2 h-12 w-full rounded-lg"
-            placeholder="Name..."
-            placeholderTextColor="#999"
-            onChangeText={(str) => {
-              setValue("name", str);
-            }}
-          />
+          <Box width="100%">
+            <Input
+              paragraph
+              placeholder="Enter your name"
+              value={data?.name ?? undefined}
+              onChangeText={(str) => {
+                setValue("name", str);
+              }}
+              error={
+                error
+                  ? "Failed to update name. Please try again later."
+                  : userError
+                    ? "Failed to fetch your name."
+                    : undefined
+              }
+            />
+          </Box>
         )}
       />
-      <TextButton onPress={handleSubmit(onSubmit)} label="Save" variant="primary" />
+      <TextButton
+        disabled={isPending}
+        onPress={handleSubmit(onSubmit)}
+        label="Save"
+        variant="primary"
+      />
     </Box>
   );
 }

@@ -1,6 +1,6 @@
-import { getNotifications, getUserGroups, updateUser } from "@/api/user";
+import { getNotifications, getUser, getUserGroups, updateUser } from "@/api/user";
 import { Notifications, UpdateUserPayload, User } from "@/types/user";
-import { useMutationBase, useQueryPagination } from "./base";
+import { useMutationBase, useQueryBase, useQueryPagination } from "./base";
 import { Group } from "@/types/group";
 import { UploadUserMediaResponse } from "@/types/media";
 import { uploadUserMedia } from "@/api/media";
@@ -20,8 +20,15 @@ export const useUserNotification = (options: any = {}) => {
   );
 };
 
-export const usePatchUser = (options: any = {}) => {
-  return useMutationBase((payload) => updateUser(payload), ["users", "userid"]);
+export const useUser = (id: string, options: any = {}) => {
+  return useQueryBase<User>(["users", id], () => getUser(id), {
+    enabled: !!id,
+    ...options,
+  });
+};
+
+export const usePatchUser = (id: string, options: any = {}) => {
+  return useMutationBase<UpdateUserPayload, User>((payload) => updateUser(payload), ["users", id]);
 };
 
 /**

@@ -1,7 +1,7 @@
 import { AnimatedBox } from "@/design-system/base/animated-box";
 import usePulsingAnimation from "@/hooks/component/pulse-animate";
 
-const PostSkeleton = () => {
+export const PostSkeleton = () => {
   const opacity = usePulsingAnimation();
 
   return (
@@ -26,5 +26,3 @@ const PostSkeleton = () => {
     </AnimatedBox>
   );
 };
-
-export default PostSkeleton;
