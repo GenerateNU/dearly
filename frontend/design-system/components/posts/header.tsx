@@ -5,6 +5,7 @@ import { Text } from "@/design-system/base/text";
 import { Avatar } from "../shared/avatar";
 import { TextButton } from "../shared/buttons/text-button";
 import { router } from "expo-router";
+import { useRemoveMemberContext } from "@/contexts/remove-meber";
 
 interface PostHeaderProps {
   username: string;
@@ -24,6 +25,16 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
   location,
   onPress,
 }) => {
+  const { setUser } = useRemoveMemberContext();
+
+  const removeMemberPressed = () => {
+    setUser({
+      id,
+      username: username,
+    });
+    router.push(`/(app)/user/${id}`);
+  };
+
   return (
     <Box width="100%" flexDirection="row" justifyContent="space-between" alignItems="center">
       <Box flexDirection="row" gap="s" justifyContent="space-between">
@@ -31,11 +42,7 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
           <Avatar variant="small" profilePhoto={profilePhoto} />
         </Pressable>
         <Box flexDirection="column" justifyContent="center" alignItems="flex-start">
-          <TextButton
-            variant="text"
-            label={username}
-            onPress={() => router.push(`/(app)/user/${id}`)}
-          ></TextButton>
+          <TextButton variant="text" label={username} onPress={removeMemberPressed}></TextButton>
           {location && (
             <Box flexDirection="row" justifyContent="flex-start" alignItems="center">
               <Box>

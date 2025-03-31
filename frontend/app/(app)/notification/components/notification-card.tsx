@@ -1,4 +1,5 @@
 import { DEFAULT_PROFILE_PHOTO } from "@/constants/photo";
+import { useRemoveMemberContext } from "@/contexts/remove-meber";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { Theme } from "@/design-system/base/theme";
@@ -19,14 +20,23 @@ const NotificationCard: React.FC<Notification> = ({
   createdAt,
 }) => {
   const theme = useTheme<Theme>();
+  const { setUser } = useRemoveMemberContext();
+
+  const removeMemberPressed = () => {
+    setUser({
+      id: actorId,
+      username: description!.split(" ")[0],
+    });
+    router.push(`/(app)/user/${actorId}`);
+  };
 
   return (
     <Box gap="s" flexDirection="row" justifyContent="center" alignContent="center">
-      <Pressable onPress={() => router.push(`/(app)/user/${actorId}`)}>
+      <Pressable onPress={removeMemberPressed}>
         <Avatar variant="small" profilePhoto={profilePhoto ?? DEFAULT_PROFILE_PHOTO} />
       </Pressable>
       <Box width="55%">
-        <Pressable onPress={() => router.push(`/(app)/user/${actorId}`)}>
+        <Pressable onPress={removeMemberPressed}>
           <Text ellipsizeMode="tail" variant="caption">
             <Text variant="captionBold">{description!.split(" ")[0]}</Text>{" "}
             <Text variant="caption">

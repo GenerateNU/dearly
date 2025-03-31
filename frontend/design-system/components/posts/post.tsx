@@ -9,6 +9,7 @@ import { useToggleLike } from "@/hooks/api/like";
 import { useUserStore } from "@/auth/store";
 import { useState } from "react";
 import { router } from "expo-router";
+import { useRemoveMemberContext } from "@/contexts/remove-meber";
 
 interface Props {
   onCommentClicked: () => void;
@@ -32,6 +33,7 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
   onCommentClicked,
 }) => {
   const { group } = useUserStore();
+  const { setUser } = useRemoveMemberContext();
   const data = media
     .filter(
       (item: any): item is Required<Pick<Media, "url">> =>
@@ -59,7 +61,13 @@ export const ImagePost: React.FC<Required<Post> & Props> = ({
         profilePhoto={profilePhoto}
         location={location}
         createdAt={createdAt}
-        onPress={() => router.push(`/(app)/user/${userId}`)}
+        onPress={() => {
+          setUser({
+            id: userId,
+            username: username,
+          });
+          router.push(`/(app)/user/${userId}`);
+        }}
       />
       <ImageCarousel setLike={toggleLike} like={pending || isLiked} data={data} />
       <CommentLike

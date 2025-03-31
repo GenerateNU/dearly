@@ -63,7 +63,7 @@ const ViewGroupProfile: React.FC<MemberProps> = ({
 
   return (
     <Box flexDirection="row" justifyContent="space-between">
-      <Pressable onPress={() => router.push(`/(app)/user/${id}`)}>
+      <Pressable onPress={removeMemberPressed}>
         <Box gap="m" flexDirection="row" alignItems="center" justifyContent="flex-start">
           <Box>
             <Avatar variant="small" profilePhoto={profile} />

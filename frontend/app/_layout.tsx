@@ -20,6 +20,7 @@ import { DropdownProvider } from "@/contexts/nudge-dropdown";
 import LoadingOverlay from "@/design-system/components/shared/states/loading-overlay";
 import SplashScreenAnimation from "@/app/(auth)/components/splash-screen";
 import { FeedContextProvider } from "@/contexts/feed-post-context";
+import { RemoveMemberProvider } from "@/contexts/remove-meber";
 
 const InitialLayout = () => {
   const { isAuthenticated, clearError, completeOnboarding, setInviteToken, inviteToken } =
@@ -158,18 +159,20 @@ const RootLayout = () => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <NotificationProvider>
-        <FeedContextProvider>
-          <UserProvider>
-            <DropdownProvider>
-              <QueryClientProvider client={queryClient}>
-                <OnboardingProvider>
-                  <StatusBar />
-                  <InitialLayout />
-                </OnboardingProvider>
-              </QueryClientProvider>
-            </DropdownProvider>
-          </UserProvider>
-        </FeedContextProvider>
+        <RemoveMemberProvider>
+          <FeedContextProvider>
+            <UserProvider>
+              <DropdownProvider>
+                <QueryClientProvider client={queryClient}>
+                  <OnboardingProvider>
+                    <StatusBar />
+                    <InitialLayout />
+                  </OnboardingProvider>
+                </QueryClientProvider>
+              </DropdownProvider>
+            </UserProvider>
+          </FeedContextProvider>
+        </RemoveMemberProvider>
       </NotificationProvider>
     </GestureHandlerRootView>
   );

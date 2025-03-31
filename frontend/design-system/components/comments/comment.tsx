@@ -7,6 +7,7 @@ import { Avatar } from "../shared/avatar";
 import { Playback } from "./playback";
 import { Pressable } from "react-native";
 import { router } from "expo-router";
+import { useRemoveMemberContext } from "@/contexts/remove-meber";
 
 export const CommentCard: React.FC<Required<Comment>> = ({
   id,
@@ -18,10 +19,19 @@ export const CommentCard: React.FC<Required<Comment>> = ({
   createdAt,
 }) => {
   const profile = profilePhoto ? profilePhoto : DEFAULT_PROFILE_PHOTO;
+  const { setUser } = useRemoveMemberContext();
+
+  const removeMemberPressed = () => {
+    setUser({
+      id: userId,
+      username: username!,
+    });
+    router.push(`/(app)/user/${userId}`);
+  };
 
   return (
     <Box width="100%">
-      <Pressable className="w-[100%]" onPress={() => router.push(`/(app)/user/${id}`)}>
+      <Pressable className="w-[100%]" onPress={removeMemberPressed}>
         <Box
           gap="s"
           flexDirection="row"

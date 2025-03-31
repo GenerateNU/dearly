@@ -5,13 +5,24 @@ import { Avatar } from "../shared/avatar";
 import { SearchedUser } from "@/types/user";
 import { Pressable } from "react-native";
 import { router } from "expo-router";
+import { useRemoveMemberContext } from "@/contexts/remove-meber";
 
 export const LikeCard: React.FC<SearchedUser> = ({ name, profilePhoto, username, id }) => {
   const profile = profilePhoto ? profilePhoto : DEFAULT_PROFILE_PHOTO;
+  const { setUser } = useRemoveMemberContext();
 
   return (
     <Box width="100%">
-      <Pressable className="w-[100%]" onPress={() => router.push(`/(app)/user/${id}`)}>
+      <Pressable
+        className="w-[100%]"
+        onPress={() => {
+          setUser({
+            id,
+            username,
+          });
+          router.push(`/(app)/user/${id}`);
+        }}
+      >
         <Box
           gap="m"
           flexDirection="row"
