@@ -5,12 +5,12 @@ import { PostWithComment } from "@/design-system/components/posts/post-with-comm
 import { usePost } from "@/hooks/api/post";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { useLocalSearchParams } from "expo-router";
-import { useCallback, useRef, useMemo, useState, useEffect } from "react";
+import { useCallback, useRef, useMemo, useState } from "react";
 import { PostSkeleton } from "@/design-system/components/posts/post-skeleton";
 import ResourceView from "@/design-system/components/utilities/resource-view";
 import { Post } from "@/types/post";
 import ErrorDisplay from "@/design-system/components/shared/states/error";
-import { BackHandler, Keyboard, StyleSheet, View } from "react-native";
+import { Keyboard, StyleSheet, View } from "react-native";
 
 const ViewPost = () => {
   const { id } = useLocalSearchParams<{ id: string }>();

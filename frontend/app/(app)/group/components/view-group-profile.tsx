@@ -10,7 +10,6 @@ import { useRemoveMemberContext } from "@/contexts/remove-meber";
 import { useManualNudge } from "@/hooks/api/member";
 import { useUserStore } from "@/auth/store";
 import { Alert, Pressable } from "react-native";
-import { router } from "expo-router";
 
 interface MemberProps extends GroupMember {
   managerView: boolean;
