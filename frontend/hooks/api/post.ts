@@ -1,6 +1,6 @@
 import { Comment, CreatePostPayload, CreateCommentPayload, Post } from "@/types/post";
-import { useMutationBase, useQueryPagination } from "./base";
-import { createPost } from "@/api/post";
+import { useMutationBase, useQueryBase, useQueryPagination } from "./base";
+import { createPost, getPost } from "@/api/post";
 import { getComments } from "@/api/comment";
 import { postComment } from "@/api/comment";
 import { useQueryClient } from "@tanstack/react-query";
@@ -17,6 +17,13 @@ export const useCreatePost = (groupId: string) => {
     (payload) => createPost(groupId, payload),
     ["groups", groupId],
   );
+};
+
+export const usePost = (id: string, options: any = {}) => {
+  return useQueryBase<Post>(["posts", id], () => getPost(id), {
+    enabled: !!id,
+    ...options,
+  });
 };
 
 export const useGroupFeed = (id: string, date?: string, options: any = {}) => {

@@ -1,7 +1,9 @@
 import { Box } from "@/design-system/base/box";
+import { useLocalSearchParams } from "expo-router";
 
-// TODO: user profile page here
 const Index = () => {
+  const { id: postId } = useLocalSearchParams<{ id: string }>();
+
   return <Box></Box>;
 };
 
