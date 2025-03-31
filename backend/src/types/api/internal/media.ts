@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { MediaType } from "../../../constants/database";
 import { mediaTable } from "../../../entities/schema";
 
@@ -19,3 +20,7 @@ export type WaveForm = {
   length: number;
   data: number[];
 };
+
+export const processURLValidate = z.object({
+  url: z.string(),
+});

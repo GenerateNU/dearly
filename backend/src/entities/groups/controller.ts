@@ -61,7 +61,7 @@ export class GroupControllerImpl implements GroupController {
         userId: ctx.get("userId"),
         groupId,
       });
-      return ctx.json(calendar, 200);
+      return ctx.json(calendar, Status.OK);
     };
     return await handleAppError(getCalendarImpl)(ctx);
   }
@@ -76,7 +76,7 @@ export class GroupControllerImpl implements GroupController {
         userId: ctx.get("userId"),
         groupId,
       });
-      return ctx.json(feed, 200);
+      return ctx.json(feed, Status.OK);
     };
     return await handleAppError(getAllPostsImpl)(ctx);
   }

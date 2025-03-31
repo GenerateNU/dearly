@@ -10,6 +10,7 @@ import {
 } from "../../types/api/routes/comment";
 import { CreateCommentPayload, createCommentValidate } from "../../types/api/internal/comments";
 import { paginationSchema } from "../../utilities/api/pagination";
+import { Status } from "../../constants/http";
 
 /**
  * Interface defining the methods for interacting with comments.
@@ -79,7 +80,7 @@ export class CommentControllerImpl implements CommentController {
         ...commentPayload,
       };
       const comment = await this.commentService.createComment(createCommentPayload);
-      return ctx.json(comment, 201);
+      return ctx.json(comment, Status.Created);
     };
     return await handleAppError(createCommentImpl)(ctx);
   }
@@ -106,7 +107,7 @@ export class CommentControllerImpl implements CommentController {
         limit: pagination.limit,
         page: pagination.page,
       });
-      return ctx.json(comments, 200);
+      return ctx.json(comments, Status.OK);
     };
     return await handleAppError(getCommentImpl)(ctx);
   }

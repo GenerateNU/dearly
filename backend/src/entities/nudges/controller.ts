@@ -9,6 +9,7 @@ import {
   GetNudgeConfigResponse,
 } from "../../types/api/routes/nudges";
 import { nudgeScheduleValidate, userIDValidate } from "../../types/api/internal/nudges";
+import { Status } from "../../constants/http";
 
 /**
  * Interface defining the operations available for managing nudges in the application.
@@ -74,7 +75,7 @@ export class NudgeControllerImpl implements NudgeController {
         ...payload,
       };
       const schedule = await this.nudgeService.upsertSchedule(managerId, payloadWithIds);
-      return ctx.json(schedule, 200);
+      return ctx.json(schedule, Status.OK);
     };
     return await handleAppError(upsertScheduleImpl)(ctx);
   }
@@ -85,7 +86,7 @@ export class NudgeControllerImpl implements NudgeController {
       const managerId = ctx.get("userId");
       const schedule = await this.nudgeService.getSchedule(groupId, managerId);
       if (schedule) {
-        return ctx.json(schedule, 200);
+        return ctx.json(schedule, Status.OK);
       }
       return ctx.json({ message: "Group did not have schedule configured" }, 200);
     };
@@ -98,7 +99,7 @@ export class NudgeControllerImpl implements NudgeController {
       const managerId = ctx.get("userId");
       const schedule = await this.nudgeService.deactivateNudge(groupId, managerId);
       if (schedule) {
-        return ctx.json(schedule, 200);
+        return ctx.json(schedule, Status.OK);
       }
       return ctx.json({ message: "Nudge schedule not configured for deactivation" }, 200);
     };
