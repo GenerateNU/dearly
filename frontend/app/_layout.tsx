@@ -20,7 +20,7 @@ import { DropdownProvider } from "@/contexts/nudge-dropdown";
 import LoadingOverlay from "@/design-system/components/shared/states/loading-overlay";
 import SplashScreenAnimation from "@/app/(auth)/components/splash-screen";
 import { FeedContextProvider } from "@/contexts/feed-post-context";
-import { RemoveMemberProvider } from "@/contexts/remove-meber";
+import { RemoveMemberProvider } from "@/contexts/remove-member";
 
 const InitialLayout = () => {
   const { isAuthenticated, clearError, completeOnboarding, setInviteToken, inviteToken } =

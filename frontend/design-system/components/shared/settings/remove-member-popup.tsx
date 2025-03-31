@@ -3,7 +3,7 @@ import { forwardRef } from "react";
 import BottomSheetModal from "../bottom-sheet";
 import { Box } from "@/design-system/base/box";
 import { useUserStore } from "@/auth/store";
-import { useRemoveMemberContext } from "@/contexts/remove-meber";
+import { useRemoveMemberContext } from "@/contexts/remove-member";
 import { Text } from "@/design-system/base/text";
 import RedTextButton from "../buttons/red-text-button";
 import { router } from "expo-router";

@@ -1,5 +1,5 @@
 import { DEFAULT_PROFILE_PHOTO } from "@/constants/photo";
-import { useRemoveMemberContext } from "@/contexts/remove-meber";
+import { useRemoveMemberContext } from "@/contexts/remove-member";
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { Theme } from "@/design-system/base/theme";

@@ -6,7 +6,7 @@ import { TextButton } from "@/design-system/components/shared/buttons/text-butto
 import React, { useEffect, useMemo } from "react";
 import { GroupMember } from "@/types/group";
 import { Icon } from "@/design-system/components/shared/icons/icon";
-import { useRemoveMemberContext } from "@/contexts/remove-meber";
+import { useRemoveMemberContext } from "@/contexts/remove-member";
 import { useManualNudge } from "@/hooks/api/member";
 import { useUserStore } from "@/auth/store";
 import { Alert, Pressable } from "react-native";

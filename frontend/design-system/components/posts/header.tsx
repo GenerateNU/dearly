@@ -5,7 +5,7 @@ import { Text } from "@/design-system/base/text";
 import { Avatar } from "../shared/avatar";
 import { TextButton } from "../shared/buttons/text-button";
 import { router } from "expo-router";
-import { useRemoveMemberContext } from "@/contexts/remove-meber";
+import { useRemoveMemberContext } from "@/contexts/remove-member";
 
 interface PostHeaderProps {
   username: string;

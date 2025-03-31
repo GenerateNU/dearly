@@ -5,7 +5,7 @@ import { Avatar } from "../shared/avatar";
 import { SearchedUser } from "@/types/user";
 import { Pressable } from "react-native";
 import { router } from "expo-router";
-import { useRemoveMemberContext } from "@/contexts/remove-meber";
+import { useRemoveMemberContext } from "@/contexts/remove-member";
 
 export const LikeCard: React.FC<SearchedUser> = ({ name, profilePhoto, username, id }) => {
   const profile = profilePhoto ? profilePhoto : DEFAULT_PROFILE_PHOTO;
