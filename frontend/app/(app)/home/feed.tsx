@@ -76,8 +76,10 @@ const Feed: React.FC<FeedProps> = ({
     return (
       <PostWithComment
         item={item}
-        onCommentClicked={() => onClickComment(item.id, item.caption, item.likes)}
-        onLikeClick={() => onClickLikes(item.id)}
+        onClickComment={() =>
+          onClickComment(item.id!, item.caption ? item.caption : "", item.likes!)
+        }
+        onClickLike={() => onClickLikes(item.id!)}
       />
     );
   };
