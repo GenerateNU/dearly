@@ -1,10 +1,9 @@
-import { Box } from "@/design-system/base/box";
+import User from "@/design-system/components/profiles/user";
 import { useLocalSearchParams } from "expo-router";
 
 const Index = () => {
-  const { id: postId } = useLocalSearchParams<{ id: string }>();
-
-  return <Box></Box>;
+  const { id } = useLocalSearchParams<{ id: string }>();
+  return <User id={id} />;
 };
 
 export default Index;
