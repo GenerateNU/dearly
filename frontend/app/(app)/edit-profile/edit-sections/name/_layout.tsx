@@ -23,8 +23,9 @@ export default function Layout() {
 
   const { data, error: userError } = useUser(userId!);
 
-  const { control, handleSubmit, setValue } = useForm<UPDATE_USER_FORM_TYPE>({
+  const { control, handleSubmit, setValue, getValues } = useForm<UPDATE_USER_FORM_TYPE>({
     resolver: zodResolver(UPDATE_USER_FORM),
+    defaultValues: { name: data?.name ? data?.name : "" },
   });
 
   return (
@@ -38,9 +39,8 @@ export default function Layout() {
         render={() => (
           <Box width="100%">
             <Input
-              paragraph
               placeholder="Enter your name"
-              value={data?.name ?? undefined}
+              value={getValues("name")}
               onChangeText={(str) => {
                 setValue("name", str);
               }}

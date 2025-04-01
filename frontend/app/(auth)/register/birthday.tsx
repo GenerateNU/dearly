@@ -9,19 +9,7 @@ import { useEffect, useRef } from "react";
 import BackNextButtons from "@/design-system/components/shared/buttons/back-next-buttons";
 import Input from "@/design-system/components/shared/controls/input";
 import SelectBirthdayPopup from "../components/birthday-popup";
-
-const formatBirthday = (birthday?: Date | null) => {
-  if (!birthday) {
-    return "MM/DD/YYYY";
-  }
-
-  const date = new Date(birthday);
-  const month = (date.getMonth() + 1).toString().padStart(2, "0");
-  const day = date.getDate().toString().padStart(2, "0");
-  const year = date.getFullYear();
-
-  return `${month}/${day}/${year}`;
-};
+import { formatBirthday } from "@/utilities/birthday";
 
 const Birthday = () => {
   const { user, setIsCreatingProfile, isCreatingProfile, setPage, page } = useOnboarding();
@@ -95,7 +83,7 @@ const Birthday = () => {
           </Box>
         </Box>
       </SafeAreaView>
-      <SelectBirthdayPopup onClose={() => null} ref={birthdayRef} />
+      <SelectBirthdayPopup ref={birthdayRef} />
     </>
   );
 };

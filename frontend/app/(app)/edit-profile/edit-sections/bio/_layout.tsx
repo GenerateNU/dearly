@@ -23,8 +23,9 @@ export default function Layout() {
 
   const { data, error: userError } = useUser(userId!);
 
-  const { control, handleSubmit, setValue } = useForm<UPDATE_USER_FORM_TYPE>({
+  const { control, handleSubmit, setValue, getValues } = useForm<UPDATE_USER_FORM_TYPE>({
     resolver: zodResolver(UPDATE_BIO_FORM),
+    defaultValues: { bio: data?.bio ? data?.bio : "" },
   });
 
   return (
@@ -40,7 +41,7 @@ export default function Layout() {
             <Input
               paragraph
               placeholder="Enter your bio"
-              value={data?.bio ?? undefined}
+              value={getValues("bio")}
               onChangeText={(str) => {
                 setValue("bio", str);
               }}

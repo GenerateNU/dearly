@@ -21,8 +21,9 @@ export default function Layout() {
     await uploadUserData(form);
     router.push("/(app)/edit-profile");
   };
-  const { control, handleSubmit, setValue } = useForm<UPDATE_USER_FORM_TYPE>({
+  const { control, handleSubmit, setValue, getValues } = useForm<UPDATE_USER_FORM_TYPE>({
     resolver: zodResolver(UPDATE_USERNAME_FORM),
+    defaultValues: { username: data?.username ? data?.username : "" },
   });
 
   return (
@@ -36,9 +37,8 @@ export default function Layout() {
         render={() => (
           <Box width="100%">
             <Input
-              paragraph
               placeholder="Enter your username"
-              value={data?.username ?? undefined}
+              value={getValues("username")}
               onChangeText={(str) => {
                 setValue("username", str);
               }}
