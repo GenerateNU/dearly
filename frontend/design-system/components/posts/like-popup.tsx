@@ -103,7 +103,7 @@ const LikePopUpData: React.FC<LikePopUpDataProps> = ({ postId, onEmptyChange }) 
             ListFooterComponent={renderFooter}
             contentContainerStyle={{
               paddingTop: 5,
-              paddingBottom: 20,
+              paddingBottom: 200,
             }}
             showsVerticalScrollIndicator={false}
             style={{ flex: 1 }}
