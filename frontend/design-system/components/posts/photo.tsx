@@ -57,7 +57,6 @@ export const Photo: React.FC<PhotoProps> = ({ image, onPress }) => {
         aspectRatio={aspectRatio ?? 1}
         borderRadius="s"
         overflow="hidden"
-        backgroundColor="gray"
         style={{
           backgroundColor: "#f0f0f0",
         }}
