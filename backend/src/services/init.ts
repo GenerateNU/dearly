@@ -91,7 +91,7 @@ export const initService = (
 
   const expoService = new ExpoPushService(expoClient);
   const mediaService = new MediaServiceImpl(db, s3Service);
-  const nudgeSchedulerService = new AWSEventBridgeScheduler(schedulerClient);
+  const nudgeSchedulerService = new AWSEventBridgeScheduler(schedulerClient, config.lambdaConfig);
   const pushNotificationService = new ExpoNotificationService(
     supabaseClient,
     new NotificationTransactionImpl(db),
