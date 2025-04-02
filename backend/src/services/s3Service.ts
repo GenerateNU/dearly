@@ -68,7 +68,15 @@ export class S3ServiceImpl implements S3Service {
         withoutEnlargement: true,
         width: 800,
       })
-      .jpeg({ quality: 80 })
+      .sharpen()
+      .jpeg({
+        quality: 70,
+        progressive: true,
+        trellisQuantisation: true,
+        overshootDeringing: true,
+        optimizeScans: true,
+        mozjpeg: true,
+      })
       .toBuffer();
   }
 
