@@ -10,7 +10,7 @@ import {
 } from "@aws-sdk/client-scheduler";
 import { handleAWSServiceError } from "../utilities/errors/aws-error";
 import { NudgeSchedulePayload, SchedulePayload } from "../types/api/internal/nudges";
-import { getConfigurations } from "../config/init";
+import { Configuration } from "../types/config";
 
 export interface NudgeSchedulerService {
   /**
@@ -46,9 +46,11 @@ export interface NudgeSchedulerService {
 
 export class AWSEventBridgeScheduler implements NudgeSchedulerService {
   private scheduler: SchedulerClient;
+  private config: Configuration["lambdaConfig"];
 
-  constructor(scheduler: SchedulerClient) {
+  constructor(scheduler: SchedulerClient, config: Configuration["lambdaConfig"]) {
     this.scheduler = scheduler;
+    this.config = config;
   }
 
   // Add a new schedule
@@ -65,7 +67,6 @@ export class AWSEventBridgeScheduler implements NudgeSchedulerService {
   async updateSchedule(id: string, payload: SchedulePayload): Promise<number | null> {
     const updateScheduleImpl = async () => {
       const input = await this.scheduleCommandInput(id, payload);
-
       const command = new UpdateScheduleCommand(input);
       const response = await this.scheduler.send(command);
       return response.$metadata.httpStatusCode ?? null;
@@ -105,8 +106,9 @@ export class AWSEventBridgeScheduler implements NudgeSchedulerService {
     const dayOfMonth = payload.day ?? "?";
     const month = payload.month ?? "*";
     const dayOfWeek = payload.daysOfWeek?.join() ?? (payload.frequency == "MONTHLY" ? "?" : "*");
+    const year = "*";
 
-    const cronExpression = `cron(${min} ${hour} ${dayOfMonth} ${month} ${dayOfWeek})`;
+    const cronExpression = `cron(${min} ${hour} ${dayOfMonth} ${month} ${dayOfWeek} ${year})`;
 
     return cronExpression;
   }
@@ -129,7 +131,6 @@ export class AWSEventBridgeScheduler implements NudgeSchedulerService {
       schedule = this.getCronExpression(payload.schedule);
       lambdaInput = JSON.stringify(payload.expo);
     }
-    const lambda_config = getConfigurations().lambdaConfig;
 
     const FLEXIBLE_TIME_WINDOW: FlexibleTimeWindow = {
       Mode: "FLEXIBLE",
@@ -141,10 +142,11 @@ export class AWSEventBridgeScheduler implements NudgeSchedulerService {
       ScheduleExpression: schedule,
       State: disabled,
       Target: {
-        Arn: lambda_config.lambdaARN,
-        RoleArn: lambda_config.lambdaRoleARN,
+        Arn: this.config.lambdaARN,
+        RoleArn: this.config.lambdaRoleARN,
         Input: lambdaInput,
       },
+      ScheduleExpressionTimezone: "America/New_York",
       FlexibleTimeWindow: FLEXIBLE_TIME_WINDOW,
     };
     return input;

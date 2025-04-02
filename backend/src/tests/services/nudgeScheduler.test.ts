@@ -2,10 +2,11 @@ import { AWSEventBridgeScheduler } from "../../services/nudgeScheduler";
 import { SchedulePayload } from "../../types/api/internal/nudges";
 import { ExpoPushMessage } from "expo-server-sdk";
 import { mockSchedulerClient } from "../helpers/mock";
+import { getConfigurations } from "../../config/init";
 
 const schedulerClient = mockSchedulerClient;
 
-const scheduler = new AWSEventBridgeScheduler(schedulerClient);
+const scheduler = new AWSEventBridgeScheduler(schedulerClient, getConfigurations().lambdaConfig);
 
 describe("Nudge Scheduler Testing", async () => {
   const expoPushMessages: ExpoPushMessage[] = [];
