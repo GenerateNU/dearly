@@ -93,18 +93,18 @@ const Feed: React.FC<FeedProps> = ({
     });
   }, [refetch]);
 
-  if (posts.length === 0) {
-    return (
-      <Box flex={1} padding="m">
-        <EmptyFeed />
-      </Box>
-    );
-  }
-
   if (isLoading) {
     return (
       <Box flex={1} paddingHorizontal="m">
         <PostSkeleton />
+      </Box>
+    );
+  }
+
+  if (posts.length === 0) {
+    return (
+      <Box flex={1} padding="m">
+        <EmptyFeed />
       </Box>
     );
   }

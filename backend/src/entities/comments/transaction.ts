@@ -8,7 +8,7 @@ import {
   postsTable,
   usersTable,
 } from "../schema";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and, sql, desc } from "drizzle-orm";
 import {
   ForbiddenError,
   InternalServerError,
@@ -171,7 +171,7 @@ export class CommentTransactionImpl implements CommentTransaction {
       .from(commentsTable)
       .innerJoin(usersTable, eq(commentsTable.userId, usersTable.id))
       .where(eq(commentsTable.postId, postId))
-      .orderBy(commentsTable.createdAt)
+      .orderBy(desc(commentsTable.createdAt))
       .limit(limit)
       .offset((page - 1) * limit);
 

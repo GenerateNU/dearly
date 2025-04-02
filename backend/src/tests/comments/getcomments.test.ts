@@ -34,11 +34,11 @@ describe("GET /posts/:id/comments", () => {
   });
 
   it.each([
-    ["1", "1", [BOB_COMMENT]],
-    ["1", "2", [ALICE_COMMENT]],
+    ["1", "1", [ALICE_COMMENT]],
+    ["1", "2", [BOB_COMMENT]],
     ["1", "3", []],
     ["1", "4", []],
-    ["2", "1", [BOB_COMMENT, ALICE_COMMENT]],
+    ["2", "1", [ALICE_COMMENT, BOB_COMMENT]],
     ["2", "2", []],
   ])("should return 200 with limit %s and page %s", async (limit, page, expectedBody) => {
     await testBuilder.request({

@@ -6,7 +6,7 @@ const LoadingNotifications = () => {
   const skeletonData = Array.from({ length: 5 }, (_, index) => ({ id: `skeleton-${index}` }));
 
   return (
-    <Box flex={1} width="100%" paddingTop="m">
+    <Box width="100%" paddingTop="m">
       <FlatList
         data={skeletonData}
         renderItem={() => (
