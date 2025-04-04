@@ -1,5 +1,10 @@
 import { useState, useCallback, useRef } from "react";
-import { LayoutChangeEvent, TouchableWithoutFeedback, Animated } from "react-native";
+import {
+  LayoutChangeEvent,
+  TouchableWithoutFeedback,
+  Animated,
+  ActivityIndicator,
+} from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import { Image } from "expo-image";
 import { Box } from "@/design-system/base/box";
@@ -16,10 +21,11 @@ interface CarouselProps {
 }
 
 const ImageCarousel: React.FC<CarouselProps> = ({ data, initialPage = 0, like, setLike }) => {
-  const [containerWidth, setContainerWidth] = useState<number>(0);
+  const [containerWidth, setContainerWidth] = useState<number>(500);
   const [page, setPage] = useState<number>(0);
   const [showFlyingHeart, setShowFlyingHeart] = useState(false);
   const [lastTap, setLastTap] = useState<number>(0);
+  const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
 
   const scale = useRef(new Animated.Value(0.5)).current;
   const opacity = useRef(new Animated.Value(0)).current;
@@ -97,6 +103,10 @@ const ImageCarousel: React.FC<CarouselProps> = ({ data, initialPage = 0, like, s
     setLastTap(now);
   }, [lastTap, like, setLike, animateHeart]);
 
+  const handleImageLoad = useCallback((uri: string) => {
+    setLoadedImages((prev) => ({ ...prev, [uri]: true }));
+  }, []);
+
   const animatedStyle = {
     transform: [{ translateX: translateX }, { translateY: translateY }, { scale: scale }],
     opacity: opacity,
@@ -104,16 +114,42 @@ const ImageCarousel: React.FC<CarouselProps> = ({ data, initialPage = 0, like, s
 
   const renderItem = ({ item }: { item: string }) => (
     <TouchableWithoutFeedback onPress={handleDoubleTap}>
-      <Box style={{ width: "100%" }}>
+      <Box
+        style={{ width: "100%" }}
+        position="relative"
+        borderRadius="m"
+        overflow="hidden"
+        height={containerWidth}
+      >
+        <Box
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          backgroundColor="gray"
+          justifyContent="center"
+          alignItems="center"
+          zIndex={1}
+        >
+          <ActivityIndicator size="large" color="#FFC107" />
+        </Box>
+
         <Image
-          className="w-full"
+          className="w-full h-full"
           style={{
-            aspectRatio: 1,
-            borderRadius: 12,
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 2,
+            opacity: loadedImages[item] ? 1 : 0,
           }}
-          source={{
-            uri: item,
-          }}
+          source={{ uri: item }}
+          onLoad={() => handleImageLoad(item)}
+          contentFit="cover"
+          transition={200}
         />
       </Box>
     </TouchableWithoutFeedback>

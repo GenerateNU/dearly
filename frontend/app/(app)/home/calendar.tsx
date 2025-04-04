@@ -21,7 +21,7 @@ type ViewMode = "month" | "week" | "year";
 const Calendar: React.FC = () => {
   const { group } = useUserStore();
   const today = new Date();
-  const todayString = today.toISOString().split("T")[0];
+  const todayString = today.toLocaleDateString().split("T")[0];
   const [selectedDate, setSelectedDate] = useState<string | undefined>(todayString);
   const [formattedDate, setFormattedDate] = useState<string>("");
   const [viewMode, setViewMode] = useState<ViewMode>("month");
