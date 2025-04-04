@@ -101,6 +101,8 @@ const Feed: React.FC<FeedProps> = ({
     );
   }
 
+  console.log(posts);
+
   if (posts.length === 0) {
     return (
       <Box

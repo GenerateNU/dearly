@@ -67,24 +67,23 @@ export class GroupTransactionImpl implements GroupTransaction {
   }: FeedParamPayload): Promise<PostWithMedia[]> {
     await this.checkMembership(groupId, userId);
 
+    let dateCondition;
+
+    if (date) {
+      const formattedDate = `'${date.toISOString()}'`;
+      dateCondition = sql`DATE(${postsTable.createdAt}) = DATE(${sql.raw(formattedDate)})`;
+    }
+
     return await this.db
       .select(getPostMetadata(userId))
       .from(postsTable)
       .innerJoin(mediaTable, eq(mediaTable.postId, postsTable.id))
-      // extra check to return nothing if user is not a member of group
       .innerJoin(
         membersTable,
         and(eq(membersTable.groupId, groupId), eq(membersTable.userId, userId)),
       )
       .innerJoin(usersTable, eq(postsTable.userId, usersTable.id))
-      .where(
-        and(
-          date
-            ? eq(sql`DATE(${postsTable.createdAt})`, sql`DATE(${date.toISOString()})`)
-            : undefined,
-          eq(postsTable.groupId, groupId),
-        ),
-      )
+      .where(and(dateCondition, eq(postsTable.groupId, groupId)))
       .groupBy(
         postsTable.id,
         postsTable.userId,
@@ -96,7 +95,6 @@ export class GroupTransactionImpl implements GroupTransaction {
         usersTable.name,
         usersTable.username,
       )
-      // most recent to less recent
       .orderBy(desc(postsTable.createdAt))
       .limit(limit)
       .offset((page - 1) * limit);
