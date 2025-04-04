@@ -4,7 +4,7 @@ import { z } from "zod";
 
 const getNotificationBody = (groupName: string) => {
   return {
-    title: "Time to Connect! 🚀",
+    title: "You got nudged! 🚀",
     body: `✨ Share a post with your ${groupName} group now! ✨`,
   };
 };

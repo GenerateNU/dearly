@@ -68,7 +68,7 @@ describe("POST /groups/:id/nudges/manual", () => {
     expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledTimes(1);
     expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledWith([
       {
-        title: "Time to Connect! 🚀",
+        title: "You got nudged! 🚀",
         body: `✨ Share a post with your dearly group now! ✨`,
         to: MOCK_EXPO_TOKEN,
         sound: "default",
@@ -155,7 +155,7 @@ describe("POST /groups/:id/nudges/manual", () => {
     expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledTimes(1);
     expect(await sendPushNotificationsAsyncSpy).toHaveBeenCalledWith([
       {
-        title: "Time to Connect! 🚀",
+        title: "You got nudged! 🚀",
         body: `✨ Share a post with your dearly group now! ✨`,
         to: MOCK_EXPO_TOKEN,
         sound: "default",
