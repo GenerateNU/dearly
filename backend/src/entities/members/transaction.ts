@@ -9,7 +9,7 @@ import {
   mediaTable,
   notificationsTable,
 } from "../schema";
-import { eq, and, desc, or } from "drizzle-orm";
+import { eq, and, desc, or, sql } from "drizzle-orm";
 import {
   ForbiddenError,
   InternalServerError,
@@ -202,7 +202,7 @@ export class MemberTransactionImpl implements MemberTransaction {
       .from(usersTable)
       .innerJoin(membersTable, eq(usersTable.id, membersTable.userId))
       .where(eq(membersTable.groupId, groupId))
-      .orderBy(usersTable.name)
+      .orderBy(sql`CASE WHEN ${membersTable.role} = 'MANAGER' THEN 0 ELSE 1 END`, usersTable.name)
       .limit(limit)
       .offset((page - 1) * limit);
 
