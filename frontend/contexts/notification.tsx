@@ -1,9 +1,13 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import * as Notifications from "expo-notifications";
+import { router } from "expo-router";
 
 type NotificationData = {
   title?: string;
   body?: string;
+  data?: {
+    postId?: string;
+  };
 };
 
 type NotificationContextType = {
@@ -34,12 +38,18 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
     notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
       const title: string | undefined = notification.request.content.title ?? undefined;
       const body: string | undefined = notification.request.content.body ?? undefined;
-      setLastNotification({ title, body });
+      const data = notification.request.content.data ?? undefined;
+      setLastNotification({ title, body, data });
     });
 
-    responseListener.current = Notifications.addNotificationResponseReceivedListener(
-      (response) => {},
-    );
+    responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
+      const data = response.notification.request.content.data;
+      const postId = data?.postId;
+
+      if (postId) {
+        router.push(`/(app)/view-post/${postId}`);
+      }
+    });
 
     return () => {
       if (notificationListener.current) {
