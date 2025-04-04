@@ -4,6 +4,8 @@ import { DateData } from "react-native-calendars";
 import { Text } from "@/design-system/base/text";
 import { Box } from "@/design-system/base/box";
 import { StyleSheet } from "react-native";
+import { useTheme } from "@shopify/restyle";
+import { Theme } from "@/design-system/base/theme";
 
 interface DayComponentProps {
   date: DateData;
@@ -15,51 +17,55 @@ interface DayComponentProps {
 
 export const CustomDayComponent = memo(
   ({ date, state, onPress, selected, image }: DayComponentProps) => {
+    const theme = useTheme<Theme>();
+
     if (!date || typeof date !== "object" || !date.dateString) {
       return null;
     }
 
-    if (image) {
-      return (
-        <TouchableOpacity
-          onPress={() => onPress && onPress(date)}
-          activeOpacity={0.7}
-          style={styles.dayComponentWrapper}
-        >
+    return (
+      <TouchableOpacity
+        onPress={() => onPress && onPress(date)}
+        activeOpacity={0.7}
+        style={styles.dayComponentWrapper}
+      >
+        {image ? (
           <ImageBackground
             source={{ uri: image }}
             style={[
               styles.dayContainer,
-              state === "today" && styles.todayContainer,
-              selected && styles.selectedContainer,
+              state === "today" && {
+                borderWidth: 2,
+                borderColor: theme.colors.honey,
+              },
+              selected && {
+                borderWidth: 2,
+                borderColor: theme.colors.ink,
+              },
             ]}
-            imageStyle={styles.imageBackground}
+            imageStyle={styles.imageStyle}
           >
             <Text color="ink" variant="caption">
               {date.day}
             </Text>
           </ImageBackground>
-        </TouchableOpacity>
-      );
-    }
-
-    return (
-      <Box marginBottom="xs" justifyContent="center" alignItems="center" width={40} height={45}>
-        <Box
-          justifyContent="center"
-          alignItems="center"
-          width={40}
-          height={45}
-          borderRadius="s"
-          overflow="hidden"
-          borderWidth={state === "today" || selected ? 2 : 0}
-          borderColor={state === "today" ? "honey" : selected ? "ink" : undefined}
-        >
-          <Text color="ink" variant="caption">
-            {date.day}
-          </Text>
-        </Box>
-      </Box>
+        ) : (
+          <Box
+            justifyContent="center"
+            alignItems="center"
+            width={40}
+            height={45}
+            borderRadius="s"
+            overflow="hidden"
+            borderWidth={state === "today" || selected ? 2 : 0}
+            borderColor={state === "today" ? "honey" : selected ? "ink" : undefined}
+          >
+            <Text color="ink" variant="caption">
+              {date.day}
+            </Text>
+          </Box>
+        )}
+      </TouchableOpacity>
     );
   },
 );
@@ -82,16 +88,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     overflow: "hidden",
   },
-  todayContainer: {
-    borderWidth: 2,
-    borderColor: "#FFC107",
-  },
-  selectedContainer: {
-    borderWidth: 2,
-    borderColor: "#FFC107",
-    backgroundColor: "rgba(255, 193, 7, 0.3)",
-  },
-  imageBackground: {
+  imageStyle: {
     flex: 1,
     resizeMode: "cover",
     justifyContent: "center",

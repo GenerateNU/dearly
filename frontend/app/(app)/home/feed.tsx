@@ -103,8 +103,14 @@ const Feed: React.FC<FeedProps> = ({
 
   if (posts.length === 0) {
     return (
-      <Box flex={1} padding="m">
-        <EmptyFeed />
+      <Box
+        flex={1}
+        justifyContent="center"
+        alignItems="center"
+        paddingHorizontal="m"
+        style={{ minHeight: 420 }}
+      >
+        <EmptyFeed displayText={date ? false : true} />
       </Box>
     );
   }
