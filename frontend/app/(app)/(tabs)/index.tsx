@@ -21,28 +21,18 @@ const Home = () => {
     error: error ? error.message : null,
   };
 
-  const SuccessComponent = () => (
-    <Box flexDirection="column" gap="s">
-      <Box paddingTop="m" paddingHorizontal="m">
-        <HomeMenu
-          categories={["Feed", "Calendar"]}
-          selected={selectedView}
-          setSelected={setSelectedView}
-        />
-      </Box>
-      {selectedView === "Feed" ? <Feed /> : <Calendar />}
-    </Box>
-  );
-
   return (
     <SafeAreaView edges={["top"]} className="flex-1 pt-[35%]">
-      <Box
-        gap="xl"
-        alignItems="center"
-        justifyContent="flex-start"
-        backgroundColor="pearl"
-        flex={1}
-      >
+      <Box alignItems="center" justifyContent="flex-start" backgroundColor="pearl" flex={1}>
+        {groups.length > 0 && (
+          <Box width="100%" padding="m">
+            <HomeMenu
+              categories={["Feed", "Calendar"]}
+              selected={selectedView}
+              setSelected={setSelectedView}
+            />
+          </Box>
+        )}
         <ResourceView
           resourceState={groupsResource}
           loadingComponent={
@@ -60,7 +50,7 @@ const Home = () => {
               <EmptyHomePage />
             </Box>
           }
-          successComponent={<SuccessComponent />}
+          successComponent={selectedView === "Feed" ? <Feed /> : <Calendar />}
         />
       </Box>
     </SafeAreaView>

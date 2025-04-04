@@ -95,7 +95,7 @@ const Feed: React.FC<FeedProps> = ({
 
   if (isLoading) {
     return (
-      <Box flex={1} paddingHorizontal="m">
+      <Box width="100%" style={{ minHeight: 420 }} flex={1} paddingHorizontal="m">
         <PostSkeleton />
       </Box>
     );
@@ -104,6 +104,7 @@ const Feed: React.FC<FeedProps> = ({
   if (posts.length === 0) {
     return (
       <Box
+        width="100%"
         flex={1}
         justifyContent="center"
         alignItems="center"
