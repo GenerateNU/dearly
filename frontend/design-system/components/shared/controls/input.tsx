@@ -89,7 +89,11 @@ const Input: React.FC<TextboxProps> = ({
               ) : (
                 <BaseTextInput
                   onPressOut={onPressOut}
+                  textContentType={secureTextEntry ? "oneTimeCode" : undefined}
+                  autoCorrect={false}
+                  autoCapitalize="none"
                   onPressIn={onPressIn}
+                  autoComplete={secureTextEntry ? "off" : undefined}
                   placeholder={placeholder}
                   autoFocus={autoFocus}
                   onBlur={onBlur}
