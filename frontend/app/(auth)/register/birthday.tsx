@@ -32,8 +32,6 @@ const Birthday = () => {
         )
       : null;
 
-    console.log(processedBirthday);
-
     await register({
       ...user,
       birthday: processedBirthday,
