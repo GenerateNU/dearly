@@ -147,7 +147,7 @@ describe("GET /groups/:id/members", () => {
     )
       .assertStatusCode(Status.OK)
       .assertArraySize(2)
-      .assertBody([GROUP_MEMBER_ALICE, GROUP_MANAGER_ANA]);
+      .assertBody([GROUP_MANAGER_ANA, GROUP_MEMBER_ALICE]);
   });
 
   it("should return 400 if limit and page not number", async () => {
