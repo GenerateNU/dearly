@@ -100,7 +100,7 @@ export class ExpoNotificationService implements NotificationService {
 
     const message = this.formatMessage(username, groupName, NotificationType.COMMENT);
 
-    const notification: Notification[] = [
+    const notifications: Notification[] = [
       {
         actorId: comment.userId,
         receiverId: userId,
@@ -115,7 +115,7 @@ export class ExpoNotificationService implements NotificationService {
       },
     ];
 
-    const insertedNotification = await this.transaction.insertNotifications(notification);
+    const insertedNotification = await this.transaction.insertNotifications(notifications);
 
     if (isEnabled === false) {
       return insertedNotification;
@@ -135,7 +135,7 @@ export class ExpoNotificationService implements NotificationService {
 
     const message = this.formatMessage(username, groupName, NotificationType.LIKE);
 
-    const notification: Notification[] = [
+    const notifications: Notification[] = [
       {
         actorId: like.userId,
         receiverId: userId,
@@ -149,7 +149,7 @@ export class ExpoNotificationService implements NotificationService {
       },
     ];
 
-    const insertedNotification = await this.transaction.insertNotifications(notification);
+    const insertedNotification = await this.transaction.insertNotifications(notifications);
 
     if (isEnabled === false) {
       return insertedNotification;
