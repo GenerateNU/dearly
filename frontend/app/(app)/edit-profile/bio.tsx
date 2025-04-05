@@ -12,7 +12,7 @@ import { Text } from "@/design-system/base/text";
 
 type UPDATE_USER_FORM_TYPE = z.infer<typeof UPDATE_BIO_FORM>;
 
-export default function Layout() {
+const EditBio = () => {
   const { userId } = useUserStore();
   const { mutateAsync: uploadUserData, error, isPending } = usePatchUser(userId!);
 
@@ -58,4 +58,6 @@ export default function Layout() {
       />
     </Box>
   );
-}
+};
+
+export default EditBio;
