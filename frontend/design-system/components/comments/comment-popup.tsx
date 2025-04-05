@@ -28,7 +28,7 @@ interface CommentPopUpDataProps {
 }
 
 export const CommentPopUp = forwardRef<BottomSheetMethods, CommentPopUpProps>(
-  ({ attributes, offset = 169 }, ref) => {
+  ({ attributes, offset = 260}, ref) => {
     const [index, setIndex] = useState<number>(-1);
     return (
       <>
@@ -42,14 +42,13 @@ export const CommentPopUp = forwardRef<BottomSheetMethods, CommentPopUpProps>(
           ) : (
             <CommentPopUpData attributes={attributes} index={index} />
           )}
-        </BottomSheetModal>
-        {index !== -1 && (
+          {index !== -1 && (
           <KeyboardAvoidingView
             behavior="padding"
             keyboardVerticalOffset={Platform.OS === "ios" ? offset : 0}
             style={{
               position: "absolute",
-              bottom: offset,
+              bottom: 70,
               left: 0,
               right: 0,
               zIndex: 10,
@@ -60,6 +59,8 @@ export const CommentPopUp = forwardRef<BottomSheetMethods, CommentPopUpProps>(
             </Box>
           </KeyboardAvoidingView>
         )}
+        </BottomSheetModal>
+        
       </>
     );
   },
@@ -74,7 +75,7 @@ const CommentPopUpData: React.FC<CommentPopUpDataProps> = ({ attributes, index }
   ref.current?.focus();
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage, isLoading, error, refetch } =
     useComments(attributes.commentId);
-  const comments = data?.pages.flatMap((page) => page) || [];
+  const comments = data?.pages.flatMap((page: any) => page) || [];
 
   const onEndReached = () => {
     if (hasNextPage && !isFetchingNextPage) {
