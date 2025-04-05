@@ -65,17 +65,17 @@ export const CommentPage = () => {
         />
       </Box>
       <KeyboardAvoidingView
-              behavior="padding"
-              keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
-              style={{
-                position: "absolute",
-                bottom: 25,
-                left: 5,
-                right: 5,
-                zIndex: 10,
-              }}
-            >
-          <CommentInput  postID={commentAttributes.commentId}/>
+        behavior="padding"
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+        style={{
+          position: "absolute",
+          bottom: 25,
+          left: 5,
+          right: 5,
+          zIndex: 10,
+        }}
+      >
+        <CommentInput postID={commentAttributes.commentId} />
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

@@ -13,6 +13,7 @@ const Layout = () => {
       <Stack.Screen name="edit-profile" options={{ headerShown: false }} />
       <Stack.Screen name="comment" options={{ headerShown: false }} />
       <Stack.Screen name="likes" options={{ headerShown: false }} />
+      <Stack.Screen name="settings" options={{ headerShown: false }} />
     </Stack>
   );
 };

@@ -27,7 +27,7 @@ const ViewPost = () => {
   const onClickLikes = useCallback(
     (postId: string) => {
       setLikePostId(postId);
-      router.push("/(app)/likes")
+      router.push("/(app)/likes");
     },
     [setLikePostId],
   );
