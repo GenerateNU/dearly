@@ -15,6 +15,7 @@ import {
   unique,
   date,
   check,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
 import { NAME_MAX_LIMIT } from "../constants/database";
@@ -155,23 +156,32 @@ export const likeCommentsTable = pgTable(
   ],
 );
 
-export const notificationsTable = pgTable("notifications", {
-  id: uuid().primaryKey().defaultRandom(),
-  actorId: uuid()
-    .notNull()
-    .references(() => usersTable.id, { onDelete: "cascade" }),
-  receiverId: uuid()
-    .notNull()
-    .references(() => usersTable.id, { onDelete: "cascade" }),
-  createdAt: timestamp().notNull().defaultNow(),
-  groupId: uuid().references(() => groupsTable.id, { onDelete: "cascade" }),
-  referenceType: referenceTypeEnum().notNull(),
-  postId: uuid().references(() => postsTable.id, { onDelete: "cascade" }),
-  commentId: uuid().references(() => commentsTable.id, { onDelete: "cascade" }),
-  likeId: uuid().references(() => likesTable.id, { onDelete: "cascade" }),
-  title: varchar({ length: NAME_MAX_LIMIT }).notNull(),
-  description: varchar({ length: NOTIFICATION_BODY_MAX_LIMIT }).notNull(),
-});
+export const notificationsTable = pgTable(
+  "notifications",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    actorId: uuid()
+      .notNull()
+      .references(() => usersTable.id, { onDelete: "cascade" }),
+    receiverId: uuid()
+      .notNull()
+      .references(() => usersTable.id, { onDelete: "cascade" }),
+    createdAt: timestamp().notNull().defaultNow(),
+    groupId: uuid().references(() => groupsTable.id, { onDelete: "cascade" }),
+    referenceType: referenceTypeEnum().notNull(),
+    postId: uuid().references(() => postsTable.id, { onDelete: "cascade" }),
+    commentId: uuid().references(() => commentsTable.id, { onDelete: "cascade" }),
+    likeId: uuid().references(() => likesTable.id, { onDelete: "cascade" }),
+    title: varchar({ length: NAME_MAX_LIMIT }).notNull(),
+    description: varchar({ length: NOTIFICATION_BODY_MAX_LIMIT }).notNull(),
+  },
+  (table) => {
+    return [
+      uniqueIndex("post_like_idx").on(table.postId, table.likeId),
+      uniqueIndex("post_comment_idx").on(table.postId, table.commentId),
+    ];
+  },
+);
 
 export const linksTable = pgTable("links", {
   id: uuid().primaryKey().defaultRandom(),
