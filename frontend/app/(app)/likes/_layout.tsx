@@ -11,7 +11,7 @@ const Layout = () => {
           headerTitle: "",
           headerTransparent: true,
           gestureEnabled: false,
-          headerLeft: () => <BackIcon onPress={() => router.navigate("/(app)/(tabs)")} />,
+          headerLeft: () => <BackIcon/>,
         }}
       />
     </Stack>
