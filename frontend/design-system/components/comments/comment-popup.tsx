@@ -34,7 +34,7 @@ export const CommentPopUp = forwardRef<BottomSheetMethods, CommentPopUpProps>(
       <>
         <BottomSheetModal
           ref={ref}
-          snapPoints={["85%"]}
+          snapPoints={["95%"]}
           onChange={(index: number) => setIndex(index)}
         >
           {attributes.commentId === "" ? (
