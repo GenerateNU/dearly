@@ -92,10 +92,10 @@ export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
   }, []);
 
   useEffect(() => {
-    if(attributes.length >= 30){
-      stopRecording()
+    if (attributes.length >= 30) {
+      stopRecording();
     }
-  }, [attributes.length])
+  }, [attributes.length]);
 
   return (
     <Box
@@ -164,7 +164,13 @@ export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
           size={30}
         />
       ) : (
-        <IconButton variant="icon" onPress={stopRecording} icon="square-rounded" size={30}  disabled={sending? true: false} />
+        <IconButton
+          variant="icon"
+          onPress={stopRecording}
+          icon="square-rounded"
+          size={30}
+          disabled={sending ? true : false}
+        />
       )}
     </Box>
   );

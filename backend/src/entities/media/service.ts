@@ -302,10 +302,10 @@ export class MediaServiceImpl {
         }
 
         length = metadata.format.duration;
-        const segmentDuration = length / numSegments; 
+        const segmentDuration = length / numSegments;
         const dbData: number[] = new Array(numSegments).fill(0);
         let completedSegments = 0;
-        
+
         for (let i = 0; i < numSegments; i++) {
           const timestamp = i * segmentDuration;
           ffmpeg(media)

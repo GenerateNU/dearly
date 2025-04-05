@@ -16,6 +16,7 @@ import { PostSkeleton } from "@/design-system/components/posts/post-skeleton";
 import { CommentLikesPopup } from "@/design-system/components/posts/comment-like-popup";
 import { PostWithComment } from "@/design-system/components/posts/post-with-comment";
 import { Mode } from "@/types/mode";
+import { router } from "expo-router";
 
 interface FeedProps {
   date?: string;
@@ -33,7 +34,6 @@ const Feed: React.FC<FeedProps> = ({
     group?.id as string,
     date,
   );
-
 
   useEffect(() => {
     if (date) {
@@ -58,11 +58,11 @@ const Feed: React.FC<FeedProps> = ({
   };
 
   const onClickComment = (id: string, caption: string, likes: number) => {
-    if(mode == Mode.ADVANCED){
-      setCommentAttributes({ commentId: id, caption: caption, likes: likes });
+    setCommentAttributes({ commentId: id, caption: caption, likes: likes });
+    if (mode == Mode.ADVANCED) {
       commentRef.current?.snapToIndex(0);
     } else {
-      
+      router.push("/(app)/comment");
     }
   };
 

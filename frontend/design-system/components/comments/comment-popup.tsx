@@ -28,7 +28,7 @@ interface CommentPopUpDataProps {
 }
 
 export const CommentPopUp = forwardRef<BottomSheetMethods, CommentPopUpProps>(
-  ({ attributes, offset = 260}, ref) => {
+  ({ attributes, offset = 260 }, ref) => {
     const [index, setIndex] = useState<number>(-1);
     return (
       <>
@@ -43,24 +43,23 @@ export const CommentPopUp = forwardRef<BottomSheetMethods, CommentPopUpProps>(
             <CommentPopUpData attributes={attributes} index={index} />
           )}
           {index !== -1 && (
-          <KeyboardAvoidingView
-            behavior="padding"
-            keyboardVerticalOffset={Platform.OS === "ios" ? offset : 0}
-            style={{
-              position: "absolute",
-              bottom: 70,
-              left: 0,
-              right: 0,
-              zIndex: 10,
-            }}
-          >
-            <Box backgroundColor="white" padding="s">
-              <CommentInput postID={attributes.commentId} />
-            </Box>
-          </KeyboardAvoidingView>
-        )}
+            <KeyboardAvoidingView
+              behavior="padding"
+              keyboardVerticalOffset={Platform.OS === "ios" ? offset : 0}
+              style={{
+                position: "absolute",
+                bottom: 70,
+                left: 0,
+                right: 0,
+                zIndex: 10,
+              }}
+            >
+              <Box backgroundColor="white" padding="s">
+                <CommentInput postID={attributes.commentId} />
+              </Box>
+            </KeyboardAvoidingView>
+          )}
         </BottomSheetModal>
-        
       </>
     );
   },
