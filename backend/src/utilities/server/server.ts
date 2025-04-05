@@ -11,10 +11,4 @@ export const handleServerShuttingDown = (notificationService: NotificationServic
     notificationService.unsubscribeSupabaseRealtime();
     process.exit(0);
   });
-
-  process.on("SIGTERM", () => {
-    console.log("SIGTERM received: Shutting down...");
-    notificationService.unsubscribeSupabaseRealtime();
-    process.exit(0);
-  });
 };
