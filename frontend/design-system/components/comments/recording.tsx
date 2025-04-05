@@ -91,6 +91,12 @@ export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
     startRecording();
   }, []);
 
+  useEffect(() => {
+    if(attributes.length >= 30){
+      stopRecording()
+    }
+  }, [attributes.length])
+
   return (
     <Box
       gap="s"
