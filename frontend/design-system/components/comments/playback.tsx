@@ -41,7 +41,8 @@ export const Playback: React.FC<PlaybackProps> = ({
   const [memoLines, setMemoLines] = useState<number[]>([]);
   const numLines = 23;
   const [totalLength, setTotalLength] = useState<number>(0);
-  const { mutateAsync: processAudio } = useProcessAudio();
+  const { mutateAsync: processAudio, isPending: mediaPending  } = useProcessAudio();
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     async function initializeValues() {
@@ -57,8 +58,7 @@ export const Playback: React.FC<PlaybackProps> = ({
         );
         const localUri = downloadResult.uri;
         setUri(localUri);
-        const response = await processAudio({ url: location });
-
+        const response = await processAudio({ url: location })
         if (!response.length || !response.data) return;
 
         setLength(response.length);
@@ -77,6 +77,10 @@ export const Playback: React.FC<PlaybackProps> = ({
         }
       : undefined;
   }, [sound]);
+
+  useEffect(() => {
+    setLoading(mediaPending)
+  }, [mediaPending])
 
   async function playRecording() {
     if (status.pausing) {
@@ -147,7 +151,9 @@ export const Playback: React.FC<PlaybackProps> = ({
             }
             borderRadius="l"
           ></Box>
+          
         ))}
+        {loading && <Text variant="body"> loading ... </Text>}
       </Box>
     </Box>
   );
