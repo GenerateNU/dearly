@@ -15,25 +15,25 @@ import { EmptyFeed } from "@/design-system/components/posts/empty-feed";
 import { PostSkeleton } from "@/design-system/components/posts/post-skeleton";
 import { CommentLikesPopup } from "@/design-system/components/posts/comment-like-popup";
 import { PostWithComment } from "@/design-system/components/posts/post-with-comment";
+import { Mode } from "@/types/mode";
 
 interface FeedProps {
   date?: string;
-  popup?: boolean;
   commentRef?: React.RefObject<BottomSheetMethods>;
   likeRef?: React.RefObject<BottomSheetMethods>;
 }
 
 const Feed: React.FC<FeedProps> = ({
   date,
-  popup = true,
   commentRef = useRef<BottomSheet>(null),
   likeRef = useRef<BottomSheet>(null),
 }) => {
-  const { group } = useUserStore();
+  const { group, mode } = useUserStore();
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage, isLoading, refetch } = useGroupFeed(
     group?.id as string,
     date,
   );
+
 
   useEffect(() => {
     if (date) {
@@ -58,8 +58,12 @@ const Feed: React.FC<FeedProps> = ({
   };
 
   const onClickComment = (id: string, caption: string, likes: number) => {
-    setCommentAttributes({ commentId: id, caption: caption, likes: likes });
-    commentRef.current?.snapToIndex(0);
+    if(mode == Mode.ADVANCED){
+      setCommentAttributes({ commentId: id, caption: caption, likes: likes });
+      commentRef.current?.snapToIndex(0);
+    } else {
+      
+    }
   };
 
   const onClickLikes = useCallback((postId: string) => {
@@ -161,7 +165,7 @@ const Feed: React.FC<FeedProps> = ({
           }
         />
       </Box>
-      {popup && <CommentLikesPopup commentRef={commentRef} likeRef={likeRef} />}
+      {mode == Mode.ADVANCED && <CommentLikesPopup commentRef={commentRef} likeRef={likeRef} />}
     </Box>
   );
 };

@@ -5,7 +5,6 @@ import { API_BASE_URL } from "@/constants/api";
 
 const fetchClient = createFetchClient<paths>({
   baseUrl: API_BASE_URL,
-  // process.env.EXPO_PUBLIC_API_BASE_URL,
 });
 
 const middleware: Middleware = {
