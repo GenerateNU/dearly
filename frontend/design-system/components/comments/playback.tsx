@@ -4,7 +4,7 @@ import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { IconButton } from "../shared/buttons/icon-button";
 import { formatSeconds } from "@/utilities/time";
-import { condenseAudioBarHeights } from "@/utilities/audio";
+import { condenseAudioBarHeights, normalizeLinesWithScale } from "@/utilities/audio";
 import { playbackStates } from "@/types/comment";
 import * as FileSystem from "expo-file-system";
 import { useProcessAudio } from "@/hooks/api/media";
@@ -63,7 +63,7 @@ export const Playback: React.FC<PlaybackProps> = ({
 
         setLength(response.length);
         setTotalLength(response.length);
-        setMemoLines(condenseAudioBarHeights(25, response.data, 91));
+        setMemoLines(normalizeLinesWithScale(response.data));
       }
     }
     initializeValues();
