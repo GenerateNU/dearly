@@ -328,6 +328,7 @@ export class MediaServiceImpl {
             .on("end", () => {
               completedSegments++;
               if (completedSegments === segments) {
+                length = Math.ceil(length)
                 resolve({
                   length: Math.round(length),
                   data: dbData,
