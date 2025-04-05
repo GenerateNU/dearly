@@ -10,7 +10,7 @@ const Layout = () => {
           headerShown: true,
           headerTitle: "",
           headerTransparent: true,
-          gestureEnabled: true,
+          gestureEnabled: false,
           headerLeft: () => <BackIcon onPress={() => router.navigate("/(app)/(tabs)")} />,
         }}
       />

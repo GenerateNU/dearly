@@ -121,7 +121,7 @@ const CommentPopUpData: React.FC<CommentPopUpDataProps> = ({ attributes, index }
           <Box flexDirection="row" gap="xs" alignItems="center">
             <Text variant="bodyBold">{attributes.likes + " likes"}</Text>
             <Box height={4} width={4} backgroundColor="ink" borderRadius="xl" />
-            <Text variant="bodyBold"> {comments.length + " comments"} </Text>
+            <Text variant="bodyBold"> {comments.length + " reactions"} </Text>
           </Box>
           <Box borderRadius="xl" backgroundColor="slate" height={1}></Box>
         </Box>

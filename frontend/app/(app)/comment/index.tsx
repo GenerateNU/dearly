@@ -8,8 +8,9 @@ import { Comment } from "@/types/post";
 import { Text } from "@/design-system/base/text";
 import { FlatList } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useLocalSearchParams } from "expo-router";
 import { useFeedContext } from "@/contexts/feed-post-context";
+import CommentInput from "../home/comment-input";
+import { KeyboardAvoidingView, Platform } from "react-native";
 
 export const CommentPage = () => {
   const { commentAttributes } = useFeedContext();
@@ -44,7 +45,7 @@ export const CommentPage = () => {
   );
   return (
     <SafeAreaView edges={["top"]} className="flex-1">
-      <Box position="relative" paddingHorizontal="m" height={"100%"} width={"100%"}>
+      <Box position="relative" paddingHorizontal="m" height={"100%"} width={"100%"} paddingTop="xl">
         <Text variant="h1" paddingBottom="m">
           Reactions
         </Text>
@@ -62,6 +63,19 @@ export const CommentPage = () => {
           style={{ flex: 1 }}
         />
       </Box>
+      <KeyboardAvoidingView
+              behavior="padding"
+              keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+              style={{
+                position: "absolute",
+                bottom: 25,
+                left: 5,
+                right: 5,
+                zIndex: 10,
+              }}
+            >
+          <CommentInput  postID={commentAttributes.commentId}/>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

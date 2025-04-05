@@ -11,6 +11,7 @@ const Layout = () => {
       <Stack.Screen name="logout" options={{ headerShown: false }} />
       <Stack.Screen name="view-post" options={{ headerShown: false }} />
       <Stack.Screen name="edit-profile" options={{ headerShown: false }} />
+      <Stack.Screen name="comment" options={{ headerShown: false }} />
     </Stack>
   );
 };
