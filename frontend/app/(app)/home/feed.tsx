@@ -68,7 +68,11 @@ const Feed: React.FC<FeedProps> = ({
 
   const onClickLikes = useCallback((postId: string) => {
     setLikePostId(postId);
-    likeRef.current?.snapToIndex(0);
+    if (mode == Mode.ADVANCED) {
+      likeRef.current?.snapToIndex(0);
+    } else {
+      router.push("/(app)/likes");
+    }
   }, []);
 
   const renderFooter = () => {

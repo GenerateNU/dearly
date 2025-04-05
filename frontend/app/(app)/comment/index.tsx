@@ -49,6 +49,7 @@ export const CommentPage = () => {
         <Text variant="h1" paddingBottom="m">
           Reactions
         </Text>
+        <Box borderRadius="xl" backgroundColor="slate" height={1}></Box>
         <FlatList
           data={comments}
           renderItem={renderItem}
