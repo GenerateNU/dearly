@@ -109,7 +109,7 @@ const PostCreationForm = () => {
     <ScrollView>
       <Box
         flex={1}
-        gap="xxl"
+        gap="s"
         padding="m"
         paddingTop="xxl"
         width="100%"

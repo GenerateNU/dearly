@@ -16,7 +16,7 @@ import { formatBirthday } from "@/utilities/birthday";
 
 type UPDATE_USER_FORM_TYPE = z.infer<typeof UPDATE_BIRTHDAY_FORM>;
 
-export default function Layout() {
+const EditBirthday = () => {
   const { userId } = useUserStore();
   const { data, error: userError } = useUser(userId!);
   const birthdayRef = useRef<BottomSheet>(null);
@@ -92,4 +92,6 @@ export default function Layout() {
       />
     </Box>
   );
-}
+};
+
+export default EditBirthday;
