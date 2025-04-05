@@ -112,10 +112,12 @@ const CommentPopUpData: React.FC<CommentPopUpDataProps> = ({ attributes, index }
     return (
       <Box position="relative" paddingHorizontal="m" height={"100%"} width={"100%"}>
         <Box flexDirection="column" gap="s">
-          <Box width="90%" flexDirection="row" gap="s" alignItems="center">
-            <Text>💬</Text>
-            <Text>{attributes.caption}</Text>
-          </Box>
+          {attributes.caption && (
+            <Box width="90%" flexDirection="row" gap="s" alignItems="center">
+              <Text>💬</Text>
+              <Text>{attributes.caption}</Text>
+            </Box>
+          )}
           <Box flexDirection="row" gap="xs" alignItems="center">
             <Text variant="bodyBold">{attributes.likes + " likes"}</Text>
             <Box height={4} width={4} backgroundColor="ink" borderRadius="xl" />
