@@ -10,7 +10,7 @@ import * as FileSystem from "expo-file-system";
 import { useProcessAudio } from "@/hooks/api/media";
 
 interface PlaybackPropsWhenLocal {
-  id: string;
+  id?: string;
   local: true; // is the audio message being stored locally or in s3
   dbLevels: number[];
   audioLength: number;
