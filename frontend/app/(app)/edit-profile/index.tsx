@@ -139,13 +139,13 @@ const PostCreationForm = () => {
             <BaseButton
               variant="text"
               onPress={() => {
-                router.push("/(app)/edit-profile/edit-sections/name");
+                router.push("/(app)/edit-profile/name");
               }}
             >
               <Input
                 title="Name"
                 onPress={() => {
-                  router.push("/(app)/edit-profile/edit-sections/name");
+                  router.push("/(app)/edit-profile/name");
                 }}
                 isButton={true}
                 value={data?.name}
@@ -155,13 +155,13 @@ const PostCreationForm = () => {
             <BaseButton
               variant="text"
               onPress={() => {
-                router.push("/(app)/edit-profile/edit-sections/username");
+                router.push("/(app)/edit-profile/username");
               }}
             >
               <Input
                 title="Username"
                 onPress={() => {
-                  router.push("/(app)/edit-profile/edit-sections/username");
+                  router.push("/(app)/edit-profile/username");
                 }}
                 isButton={true}
                 value={data?.username}
@@ -171,15 +171,16 @@ const PostCreationForm = () => {
             <BaseButton
               variant="text"
               onPress={() => {
-                router.push("/(app)/edit-profile/edit-sections/bio");
+                router.push("/(app)/edit-profile/bio");
               }}
             >
               <Input
                 title="Bio"
                 paragraph={true}
                 onPress={() => {
-                  router.push("/(app)/edit-profile/edit-sections/bio");
+                  router.push("/(app)/edit-profile/bio");
                 }}
+                r
                 isButton={true}
                 value={data?.bio ? data?.bio : undefined}
                 placeholder={data ? data.bio! : "Bio..."}
@@ -188,13 +189,13 @@ const PostCreationForm = () => {
             <BaseButton
               variant="text"
               onPress={() => {
-                router.push("/(app)/edit-profile/edit-sections/birthday");
+                router.push("/(app)/edit-profile/birthday");
               }}
             >
               <Input
                 title="Birthday"
                 onPress={() => {
-                  router.push("/(app)/edit-profile/edit-sections/birthday");
+                  router.push("/(app)/edit-profile/birthday");
                 }}
                 isButton={true}
                 value={data?.birthday ? data?.birthday : undefined}
