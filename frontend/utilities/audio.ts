@@ -82,8 +82,6 @@ export const normalizeLinesWithScale = (
   const newLines: number[] = [];
   for (let i = 0; i < flippedArray.length; i++) {
     let scaledNum = scaleValue(flippedArray[i] || 3, min, max, 0, 25)
-    
-    console.log(scaledNum)
     scaledNum = scaledNum > 3 ? scaledNum : 3;
     newLines.push(scaledNum);
   }

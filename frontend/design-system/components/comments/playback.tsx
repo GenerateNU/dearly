@@ -60,7 +60,6 @@ export const Playback: React.FC<PlaybackProps> = ({
         setUri(localUri);
         const response = await processAudio({ url: location })
         if (!response.length || !response.data) return;
-
         setLength(response.length);
         setTotalLength(response.length);
         setMemoLines(normalizeLinesWithScale(response.data));
