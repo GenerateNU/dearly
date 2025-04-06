@@ -39,7 +39,7 @@ export const feedParamValidate = z
         return date;
       })
       .optional(),
-    tmz: z.string().optional().default('America/New_York'),
+    tmz: z.string().optional().default("America/New_York"),
   })
   .merge(paginationSchema);
 
@@ -69,11 +69,15 @@ export const calendarParamsValidate = z.object({
     }),
 
   direction: z.enum(["before", "after", "both"]).optional().default("before"),
-  tmzOffset: z.string().transform((val) => {
-    const parsed = Number(val);
-    return parsed;
-  }).optional().default("240"),
-  tmz: z.string().optional().default("America/New_York")
+  tmzOffset: z
+    .string()
+    .transform((val) => {
+      const parsed = Number(val);
+      return parsed;
+    })
+    .optional()
+    .default("240"),
+  tmz: z.string().optional().default("America/New_York"),
 });
 
 export const updateGroupValidate = createGroupValidate.partial();

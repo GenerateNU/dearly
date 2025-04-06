@@ -81,8 +81,10 @@ export class GroupTransactionImpl implements GroupTransaction {
       .where(
         and(
           date
-            ? eq(sql`DATE(${postsTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE ${tmz})`, 
-              sql`${date.toISOString().split('T')[0]}::date`)
+            ? eq(
+                sql`DATE(${postsTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE ${tmz})`,
+                sql`${date.toISOString().split("T")[0]}::date`,
+              )
             : undefined,
           eq(postsTable.groupId, groupId),
         ),
@@ -210,14 +212,14 @@ export class GroupTransactionImpl implements GroupTransaction {
     range,
     direction,
     tmzOffset,
-    tmz
+    tmz,
   }: CalendarParamPayload): Promise<ThumbnailResponse[]> {
     await this.checkMembership(groupId, userId);
 
     const pivotDate = new Date(pivot);
 
     // add offset
-    const dateWOffset = new Date(pivotDate.getTime() + (tmzOffset * 60 * 1000))
+    const dateWOffset = new Date(pivotDate.getTime() + tmzOffset * 60 * 1000);
 
     let startDate, endDate;
 
@@ -251,7 +253,9 @@ export class GroupTransactionImpl implements GroupTransaction {
     // subquery to get all groups of posts that are grouped into date and sorted by likes
     const rankedPosts = this.db
       .select({
-        createdAt: sql`${postsTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE ${tmz}`.as("createdAt"),
+        createdAt: sql`${postsTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE ${tmz}`.as(
+          "createdAt",
+        ),
         objectKey: mediaTable.objectKey,
         likes: sql<number>`COUNT(${likesTable.id}) AS likeCount`,
         rowNum:
@@ -272,7 +276,11 @@ export class GroupTransactionImpl implements GroupTransaction {
           eq(postsTable.groupId, groupId),
         ),
       )
-      .groupBy(sql`DATE(${postsTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE ${tmz})`, postsTable.id, mediaTable.objectKey)
+      .groupBy(
+        sql`DATE(${postsTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE ${tmz})`,
+        postsTable.id,
+        mediaTable.objectKey,
+      )
       .as("rankedPosts");
 
     const orderDirection = direction === "after" ? "ASC" : "DESC";

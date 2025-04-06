@@ -1,6 +1,6 @@
 import fetchClient from "./client";
 import { authWrapper, getHeaders } from "@/utilities/auth-token";
-import { getCalendars } from 'expo-localization';
+import { getCalendars } from "expo-localization";
 import {
   CreateGroupPayload,
   Group,
@@ -73,7 +73,7 @@ export const getGroupCalendar = async (
 ): Promise<GroupCalendar> => {
   const req = async (token: string): Promise<GroupCalendar> => {
     const tmzOffset = new Date().getTimezoneOffset();
-    const calendar = getCalendars()[0]
+    const calendar = getCalendars()[0];
     const tmz = calendar ? calendar.timeZone : "America/New_York";
     const { data } = await fetchClient.GET("/api/v1/groups/{id}/calendar", {
       headers: getHeaders(token),
@@ -86,7 +86,7 @@ export const getGroupCalendar = async (
           range,
           direction,
           tmzOffset,
-          tmz
+          tmz,
         },
       },
     });
