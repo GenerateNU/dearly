@@ -86,9 +86,7 @@ export class ExpoNotificationService implements NotificationService {
 
     const insertedNotification = await this.transaction.insertNotifications(notifications);
 
-    if (insertedNotification.length == notifications.length) {
-      await this.expoService.sendPushNotifications({ deviceTokens, message, data: post });
-    }
+    await this.expoService.sendPushNotifications({ deviceTokens, message, data: post });
 
     return insertedNotification;
   }
@@ -102,7 +100,7 @@ export class ExpoNotificationService implements NotificationService {
 
     const message = this.formatMessage(username, groupName, NotificationType.COMMENT);
 
-    const notifications: Notification[] = [
+    const notification: Notification[] = [
       {
         actorId: comment.userId,
         receiverId: userId,
@@ -117,16 +115,13 @@ export class ExpoNotificationService implements NotificationService {
       },
     ];
 
-    const insertedNotification = await this.transaction.insertNotifications(notifications);
+    const insertedNotification = await this.transaction.insertNotifications(notification);
 
-    // Early return only if there are conflicts (This does not account for if some notifications are accounted for.)
     if (isEnabled === false) {
       return insertedNotification;
     }
 
-    if (insertedNotification.length == notifications.length) {
-      await this.expoService.sendPushNotifications({ deviceTokens, message, data: comment });
-    }
+    await this.expoService.sendPushNotifications({ deviceTokens, message, data: comment });
 
     return insertedNotification;
   }
@@ -140,7 +135,7 @@ export class ExpoNotificationService implements NotificationService {
 
     const message = this.formatMessage(username, groupName, NotificationType.LIKE);
 
-    const notifications: Notification[] = [
+    const notification: Notification[] = [
       {
         actorId: like.userId,
         receiverId: userId,
@@ -154,15 +149,13 @@ export class ExpoNotificationService implements NotificationService {
       },
     ];
 
-    const insertedNotification = await this.transaction.insertNotifications(notifications);
+    const insertedNotification = await this.transaction.insertNotifications(notification);
 
     if (isEnabled === false) {
       return insertedNotification;
     }
 
-    if (insertedNotification.length == notifications.length) {
-      await this.expoService.sendPushNotifications({ deviceTokens, message, data: like });
-    }
+    await this.expoService.sendPushNotifications({ deviceTokens, message, data: like });
 
     return insertedNotification;
   }

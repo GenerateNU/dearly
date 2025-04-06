@@ -125,10 +125,6 @@ export class NotificationTransactionImpl implements NotificationTransaction {
   }
 
   async insertNotifications(notifications: Notification[]): Promise<Notification[]> {
-    return await this.db
-      .insert(notificationsTable)
-      .values(notifications)
-      .onConflictDoNothing()
-      .returning();
+    return await this.db.insert(notificationsTable).values(notifications).returning();
   }
 }

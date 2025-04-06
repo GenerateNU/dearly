@@ -103,10 +103,20 @@ describe("Notification server test", () => {
     await notifService.notifyPost(FULL_SNAPPER_POST_EXAMPLE);
 
     // assert that there are 3 new notifications inserted into notification table
-    await assertNotificationLength(FULL_SNAPPER_POST_EXAMPLE.userId, 1);
+    await assertNotificationLength(FULL_SNAPPER_POST_EXAMPLE.userId, 3);
 
     // Stone did not receive notification since he's the poster
-    await sendPushNotificationCalled(0);
+    const tokens = [MAI_DEVICE_TOKEN, NUBS_DEVICE_TOKEN, JOSH_DEVICE_TOKEN];
+    await sendPushNotificationCalled(
+      1,
+      tokens.map((token) => ({
+        to: token,
+        title: "✨ You got a new notification ✨",
+        body: "theRock just made a new post in eng snapper!",
+        data: FULL_SNAPPER_POST_EXAMPLE,
+        sound: "default",
+      })),
+    );
   });
 
   it("should query the database correctly for post for large group", async () => {
@@ -139,9 +149,21 @@ describe("Notification server test", () => {
 
     await notifService.notifyPost(FULL_SNAPPER_POST_EXAMPLE);
 
-    await assertNotificationLength(FULL_SNAPPER_POST_EXAMPLE.userId, 1);
+    await assertNotificationLength(FULL_SNAPPER_POST_EXAMPLE.userId, 3);
 
-    await sendPushNotificationCalled(0);
+    // only send notification to Nubs and Josh without Mai
+    const tokens = [NUBS_DEVICE_TOKEN, JOSH_DEVICE_TOKEN];
+
+    await sendPushNotificationCalled(
+      1,
+      tokens.map((token) => ({
+        to: token,
+        title: "✨ You got a new notification ✨",
+        body: "theRock just made a new post in eng snapper!",
+        data: FULL_SNAPPER_POST_EXAMPLE,
+        sound: "default",
+      })),
+    );
   });
 
   it("notifyLike: should insert and notify - like another user post", async () => {
