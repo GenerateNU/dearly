@@ -8,6 +8,7 @@ import { audioBarHeights, condenseAudioBarHeights } from "@/utilities/audio";
 import { Playback } from "./playback";
 import { recordingAttributes, recordingStatus } from "@/types/comment";
 import { Icon } from "../shared/icons/icon";
+import { useIsBasicMode } from "@/hooks/component/mode";
 
 interface RecordingProps {
   onClose: () => void;
@@ -17,6 +18,7 @@ interface RecordingProps {
 export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
   const numLines = 36;
   const [status, setStatus] = useState<recordingStatus>({ recording: true, done: false });
+  const isBasic = useIsBasicMode();
   const [attributes, setAttributes] = useState<recordingAttributes>({
     recording: null,
     audioLevels: [],
@@ -108,11 +110,12 @@ export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
     >
       {status.done && (
         <Box>
-          <IconButton variant="iconGray" onPress={onClose} icon="close" size={30} />
+          <IconButton variant="iconGray" onPress={onClose} icon="close" size={isBasic ? 20 : 30}/>
+          {isBasic && <Text variant="body"> CLEAR </Text>}
         </Box>
       )}
       {status.done ? (
-        <Box width="65%">
+        <Box width="65%" paddingBottom={isBasic ? "s" : undefined}>
           <Playback
             local
             dbLevels={attributes.audioLevels}
@@ -132,6 +135,7 @@ export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
           borderRadius="l"
           flexDirection="row"
           alignContent="center"
+          marginBottom={isBasic ? "s" : undefined}
         >
           <Box flexDirection="row" gap="xs" alignItems="center" paddingLeft="s">
             <Text variant="bodyLarge">{formatSeconds(attributes.length)}</Text>
@@ -154,6 +158,7 @@ export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
       )}
 
       {status.done ? (
+        <Box>
         <IconButton
           variant="icon"
           onPress={() => {
@@ -161,16 +166,21 @@ export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
             onSend(attributes.uri);
           }}
           icon="send"
-          size={30}
+          size={isBasic ? 20 : 30}
         />
+        {isBasic && <Text variant="body"> SEND </Text>}
+        </Box>
       ) : (
-        <IconButton
-          variant="icon"
-          onPress={stopRecording}
-          icon="square-rounded"
-          size={30}
-          disabled={sending ? true : false}
-        />
+        <Box>
+          <IconButton
+            variant="icon"
+            onPress={stopRecording}
+            icon="square-rounded"
+            size={isBasic ? 20 : 30}
+            disabled={sending ? true : false}
+          />
+          {isBasic && <Text variant="body"> STOP </Text>}
+        </Box>
       )}
     </Box>
   );

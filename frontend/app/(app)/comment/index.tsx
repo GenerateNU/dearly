@@ -70,12 +70,14 @@ export const CommentPage = () => {
         style={{
           position: "absolute",
           bottom: 25,
-          left: 5,
-          right: 5,
+          left: 0,
+          right: 0,
           zIndex: 10,
         }}
       >
-        <CommentInput postID={commentAttributes.commentId} />
+        <Box padding="s">
+          <CommentInput postID={commentAttributes.commentId} />
+        </Box>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
