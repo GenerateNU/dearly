@@ -2,6 +2,8 @@ import { NotificationConfig } from "./../../types/api/internal/notification";
 import { getConfigurations } from "../../config/init";
 import { connectDB } from "../../database/connect";
 import {
+  ADRIENNE_COMMENTS_BUCKPOST,
+  COMMENTS,
   FULL_SNAPPER_POST_EXAMPLE,
   GROUP_FULL_SNAPPER_ID,
   JOSH_COMMENT_POST,
@@ -17,9 +19,9 @@ import {
   USER_MAI_ID,
   USER_Nubs_ID,
 } from "./../helpers/test-constants";
-import { eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { describe, expect, it, beforeAll, beforeEach } from "bun:test";
-import { notificationsTable } from "../../entities/schema";
+import { commentsTable, notificationsTable } from "../../entities/schema";
 import { resetDB } from "../../database/reset";
 import { seedDatabase } from "../helpers/seed-db";
 import {
@@ -103,10 +105,19 @@ describe("Notification server test", () => {
     await notifService.notifyPost(FULL_SNAPPER_POST_EXAMPLE);
 
     // assert that there are 3 new notifications inserted into notification table
-    await assertNotificationLength(FULL_SNAPPER_POST_EXAMPLE.userId, 1);
-
+    await assertNotificationLength(FULL_SNAPPER_POST_EXAMPLE.userId, 3);
+    const tokens = [MAI_DEVICE_TOKEN, NUBS_DEVICE_TOKEN, JOSH_DEVICE_TOKEN];
     // Stone did not receive notification since he's the poster
-    await sendPushNotificationCalled(0);
+    await sendPushNotificationCalled(
+      1,
+      tokens.map((token) => ({
+        to: token,
+        title: "✨ You got a new notification ✨",
+        body: "theRock just made a new post in eng snapper!",
+        data: FULL_SNAPPER_POST_EXAMPLE,
+        sound: "default",
+      })),
+    );
   });
 
   it("should query the database correctly for post for large group", async () => {
@@ -139,9 +150,20 @@ describe("Notification server test", () => {
 
     await notifService.notifyPost(FULL_SNAPPER_POST_EXAMPLE);
 
-    await assertNotificationLength(FULL_SNAPPER_POST_EXAMPLE.userId, 1);
+    await assertNotificationLength(FULL_SNAPPER_POST_EXAMPLE.userId, 3);
 
-    await sendPushNotificationCalled(0);
+    // only send notification to Nubs and Josh without Mai
+    const tokens = [NUBS_DEVICE_TOKEN, JOSH_DEVICE_TOKEN];
+    await sendPushNotificationCalled(
+      1,
+      tokens.map((token) => ({
+        to: token,
+        title: "✨ You got a new notification ✨",
+        body: "theRock just made a new post in eng snapper!",
+        data: FULL_SNAPPER_POST_EXAMPLE,
+        sound: "default",
+      })),
+    );
   });
 
   it("notifyLike: should insert and notify - like another user post", async () => {
@@ -297,6 +319,16 @@ describe("Notification server test", () => {
 
     // but not push notification is sent
     await sendPushNotificationCalled(0);
+  });
+
+  it("Test to prevent duplicate notifications going out", async () => {
+    //Arrange: Invariant to maintain: Somebody has already commented on a post.
+    const currentCommentSize = await db.select({ count: count() }).from(commentsTable);
+    expect(currentCommentSize[0]?.count).toBe(3);
+    console.log(await db.select().from(commentsTable));
+    // await notifService.notifyComment(ADRIENNE_COMMENTS_BUCKPOST);
+    // currentCommentSize = await db.select({ count: count() }).from(commentsTable);
+    // expect(currentCommentSize[0]?.count).toBe(4);
   });
 
   // helpers to improve test readability
