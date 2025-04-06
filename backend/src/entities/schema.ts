@@ -179,6 +179,7 @@ export const notificationsTable = pgTable(
     return [
       uniqueIndex("post_like_idx").on(table.postId, table.likeId),
       uniqueIndex("post_comment_idx").on(table.postId, table.commentId),
+      uniqueIndex("post_idx").on(table.postId, table.actorId),
     ];
   },
 );
