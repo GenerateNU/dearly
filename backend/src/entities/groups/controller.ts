@@ -53,9 +53,10 @@ export class GroupControllerImpl implements GroupController {
 
   async getCalendar(ctx: Context): Promise<GroupCalendarResponse> {
     const getCalendarImpl = async () => {
-      const { pivot, range } = ctx.req.query();
+      const { pivot, range, tmzOffset } = ctx.req.query();
       const groupId = parseUUID(ctx.req.param("id"));
-      const parsedParams = calendarParamsValidate.parse({ pivot, range });
+      const parsedParams = calendarParamsValidate.parse({ pivot, range, tmzOffset });
+
       const calendar = await this.groupService.getCalendar({
         ...parsedParams,
         userId: ctx.get("userId"),

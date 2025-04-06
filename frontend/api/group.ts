@@ -71,6 +71,7 @@ export const getGroupCalendar = async (
   direction: "before" | "after" | "both" = "before",
 ): Promise<GroupCalendar> => {
   const req = async (token: string): Promise<GroupCalendar> => {
+    const tmzOffset = new Date().getTimezoneOffset()
     const { data } = await fetchClient.GET("/api/v1/groups/{id}/calendar", {
       headers: getHeaders(token),
       params: {
@@ -81,6 +82,7 @@ export const getGroupCalendar = async (
           pivot,
           range,
           direction,
+          tmzOffset
         },
       },
     });

@@ -2772,6 +2772,13 @@ paths:
             type: string
             enum: [before, after, both]
             default: before
+        - name: tmzOffset
+          in: query
+          description: The number of minutes between UTC and the timezone of the device.
+          required: false
+          schema:
+            type: integer
+            default: 240
         - name: id
           in: path
           description: ID of the group a post is made in

@@ -29,7 +29,15 @@ export const feedParamValidate = z
       .refine(validateYearMonth, {
         message: "Invalid date. Please follow the format YYYY-MM-DD.",
       })
-      .transform((val) => new Date(val))
+      .transform((val) => {
+        if (!val) {
+          return new Date();
+        }
+        const [year, month, day] = val.split("-").map(Number);
+
+        const date = new Date(Date.UTC(year!, month! - 1, day!));
+        return date;
+      })
       .optional(),
   })
   .merge(paginationSchema);
@@ -56,10 +64,14 @@ export const calendarParamsValidate = z.object({
     .optional()
     .default(() => {
       const now = new Date();
-      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+      return `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
     }),
 
   direction: z.enum(["before", "after", "both"]).optional().default("before"),
+  tmzOffset: z.string().transform((val) => {
+    const parsed = Number(val);
+    return parsed;
+  }).optional().default("240")
 });
 
 export const updateGroupValidate = createGroupValidate.partial();
