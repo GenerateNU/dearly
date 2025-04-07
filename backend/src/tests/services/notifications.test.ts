@@ -2,8 +2,6 @@ import { NotificationConfig } from "./../../types/api/internal/notification";
 import { getConfigurations } from "../../config/init";
 import { connectDB } from "../../database/connect";
 import {
-  ADRIENNE_COMMENTS_BUCKPOST,
-  COMMENTS,
   FULL_SNAPPER_POST_EXAMPLE,
   GROUP_FULL_SNAPPER_ID,
   JOSH_COMMENT_POST,
@@ -19,9 +17,9 @@ import {
   USER_MAI_ID,
   USER_Nubs_ID,
 } from "./../helpers/test-constants";
-import { count, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { describe, expect, it, beforeAll, beforeEach } from "bun:test";
-import { commentsTable, notificationsTable } from "../../entities/schema";
+import { notificationsTable } from "../../entities/schema";
 import { resetDB } from "../../database/reset";
 import { seedDatabase } from "../helpers/seed-db";
 import {
@@ -319,16 +317,6 @@ describe("Notification server test", () => {
 
     // but not push notification is sent
     await sendPushNotificationCalled(0);
-  });
-
-  it("Test to prevent duplicate notifications going out", async () => {
-    //Arrange: Invariant to maintain: Somebody has already commented on a post.
-    const currentCommentSize = await db.select({ count: count() }).from(commentsTable);
-    expect(currentCommentSize[0]?.count).toBe(3);
-    console.log(await db.select().from(commentsTable));
-    // await notifService.notifyComment(ADRIENNE_COMMENTS_BUCKPOST);
-    // currentCommentSize = await db.select({ count: count() }).from(commentsTable);
-    // expect(currentCommentSize[0]?.count).toBe(4);
   });
 
   // helpers to improve test readability

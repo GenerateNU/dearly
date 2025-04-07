@@ -176,8 +176,7 @@ export const notificationsTable = pgTable(
     description: varchar({ length: NOTIFICATION_BODY_MAX_LIMIT }).notNull(),
   },
   (table) => {
-    return [
-    ];
+    return [uniqueIndex("post_idx").on(table.postId, table.receiverId)];
   },
 );
 
