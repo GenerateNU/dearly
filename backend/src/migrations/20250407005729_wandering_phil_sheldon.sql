@@ -1,2 +1,0 @@
-CREATE UNIQUE INDEX "comment_idx" ON "notifications" USING btree ("commentId","receiverId");--> statement-breakpoint
-CREATE UNIQUE INDEX "like_idx" ON "notifications" USING btree ("likeId","receiverId");
