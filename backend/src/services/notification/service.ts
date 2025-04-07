@@ -64,7 +64,6 @@ export class ExpoNotificationService implements NotificationService {
 
   async notifyPost(post: Post): Promise<Notification[]> {
     const data = await this.transaction.getPostMetadata(post);
-    console.log(data)
 
     if (!data) return [];
 
@@ -84,8 +83,6 @@ export class ExpoNotificationService implements NotificationService {
       description: message,
       createdAt: new Date(),
     }));
-
-    console.log(JSON.stringify(notifications))
 
     const insertedNotification = await this.transaction.insertNotifications(notifications);
 

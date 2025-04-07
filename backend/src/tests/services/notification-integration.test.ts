@@ -144,5 +144,10 @@ describe("Notification server test", () => {
     await notificationService.notifyPost(post);
     [countNotifications] = await db.select({ count: count() }).from(notificationsTable);
     expect(countNotifications!.count).toBe(2);
+    await notificationService.notifyPost(post);
+    await notificationService.notifyPost(post);
+    await notificationService.notifyPost(post);
+    await notificationService.notifyPost(post);
+    expect(countNotifications!.count).toBe(2);
   });
 });
