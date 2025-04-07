@@ -247,6 +247,14 @@ const Calendar: React.FC = () => {
     return yearsList.findIndex((year) => year === selectedYear);
   }, [yearsList, selectedYear]);
 
+  const calendarRef = useRef(null);
+
+  useEffect(() => {
+    setTimeout(() => {
+      calendarRef.current?.scrollToDay?.(currentDate, 0, false);
+    }, 0);
+  }, [currentDate]);
+
   if (viewMode === "year") {
     return (
       <Box flex={1} paddingHorizontal="m">
@@ -324,14 +332,6 @@ const Calendar: React.FC = () => {
       </Box>
     );
   }
-
-  const calendarRef = useRef(null);
-
-  useEffect(() => {
-    setTimeout(() => {
-      calendarRef.current?.scrollToDay?.(currentDate, 0, false);
-    }, 0);
-  }, [currentDate]);
 
   return (
     <Box paddingBottom="xl" marginBottom="xl">
