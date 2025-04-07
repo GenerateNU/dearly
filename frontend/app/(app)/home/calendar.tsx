@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback, memo, useMemo } from "react";
+import { useState, useRef, useEffect, useCallback, memo, useMemo } from "react";
 import { useUserStore } from "@/auth/store";
 import { Box } from "@/design-system/base/box";
 import { useGroupCalendar } from "@/hooks/api/group";
@@ -325,6 +325,14 @@ const Calendar: React.FC = () => {
     );
   }
 
+  const calendarRef = useRef(null);
+
+  useEffect(() => {
+    setTimeout(() => {
+      calendarRef.current?.scrollToDay?.(currentDate, 0, false);
+    }, 0);
+  }, [currentDate]);
+
   return (
     <Box paddingBottom="xl" marginBottom="xl">
       {isLoading && calendarData?.length === 0 ? (
@@ -333,6 +341,7 @@ const Calendar: React.FC = () => {
         <>
           {isFetchingFuture && <LoadingComponent />}
           <CalendarList
+            ref={calendarRef}
             pastScrollRange={50}
             futureScrollRange={getFutureScrollRange()}
             maxDate={getMaxDate()}
