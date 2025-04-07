@@ -42,8 +42,7 @@ const convertToDate = (val: string) => {
   }
   const [year, month] = val.split("-").map(Number);
   // `0` day gives the last day of the current month
-  const date = new Date(year!, month!, 0);
-  date.setHours(23, 59, 59, 999);
+  const date = new Date(Date.UTC(year!, month!, 0, 23, 59, 59, 999));
   return date;
 };
 

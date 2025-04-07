@@ -63,6 +63,7 @@ export class GroupTransactionImpl implements GroupTransaction {
     limit,
     page,
     date,
+    tmz,
     groupId,
   }: FeedParamPayload): Promise<PostWithMedia[]> {
     await this.checkMembership(groupId, userId);
@@ -80,7 +81,10 @@ export class GroupTransactionImpl implements GroupTransaction {
       .where(
         and(
           date
-            ? eq(sql`DATE(${postsTable.createdAt})`, sql`DATE(${date.toISOString()})`)
+            ? eq(
+                sql`DATE(${postsTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE ${tmz})`,
+                sql`${date.toISOString().split("T")[0]}::date`,
+              )
             : undefined,
           eq(postsTable.groupId, groupId),
         ),
@@ -207,30 +211,35 @@ export class GroupTransactionImpl implements GroupTransaction {
     groupId,
     range,
     direction,
+    tmzOffset,
+    tmz,
   }: CalendarParamPayload): Promise<ThumbnailResponse[]> {
     await this.checkMembership(groupId, userId);
 
     const pivotDate = new Date(pivot);
 
+    // add offset
+    const dateWOffset = new Date(pivotDate.getTime() + tmzOffset * 60 * 1000);
+
     let startDate, endDate;
 
     switch (direction) {
       case "before":
-        startDate = new Date(pivotDate);
+        startDate = new Date(dateWOffset);
         startDate.setMonth(startDate.getMonth() - range);
-        endDate = pivotDate;
+        endDate = dateWOffset;
         break;
 
       case "after":
-        startDate = pivotDate;
-        endDate = new Date(pivotDate);
+        startDate = dateWOffset;
+        endDate = new Date(dateWOffset);
         endDate.setMonth(endDate.getMonth() + range);
         break;
 
       case "both":
-        startDate = new Date(pivotDate);
+        startDate = new Date(dateWOffset);
         startDate.setMonth(startDate.getMonth() - Math.floor(range / 2));
-        endDate = new Date(pivotDate);
+        endDate = new Date(dateWOffset);
         endDate.setMonth(endDate.getMonth() + Math.ceil(range / 2));
         break;
     }
@@ -244,11 +253,13 @@ export class GroupTransactionImpl implements GroupTransaction {
     // subquery to get all groups of posts that are grouped into date and sorted by likes
     const rankedPosts = this.db
       .select({
-        createdAt: postsTable.createdAt,
+        createdAt: sql`${postsTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE ${tmz}`.as(
+          "createdAt",
+        ),
         objectKey: mediaTable.objectKey,
         likes: sql<number>`COUNT(${likesTable.id}) AS likeCount`,
         rowNum:
-          sql<number>`ROW_NUMBER() OVER (PARTITION BY DATE(${postsTable.createdAt}) ORDER BY COUNT(${likesTable.id}) DESC)`.as(
+          sql<number>`ROW_NUMBER() OVER (PARTITION BY DATE(${postsTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE ${tmz}) ORDER BY COUNT(${likesTable.id}) DESC)`.as(
             "rowNum",
           ),
       })
@@ -265,7 +276,11 @@ export class GroupTransactionImpl implements GroupTransaction {
           eq(postsTable.groupId, groupId),
         ),
       )
-      .groupBy(sql`DATE(${postsTable.createdAt})`, postsTable.id, mediaTable.objectKey)
+      .groupBy(
+        sql`DATE(${postsTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE ${tmz})`,
+        postsTable.id,
+        mediaTable.objectKey,
+      )
       .as("rankedPosts");
 
     const orderDirection = direction === "after" ? "ASC" : "DESC";
