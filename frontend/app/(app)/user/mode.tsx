@@ -17,7 +17,7 @@ const SwitchMode = () => {
     const modeToSwitch = isBasic ? Mode.ADVANCED : Mode.BASIC;
     await mutateAsync({ mode: modeToSwitch });
     setMode(modeToSwitch);
-    router.navigate("/(app)/(tabs)")
+    router.navigate("/(app)/(tabs)");
   };
 
   const message = isBasic

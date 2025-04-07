@@ -11,6 +11,7 @@ import ResourceView from "@/design-system/components/utilities/resource-view";
 import { Post } from "@/types/post";
 import ErrorDisplay from "@/design-system/components/shared/states/error";
 import { Keyboard, StyleSheet, View } from "react-native";
+import { useIsBasicMode } from "@/hooks/component/mode";
 
 const ViewPost = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -24,18 +25,48 @@ const ViewPost = () => {
   const [isCommentOpen, setIsCommentOpen] = useState(false);
   const [isLikeOpen, setIsLikeOpen] = useState(false);
 
+  const isBasic = useIsBasicMode();
+
   const onClickLikes = useCallback(
     (postId: string) => {
+      if (!postId) return;
+
       setLikePostId(postId);
-      router.push("/(app)/likes");
+
+      if (isBasic) {
+        router.push("/(app)/likes");
+      } else {
+        setIsLikeOpen(true);
+
+        Keyboard.dismiss();
+
+        setTimeout(() => {
+          likeRef.current?.snapToIndex(0);
+        }, 100);
+      }
     },
     [setLikePostId],
   );
 
   const onClickComment = useCallback(
     (id: string, caption: string, likes: number) => {
+      if (!id) return;
+
       setCommentAttributes({ commentId: id, caption: caption, likes: likes });
-      router.push("/(app)/comment");
+
+      if (isBasic) {
+        router.push("/(app)/comment");
+      } else {
+        setIsCommentOpen(true);
+
+        // Make sure keyboard is dismissed before opening sheet
+        Keyboard.dismiss();
+
+        // Slight delay to ensure keyboard is fully dismissed
+        setTimeout(() => {
+          commentRef.current?.snapToIndex(0);
+        }, 100);
+      }
     },
     [setCommentAttributes],
   );
@@ -81,6 +112,10 @@ const ViewPost = () => {
           errorComponent={<ErrorDisplay refresh={refetch} />}
         />
       </Box>
+
+      <View style={styles.popupContainer} pointerEvents="box-none">
+        <CommentLikesPopup offset={180} commentRef={commentRef} likeRef={likeRef}  bottomPadding={20} snapPoints={["80%"]}/>
+      </View>
     </View>
   );
 };

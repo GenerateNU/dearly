@@ -70,11 +70,11 @@ export const Playback: React.FC<PlaybackProps> = ({
 
   useEffect(() => {
     return () => {
-          FileSystem.deleteAsync(uri, { idempotent: true }).catch();
-          if(sound){
-            sound.unloadAsync();
-          }
-        }
+      FileSystem.deleteAsync(uri, { idempotent: true }).catch();
+      if (sound) {
+        sound.unloadAsync();
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -84,8 +84,6 @@ export const Playback: React.FC<PlaybackProps> = ({
         }
       : undefined;
   }, [sound]);
-
-  
 
   useEffect(() => {
     setLoading(mediaPending);

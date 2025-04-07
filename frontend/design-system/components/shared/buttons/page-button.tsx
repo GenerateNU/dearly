@@ -24,12 +24,13 @@ export const PageButton: React.FC<PageButtonProps> = ({
 }) => {
   return (
     <Box height={70} flexDirection="row" paddingHorizontal="s">
-      <TouchableOpacity style={{flexDirection:"row", alignItems:"center", width:"100%"}} onPress={onPress}>
-        <Text variant={textVariant}>
-          {label}
-        </Text>
+      <TouchableOpacity
+        style={{ flexDirection: "row", alignItems: "center", width: "100%" }}
+        onPress={onPress}
+      >
+        <Text variant={textVariant}>{label}</Text>
         <Box position="absolute" right={5}>
-            <Icon name="chevron-right"></Icon>
+          <Icon name="chevron-right"></Icon>
         </Box>
       </TouchableOpacity>
     </Box>

@@ -20,6 +20,8 @@ import { EmptyCommentDisplay } from "./empty-comments";
 interface CommentPopUpProps {
   attributes: commentPopUpAttributes;
   offset?: number;
+  snapPoints?: string[]
+  bottomPadding?: number
 }
 
 interface CommentPopUpDataProps {
@@ -28,13 +30,13 @@ interface CommentPopUpDataProps {
 }
 
 export const CommentPopUp = forwardRef<BottomSheetMethods, CommentPopUpProps>(
-  ({ attributes, offset = 260 }, ref) => {
+  ({ attributes, offset = 260 , snapPoints = ["90%"], bottomPadding = 70}, ref) => {
     const [index, setIndex] = useState<number>(-1);
     return (
       <>
         <BottomSheetModal
           ref={ref}
-          snapPoints={["90%"]}
+          snapPoints={snapPoints}
           onChange={(index: number) => setIndex(index)}
         >
           {attributes.commentId === "" ? (
@@ -48,7 +50,7 @@ export const CommentPopUp = forwardRef<BottomSheetMethods, CommentPopUpProps>(
               keyboardVerticalOffset={Platform.OS === "ios" ? offset : 0}
               style={{
                 position: "absolute",
-                bottom: 70,
+                bottom: bottomPadding,
                 left: 0,
                 right: 0,
                 zIndex: 10,
