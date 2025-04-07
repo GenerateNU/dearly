@@ -14,8 +14,10 @@ import { ExpoPushService } from "../../services/notification/expo";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { count, eq } from "drizzle-orm";
 import {
+  commentsTable,
   devicesTable,
   groupsTable,
+  likesTable,
   membersTable,
   notificationsTable,
   postsTable,
@@ -80,16 +82,25 @@ describe("Notification server test", () => {
         userId: USER_ALICE_ID,
         groupId: DEARLY_GROUP_ID,
         role: "MANAGER",
+        commentNotificationEnabled: true,
+        likeNotificationEnabled: true,
+        postNotificationEnabled: true,
       },
       {
         userId: USER_STONE_ID,
         groupId: DEARLY_GROUP_ID,
         role: "MEMBER",
+        commentNotificationEnabled: true,
+        likeNotificationEnabled: true,
+        postNotificationEnabled: true,
       },
       {
         userId: USER_MAI_ID,
         groupId: DEARLY_GROUP_ID,
         role: "MEMBER",
+        commentNotificationEnabled: true,
+        likeNotificationEnabled: true,
+        postNotificationEnabled: true,
       },
     ];
     await db.insert(membersTable).values(members);
@@ -161,9 +172,10 @@ describe("Notification server test", () => {
       content: "Look at da fishes!",
       voiceMemo: null,
     };
+    await db.insert(commentsTable).values(comment);
     await notificationService.notifyComment(comment);
     [countNotifications] = await db.select({ count: count() }).from(notificationsTable);
-    expect(countNotifications!.count).toBe(4);
+    expect(countNotifications!.count).toBe(3);
 
     const like: Like = {
       id: DEARLY_COMMENT_ID,
@@ -171,9 +183,10 @@ describe("Notification server test", () => {
       createdAt: new Date(),
       postId: POST_ID,
     };
+    await db.insert(likesTable).values(like);
     await notificationService.notifyLike(like);
     [countNotifications] = await db.select({ count: count() }).from(notificationsTable);
     // Only the owner should be alerted of their like so only 1 extra notification is added.
-    expect(countNotifications!.count).toBe(5);
+    expect(countNotifications!.count).toBe(4);
   });
 });

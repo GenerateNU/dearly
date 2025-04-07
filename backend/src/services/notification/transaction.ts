@@ -24,6 +24,9 @@ export interface NotificationTransaction {
   getPostMetadata(post: Post): Promise<PostNotificationMetadata | null>;
   getLikeMetadata(like: Like): Promise<LikeCommentNotificationMetadata | null>;
   getCommentMetadata(comment: Comment): Promise<LikeCommentNotificationMetadata | null>;
+  checkPost(post: Post): Promise<boolean>;
+  checkLike(like: Like): Promise<boolean>;
+  checkComment(comment: Comment): Promise<boolean>;
   insertNotifications(notifications: Notification[]): Promise<Notification[]>;
 }
 
@@ -32,6 +35,29 @@ export class NotificationTransactionImpl implements NotificationTransaction {
 
   constructor(db: PostgresJsDatabase) {
     this.db = db;
+  }
+  async checkPost(post: Post): Promise<boolean> {
+    const [tx] = await this.db
+      .select({ postId: notificationsTable.postId })
+      .from(notificationsTable)
+      .where(eq(notificationsTable.postId, post.id));
+    return tx && tx.postId ? true : false;
+  }
+
+  async checkLike(like: Like): Promise<boolean> {
+    const [tx] = await this.db
+      .select({ likeId: notificationsTable.likeId })
+      .from(notificationsTable)
+      .where(eq(notificationsTable.likeId, like.id));
+    return tx && tx.likeId ? true : false;
+  }
+
+  async checkComment(comment: Comment): Promise<boolean> {
+    const [tx] = await this.db
+      .select({ commentId: notificationsTable.commentId })
+      .from(notificationsTable)
+      .where(eq(notificationsTable.commentId, comment.id));
+    return tx && tx.commentId ? true : false;
   }
 
   async getPostMetadata(post: Post): Promise<PostNotificationMetadata | null> {

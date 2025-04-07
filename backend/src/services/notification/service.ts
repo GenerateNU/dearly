@@ -84,6 +84,10 @@ export class ExpoNotificationService implements NotificationService {
       createdAt: new Date(),
     }));
 
+    if (await this.transaction.checkPost(post)) {
+      return notifications;
+    }
+
     const insertedNotification = await this.transaction.insertNotifications(notifications);
 
     if (insertedNotification.length == notifications.length) {
@@ -116,6 +120,10 @@ export class ExpoNotificationService implements NotificationService {
         createdAt: new Date(),
       },
     ];
+
+    if (await this.transaction.checkComment(comment)) {
+      return notifications;
+    }
 
     const insertedNotification = await this.transaction.insertNotifications(notifications);
 
@@ -152,6 +160,10 @@ export class ExpoNotificationService implements NotificationService {
         createdAt: new Date(),
       },
     ];
+
+    if (await this.transaction.checkLike(like)) {
+      return notifications;
+    }
 
     const insertedNotification = await this.transaction.insertNotifications(notifications);
 
