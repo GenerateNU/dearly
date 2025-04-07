@@ -104,9 +104,8 @@ describe("Notification server test", () => {
 
     // assert that there are 3 new notifications inserted into notification table
     await assertNotificationLength(FULL_SNAPPER_POST_EXAMPLE.userId, 3);
-
-    // Stone did not receive notification since he's the poster
     const tokens = [MAI_DEVICE_TOKEN, NUBS_DEVICE_TOKEN, JOSH_DEVICE_TOKEN];
+    // Stone did not receive notification since he's the poster
     await sendPushNotificationCalled(
       1,
       tokens.map((token) => ({
@@ -153,7 +152,6 @@ describe("Notification server test", () => {
 
     // only send notification to Nubs and Josh without Mai
     const tokens = [NUBS_DEVICE_TOKEN, JOSH_DEVICE_TOKEN];
-
     await sendPushNotificationCalled(
       1,
       tokens.map((token) => ({

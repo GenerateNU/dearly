@@ -84,9 +84,15 @@ export class ExpoNotificationService implements NotificationService {
       createdAt: new Date(),
     }));
 
+    if (await this.transaction.checkPost(post)) {
+      return notifications;
+    }
+
     const insertedNotification = await this.transaction.insertNotifications(notifications);
 
-    await this.expoService.sendPushNotifications({ deviceTokens, message, data: post });
+    if (insertedNotification.length == notifications.length) {
+      await this.expoService.sendPushNotifications({ deviceTokens, message, data: post });
+    }
 
     return insertedNotification;
   }
@@ -100,7 +106,7 @@ export class ExpoNotificationService implements NotificationService {
 
     const message = this.formatMessage(username, groupName, NotificationType.COMMENT);
 
-    const notification: Notification[] = [
+    const notifications: Notification[] = [
       {
         actorId: comment.userId,
         receiverId: userId,
@@ -115,13 +121,19 @@ export class ExpoNotificationService implements NotificationService {
       },
     ];
 
-    const insertedNotification = await this.transaction.insertNotifications(notification);
+    if (await this.transaction.checkComment(comment)) {
+      return notifications;
+    }
+
+    const insertedNotification = await this.transaction.insertNotifications(notifications);
 
     if (isEnabled === false) {
       return insertedNotification;
     }
 
-    await this.expoService.sendPushNotifications({ deviceTokens, message, data: comment });
+    if (insertedNotification.length == notifications.length) {
+      await this.expoService.sendPushNotifications({ deviceTokens, message, data: comment });
+    }
 
     return insertedNotification;
   }
@@ -135,7 +147,7 @@ export class ExpoNotificationService implements NotificationService {
 
     const message = this.formatMessage(username, groupName, NotificationType.LIKE);
 
-    const notification: Notification[] = [
+    const notifications: Notification[] = [
       {
         actorId: like.userId,
         receiverId: userId,
@@ -149,13 +161,19 @@ export class ExpoNotificationService implements NotificationService {
       },
     ];
 
-    const insertedNotification = await this.transaction.insertNotifications(notification);
+    if (await this.transaction.checkLike(like)) {
+      return notifications;
+    }
+
+    const insertedNotification = await this.transaction.insertNotifications(notifications);
 
     if (isEnabled === false) {
       return insertedNotification;
     }
 
-    await this.expoService.sendPushNotifications({ deviceTokens, message, data: like });
+    if (insertedNotification.length == notifications.length) {
+      await this.expoService.sendPushNotifications({ deviceTokens, message, data: like });
+    }
 
     return insertedNotification;
   }
