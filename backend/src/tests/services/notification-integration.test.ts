@@ -22,6 +22,7 @@ import {
   usersTable,
 } from "../../entities/schema";
 import {
+  DEARLY_COMMENT_ID,
   DEARLY_GROUP,
   DEARLY_GROUP_ID,
   MAI_DEVICE_TOKEN,
@@ -37,6 +38,8 @@ import {
 } from "../helpers/test-constants";
 import { CreateGroupPayload } from "../../types/api/internal/groups";
 import { Post } from "../../types/api/internal/posts";
+import { Comment } from "../../types/api/internal/comments";
+import { Like } from "../../types/api/internal/like";
 
 describe("Notification server test", () => {
   const config = getConfigurations();
@@ -149,5 +152,28 @@ describe("Notification server test", () => {
     await notificationService.notifyPost(post);
     await notificationService.notifyPost(post);
     expect(countNotifications!.count).toBe(2);
+
+    const comment: Comment = {
+      id: DEARLY_COMMENT_ID,
+      userId: USER_MAI_ID,
+      createdAt: new Date(),
+      postId: POST_ID,
+      content: "Look at da fishes!",
+      voiceMemo: null,
+    };
+    await notificationService.notifyComment(comment);
+    [countNotifications] = await db.select({ count: count() }).from(notificationsTable);
+    expect(countNotifications!.count).toBe(4);
+
+    const like: Like = {
+      id: DEARLY_COMMENT_ID,
+      userId: USER_MAI_ID,
+      createdAt: new Date(),
+      postId: POST_ID,
+    };
+    await notificationService.notifyLike(like);
+    [countNotifications] = await db.select({ count: count() }).from(notificationsTable);
+    // Only the owner should be alerted of their like so only 1 extra notification is added.
+    expect(countNotifications!.count).toBe(5);
   });
 });

@@ -119,7 +119,6 @@ export class ExpoNotificationService implements NotificationService {
 
     const insertedNotification = await this.transaction.insertNotifications(notifications);
 
-    // Early return only if there are conflicts (This does not account for if some notifications are accounted for.)
     if (isEnabled === false) {
       return insertedNotification;
     }
