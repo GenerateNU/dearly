@@ -6,7 +6,6 @@ import {
   chunkPushNotificationsSpy,
   expo,
   sendPushNotificationsAsyncSpy,
-  startTestApp,
 } from "../helpers/test-app";
 import { automigrateDB } from "../../database/migrate";
 import { ExpoNotificationService } from "../../services/notification/service";
@@ -14,10 +13,21 @@ import { NotificationTransactionImpl } from "../../services/notification/transac
 import { ExpoPushService } from "../../services/notification/expo";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { count, eq } from "drizzle-orm";
-import { groupsTable, membersTable, usersTable } from "../../entities/schema";
+import {
+  devicesTable,
+  groupsTable,
+  membersTable,
+  notificationsTable,
+  postsTable,
+  usersTable,
+} from "../../entities/schema";
 import {
   DEARLY_GROUP,
   DEARLY_GROUP_ID,
+  MAI_DEVICE_TOKEN,
+  MOCK_EXPO_TOKEN,
+  NUBS_DEVICE_TOKEN,
+  POST_ID,
   USER_ALICE,
   USER_ALICE_ID,
   USER_MAI,
@@ -26,14 +36,12 @@ import {
   USER_STONE_ID,
 } from "../helpers/test-constants";
 import { CreateGroupPayload } from "../../types/api/internal/groups";
-import { Hono } from "hono";
+import { Post } from "../../types/api/internal/posts";
 
 describe("Notification server test", () => {
   const config = getConfigurations();
   const db = connectDB(config);
   const transaction = new NotificationTransactionImpl(db);
-  let app: Hono;
-
   const notificationService = new ExpoNotificationService(
     new SupabaseClient("supabase_url", "supabase_key"),
     transaction,
@@ -42,7 +50,6 @@ describe("Notification server test", () => {
 
   beforeAll(async () => {
     await automigrateDB(db, config);
-    app = await startTestApp();
   });
 
   beforeEach(async () => {
@@ -53,11 +60,11 @@ describe("Notification server test", () => {
 
   it("A complete integration test of notifications, from user registration, group creation, to creating a post, comment, and like, and receiving notifications.", async () => {
     // Arrange:
-    const twoPeople = [USER_MAI, USER_STONE, USER_ALICE];
-    // Add two people into the database
-    await db.insert(usersTable).values(twoPeople);
+    const threePeople = [USER_MAI, USER_STONE, USER_ALICE];
+    // Add three people into the database
+    await db.insert(usersTable).values(threePeople);
     const [countUsers] = await db.select({ count: count() }).from(usersTable);
-    // Assert that there are exactly two people in the database
+    // Assert that there are exactly three people in the database
     expect(countUsers!.count).toBe(3);
     // Add a group
     const oneGroup: CreateGroupPayload[] = [DEARLY_GROUP];
@@ -88,5 +95,54 @@ describe("Notification server test", () => {
       .from(membersTable)
       .where(eq(membersTable.groupId, DEARLY_GROUP_ID));
     expect(countMembers!.count).toBe(3);
+    // CONTEXT PROVIDED, LETS TEST WHAT HAPPENS TO THE NOTIFICATIONS
+    // Assert that the notification table is currently empty
+    let [countNotifications] = await db.select({ count: count() }).from(notificationsTable);
+    expect(countNotifications!.count).toBe(0);
+
+    const post: Post = {
+      userId: USER_ALICE_ID,
+      groupId: DEARLY_GROUP_ID,
+      id: POST_ID,
+      createdAt: new Date(-1),
+      caption: "my first post",
+      location: "Your Moms house.",
+    };
+
+    await db.insert(postsTable).values(post);
+    // TEST CASE 1: User Alice makes a single post
+    // Assert that the post was indeed recored in the table
+    const [countPostFromDearlyGroup] = await db
+      .select({ count: count() })
+      .from(postsTable)
+      .where(eq(postsTable.groupId, DEARLY_GROUP_ID));
+    expect(countPostFromDearlyGroup!.count).toBe(1);
+
+    // Add the correct device tokens
+    await db.insert(devicesTable).values([
+      {
+        token: MOCK_EXPO_TOKEN,
+        userId: USER_ALICE_ID,
+      },
+      {
+        token: MAI_DEVICE_TOKEN,
+        userId: USER_MAI_ID,
+      },
+      {
+        token: NUBS_DEVICE_TOKEN,
+        userId: USER_STONE_ID,
+      },
+    ]);
+
+    const [countDeviceTokens] = await db.select({ count: count() }).from(devicesTable);
+    expect(countDeviceTokens!.count).toBe(3);
+    // now we notify them of the posts
+    await notificationService.notifyPost(post);
+    [countNotifications] = await db.select({ count: count() }).from(notificationsTable);
+    expect(countNotifications!.count).toBe(2);
+    // What happens when we call again? To simulate supabase calling the callback multiple times.
+    await notificationService.notifyPost(post);
+    [countNotifications] = await db.select({ count: count() }).from(notificationsTable);
+    expect(countNotifications!.count).toBe(2);
   });
 });
