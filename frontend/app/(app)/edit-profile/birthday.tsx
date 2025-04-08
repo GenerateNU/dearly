@@ -13,20 +13,22 @@ import { useRef } from "react";
 import SelectBirthdayPopup from "@/app/(auth)/components/birthday-popup";
 import Input from "@/design-system/components/shared/controls/input";
 import { formatBirthday } from "@/utilities/birthday";
+import { useIsBasicMode } from "@/hooks/component/mode";
 
 type UPDATE_USER_FORM_TYPE = z.infer<typeof UPDATE_BIRTHDAY_FORM>;
 
-export default function Layout() {
+const EditBirthday = () => {
   const { userId } = useUserStore();
   const { data, error: userError } = useUser(userId!);
   const birthdayRef = useRef<BottomSheet>(null);
+  const basic = useIsBasicMode();
 
   const { mutateAsync: uploadUserData, error, isPending } = usePatchUser(userId!);
 
   const onSubmit = async (form: UPDATE_USER_FORM_TYPE) => {
     try {
       await uploadUserData(form);
-      router.push("/(app)/edit-profile");
+      router.back();
     } catch (err) {
       console.error("Failed to update birthday", err);
     }
@@ -54,16 +56,20 @@ export default function Layout() {
   });
 
   return (
-    <Box width="100%" paddingTop="xxl" padding="m" flex={1} gap="l" alignItems="center">
-      <Box paddingTop="xxl" width="100%" gap="s">
-        <Text variant="body">Birthday</Text>
-      </Box>
-      <Box width="100%">
+    <Box
+      width="100%"
+      marginTop={basic ? "m" : "xxl"}
+      paddingHorizontal="m"
+      flex={1}
+      gap="m"
+      alignItems="center"
+    >
+      <Box width="100%" paddingTop={!basic ? "xxl" : undefined}>
         <Input
+          title={`${basic ? "EDIT" : ""} BIRTHDAY`}
           isButton
           onPress={() => birthdayRef.current?.snapToIndex(0)}
           value={formatBirthday(watchedBirthday)}
-          title="BIRTHDAY"
         />
       </Box>
 
@@ -78,12 +84,14 @@ export default function Layout() {
         </Text>
       )}
 
-      <TextButton
-        disabled={isPending}
-        onPress={handleSubmit(onSubmit)}
-        label="Save"
-        variant="primary"
-      />
+      <Box width="30%">
+        <TextButton
+          disabled={isPending}
+          onPress={handleSubmit(onSubmit)}
+          label="Save"
+          variant="primary"
+        />
+      </Box>
 
       <SelectBirthdayPopup
         setBirthday={(birthday: Date) => setValue("birthday", birthday)}
@@ -92,4 +100,6 @@ export default function Layout() {
       />
     </Box>
   );
-}
+};
+
+export default EditBirthday;

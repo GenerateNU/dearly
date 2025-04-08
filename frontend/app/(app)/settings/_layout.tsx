@@ -1,5 +1,5 @@
+import { Stack } from "expo-router";
 import { BackIcon } from "@/design-system/components/shared/icons/back-icon";
-import { router, Stack } from "expo-router";
 
 const Layout = () => {
   return (
@@ -11,7 +11,7 @@ const Layout = () => {
           headerTitle: "",
           headerTransparent: true,
           gestureEnabled: false,
-          headerLeft: () => <BackIcon onPress={() => router.navigate("/(app)/(tabs)")} />,
+          headerLeft: () => <BackIcon />,
         }}
       />
     </Stack>

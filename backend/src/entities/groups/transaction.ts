@@ -72,7 +72,6 @@ export class GroupTransactionImpl implements GroupTransaction {
       .select(getPostMetadata(userId))
       .from(postsTable)
       .innerJoin(mediaTable, eq(mediaTable.postId, postsTable.id))
-      // extra check to return nothing if user is not a member of group
       .innerJoin(
         membersTable,
         and(eq(membersTable.groupId, groupId), eq(membersTable.userId, userId)),
@@ -100,7 +99,6 @@ export class GroupTransactionImpl implements GroupTransaction {
         usersTable.name,
         usersTable.username,
       )
-      // most recent to less recent
       .orderBy(desc(postsTable.createdAt))
       .limit(limit)
       .offset((page - 1) * limit);

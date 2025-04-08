@@ -31,7 +31,7 @@ export const audioBarHeights = (numLines: number, audioLevels: number[]): number
 export const condenseAudioBarHeights = (
   numLines: number,
   audioLevels: number[],
-  max: number = 160,
+  max = 160,
 ): number[] => {
   if (audioLevels.length <= numLines) {
     return normalizeLines(audioLevels, 0, audioLevels.length);
@@ -70,4 +70,28 @@ const normalizeLines = (
     newLines.push(scaledNum);
   }
   return newLines;
+};
+
+export const normalizeLinesWithScale = (audioLevels: number[]): number[] => {
+  const num = Math.abs(Math.min(...audioLevels)) + 3;
+  const flippedArray = audioLevels.map((element) => num - Math.abs(element));
+  const min = Math.min(...flippedArray);
+  const max = Math.max(...flippedArray);
+  const newLines: number[] = [];
+  for (let i = 0; i < flippedArray.length; i++) {
+    let scaledNum = scaleValue(flippedArray[i] || 3, min, max, 0, 25);
+    scaledNum = scaledNum > 3 ? scaledNum : 3;
+    newLines.push(scaledNum);
+  }
+  return newLines;
+};
+
+const scaleValue = (
+  value: number,
+  oldMin: number,
+  oldMax: number,
+  min: number,
+  max: number,
+): number => {
+  return ((value - oldMin) / (oldMax - oldMin)) * (max - min) + min;
 };

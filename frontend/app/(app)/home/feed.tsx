@@ -15,21 +15,22 @@ import { EmptyFeed } from "@/design-system/components/posts/empty-feed";
 import { PostSkeleton } from "@/design-system/components/posts/post-skeleton";
 import { CommentLikesPopup } from "@/design-system/components/posts/comment-like-popup";
 import { PostWithComment } from "@/design-system/components/posts/post-with-comment";
+import { router } from "expo-router";
+import { useIsBasicMode } from "@/hooks/component/mode";
 
 interface FeedProps {
   date?: string;
-  popup?: boolean;
   commentRef?: React.RefObject<BottomSheetMethods>;
   likeRef?: React.RefObject<BottomSheetMethods>;
 }
 
 const Feed: React.FC<FeedProps> = ({
   date,
-  popup = true,
   commentRef = useRef<BottomSheet>(null),
   likeRef = useRef<BottomSheet>(null),
 }) => {
   const { group } = useUserStore();
+  const isBasic = useIsBasicMode();
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage, isLoading, refetch } = useGroupFeed(
     group?.id as string,
     date,
@@ -59,12 +60,20 @@ const Feed: React.FC<FeedProps> = ({
 
   const onClickComment = (id: string, caption: string, likes: number) => {
     setCommentAttributes({ commentId: id, caption: caption, likes: likes });
-    commentRef.current?.snapToIndex(0);
+    if (!isBasic) {
+      commentRef.current?.snapToIndex(0);
+    } else {
+      router.push("/(app)/comment");
+    }
   };
 
   const onClickLikes = useCallback((postId: string) => {
     setLikePostId(postId);
-    likeRef.current?.snapToIndex(0);
+    if (!isBasic) {
+      likeRef.current?.snapToIndex(0);
+    } else {
+      router.push("/(app)/likes");
+    }
   }, []);
 
   const renderFooter = () => {
@@ -95,7 +104,7 @@ const Feed: React.FC<FeedProps> = ({
 
   if (isLoading) {
     return (
-      <Box flex={1} paddingHorizontal="m">
+      <Box width="100%" style={{ minHeight: 420 }} flex={1} paddingHorizontal="m">
         <PostSkeleton />
       </Box>
     );
@@ -103,8 +112,15 @@ const Feed: React.FC<FeedProps> = ({
 
   if (posts.length === 0) {
     return (
-      <Box flex={1} padding="m">
-        <EmptyFeed />
+      <Box
+        width="100%"
+        flex={1}
+        justifyContent="center"
+        alignItems="center"
+        paddingHorizontal="m"
+        style={{ minHeight: 420 }}
+      >
+        <EmptyFeed displayText={date ? false : true} />
       </Box>
     );
   }
@@ -154,7 +170,7 @@ const Feed: React.FC<FeedProps> = ({
           }
         />
       </Box>
-      {popup && <CommentLikesPopup commentRef={commentRef} likeRef={likeRef} />}
+      {!isBasic && <CommentLikesPopup commentRef={commentRef} likeRef={likeRef} />}
     </Box>
   );
 };

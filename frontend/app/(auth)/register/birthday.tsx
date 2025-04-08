@@ -18,7 +18,24 @@ const Birthday = () => {
 
   const createProfile = async () => {
     setIsCreatingProfile(true);
-    await register(user);
+
+    const processedBirthday = user.birthday
+      ? new Date(
+          Date.UTC(
+            user.birthday.getFullYear(),
+            user.birthday.getMonth(),
+            user.birthday.getDate(),
+            12,
+            0,
+            0,
+          ),
+        )
+      : null;
+
+    await register({
+      ...user,
+      birthday: processedBirthday,
+    });
 
     if (error) return;
 

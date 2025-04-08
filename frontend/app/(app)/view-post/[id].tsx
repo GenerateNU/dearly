@@ -4,13 +4,14 @@ import { CommentLikesPopup } from "@/design-system/components/posts/comment-like
 import { PostWithComment } from "@/design-system/components/posts/post-with-comment";
 import { usePost } from "@/hooks/api/post";
 import BottomSheet from "@gorhom/bottom-sheet";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useRef, useMemo, useState } from "react";
 import { PostSkeleton } from "@/design-system/components/posts/post-skeleton";
 import ResourceView from "@/design-system/components/utilities/resource-view";
 import { Post } from "@/types/post";
 import ErrorDisplay from "@/design-system/components/shared/states/error";
 import { Keyboard, StyleSheet, View } from "react-native";
+import { useIsBasicMode } from "@/hooks/component/mode";
 
 const ViewPost = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -24,18 +25,25 @@ const ViewPost = () => {
   const [isCommentOpen, setIsCommentOpen] = useState(false);
   const [isLikeOpen, setIsLikeOpen] = useState(false);
 
+  const isBasic = useIsBasicMode();
+
   const onClickLikes = useCallback(
     (postId: string) => {
       if (!postId) return;
 
       setLikePostId(postId);
-      setIsLikeOpen(true);
 
-      Keyboard.dismiss();
+      if (isBasic) {
+        router.push("/(app)/likes");
+      } else {
+        setIsLikeOpen(true);
 
-      setTimeout(() => {
-        likeRef.current?.snapToIndex(0);
-      }, 100);
+        Keyboard.dismiss();
+
+        setTimeout(() => {
+          likeRef.current?.snapToIndex(0);
+        }, 100);
+      }
     },
     [setLikePostId],
   );
@@ -45,15 +53,20 @@ const ViewPost = () => {
       if (!id) return;
 
       setCommentAttributes({ commentId: id, caption: caption, likes: likes });
-      setIsCommentOpen(true);
 
-      // Make sure keyboard is dismissed before opening sheet
-      Keyboard.dismiss();
+      if (isBasic) {
+        router.push("/(app)/comment");
+      } else {
+        setIsCommentOpen(true);
 
-      // Slight delay to ensure keyboard is fully dismissed
-      setTimeout(() => {
-        commentRef.current?.snapToIndex(0);
-      }, 100);
+        // Make sure keyboard is dismissed before opening sheet
+        Keyboard.dismiss();
+
+        // Slight delay to ensure keyboard is fully dismissed
+        setTimeout(() => {
+          commentRef.current?.snapToIndex(0);
+        }, 100);
+      }
     },
     [setCommentAttributes],
   );
@@ -101,7 +114,13 @@ const ViewPost = () => {
       </Box>
 
       <View style={styles.popupContainer} pointerEvents="box-none">
-        <CommentLikesPopup offset={0} commentRef={commentRef} likeRef={likeRef} />
+        <CommentLikesPopup
+          offset={180}
+          commentRef={commentRef}
+          likeRef={likeRef}
+          bottomPadding={20}
+          snapPoints={["80%"]}
+        />
       </View>
     </View>
   );

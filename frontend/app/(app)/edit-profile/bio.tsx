@@ -8,17 +8,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { usePatchUser, useUser } from "@/hooks/api/user";
 import { useUserStore } from "@/auth/store";
 import Input from "@/design-system/components/shared/controls/input";
-import { Text } from "@/design-system/base/text";
+import { useIsBasicMode } from "@/hooks/component/mode";
 
 type UPDATE_USER_FORM_TYPE = z.infer<typeof UPDATE_BIO_FORM>;
 
-export default function Layout() {
+const EditBio = () => {
   const { userId } = useUserStore();
   const { mutateAsync: uploadUserData, error, isPending } = usePatchUser(userId!);
+  const basic = useIsBasicMode();
 
   const onSubmit = async (form: UPDATE_USER_FORM_TYPE) => {
     await uploadUserData(form);
-    router.push("/(app)/edit-profile");
+    router.back();
   };
 
   const { data, error: userError } = useUser(userId!);
@@ -29,22 +30,28 @@ export default function Layout() {
   });
 
   return (
-    <Box width="100%" className="mt-[20%]" padding="m" flex={1} gap="l" alignItems="center">
-      <Box width="100%" gap="s">
-        <Text variant="body">Bio</Text>
-      </Box>
+    <Box
+      width="100%"
+      marginTop={basic ? "m" : "xxl"}
+      paddingHorizontal="m"
+      flex={1}
+      gap="m"
+      alignItems="center"
+    >
       <Controller
         name="bio"
         control={control}
         render={() => (
-          <Box width={"100%"}>
+          <Box width={"100%"} paddingTop={!basic ? "xxl" : undefined}>
             <Input
+              title={`${basic ? "EDIT" : ""} BIO`}
               paragraph
               placeholder="Enter your bio"
               value={getValues("bio")}
               onChangeText={(str) => {
                 setValue("bio", str);
               }}
+              maxLength={100}
               error={error || userError ? "Failed to fetch your bio." : undefined}
             />
           </Box>
@@ -58,4 +65,6 @@ export default function Layout() {
       />
     </Box>
   );
-}
+};
+
+export default EditBio;

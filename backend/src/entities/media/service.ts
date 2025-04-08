@@ -289,7 +289,7 @@ export class MediaServiceImpl {
     );
   }
 
-  getDBData(media: string, interval = 500): Promise<WaveForm> {
+  getDBData(media: string, numSegments = 40): Promise<WaveForm> {
     return new Promise((resolve, reject) => {
       let length = 0;
       ffmpeg.ffprobe(media, (err: Error, metadata: FfprobeData) => {
@@ -302,15 +302,15 @@ export class MediaServiceImpl {
         }
 
         length = metadata.format.duration;
-        const segments = Math.floor((length * 1000) / interval);
-        const dbData: number[] = new Array(segments).fill(0); // Preallocate array
+        const segmentDuration = length / numSegments;
+        const dbData: number[] = new Array(numSegments).fill(0);
         let completedSegments = 0;
-        for (let i = 0; i < segments; i++) {
-          const timestamp = (i * length) / 1000;
 
+        for (let i = 0; i < numSegments; i++) {
+          const timestamp = i * segmentDuration;
           ffmpeg(media)
             .setStartTime(timestamp)
-            .setDuration(length / 1000)
+            .setDuration(segmentDuration)
             .audioFilters("volumedetect")
             .format("null")
             .output("/dev/null")
@@ -327,9 +327,10 @@ export class MediaServiceImpl {
             })
             .on("end", () => {
               completedSegments++;
-              if (completedSegments === segments) {
+              if (completedSegments === numSegments) {
+                length = Math.ceil(length);
                 resolve({
-                  length: Math.round(length),
+                  length: length,
                   data: dbData,
                 });
               }

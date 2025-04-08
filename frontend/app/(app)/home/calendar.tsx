@@ -359,9 +359,6 @@ const Calendar: React.FC = () => {
             current={currentDate}
             hideExtraDays={true}
             onDayPress={handleDayPress}
-            style={{
-              marginBottom: 100,
-            }}
           />
           {isFetchingPrevious && <LoadingComponent />}
         </>

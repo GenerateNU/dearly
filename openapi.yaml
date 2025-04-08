@@ -3160,22 +3160,21 @@ paths:
                 $ref: "#/components/schemas/Error"
 
   /api/v1/media/processing:
-    post:
+    get:
         tags:
           - Media Endpoint
         summary: Returns an array of db levels to use in pre-processing
         description: Allow users to get the db levels from an audio message
         security:
           - BearerAuth: []
-        requestBody:
-          application/json:
-              schema:
-                type: object
-                properties:
-                  url:
-                    type: string
-                    format: url
-                    example: "https://example.com/thumbnail.jpg"
+            parameters:
+              - name: url
+                in: query
+                description: The url to process from
+                required: true
+                schema:
+                  type: string
+                  example: "https://s3.com"
         responses:
           200:
             description: Successfully retrieve object key and type

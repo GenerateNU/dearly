@@ -23,7 +23,11 @@ const Layout = () => {
   };
 
   const onSettingPressed = () => {
-    settingRef.current?.snapToIndex(0);
+    if (isBasic) {
+      router.navigate("/(app)/settings");
+    } else {
+      settingRef.current?.snapToIndex(0);
+    }
   };
 
   return (

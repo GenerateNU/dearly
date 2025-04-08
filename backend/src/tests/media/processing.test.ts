@@ -7,14 +7,10 @@ import { HTTPRequest, Status } from "../../constants/http";
 import { resolve } from "node:path";
 const PROJECT_ROOT = resolve(__dirname, "../..");
 
-describe("POST /media/processing", () => {
+describe("GET /media/processing", () => {
   let app: Hono;
   const testBuilder = new TestBuilder();
   const ALICE_JWT = generateJWTFromID(USER_ALICE_ID);
-
-  const goodRequestBody = {
-    url: PROJECT_ROOT + "/tests/test-assets/test_audio_2.m4a",
-  };
 
   beforeAll(async () => {
     app = await startTestApp();
@@ -24,19 +20,19 @@ describe("POST /media/processing", () => {
     (
       await testBuilder.request({
         app,
-        type: HTTPRequest.POST,
+        type: HTTPRequest.GET,
         route: `/api/v1/media/processing`,
-        requestBody: {
-          ...goodRequestBody,
-        },
         autoAuthorized: false,
+        queryParams: {
+          url: PROJECT_ROOT + "/tests/test-assets/test_audio_2.m4a",
+        },
         headers: {
           Authorization: `Bearer ${ALICE_JWT}`,
         },
       })
     )
       .assertStatusCode(Status.OK)
-      .assertField("length", 5)
+      .assertField("length", 6)
       .assertArrayFieldExists("data");
   });
 });
