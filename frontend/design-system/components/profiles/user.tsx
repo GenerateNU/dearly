@@ -8,12 +8,12 @@ import ErrorDisplay from "@/design-system/components/shared/states/error";
 import { useUser } from "@/hooks/api/user";
 import { useMemberPost } from "@/hooks/api/post";
 import { useUserStore } from "@/auth/store";
-import UserInfo from "@/app/(app)/(tabs)/profile/components/userInfo";
 import { EmptyFeed } from "@/design-system/components/posts/empty-feed";
 import EmptyDataDisplay from "@/design-system/components/shared/states/empty";
 import { Photo } from "../posts/photo";
 import { Dimensions } from "react-native";
 import { EmptyHomePage } from "../home/empty";
+import { Profile } from "./profile";
 
 export const User = ({ id }: { id: string }) => {
   const {
@@ -55,13 +55,15 @@ export const User = ({ id }: { id: string }) => {
         justifyContent="center"
         width="100%"
       >
-        <UserInfo
-          username={userData?.username!}
-          name={userData?.name ? userData.name : ""}
-          profilePhoto={userData?.profilePhoto ? userData.profilePhoto : ""}
-          bio={userData?.bio ? userData.bio : ""}
-          birthday={userData?.birthday ? userData.birthday : undefined}
-        />
+        <Box width="100%" maxWidth="100%">
+          <Profile
+            username={userData?.username ? userData.username : ""}
+            name={userData?.name ? userData.name : ""}
+            profilePhoto={userData?.profilePhoto ? userData.profilePhoto : ""}
+            bio={userData?.bio ? userData.bio : ""}
+            birthday={userData?.birthday ? userData.birthday : null}
+          />
+        </Box>
         {group && (
           <Text paddingBottom="s" variant="bodyLargeBold">
             Posts
