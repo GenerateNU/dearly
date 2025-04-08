@@ -155,7 +155,7 @@ export class SupabaseAuth implements AuthService {
   }
 
   async forgotPassword({ email }: { email: string }): Promise<void> {
-    const redirectTo = Linking.createURL(`(auth)/reset-password`);
+    const redirectTo = Linking.createURL(`(auth)/login/reset-password`);
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo,
