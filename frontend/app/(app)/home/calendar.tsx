@@ -288,7 +288,7 @@ const Calendar: React.FC = () => {
           }}
         >
           <Box paddingHorizontal="m">
-            <BackIcon text={formattedDate} onPress={() => setViewMode("month")} />
+            <BackIcon required text={formattedDate} onPress={() => setViewMode("month")} />
           </Box>
           <Box marginVertical="xxs">
             <WeekCalendar
@@ -381,14 +381,6 @@ const styles = StyleSheet.create({
   yearText: {
     fontSize: 18,
     fontWeight: "600",
-  },
-  backButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 8,
   },
 });
 

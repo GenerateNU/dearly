@@ -29,7 +29,7 @@ interface CommentPopUpDataProps {
 }
 
 export const CommentPopUp = forwardRef<BottomSheetMethods, CommentPopUpProps>(
-  ({ attributes, offset = 260, snapPoints = ["90%"], bottomPadding = 70 }, ref) => {
+  ({ attributes, offset = 265, snapPoints = ["90%"], bottomPadding = 80 }, ref) => {
     const [index, setIndex] = useState<number>(-1);
     return (
       <>
@@ -55,7 +55,7 @@ export const CommentPopUp = forwardRef<BottomSheetMethods, CommentPopUpProps>(
                 zIndex: 10,
               }}
             >
-              <Box backgroundColor="white" padding="s">
+              <Box backgroundColor="white" paddingTop="xs" paddingHorizontal="s" paddingBottom="s">
                 <CommentInput postID={attributes.commentId} />
               </Box>
             </KeyboardAvoidingView>

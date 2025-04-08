@@ -131,6 +131,7 @@ export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
           gap="s"
           width={status.done ? "70%" : "80%"}
           height={50}
+          justifyContent="center"
           borderRadius="l"
           flexDirection="row"
           alignContent="center"
