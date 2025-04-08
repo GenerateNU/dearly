@@ -15,7 +15,6 @@ import { EmptyFeed } from "@/design-system/components/posts/empty-feed";
 import { PostSkeleton } from "@/design-system/components/posts/post-skeleton";
 import { CommentLikesPopup } from "@/design-system/components/posts/comment-like-popup";
 import { PostWithComment } from "@/design-system/components/posts/post-with-comment";
-import { Mode } from "@/types/mode";
 import { router } from "expo-router";
 import { useIsBasicMode } from "@/hooks/component/mode";
 
@@ -30,8 +29,8 @@ const Feed: React.FC<FeedProps> = ({
   commentRef = useRef<BottomSheet>(null),
   likeRef = useRef<BottomSheet>(null),
 }) => {
-  const { group} = useUserStore();
-  const isBasic = useIsBasicMode()
+  const { group } = useUserStore();
+  const isBasic = useIsBasicMode();
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage, isLoading, refetch } = useGroupFeed(
     group?.id as string,
     date,

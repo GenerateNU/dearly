@@ -1,10 +1,6 @@
 import { authWrapper, getHeaders } from "@/utilities/auth-token";
 import fetchClient from "./client";
-import {
-  UploadGroupMediaResponse,
-  UploadUserMediaResponse,
-  Waveform,
-} from "@/types/media";
+import { UploadGroupMediaResponse, UploadUserMediaResponse, Waveform } from "@/types/media";
 
 export const uploadPostMedia = async (
   id: string,

@@ -12,8 +12,9 @@ import { KeyboardAvoidingView, Platform } from "react-native";
 
 export const CommentPage = () => {
   const { commentAttributes } = useFeedContext();
-  const { data, isFetchingNextPage, fetchNextPage, hasNextPage} =
-    useComments(commentAttributes.commentId);
+  const { data, isFetchingNextPage, fetchNextPage, hasNextPage } = useComments(
+    commentAttributes.commentId,
+  );
   const comments = data?.pages.flatMap((page: any) => page) || [];
 
   const onEndReached = () => {

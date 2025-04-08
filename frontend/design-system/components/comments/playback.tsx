@@ -42,7 +42,7 @@ export const Playback: React.FC<PlaybackProps> = ({
   const numLines = 23;
   const [totalLength, setTotalLength] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
-  const { data, isLoading, isPending} = useProcessAudio(id || "", location);
+  const { data, isLoading, isPending } = useProcessAudio(id || "", location);
 
   useEffect(() => {
     async function initializeValues() {

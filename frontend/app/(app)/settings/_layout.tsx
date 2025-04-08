@@ -1,4 +1,4 @@
-import { Stack, router } from "expo-router";
+import { Stack } from "expo-router";
 import { BackIcon } from "@/design-system/components/shared/icons/back-icon";
 
 const Layout = () => {

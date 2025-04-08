@@ -9,7 +9,6 @@ import ErrorDisplay from "@/design-system/components/shared/states/error";
 import ResourceView from "@/design-system/components/utilities/resource-view";
 import { useGetAllLikeUsers } from "@/hooks/api/like";
 import { SearchedUser } from "@/types/user";
-import React, { useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList } from "react-native-gesture-handler";
 

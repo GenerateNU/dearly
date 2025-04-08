@@ -68,13 +68,6 @@ export class GroupTransactionImpl implements GroupTransaction {
   }: FeedParamPayload): Promise<PostWithMedia[]> {
     await this.checkMembership(groupId, userId);
 
-    let dateCondition;
-
-    if (date) {
-      const formattedDate = `'${date.toISOString()}'`;
-      dateCondition = sql`DATE(${postsTable.createdAt}) = DATE(${sql.raw(formattedDate)})`;
-    }
-
     return await this.db
       .select(getPostMetadata(userId))
       .from(postsTable)

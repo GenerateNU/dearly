@@ -1,7 +1,7 @@
-import { UploadGroupMediaResponse} from "@/types/media";
-import { useMutationBase} from "./base";
+import { UploadGroupMediaResponse } from "@/types/media";
+import { useMutationBase } from "./base";
 import { processMedia, uploadPostMedia } from "@/api/media";
-import { useQuery} from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 /**
  * Hook to upload group media
  *
