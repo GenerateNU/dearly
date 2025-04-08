@@ -4,13 +4,13 @@ import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
 import { IconButton } from "../shared/buttons/icon-button";
 import { formatSeconds } from "@/utilities/time";
-import { condenseAudioBarHeights, normalizeLinesWithScale } from "@/utilities/audio";
+import { condenseAudioBarHeights } from "@/utilities/audio";
 import { playbackStates } from "@/types/comment";
 import * as FileSystem from "expo-file-system";
 import { useProcessAudio } from "@/hooks/api/media";
 
 interface PlaybackPropsWhenLocal {
-  id?: string;
+  id: string;
   local: true; // is the audio message being stored locally or in s3
   dbLevels: number[];
   audioLength: number;
@@ -41,8 +41,7 @@ export const Playback: React.FC<PlaybackProps> = ({
   const [memoLines, setMemoLines] = useState<number[]>([]);
   const numLines = 23;
   const [totalLength, setTotalLength] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(false);
-  const { data, isLoading, isPending } = useProcessAudio(id || "", location);
+  const { mutateAsync: processAudio } = useProcessAudio();
 
   useEffect(() => {
     async function initializeValues() {
@@ -58,35 +57,22 @@ export const Playback: React.FC<PlaybackProps> = ({
         );
         const localUri = downloadResult.uri;
         setUri(localUri);
+        const response = await processAudio({ url: location });
+
+        if (!response.length || !response.data) return;
+
+        setLength(response.length);
+        setTotalLength(response.length);
+        setMemoLines(condenseAudioBarHeights(25, response.data, 91));
       }
     }
     initializeValues();
   }, []);
 
   useEffect(() => {
-    return () => {
-      FileSystem.deleteAsync(uri, { idempotent: true }).catch();
-      if (sound) {
-        sound.unloadAsync();
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    setLoading((isLoading || isPending) && !local);
-  }, [isLoading, isPending]);
-
-  useEffect(() => {
-    if (data) {
-      setLength(data.length);
-      setTotalLength(data.length);
-      setMemoLines(normalizeLinesWithScale(data.data));
-    }
-  }, [data]);
-
-  useEffect(() => {
     return sound
       ? () => {
+          FileSystem.deleteAsync(uri, { idempotent: true }).catch();
           sound.unloadAsync();
         }
       : undefined;
@@ -101,7 +87,7 @@ export const Playback: React.FC<PlaybackProps> = ({
       await Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
       const { sound } = await Audio.Sound.createAsync({ uri: local ? location : uri });
       sound.setOnPlaybackStatusUpdate(onPlayingUpdate);
-      sound.setProgressUpdateIntervalAsync(25);
+      sound.setProgressUpdateIntervalAsync(500);
       setSound(sound);
       await sound.playAsync();
     }
@@ -119,9 +105,10 @@ export const Playback: React.FC<PlaybackProps> = ({
           (statusPlayback.durationMillis || 0) / 1000 - statusPlayback.positionMillis / 1000,
         );
       else {
-        setLength(totalLength);
+        setLength(statusPlayback.durationMillis! / 1000);
         setStatus({ ...status, playing: false });
       }
+    } else {
     }
   };
   return (
@@ -156,12 +143,11 @@ export const Playback: React.FC<PlaybackProps> = ({
             height={item}
             width={2}
             backgroundColor={
-              index < (memoLines.length / totalLength) * (totalLength - length) ? "honey" : "ink"
+              index < (memoLines.length / totalLength) * (totalLength - length) ? "ink" : "darkGray"
             }
             borderRadius="l"
           ></Box>
         ))}
-        {loading && <Text variant="body"> loading ... </Text>}
       </Box>
     </Box>
   );

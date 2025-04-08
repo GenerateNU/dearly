@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode } from "react";
 import { TextInput, TextInputProps, TouchableOpacity } from "react-native";
 
 import { BoxProps, createBox, useTheme } from "@shopify/restyle";
@@ -39,7 +39,7 @@ const Input: React.FC<TextboxProps> = ({
   readOnly = false,
   inputMode = "text",
   onChangeText,
-  value = "",
+  value,
   maxLength,
   secureTextEntry = false,
   leftIcon,
@@ -52,19 +52,11 @@ const Input: React.FC<TextboxProps> = ({
   onPressOut,
 }) => {
   const theme = useTheme<Theme>();
-  const [currentLength, setCurrentLength] = useState(value.length);
-
-  const handleTextChange = (text: string) => {
-    setCurrentLength(text.length);
-    if (onChangeText) {
-      onChangeText(text);
-    }
-  };
 
   return (
-    <Box marginVertical="xs">
+    <Box>
       {title && (
-        <Text variant="captionBold" paddingBottom="s">
+        <Text variant="caption" paddingBottom="s">
           {title}
         </Text>
       )}
@@ -97,18 +89,14 @@ const Input: React.FC<TextboxProps> = ({
               ) : (
                 <BaseTextInput
                   onPressOut={onPressOut}
-                  textContentType={secureTextEntry ? "oneTimeCode" : undefined}
-                  autoCorrect={false}
-                  autoCapitalize="none"
                   onPressIn={onPressIn}
-                  autoComplete={secureTextEntry ? "off" : undefined}
                   placeholder={placeholder}
                   autoFocus={autoFocus}
                   onBlur={onBlur}
                   readOnly={readOnly}
                   inputMode={inputMode}
                   placeholderTextColor="#5B4E4C"
-                  onChangeText={handleTextChange}
+                  onChangeText={onChangeText}
                   value={value}
                   maxLength={maxLength}
                   secureTextEntry={secureTextEntry}
@@ -128,14 +116,6 @@ const Input: React.FC<TextboxProps> = ({
           {rightIcon && <Box paddingLeft="xs">{rightIcon}</Box>}
         </Box>
       </TouchableOpacity>
-
-      {maxLength && (
-        <Box paddingTop="xs" flexDirection="row" justifyContent="flex-end">
-          <Text variant="caption" color="slate">
-            {currentLength}/{maxLength}
-          </Text>
-        </Box>
-      )}
 
       {error && (
         <Box paddingTop="xs" flexDirection="row" alignItems="center">

@@ -20,8 +20,6 @@ import { EmptyCommentDisplay } from "./empty-comments";
 interface CommentPopUpProps {
   attributes: commentPopUpAttributes;
   offset?: number;
-  snapPoints?: string[];
-  bottomPadding?: number;
 }
 
 interface CommentPopUpDataProps {
@@ -30,13 +28,13 @@ interface CommentPopUpDataProps {
 }
 
 export const CommentPopUp = forwardRef<BottomSheetMethods, CommentPopUpProps>(
-  ({ attributes, offset = 260, snapPoints = ["90%"], bottomPadding = 70 }, ref) => {
+  ({ attributes, offset = 169 }, ref) => {
     const [index, setIndex] = useState<number>(-1);
     return (
       <>
         <BottomSheetModal
           ref={ref}
-          snapPoints={snapPoints}
+          snapPoints={["85%"]}
           onChange={(index: number) => setIndex(index)}
         >
           {attributes.commentId === "" ? (
@@ -44,24 +42,24 @@ export const CommentPopUp = forwardRef<BottomSheetMethods, CommentPopUpProps>(
           ) : (
             <CommentPopUpData attributes={attributes} index={index} />
           )}
-          {index !== -1 && (
-            <KeyboardAvoidingView
-              behavior="padding"
-              keyboardVerticalOffset={Platform.OS === "ios" ? offset : 0}
-              style={{
-                position: "absolute",
-                bottom: bottomPadding,
-                left: 0,
-                right: 0,
-                zIndex: 10,
-              }}
-            >
-              <Box backgroundColor="white" padding="s">
-                <CommentInput postID={attributes.commentId} />
-              </Box>
-            </KeyboardAvoidingView>
-          )}
         </BottomSheetModal>
+        {index !== -1 && (
+          <KeyboardAvoidingView
+            behavior="padding"
+            keyboardVerticalOffset={Platform.OS === "ios" ? offset : 0}
+            style={{
+              position: "absolute",
+              bottom: offset,
+              left: 0,
+              right: 0,
+              zIndex: 10,
+            }}
+          >
+            <Box backgroundColor="white" padding="s">
+              <CommentInput postID={attributes.commentId} />
+            </Box>
+          </KeyboardAvoidingView>
+        )}
       </>
     );
   },
@@ -76,7 +74,7 @@ const CommentPopUpData: React.FC<CommentPopUpDataProps> = ({ attributes, index }
   ref.current?.focus();
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage, isLoading, error, refetch } =
     useComments(attributes.commentId);
-  const comments = data?.pages.flatMap((page: any) => page) || [];
+  const comments = data?.pages.flatMap((page) => page) || [];
 
   const onEndReached = () => {
     if (hasNextPage && !isFetchingNextPage) {
@@ -114,16 +112,14 @@ const CommentPopUpData: React.FC<CommentPopUpDataProps> = ({ attributes, index }
     return (
       <Box position="relative" paddingHorizontal="m" height={"100%"} width={"100%"}>
         <Box flexDirection="column" gap="s">
-          {attributes.caption && (
-            <Box width="90%" flexDirection="row" gap="s" alignItems="center">
-              <Text>💬</Text>
-              <Text>{attributes.caption}</Text>
-            </Box>
-          )}
+          <Box width="90%" flexDirection="row" gap="s" alignItems="center">
+            <Text>💬</Text>
+            <Text>{attributes.caption}</Text>
+          </Box>
           <Box flexDirection="row" gap="xs" alignItems="center">
             <Text variant="bodyBold">{attributes.likes + " likes"}</Text>
             <Box height={4} width={4} backgroundColor="ink" borderRadius="xl" />
-            <Text variant="bodyBold"> {comments.length + " reactions"} </Text>
+            <Text variant="bodyBold"> {comments.length + " comments"} </Text>
           </Box>
           <Box borderRadius="xl" backgroundColor="slate" height={1}></Box>
         </Box>

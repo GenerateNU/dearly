@@ -23,7 +23,7 @@ export const CommentLike: React.FC<CommentLikeProps> = ({
     <>
       <Box gap="m" flexDirection="row" alignItems="center">
         <BaseButton variant="text" onPress={onCommentClicked}>
-          <Icon label={`${comments} REACTIONS`} name="chat-outline" color="ink" />
+          <Icon label={`${comments} COMMENTS`} name="chat-outline" color="ink" />
         </BaseButton>
         <BaseButton variant="text" onPress={onLikeClicked}>
           <Icon
