@@ -1,8 +1,7 @@
 import { Box } from "@/design-system/base/box";
 import { Text } from "@/design-system/base/text";
-import { PageButton } from "@/design-system/components/shared/buttons/page-button";
+import SettingContent from "@/design-system/components/shared/settings/setting";
 import { useIsBasicMode } from "@/hooks/component/mode";
-import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export const SettingsPage = () => {
@@ -20,16 +19,7 @@ export const SettingsPage = () => {
         gap="m"
       >
         <Text variant={isBasic ? "h2" : "bodyLargeBold"}>Settings</Text>
-        <PageButton onPress={() => router.navigate("/(app)/edit-profile")} label="Edit Profile" />
-        <PageButton
-          onPress={() => router.navigate("/(app)/notification/config")}
-          label="Notifications"
-        />
-        <PageButton onPress={() => router.navigate("/(app)/group/member")} label="View Group" />
-        <PageButton
-          onPress={() => router.navigate("/(app)/user/mode")}
-          label={`Switch to ${isBasic ? "Advanced" : "Basic"}`}
-        />
+        <SettingContent />
       </Box>
     </SafeAreaView>
   );
