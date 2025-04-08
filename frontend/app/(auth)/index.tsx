@@ -1,5 +1,7 @@
 import { Box } from "@/design-system/base/box";
 import Illustration from "@/assets/splash-screen-illustration.svg";
+import Logo from "@/assets/logo.svg";
+import Connection from "@/assets/connection.svg";
 import { Text } from "@/design-system/base/text";
 import Carousel, { ICarouselInstance } from "react-native-reanimated-carousel";
 import { useRef, useState, useEffect } from "react";
@@ -25,10 +27,24 @@ const Welcome = () => {
   const carouselRef = useRef<ICarouselInstance>(null);
   const { loginWithBiometrics } = useUserStore();
 
-  const renderItem = ({ item }: { item: SplashScreenContent }) => (
+  const renderIllustration = (index: number) => {
+    switch (index) {
+      case 0:
+        return <Logo height={300} width="95%" />;
+      case 1:
+      case 2:
+        return <Illustration width="95%" />;
+      case 3:
+        return <Connection width="95%" />;
+      default:
+        return null;
+    }
+  };
+
+  const renderItem = ({ item, index }: { item: SplashScreenContent; index: number }) => (
     <AnimatedBox entering={FadeIn.duration(1000).delay(300)}>
       <Box alignContent="center" justifyContent="flex-start" alignItems="flex-start" gap="m">
-        <Illustration width="95%" />
+        {renderIllustration(index)}
         <Box gap="xs" width="95%">
           <Text variant="bodyLargeBold">{item.header}</Text>
           <Text variant="body">{item.caption}</Text>
