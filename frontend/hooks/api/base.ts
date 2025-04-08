@@ -28,6 +28,7 @@ export const useQueryBase = <T>(
   });
 };
 
+
 /**
  * Custom hook for paginated queries.
  *

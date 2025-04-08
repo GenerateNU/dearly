@@ -105,12 +105,12 @@ export class MediaControllerImpl implements MediaController {
 
   async getDBData(ctx: Context): Promise<Waveform> {
     const getDBImpl = async () => {
-      const dataProcessing = processURLValidate.parse(await ctx.req.json());
-      const url = dataProcessing["url"];
-      if (!url) {
+      const { url } = ctx.req.query();
+      const urlParsed = processURLValidate.parse(url)
+      if (!urlParsed) {
         throw new BadRequestError("Invalid Url");
       }
-      const response = await this.mediaService.getDBData(url);
+      const response = await this.mediaService.getDBData(urlParsed);
       return ctx.json(response, Status.OK);
     };
     return await handleAppError(getDBImpl)(ctx);

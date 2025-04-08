@@ -37,11 +37,11 @@ export const uploadUserMedia = async (payload: FormData): Promise<UploadUserMedi
   return authWrapper<UploadUserMediaResponse>()(req);
 };
 
-export const processMedia = async (payload: processMediaPayload): Promise<Waveform> => {
+export const processMedia = async (url: string): Promise<Waveform> => {
   const req = async (token: string): Promise<Waveform> => {
-    const { data } = await fetchClient.POST("/api/v1/media/processing", {
+    const { data } = await fetchClient.GET("/api/v1/media/processing", {
       headers: getHeaders(token),
-      body: payload,
+      params: {query : {url: url}}
     });
     return data!;
   };

@@ -1,7 +1,7 @@
 import { UploadGroupMediaResponse, Waveform, processMediaPayload } from "@/types/media";
-import { useMutationBase } from "./base";
+import { useMutationBase, useQueryBase } from "./base";
 import { processMedia, uploadPostMedia } from "@/api/media";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 /**
  * Hook to upload group media
  *
@@ -14,9 +14,9 @@ export const useUploadGroupMedia = (id: string) => {
   );
 };
 
-export const useProcessAudio = (id: string) => {
-  return useMutationBase<processMediaPayload, Waveform>(
-    (payload: processMediaPayload) => processMedia(payload),
-    ["media", "processing", id],
-  );
+export const useProcessAudio = (id: string, url: string) => {
+  return useQuery({
+    queryKey: ["media", "processing", id],
+    queryFn: () => processMedia(url)
+  })
 };

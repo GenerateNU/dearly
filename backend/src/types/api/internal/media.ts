@@ -21,6 +21,4 @@ export type WaveForm = {
   data: number[];
 };
 
-export const processURLValidate = z.object({
-  url: z.string(),
-});
+export const processURLValidate = z.string();
