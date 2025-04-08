@@ -103,7 +103,7 @@ export const Playback: React.FC<PlaybackProps> = ({
       await Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
       const { sound } = await Audio.Sound.createAsync({ uri: local ? location : uri });
       sound.setOnPlaybackStatusUpdate(onPlayingUpdate);
-      sound.setProgressUpdateIntervalAsync(500);
+      sound.setProgressUpdateIntervalAsync(25);
       setSound(sound);
       await sound.playAsync();
     }
@@ -121,10 +121,9 @@ export const Playback: React.FC<PlaybackProps> = ({
           (statusPlayback.durationMillis || 0) / 1000 - statusPlayback.positionMillis / 1000,
         );
       else {
-        setLength(statusPlayback.durationMillis! / 1000);
+        setLength(totalLength)
         setStatus({ ...status, playing: false });
       }
-    } else {
     }
   };
   return (
@@ -159,7 +158,7 @@ export const Playback: React.FC<PlaybackProps> = ({
             height={item}
             width={2}
             backgroundColor={
-              index < (memoLines.length / totalLength) * (totalLength - length) ? "ink" : "darkGray"
+              index < (memoLines.length / totalLength) * (totalLength - length) ? "honey" : "ink"
             }
             borderRadius="l"
           ></Box>
