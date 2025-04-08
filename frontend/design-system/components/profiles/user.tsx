@@ -13,6 +13,7 @@ import { EmptyFeed } from "@/design-system/components/posts/empty-feed";
 import EmptyDataDisplay from "@/design-system/components/shared/states/empty";
 import { Photo } from "../posts/photo";
 import { Dimensions } from "react-native";
+import { EmptyHomePage } from "../home/empty";
 
 export const User = ({ id }: { id: string }) => {
   const {
@@ -61,9 +62,11 @@ export const User = ({ id }: { id: string }) => {
           bio={userData?.bio ? userData.bio : ""}
           birthday={userData?.birthday ? userData.birthday : undefined}
         />
-        <Text paddingBottom="s" variant="bodyLargeBold">
-          Posts
-        </Text>
+        {group && (
+          <Text paddingBottom="s" variant="bodyLargeBold">
+            Posts
+          </Text>
+        )}
       </Box>
     );
   };
@@ -71,6 +74,21 @@ export const User = ({ id }: { id: string }) => {
   const EmptyListComponent = () => {
     return <Box>{userId === id ? <EmptyFeed /> : <EmptyDataDisplay />}</Box>;
   };
+
+  const NoGroupComponent = () => {
+    return (
+      <Box width="100%" flex={1} paddingHorizontal="m" paddingTop="m">
+        <ListHeaderComponent />
+        <Box flex={1} marginTop="l">
+          <EmptyHomePage />
+        </Box>
+      </Box>
+    );
+  };
+
+  if (!group) {
+    return <NoGroupComponent />;
+  }
 
   const SuccessComponent = () => {
     return (
