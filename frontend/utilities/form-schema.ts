@@ -45,8 +45,8 @@ export const UPDATE_USERNAME_FORM = z.object({
 });
 
 export const UPDATE_BIO_FORM = z.object({
-  bio: z.string().max(500, {
-    message: "Caption must be at most 500 characters",
+  bio: z.string().max(100, {
+    message: "Bio cannot exceed 100 characters",
   }),
 });
 
