@@ -198,6 +198,7 @@ const PostCreationForm = ({ groups, isLoading, onEndReached }: PostCreationFormP
                 value={value}
                 placeholder="Add a caption"
                 error={errors.caption && errors.caption.message}
+                maxLength={500}
               />
             )}
           />

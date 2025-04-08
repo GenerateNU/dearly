@@ -10,6 +10,7 @@ import { useRemoveMemberContext } from "@/contexts/remove-member";
 import { useManualNudge } from "@/hooks/api/member";
 import { useUserStore } from "@/auth/store";
 import { Alert, Pressable } from "react-native";
+import { router } from "expo-router";
 
 interface MemberProps extends GroupMember {
   managerView: boolean;
@@ -62,7 +63,7 @@ const ViewGroupProfile: React.FC<MemberProps> = ({
 
   return (
     <Box flexDirection="row" justifyContent="space-between">
-      <Pressable onPress={removeMemberPressed}>
+      <Pressable onPress={() => router.push(`/user/${id}`)}>
         <Box gap="m" flexDirection="row" alignItems="center" justifyContent="flex-start">
           <Box>
             <Avatar variant="small" profilePhoto={profile} />

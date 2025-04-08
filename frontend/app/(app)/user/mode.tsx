@@ -3,6 +3,7 @@ import SimplePage from "@/design-system/components/shared/simple-page";
 import { useUpdateUser } from "@/hooks/api/user";
 import { useIsBasicMode } from "@/hooks/component/mode";
 import { Mode } from "@/types/mode";
+import { router } from "expo-router";
 import { SafeAreaView } from "react-native";
 
 const SwitchMode = () => {
@@ -16,6 +17,7 @@ const SwitchMode = () => {
     const modeToSwitch = isBasic ? Mode.ADVANCED : Mode.BASIC;
     await mutateAsync({ mode: modeToSwitch });
     setMode(modeToSwitch);
+    router.navigate("/(app)/(tabs)");
   };
 
   const message = isBasic
