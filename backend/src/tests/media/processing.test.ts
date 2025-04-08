@@ -23,8 +23,8 @@ describe("GET /media/processing", () => {
         type: HTTPRequest.GET,
         route: `/api/v1/media/processing`,
         autoAuthorized: false,
-        queryParams:{
-          url: PROJECT_ROOT + "/tests/test-assets/test_audio_2.m4a"
+        queryParams: {
+          url: PROJECT_ROOT + "/tests/test-assets/test_audio_2.m4a",
         },
         headers: {
           Authorization: `Bearer ${ALICE_JWT}`,

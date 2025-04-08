@@ -17,6 +17,7 @@ import { CommentLikesPopup } from "@/design-system/components/posts/comment-like
 import { PostWithComment } from "@/design-system/components/posts/post-with-comment";
 import { Mode } from "@/types/mode";
 import { router } from "expo-router";
+import { useIsBasicMode } from "@/hooks/component/mode";
 
 interface FeedProps {
   date?: string;
@@ -29,7 +30,8 @@ const Feed: React.FC<FeedProps> = ({
   commentRef = useRef<BottomSheet>(null),
   likeRef = useRef<BottomSheet>(null),
 }) => {
-  const { group, mode } = useUserStore();
+  const { group} = useUserStore();
+  const isBasic = useIsBasicMode()
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage, isLoading, refetch } = useGroupFeed(
     group?.id as string,
     date,
@@ -59,7 +61,7 @@ const Feed: React.FC<FeedProps> = ({
 
   const onClickComment = (id: string, caption: string, likes: number) => {
     setCommentAttributes({ commentId: id, caption: caption, likes: likes });
-    if (mode == Mode.ADVANCED) {
+    if (!isBasic) {
       commentRef.current?.snapToIndex(0);
     } else {
       router.push("/(app)/comment");
@@ -68,7 +70,7 @@ const Feed: React.FC<FeedProps> = ({
 
   const onClickLikes = useCallback((postId: string) => {
     setLikePostId(postId);
-    if (mode == Mode.ADVANCED) {
+    if (!isBasic) {
       likeRef.current?.snapToIndex(0);
     } else {
       router.push("/(app)/likes");
@@ -169,7 +171,7 @@ const Feed: React.FC<FeedProps> = ({
           }
         />
       </Box>
-      {mode == Mode.ADVANCED && <CommentLikesPopup commentRef={commentRef} likeRef={likeRef} />}
+      {!isBasic && <CommentLikesPopup commentRef={commentRef} likeRef={likeRef} />}
     </Box>
   );
 };

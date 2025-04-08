@@ -7,8 +7,8 @@ interface CommentLikesPopupProps {
   commentRef: React.RefObject<BottomSheetMethods>;
   likeRef: React.RefObject<BottomSheetMethods>;
   offset?: number;
-  snapPoints?: string[]
-  bottomPadding?: number
+  snapPoints?: string[];
+  bottomPadding?: number;
 }
 
 export const CommentLikesPopup: React.FC<CommentLikesPopupProps> = ({
@@ -16,13 +16,19 @@ export const CommentLikesPopup: React.FC<CommentLikesPopupProps> = ({
   likeRef,
   offset,
   bottomPadding,
-  snapPoints
+  snapPoints,
 }) => {
   const { commentAttributes, likePostId } = useFeedContext();
 
   return (
     <>
-      <CommentPopUp offset={offset} ref={commentRef} attributes={commentAttributes}  bottomPadding={bottomPadding} snapPoints={snapPoints}/>
+      <CommentPopUp
+        offset={offset}
+        ref={commentRef}
+        attributes={commentAttributes}
+        bottomPadding={bottomPadding}
+        snapPoints={snapPoints}
+      />
       <LikePopup ref={likeRef} postId={likePostId} />
     </>
   );

@@ -4,7 +4,6 @@ import {
   UploadGroupMediaResponse,
   UploadUserMediaResponse,
   Waveform,
-  processMediaPayload,
 } from "@/types/media";
 
 export const uploadPostMedia = async (
@@ -41,7 +40,7 @@ export const processMedia = async (url: string): Promise<Waveform> => {
   const req = async (token: string): Promise<Waveform> => {
     const { data } = await fetchClient.GET("/api/v1/media/processing", {
       headers: getHeaders(token),
-      params: {query : {url: url}}
+      params: { query: { url: url } },
     });
     return data!;
   };

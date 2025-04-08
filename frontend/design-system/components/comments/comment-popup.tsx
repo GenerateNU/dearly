@@ -20,8 +20,8 @@ import { EmptyCommentDisplay } from "./empty-comments";
 interface CommentPopUpProps {
   attributes: commentPopUpAttributes;
   offset?: number;
-  snapPoints?: string[]
-  bottomPadding?: number
+  snapPoints?: string[];
+  bottomPadding?: number;
 }
 
 interface CommentPopUpDataProps {
@@ -30,7 +30,7 @@ interface CommentPopUpDataProps {
 }
 
 export const CommentPopUp = forwardRef<BottomSheetMethods, CommentPopUpProps>(
-  ({ attributes, offset = 260 , snapPoints = ["90%"], bottomPadding = 70}, ref) => {
+  ({ attributes, offset = 260, snapPoints = ["90%"], bottomPadding = 70 }, ref) => {
     const [index, setIndex] = useState<number>(-1);
     return (
       <>

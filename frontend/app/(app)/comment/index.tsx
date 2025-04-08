@@ -1,7 +1,5 @@
-import React from "react";
 import { CommentSkeleton } from "@/design-system/components/comments/comment-skeleton";
 import { useComments } from "@/hooks/api/post";
-import { commentPopUpAttributes } from "@/types/comment";
 import { Box } from "@/design-system/base/box";
 import { CommentCard } from "@/design-system/components/comments/comment";
 import { Comment } from "@/types/post";
@@ -14,7 +12,7 @@ import { KeyboardAvoidingView, Platform } from "react-native";
 
 export const CommentPage = () => {
   const { commentAttributes } = useFeedContext();
-  const { data, isFetchingNextPage, fetchNextPage, hasNextPage, isLoading, error, refetch } =
+  const { data, isFetchingNextPage, fetchNextPage, hasNextPage} =
     useComments(commentAttributes.commentId);
   const comments = data?.pages.flatMap((page: any) => page) || [];
 

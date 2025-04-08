@@ -7,7 +7,6 @@ import { formatSeconds } from "@/utilities/time";
 import { audioBarHeights, condenseAudioBarHeights } from "@/utilities/audio";
 import { Playback } from "./playback";
 import { recordingAttributes, recordingStatus } from "@/types/comment";
-import { Icon } from "../shared/icons/icon";
 import { useIsBasicMode } from "@/hooks/component/mode";
 
 interface RecordingProps {

@@ -42,7 +42,7 @@ export const Playback: React.FC<PlaybackProps> = ({
   const numLines = 23;
   const [totalLength, setTotalLength] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
-  const {data, isLoading, isPending, isError, error} = useProcessAudio(id || "", location);
+  const { data, isLoading, isPending} = useProcessAudio(id || "", location);
 
   useEffect(() => {
     async function initializeValues() {
@@ -72,18 +72,17 @@ export const Playback: React.FC<PlaybackProps> = ({
     };
   }, []);
 
-
   useEffect(() => {
-    setLoading(isLoading || isPending);
+    setLoading((isLoading || isPending) && !local);
   }, [isLoading, isPending]);
 
   useEffect(() => {
-    if(data){
+    if (data) {
       setLength(data.length);
       setTotalLength(data.length);
       setMemoLines(normalizeLinesWithScale(data.data));
     }
-  }, [data])
+  }, [data]);
 
   useEffect(() => {
     return sound
@@ -92,7 +91,6 @@ export const Playback: React.FC<PlaybackProps> = ({
         }
       : undefined;
   }, [sound]);
-
 
   async function playRecording() {
     if (status.pausing) {
@@ -121,7 +119,7 @@ export const Playback: React.FC<PlaybackProps> = ({
           (statusPlayback.durationMillis || 0) / 1000 - statusPlayback.positionMillis / 1000,
         );
       else {
-        setLength(totalLength)
+        setLength(totalLength);
         setStatus({ ...status, playing: false });
       }
     }

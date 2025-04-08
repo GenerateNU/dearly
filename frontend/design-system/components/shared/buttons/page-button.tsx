@@ -1,6 +1,4 @@
 import { Text } from "@/design-system/base/text";
-import { BaseButton } from "@/design-system/base/button";
-import { ButtonVariant } from "@/design-system/base/variants/button";
 import { FontVariant } from "@/design-system/base/config/font-family";
 import { ColorName } from "@/design-system/base/config/color";
 import { TouchableOpacity } from "react-native";

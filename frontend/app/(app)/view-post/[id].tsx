@@ -114,7 +114,13 @@ const ViewPost = () => {
       </Box>
 
       <View style={styles.popupContainer} pointerEvents="box-none">
-        <CommentLikesPopup offset={180} commentRef={commentRef} likeRef={likeRef}  bottomPadding={20} snapPoints={["80%"]}/>
+        <CommentLikesPopup
+          offset={180}
+          commentRef={commentRef}
+          likeRef={likeRef}
+          bottomPadding={20}
+          snapPoints={["80%"]}
+        />
       </View>
     </View>
   );
