@@ -11,7 +11,6 @@ import { CommentInput } from "@/app/(app)/home/comment-input";
 import { CommentSkeleton } from "./comment-skeleton";
 import { Text } from "@/design-system/base/text";
 import { commentPopUpAttributes } from "@/types/comment";
-import { SafeAreaView } from "react-native-safe-area-context";
 import ResourceView from "../utilities/resource-view";
 import Spinner from "../shared/spinner";
 import ErrorDisplay from "../shared/states/error";

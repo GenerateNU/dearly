@@ -7,7 +7,6 @@ import { Text } from "@/design-system/base/text";
 import { LikeCard } from "./like-card";
 import { SearchedUser } from "@/types/user";
 import { useGetAllLikeUsers } from "@/hooks/api/like";
-import { SafeAreaView } from "react-native-safe-area-context";
 import ResourceView from "../utilities/resource-view";
 import Spinner from "../shared/spinner";
 import ErrorDisplay from "../shared/states/error";
