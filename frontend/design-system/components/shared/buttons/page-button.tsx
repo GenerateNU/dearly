@@ -1,36 +1,25 @@
 import { Text } from "@/design-system/base/text";
 import { FontVariant } from "@/design-system/base/config/font-family";
-import { ColorName } from "@/design-system/base/config/color";
 import { TouchableOpacity } from "react-native";
-import { Box } from "@/design-system/base/box";
 import { Icon } from "../icons/icon";
+import { useIsBasicMode } from "@/hooks/component/mode";
 
 interface PageButtonProps {
   onPress: () => void;
   label: string;
-  disabled?: boolean;
   textVariant?: FontVariant;
-  colorVariant?: ColorName;
 }
 
-export const PageButton: React.FC<PageButtonProps> = ({
-  onPress,
-  label,
-  disabled = false,
-  textVariant = "h1",
-  colorVariant = "ink",
-}) => {
+export const PageButton: React.FC<PageButtonProps> = ({ onPress, label }) => {
+  const isBasic = useIsBasicMode();
+
   return (
-    <Box height={70} flexDirection="row" paddingHorizontal="s">
-      <TouchableOpacity
-        style={{ flexDirection: "row", alignItems: "center", width: "100%" }}
-        onPress={onPress}
-      >
-        <Text variant={textVariant}>{label}</Text>
-        <Box position="absolute" right={5}>
-          <Icon name="chevron-right"></Icon>
-        </Box>
-      </TouchableOpacity>
-    </Box>
+    <TouchableOpacity
+      style={{ justifyContent: "space-between", alignItems: "center", flexDirection: "row" }}
+      onPress={onPress}
+    >
+      <Text variant="bodyLargeBold">{label}</Text>
+      {isBasic && <Icon name="chevron-right" />}
+    </TouchableOpacity>
   );
 };

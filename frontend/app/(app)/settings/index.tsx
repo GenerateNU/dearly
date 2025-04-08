@@ -7,6 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export const SettingsPage = () => {
   const isBasic = useIsBasicMode();
+
   return (
     <SafeAreaView edges={["top"]} className="flex-1">
       <Box
@@ -16,12 +17,9 @@ export const SettingsPage = () => {
         width={"100%"}
         paddingTop="xl"
         flexDirection="column"
+        gap="m"
       >
-        <Text variant="h1" paddingBottom="m">
-          Settings
-        </Text>
-        <Box borderRadius="xl" backgroundColor="slate" height={1}></Box>
-
+        <Text variant={isBasic ? "h2" : "bodyLargeBold"}>Settings</Text>
         <PageButton onPress={() => router.navigate("/(app)/edit-profile")} label="Edit Profile" />
         <PageButton
           onPress={() => router.navigate("/(app)/notification/config")}
