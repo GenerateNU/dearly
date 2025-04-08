@@ -7,6 +7,7 @@ type NotificationData = {
   body?: string;
   data?: {
     postId?: string;
+    id?: string;
   };
 };
 
@@ -45,9 +46,15 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
     responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
       const data = response.notification.request.content.data;
       const postId = data?.postId;
+      const id = data?.id;
 
       if (postId) {
         router.push(`/(app)/view-post/${postId}`);
+        return;
+      }
+
+      if (id) {
+        router.push(`/(app)/view-post/${id}`);
       }
     });
 
