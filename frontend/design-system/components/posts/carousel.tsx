@@ -122,7 +122,7 @@ const ImageCarousel: React.FC<CarouselProps> = ({ data, initialPage = 0, like, s
   return (
     <Box gap="s" width="100%" justifyContent="center">
       <Box onLayout={handleLayout} className="w-full">
-        {containerWidth > 0 && (
+        {containerWidth > 0 ? (
           <>
             <Box position="absolute" zIndex={10} right={0} bottom={0} padding="m">
               <Heart onLike={handleLike} like={like} />
@@ -150,9 +150,11 @@ const ImageCarousel: React.FC<CarouselProps> = ({ data, initialPage = 0, like, s
               renderItem={renderItem}
             />
           </>
+        ) : (
+          <Box width="100%" aspectRatio={1} backgroundColor="gray" borderRadius="s" />
         )}
       </Box>
-      {data.length > 1 ? (
+      {containerWidth > 0 && data.length > 1 ? (
         <Box flexDirection="row" width="100%" justifyContent="center" alignItems="center">
           {data.map((_, index) => (
             <Box
@@ -165,9 +167,7 @@ const ImageCarousel: React.FC<CarouselProps> = ({ data, initialPage = 0, like, s
             />
           ))}
         </Box>
-      ) : (
-        <></>
-      )}
+      ) : null}
     </Box>
   );
 };
