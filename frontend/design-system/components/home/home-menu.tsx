@@ -19,7 +19,6 @@ const MenuTab = <T extends string>({
         paddingVertical="s"
         backgroundColor={isSelected ? "honey" : undefined}
         borderRadius="full"
-        margin="xxs"
       >
         <Text variant="body" color={isSelected ? "ink" : "gray"}>
           {label}
