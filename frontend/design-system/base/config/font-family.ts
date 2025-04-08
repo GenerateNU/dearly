@@ -1,51 +1,69 @@
-export const getFontConfig = (scaleRatio: number) => {
-  const config = {
+const FONT_SIZES = {
+  xsmall: 12,
+  small: 14,
+  medium: 16,
+  large: 18,
+  xlarge: 24,
+  xxlarge: 32,
+};
+
+const FONT_FAMILIES = {
+  regular: "Regular",
+  bold: "Bold",
+};
+
+export const getFontConfig = (scaleRatio: number = 1) => {
+  return {
     h1: {
-      fontSize: 28 * scaleRatio,
-      fontFamily: "Bold",
+      fontSize: FONT_SIZES.xxlarge * scaleRatio,
+      fontFamily: FONT_FAMILIES.bold,
     },
     h2: {
-      fontSize: 22 * scaleRatio,
-      fontFamily: "Bold",
-    },
-    bodyLargeBold: {
-      fontSize: 16 * scaleRatio,
-      fontFamily: "Bold",
+      fontSize: FONT_SIZES.xlarge * scaleRatio,
+      fontFamily: FONT_FAMILIES.bold,
     },
     bodyLarge: {
-      fontSize: 16 * scaleRatio,
-      fontFamily: "Regular",
+      fontSize: FONT_SIZES.large * scaleRatio,
+      fontFamily: FONT_FAMILIES.regular,
     },
-    button: {
-      fontSize: 16 * scaleRatio,
-      fontFamily: "Regular",
+    bodyLargeBold: {
+      fontSize: FONT_SIZES.large * scaleRatio,
+      fontFamily: FONT_FAMILIES.bold,
     },
     body: {
-      fontSize: 14 * scaleRatio,
-      fontFamily: "Regular",
+      fontSize: FONT_SIZES.medium * scaleRatio,
+      fontFamily: FONT_FAMILIES.regular,
     },
     bodyBold: {
-      fontSize: 14 * scaleRatio,
-      fontFamily: "Bold",
+      fontSize: FONT_SIZES.medium * scaleRatio,
+      fontFamily: FONT_FAMILIES.bold,
+    },
+    button: {
+      fontSize: FONT_SIZES.large * scaleRatio,
+      fontFamily: FONT_FAMILIES.regular,
     },
     caption: {
-      fontSize: 11 * scaleRatio,
-      fontFamily: "Regular",
+      fontSize: FONT_SIZES.small * scaleRatio,
+      fontFamily: FONT_FAMILIES.regular,
     },
     captionBold: {
-      fontSize: 11 * scaleRatio,
-      fontFamily: "Bold",
-    },
-    defaults: {
-      fontSize: 14 * scaleRatio,
-      fontFamily: "Regular",
+      fontSize: FONT_SIZES.small * scaleRatio,
+      fontFamily: FONT_FAMILIES.bold,
     },
     navbar: {
-      fontSize: 9 * scaleRatio,
-      fontFamily: "Regular",
+      fontSize: FONT_SIZES.xsmall * scaleRatio,
+      fontFamily: FONT_FAMILIES.regular,
+    },
+    defaults: {
+      fontSize: FONT_SIZES.medium * scaleRatio,
+      fontFamily: FONT_FAMILIES.regular,
     },
   };
-  return config;
 };
 
 export type FontVariant = Exclude<keyof ReturnType<typeof getFontConfig>, "defaults">;
+
+export const applyFont = (variant: FontVariant, scaleRatio: number = 1) => {
+  const config = getFontConfig(scaleRatio);
+  return config[variant];
+};

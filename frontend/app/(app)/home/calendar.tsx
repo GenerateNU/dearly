@@ -311,7 +311,7 @@ const Calendar: React.FC = () => {
             />
           </Box>
           <Box style={{ paddingBottom: 100 }}>
-            <Feed date={selectedDate} popup={false} commentRef={commentRef} likeRef={likeRef} />
+            <Feed date={selectedDate} commentRef={commentRef} likeRef={likeRef} />
           </Box>
           <CommentLikesPopup commentRef={commentRef} likeRef={likeRef} />
         </CalendarProvider>

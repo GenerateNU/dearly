@@ -11,7 +11,6 @@ import { CommentInput } from "@/app/(app)/home/comment-input";
 import { CommentSkeleton } from "./comment-skeleton";
 import { Text } from "@/design-system/base/text";
 import { commentPopUpAttributes } from "@/types/comment";
-import { SafeAreaView } from "react-native-safe-area-context";
 import ResourceView from "../utilities/resource-view";
 import Spinner from "../shared/spinner";
 import ErrorDisplay from "../shared/states/error";
@@ -145,21 +144,19 @@ const CommentPopUpData: React.FC<CommentPopUpDataProps> = ({ attributes, index }
   };
 
   return (
-    <SafeAreaView edges={["top"]} className="flex-1">
-      <Pressable onPress={Keyboard.dismiss}>
-        <ResourceView
-          resourceState={commentResources}
-          loadingComponent={
-            <Box flex={1} paddingTop="m" alignItems="center">
-              <Spinner />
-            </Box>
-          }
-          errorComponent={<ErrorDisplay refresh={refetch} />}
-          emptyComponent={<EmptyCommentDisplay caption={attributes.caption} />}
-          successComponent={<SuccessComponent />}
-        />
-      </Pressable>
-    </SafeAreaView>
+    <Pressable onPress={Keyboard.dismiss}>
+      <ResourceView
+        resourceState={commentResources}
+        loadingComponent={
+          <Box flex={1} paddingTop="m" alignItems="center">
+            <Spinner />
+          </Box>
+        }
+        errorComponent={<ErrorDisplay refresh={refetch} />}
+        emptyComponent={<EmptyCommentDisplay caption={attributes.caption} />}
+        successComponent={<SuccessComponent />}
+      />
+    </Pressable>
   );
 };
 

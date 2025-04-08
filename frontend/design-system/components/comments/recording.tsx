@@ -104,7 +104,7 @@ export const Recording: React.FC<RecordingProps> = ({ onClose, onSend }) => {
       flexDirection="row"
       justifyContent="center"
       alignItems="center"
-      height={50}
+      height={80}
       borderRadius="l"
     >
       {status.done && (

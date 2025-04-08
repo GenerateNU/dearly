@@ -2784,7 +2784,7 @@ paths:
           description: Timezone of device.
           required: false
           schema:
-            type: integer
+            type: string
             default: America/New_York
         - name: id
           in: path
@@ -3167,14 +3167,14 @@ paths:
         description: Allow users to get the db levels from an audio message
         security:
           - BearerAuth: []
-            parameters:
-              - name: url
-                in: query
-                description: The url to process from
-                required: true
-                schema:
-                  type: string
-                  example: "https://s3.com"
+        parameters:
+          - name: url
+            in: query
+            description: The url to process from
+            required: true
+            schema:
+              type: string
+              example: "https://s3.com"
         responses:
           200:
             description: Successfully retrieve object key and type
@@ -3202,6 +3202,5 @@ paths:
               application/json:
                 schema:
                   $ref: "#/components/schemas/Error"
-
 
 

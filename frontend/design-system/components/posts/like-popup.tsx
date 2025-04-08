@@ -7,7 +7,6 @@ import { Text } from "@/design-system/base/text";
 import { LikeCard } from "./like-card";
 import { SearchedUser } from "@/types/user";
 import { useGetAllLikeUsers } from "@/hooks/api/like";
-import { SafeAreaView } from "react-native-safe-area-context";
 import ResourceView from "../utilities/resource-view";
 import Spinner from "../shared/spinner";
 import ErrorDisplay from "../shared/states/error";
@@ -116,19 +115,17 @@ const LikePopUpData: React.FC<LikePopUpDataProps> = ({ postId, onEmptyChange }) 
   };
 
   return (
-    <SafeAreaView edges={["top"]} className="flex-1">
-      <ResourceView
-        resourceState={likeResources}
-        loadingComponent={
-          <Box flex={1} width="100%" paddingTop="m" alignItems="center">
-            <Spinner />
-          </Box>
-        }
-        errorComponent={<ErrorDisplay refresh={refetch} />}
-        emptyComponent={<EmptyLikesDisplay />}
-        successComponent={<SuccessComponent />}
-      />
-    </SafeAreaView>
+    <ResourceView
+      resourceState={likeResources}
+      loadingComponent={
+        <Box flex={1} width="100%" paddingTop="m" alignItems="center">
+          <Spinner />
+        </Box>
+      }
+      errorComponent={<ErrorDisplay refresh={refetch} />}
+      emptyComponent={<EmptyLikesDisplay />}
+      successComponent={<SuccessComponent />}
+    />
   );
 };
 
