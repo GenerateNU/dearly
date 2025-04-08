@@ -2,6 +2,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "@/design-system/base/text";
 import { Box } from "@/design-system/base/box";
 import SelectGroup from "@/design-system/components/shared/switch-group/select-group";
+import { ShadowLine } from "@/design-system/components/shared/shadow";
 
 const SwitchGroup = () => {
   return (
@@ -14,7 +15,9 @@ const SwitchGroup = () => {
         justifyContent="flex-start"
         alignItems="flex-start"
       >
-        <Text variant="bodyLargeBold">Switch Group</Text>
+        <Text paddingBottom="s" variant="h2">
+          Switch Group
+        </Text>
         <Box paddingTop="xs" width="100%">
           <SelectGroup />
         </Box>

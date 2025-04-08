@@ -9,7 +9,7 @@ import {
   mediaTable,
   notificationsTable,
 } from "../schema";
-import { eq, and, desc, or, sql } from "drizzle-orm";
+import { eq, and, desc, or, sql, inArray } from "drizzle-orm";
 import {
   ForbiddenError,
   InternalServerError,
@@ -146,24 +146,28 @@ export class MemberTransactionImpl implements MemberTransaction {
       .returning();
 
     // delete comment
-    const comments = tx.$with("comments").as(
-      tx
-        .select()
-        .from(commentsTable)
-        .innerJoin(postsTable, eq(postsTable.id, commentsTable.postId))
-        .where(and(eq(postsTable.groupId, groupId), eq(commentsTable.userId, userId))),
+    await tx.delete(commentsTable).where(
+      inArray(
+        commentsTable.id,
+        tx
+          .select({ id: commentsTable.id })
+          .from(commentsTable)
+          .innerJoin(postsTable, eq(postsTable.id, commentsTable.postId))
+          .where(and(eq(postsTable.groupId, groupId), eq(commentsTable.userId, userId))),
+      ),
     );
-    await tx.with(comments).delete(commentsTable);
 
     // delete like
-    const likes = tx.$with("likes").as(
-      tx
-        .select()
-        .from(likesTable)
-        .innerJoin(postsTable, eq(postsTable.id, likesTable.postId))
-        .where(and(eq(postsTable.groupId, groupId), eq(likesTable.userId, userId))),
+    await tx.delete(likesTable).where(
+      inArray(
+        likesTable.id,
+        tx
+          .select({ id: likesTable.id })
+          .from(likesTable)
+          .innerJoin(postsTable, eq(postsTable.id, likesTable.postId))
+          .where(and(eq(postsTable.groupId, groupId), eq(likesTable.userId, userId))),
+      ),
     );
-    await tx.with(likes).delete(likesTable);
 
     // delete notification
     await tx
