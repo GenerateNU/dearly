@@ -4,9 +4,16 @@ import { SafeAreaView } from "react-native";
 import { useUserStore } from "@/auth/store";
 import { router } from "expo-router";
 import BackNextButtons from "@/design-system/components/shared/buttons/back-next-buttons";
+import { useOnboarding } from "@/contexts/onboarding";
+import { useEffect } from "react";
 
 const JoinGroup = () => {
   const { finishOnboarding } = useUserStore();
+  const { setPage } = useOnboarding();
+
+  useEffect(() => {
+    setPage(4);
+  }, []);
 
   return (
     <SafeAreaView className="flex-1 mt-[25%]">

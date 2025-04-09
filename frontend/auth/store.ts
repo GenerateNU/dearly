@@ -152,6 +152,7 @@ export const useUserStore = create<UserState>()(
             birthday: data.birthday,
           });
           set({
+            mode: data.mode,
             isAuthenticated: true,
             userId: session.user.id,
             isPending: false,

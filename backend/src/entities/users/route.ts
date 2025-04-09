@@ -15,7 +15,6 @@ export const userRoutes = (db: PostgresJsDatabase, mediaService: MediaService): 
 
   user.get("/groups", (ctx) => userController.getGroups(ctx));
   user.route("/", notificationRoutes(db, mediaService));
-  user.get("/search", (ctx) => userController.searchByUsername(ctx));
   user.post("/", (ctx) => userController.createUser(ctx));
   user.get("/:id", (ctx) => userController.getUser(ctx));
   user.patch("/me", (ctx) => userController.updateUser(ctx));

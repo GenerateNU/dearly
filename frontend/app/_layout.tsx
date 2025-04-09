@@ -12,7 +12,7 @@ import { useFonts } from "expo-font";
 import { useAccessibility } from "@/hooks/component/accessibility";
 import { UserProvider } from "@/auth/provider";
 import { useUserStore } from "@/auth/store";
-import { OnboardingProvider } from "@/contexts/onboarding";
+import { OnboardingProvider, useOnboarding } from "@/contexts/onboarding";
 import { queryClient } from "@/auth/client";
 import { useVerifyInviteToken } from "@/hooks/api/group";
 import * as Linking from "expo-linking";
@@ -25,6 +25,7 @@ import { RemoveMemberProvider } from "@/contexts/remove-member";
 const InitialLayout = () => {
   const { isAuthenticated, clearError, completeOnboarding, setInviteToken, inviteToken } =
     useUserStore();
+  const { reset, setPage } = useOnboarding();
   const [showSplash, setShowSplash] = useState(true);
   const [isReady, setIsReady] = useState(false);
   const [deeplinkToken, setDeeplinkToken] = useState<string | undefined>(undefined);
@@ -106,6 +107,7 @@ const InitialLayout = () => {
 
   useEffect(() => {
     if (showSplash || !isReady) return;
+    reset();
 
     if (!isAuthenticated) {
       if (deeplinkToken) {
@@ -115,6 +117,7 @@ const InitialLayout = () => {
     }
 
     if (!completeOnboarding) {
+      setPage(4);
       return router.replace("/(auth)/group");
     }
 

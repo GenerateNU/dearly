@@ -2,7 +2,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "@/design-system/base/text";
 import { Box } from "@/design-system/base/box";
 import SelectGroup from "@/design-system/components/shared/switch-group/select-group";
-import { ShadowLine } from "@/design-system/components/shared/shadow";
 
 const SwitchGroup = () => {
   return (
