@@ -9,8 +9,6 @@ Behold the most chad Generate Project to ever Generate
 ![frontend-deployed](https://github.com/GenerateNU/dearly/actions/workflows/fe-deploy.yml/badge.svg)
 ![dependabot](https://img.shields.io/badge/dependencies-monitored-brightgreen)
 
-![Repo Beats](https://repobeats.axiom.co/api/embed/3e93568ac88a6144752bbc72a8964e63e2f470b7.svg "Repobeats analytics image")
-
 ## Project Required Dependencies
 
 ### [Nix](https://nixos.org), the all in one package manager

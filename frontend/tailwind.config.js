@@ -4,7 +4,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        proxima: ["ProximaNova-Regular", "ProximaNova-Bold"], // Add our font aliases here
+        proxima: ["ProximaNova-Regular", "ProximaNova-Bold"],
       },
     },
   },
